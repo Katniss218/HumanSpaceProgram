@@ -59,6 +59,16 @@ namespace HSP.Content.Vessels.Serialization
         /// </summary>
         public string Group { get; set; } = null;
 
+        /// <summary>
+        /// The version of the part file.
+        /// </summary>
+        public Version FileVersion { get; set; }
+
+        /// <summary>
+        /// The versions of all the mods used when the part file was created.
+        /// </summary>
+        public Dictionary<string, Version> ModVersions { get; set; } = new Dictionary<string, Version>();
+
         public PartMetadata( string path )
         {
             if( path.EndsWith( PART_METADATA_FILENAME ) )
@@ -152,9 +162,9 @@ namespace HSP.Content.Vessels.Serialization
                 .WithMember( "author", o => o.Author )
                 .WithMember( "categories", o => o.Categories )
                 .WithMember( "filter", o => o.Filter )
-                .WithMember( "group", o => o.Group );
-                // .WithMember( "file_version", o => o.FileVersion )
-                // .WithMember( "mod_versions", o => o.ModVersions )
+                .WithMember( "group", o => o.Group )
+                .WithMember( "file_version", o => o.FileVersion )
+                .WithMember( "mod_versions", o => o.ModVersions );
         }
     }
 }

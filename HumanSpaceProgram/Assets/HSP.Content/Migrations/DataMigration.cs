@@ -1,21 +1,24 @@
 ﻿using UnityPlus.Serialization;
 using Version = HSP.Content.Version;
 
-namespace HSP.Timelines
+namespace HSP.Content.Migrations
 {
-    public delegate void SaveMigrationFunc( ref SerializedData data );
+    public delegate void DataMigrationFunc( ref SerializedData data );
 
     /// <summary>
-    /// Represents a migration from a specific version to another specific version.
+    /// Represents a *data* migration from a specific version to another specific version.
     /// </summary>
-    public struct SaveMigration
+    /// <remarks>
+    /// Data migrations are intended to be used for "pure" (stateless) data transformations inside individual files, such as renaming fields, changing types, etc.
+    /// </remarks>
+    public struct DataMigration
     {
         public Version FromVersion { get; }
         public Version ToVersion { get; }
-        public SaveMigrationFunc MigrationFunc { get; }
+        public DataMigrationFunc MigrationFunc { get; }
         public string Description { get; }
 
-        public SaveMigration( Version fromVersion, Version toVersion, SaveMigrationFunc migrationFunc, string description = null )
+        public DataMigration( Version fromVersion, Version toVersion, DataMigrationFunc migrationFunc, string description = null )
         {
             this.FromVersion = fromVersion;
             this.ToVersion = toVersion;

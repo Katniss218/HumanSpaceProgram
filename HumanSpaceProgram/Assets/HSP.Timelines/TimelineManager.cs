@@ -1,4 +1,5 @@
 using HSP.Content;
+using HSP.Content.Migrations;
 using HSP.Content.Mods;
 using HSP.Time;
 using HSP.Timelines.Serialization;
@@ -446,7 +447,6 @@ namespace HSP.Timelines
                     continue;
                 }
 
-#warning TODO - use a separate 'save version' inside the mod json maybe?
                 if( !Version.AreCompatible( modVersion.Value, savedVersion ) )
                 {
                     return true;
@@ -463,7 +463,15 @@ namespace HSP.Timelines
         /// <param name="save">The save metadata to migrate</param>
         public static void MigrateSave( SaveMetadata save, bool force = false )
         {
-            MigrateSaveData( save.GetRootDirectory(), save.ModVersions, force );
+            try
+            {
+                MigrationRegistry.Migrate( save.GetRootDirectory(), save.ModVersions, HumanSpaceProgramModLoader.GetCurrentModVersions(), force );
+            }
+            catch( Exception ex )
+            {
+                Debug.LogError( $"Failed to migrate save `{save.TimelineID}/{save.SaveID}`: {ex.Message}" );
+                Debug.LogException( ex );
+            }
         }
 
         /// <summary>
@@ -472,31 +480,14 @@ namespace HSP.Timelines
         /// <param name="scenario">The scenario to migrate</param>
         public static void MigrateScenario( ScenarioMetadata scenario, bool force = false )
         {
-            MigrateSaveData( scenario.GetRootDirectory(), scenario.ModVersions, force );
-        }
-
-        /// <summary>
-        /// Migrates the contents of a save directory (save or scenario).
-        /// </summary>
-        private static void MigrateSaveData( string directory, Dictionary<string, Version> modVersions, bool force )
-        {
-            var currentVersions = HumanSpaceProgramModLoader.GetCurrentModVersions();
-
-#warning TODO - maybe use some sort of 'window' to view the files instead of operating on the file system directly? that way we have more control over the files.
-            // that same window could be used for the patches as it's basically equivalent to what I came up with for the addressing of different data files.
-            // that same window could also have more knowledge about other files, etc (cross-talk).
-
-
-            // Enumerate all data (json) files in the save directory, migrate, then save them back.
-            var files = Directory.GetFiles( directory, "*.json", SearchOption.AllDirectories );
-            foreach( var file in files )
+            try
             {
-                var handler = new JsonSerializedDataHandler( file );
-                var data = handler.Read();
-
-                SaveMigrationRegistry.Migrate( ref data, modVersions, currentVersions, force );
-
-                handler.Write( data );
+                MigrationRegistry.Migrate( scenario.GetRootDirectory(), scenario.ModVersions, HumanSpaceProgramModLoader.GetCurrentModVersions(), force );
+            }
+            catch( Exception ex )
+            {
+                Debug.LogError( $"Failed to migrate scenario `{scenario.ScenarioID}`: {ex.Message}" );
+                Debug.LogException( ex );
             }
         }
     }

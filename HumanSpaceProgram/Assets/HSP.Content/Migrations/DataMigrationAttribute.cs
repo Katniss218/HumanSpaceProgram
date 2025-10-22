@@ -1,6 +1,8 @@
 using System;
+using System.Reflection;
+using UnityPlus.Serialization;
 
-namespace HSP.Timelines
+namespace HSP.Content.Migrations
 {
     /// <summary>
     /// Specifies that a method should be used to migrate save data from one version to another. The data is modified in-place.
@@ -10,7 +12,7 @@ namespace HSP.Timelines
     /// The method will be called to migrate save data from the specified fromVersion to the toVersion.
     /// </remarks>
     [AttributeUsage( AttributeTargets.Method, AllowMultiple = false )]
-    public class SaveMigrationAttribute : Attribute
+    public class DataMigrationAttribute : Attribute
     {
         /// <summary>
         /// The ID of the mod this migration belongs to.
@@ -34,7 +36,25 @@ namespace HSP.Timelines
         /// </summary>
         public string Description { get; set; }
 
-        public SaveMigrationAttribute( string modId, string fromVersion, string toVersion )
+        public static bool IsValidMethodSignature( MethodInfo method )
+        {
+            if( !method.IsStatic )
+                return false;
+
+            ParameterInfo[] parameters = method.GetParameters();
+            if( parameters.Length != 1 )
+                return false;
+
+            if( parameters[0].ParameterType != typeof( SerializedData ).MakeByRefType() )
+                return false;
+
+            if( method.ReturnType != typeof( void ) )
+                return false;
+
+            return true;
+        }
+
+        public DataMigrationAttribute( string modId, string fromVersion, string toVersion )
         {
             if( string.IsNullOrEmpty( modId ) )
                 throw new ArgumentException( "ModID cannot be null or empty", nameof( modId ) );

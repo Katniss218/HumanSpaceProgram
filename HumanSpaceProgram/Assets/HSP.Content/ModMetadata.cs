@@ -22,17 +22,22 @@ namespace HSP.Content
         /// <summary>
         /// The unique ID of this mod. Must match the directory name in GameData.
         /// </summary>
-        public string ModID { get; set; }
+        public string ID { get; set; }
+
+        /// <summary>
+        /// The user-friendly display name of this mod.
+        /// </summary>
+        public string Name { get; set; }
+
+        /// <summary>
+        /// A user-friendly description of this mod.
+        /// </summary>
+        public string Description { get; set; }
 
         /// <summary>
         /// The current version of this mod.
         /// </summary>
-        public Version ModVersion { get; set; }
-
-        /// <summary>
-        /// The display name of this mod.
-        /// </summary>
-        public string Name { get; set; }
+        public Version Version { get; set; }
 
         /// <summary>
         /// The author(s) of this mod.
@@ -40,10 +45,19 @@ namespace HSP.Content
         public string Author { get; set; }
 
         /// <summary>
-        /// A description of this mod.
+        /// The license information for this mod.
         /// </summary>
-        public string Description { get; set; }
+        public string License { get; set; }
 
+        /// <summary>
+        /// The URL to the website about this mod, if applicable.
+        /// </summary>
+        public string Website { get; set; }
+
+        /// <summary>
+        /// Whether to exclude this mod from being saved in the save mods. <br/>
+        /// Setting this to true will make it so that saves created with this mod loaded will not warn after this mod has been uninstalled.
+        /// </summary>
         public bool ExcludeFromSaves { get; set; } = false;
 
         /// <summary>
@@ -75,9 +89,9 @@ namespace HSP.Content
 
             // Validate that ModID matches directory name.
             string expectedModId = Path.GetFileName( modDirectory );
-            if( metadata.ModID != expectedModId )
+            if( metadata.ID != expectedModId )
             {
-                throw new InvalidOperationException( $"Mod ID '{metadata.ModID}' does not match directory name '{expectedModId}'" );
+                throw new InvalidOperationException( $"Mod ID '{metadata.ID}' does not match directory name '{expectedModId}'" );
             }
 
             return metadata;
@@ -91,9 +105,9 @@ namespace HSP.Content
         {
             // Validate that ModID matches directory name.
             string expectedModId = Path.GetFileName( modDirectory );
-            if( this.ModID != expectedModId )
+            if( this.ID != expectedModId )
             {
-                throw new InvalidOperationException( $"Mod ID '{this.ModID}' does not match directory name '{expectedModId}'" );
+                throw new InvalidOperationException( $"Mod ID '{this.ID}' does not match directory name '{expectedModId}'" );
             }
 
             string filePath = Path.Combine( modDirectory, MOD_MANIFEST_FILENAME );
@@ -121,7 +135,7 @@ namespace HSP.Content
                     return false;
                 }
 
-                if( !dependency.IsSatisfiedBy( requiredMod.ModVersion ) )
+                if( !dependency.IsSatisfiedBy( requiredMod.Version ) )
                 {
                     return false;
                 }
@@ -153,7 +167,7 @@ namespace HSP.Content
                     continue;
                 }
 
-                if( !dependency.IsSatisfiedBy( requiredMod.ModVersion ) )
+                if( !dependency.IsSatisfiedBy( requiredMod.Version ) )
                 {
                     unsatisfied.Add( dependency );
                 }
@@ -166,11 +180,13 @@ namespace HSP.Content
         public static SerializationMapping ModMetadataMapping()
         {
             return new MemberwiseSerializationMapping<ModMetadata>()
-                .WithMember( "mod_id", o => o.ModID )
-                .WithMember( "version", o => o.ModVersion )
+                .WithMember( "mod_id", o => o.ID )
                 .WithMember( "name", o => o.Name )
-                .WithMember( "author", o => o.Author )
                 .WithMember( "description", o => o.Description )
+                .WithMember( "version", o => o.Version )
+                .WithMember( "author", o => o.Author )
+                .WithMember( "license", o => o.License )
+                .WithMember( "website", o => o.Website )
                 .WithMember( "exclude_from_saves", o => o.ExcludeFromSaves )
                 .WithMember( "dependencies", o => o.Dependencies );
         }

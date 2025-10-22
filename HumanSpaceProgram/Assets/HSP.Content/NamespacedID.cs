@@ -8,11 +8,21 @@ namespace HSP.Content
     /// An identifier that consists of a namespace (mod id) and a name (content id).
     /// </summary>
     [Serializable]
-    public struct NamespacedID
+    public struct NamespacedID : IEquatable<NamespacedID>
     {
-        const string SEPARATOR = "::";
+        /// <summary>
+        /// Separates the ModID and ContentID in a string representation.
+        /// </summary>
+        public const string SEPARATOR = "::";
 
+        /// <summary>
+        /// The first part of the ID, representing the mod that provides the content.
+        /// </summary>
         public string ModID { get; }
+
+        /// <summary>
+        /// The second part of the ID, representing the specific content provided by the mod.
+        /// </summary>
         public string ContentID { get; }
 
         public NamespacedID( string modId, string contentId )
@@ -30,39 +40,58 @@ namespace HSP.Content
             this.ContentID = contentId;
         }
 
-        public override int GetHashCode()
+        public readonly bool Equals( NamespacedID other )
+        {
+            return this == other;
+        }
+
+        public override readonly bool Equals( object obj )
+        {
+            if( obj is not NamespacedID id )
+            {
+                return false;
+            }
+            return this == id;
+        }
+
+        public override readonly int GetHashCode()
         {
             return HashCode.Combine( ModID.GetHashCode(), ContentID.GetHashCode() );
         }
 
-        public override bool Equals( object obj )
-        {
-            if( obj is NamespacedID other )
-                return this.ModID == other.ModID
-                    && this.ContentID == other.ContentID;
-
-            return false;
-        }
-
-        public override string ToString()
+        public override readonly string ToString()
         {
             return ModID + SEPARATOR + ContentID;
         }
 
-        public static NamespacedID Parse( string str )
+        public static NamespacedID Parse( string s )
         {
-            string[] parts = str.Split( SEPARATOR );
+            string[] parts = s.Split( SEPARATOR );
 
             if( parts.Length != 2 )
             {
-                throw new ArgumentException( $"Namespaced string must contain modId and contentId, separated by `{SEPARATOR}`.", nameof( str ) );
+                throw new ArgumentException( $"Namespaced string must contain modId and contentId, separated by `{SEPARATOR}`.", nameof( s ) );
             }
-            if( string.IsNullOrEmpty( parts[0] ) || string.IsNullOrEmpty( parts[0] ) )
+            if( string.IsNullOrEmpty( parts[0] ) || string.IsNullOrEmpty( parts[1] ) )
             {
-                throw new ArgumentException( $"modId and contentId must both be a nonnull, nonzero length strings.", nameof( str ) );
+                throw new ArgumentException( $"modId and contentId must both be a nonnull, nonzero length strings.", nameof( s ) );
             }
 
             return new NamespacedID( parts[0], parts[1] );
+        }
+        
+        public static bool TryParse( string s, out NamespacedID result )
+        {
+            string[] parts = s.Split( SEPARATOR );
+
+            if( parts.Length != 2 || string.IsNullOrEmpty( parts[0] ) || string.IsNullOrEmpty( parts[1] ) )
+            {
+                result = default;
+                return false;
+            }
+
+            result = new NamespacedID( parts[0], parts[1] );
+            return true;
         }
 
         /// <summary>
@@ -105,7 +134,7 @@ namespace HSP.Content
         /// <param name="contentType">The type of the content, see: `GameData/{mod_id}/{content_type}/{content_id}`</param>
         /// <returns></returns>
         /// <exception cref="ArgumentException"></exception>
-        public string ToContentPath( string contentType )
+        public readonly string ToContentPath( string contentType )
         {
             if( string.IsNullOrWhiteSpace( contentType ) )
                 throw new ArgumentException( "Content type cannot be null or empty", nameof( contentType ) );
@@ -120,9 +149,20 @@ namespace HSP.Content
             return path;
         }
 
-        public static explicit operator NamespacedID( string str )
+        public static explicit operator NamespacedID( string s )
         {
-            return NamespacedID.Parse( str );
+            return NamespacedID.Parse( s );
+        }
+
+        public static bool operator ==( NamespacedID left, NamespacedID right )
+        {
+            return left.ModID == right.ModID
+                && left.ContentID == right.ContentID;
+        }
+        public static bool operator !=( NamespacedID left, NamespacedID right )
+        {
+            return left.ModID != right.ModID
+                || left.ContentID != right.ContentID;
         }
 
         [MapsInheritingFrom( typeof( NamespacedID ) )]

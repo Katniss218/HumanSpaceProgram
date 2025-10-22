@@ -49,7 +49,7 @@ namespace HSP.Content.Mods
         /// <returns>Dictionary mapping mod IDs to their current versions.</returns>
         public static Dictionary<string, Version> GetCurrentModVersions()
         {
-            return HumanSpaceProgramModLoader.LoadedMods.ToDictionary( kvp => kvp.Key, kvp => kvp.Value.ModVersion );
+            return HumanSpaceProgramModLoader.LoadedMods.ToDictionary( kvp => kvp.Key, kvp => kvp.Value.Version );
         }
 
         /// <summary>
@@ -58,7 +58,7 @@ namespace HSP.Content.Mods
         /// <returns>Dictionary mapping mod IDs to their current versions.</returns>
         public static Dictionary<string, Version> GetCurrentSaveModVersions()
         {
-            return HumanSpaceProgramModLoader.LoadedMods.Where( kvp => !kvp.Value.ExcludeFromSaves ).ToDictionary( kvp => kvp.Key, kvp => kvp.Value.ModVersion );
+            return HumanSpaceProgramModLoader.LoadedMods.Where( kvp => !kvp.Value.ExcludeFromSaves ).ToDictionary( kvp => kvp.Key, kvp => kvp.Value.Version );
         }
 
         /// <summary>
@@ -82,7 +82,7 @@ namespace HSP.Content.Mods
                 }
 
                 ModMetadata loadedMod = GetLoadedMod( modId );
-                if( loadedMod == null || loadedMod.ModVersion != requiredVersion )
+                if( loadedMod == null || loadedMod.Version != requiredVersion )
                 {
                     return false;
                 }
@@ -138,12 +138,12 @@ namespace HSP.Content.Mods
                 }
 
                 modsToLoad.Add( metadata );
-                Debug.Log( $"Discovered mod: {metadata.Name} v{metadata.ModVersion} ({directory})" );
+                Debug.Log( $"Discovered mod: {metadata.Name} v{metadata.Version} ({directory})" );
             }
 
             // Topologically sort mods by dependencies.
             List<ModMetadata> sortedMods = modsToLoad.SortDependencies(
-                mod => mod.ModID,
+                mod => mod.ID,
                 mod => null,
                 mod => mod.Dependencies?.Select( d => d.ID ),
                 out IEnumerable<ModMetadata> circularDependencies );
@@ -162,11 +162,11 @@ namespace HSP.Content.Mods
                 IEnumerable<ModDependency> unsatisfiedDeps = mod.GetUnsatisfiedDependencies( _loadedMods );
                 if( unsatisfiedDeps.Any() )
                 {
-                    Debug.LogError( $"Mod '{mod.ModID}' has unsatisfied dependencies: {string.Join( ", ", unsatisfiedDeps )}" );
+                    Debug.LogError( $"Mod '{mod.ID}' has unsatisfied dependencies: {string.Join( ", ", unsatisfiedDeps )}" );
                     continue;
                 }
 
-                string modDirectory = modDirectories.First( d => HumanSpaceProgramContent.GetModID( d ) == mod.ModID );
+                string modDirectory = modDirectories.First( d => HumanSpaceProgramContent.GetModID( d ) == mod.ID );
                 try
                 {
                     LoadAssemblies( modDirectory );
@@ -174,11 +174,11 @@ namespace HSP.Content.Mods
                 catch( Exception ex )
                 {
                     // Abort because this could potentially cause a very bad state internally (failed dependencies, etc) if it were allowed to continue.
-                    throw new ModLoaderException( $"Failed to load assemblies for mod '{mod.ModID}', aborting mod loading.", ex );
+                    throw new ModLoaderException( $"Failed to load assemblies for mod '{mod.ID}', aborting mod loading.", ex );
                 }
 
-                _loadedMods[mod.ModID] = mod;
-                Debug.Log( $"Loaded mod: {mod.Name} v{mod.ModVersion} ({mod.ModID})" );
+                _loadedMods[mod.ID] = mod;
+                Debug.Log( $"Loaded mod: {mod.Name} v{mod.Version} ({mod.ID})" );
             }
 
             Debug.Log( $"Loaded {_loadedMods.Count} mods successfully." );
@@ -189,7 +189,7 @@ namespace HSP.Content.Mods
             var dlls = Directory.GetFiles( path, "*.dll", SearchOption.AllDirectories );
             if( dlls.Length == 0 )
                 return;
-            Debug.Log( $"Found {dlls.Length} {(dlls.Length == 1 ? "DLL" : "DLLs")} in mod directory '{path}'." );
+
             foreach( var dllPath in dlls )
             {
                 AssemblyName assemblyName;
