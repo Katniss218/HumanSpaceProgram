@@ -146,7 +146,7 @@ namespace HSP.Timelines
 
         private static void RegisterMigration( SaveMigrationAttribute attr, MethodInfo method )
         {
-            if( !ModManager.IsModLoaded( attr.ModID ) )
+            if( !HumanSpaceProgramModLoader.IsModLoaded( attr.ModID ) )
             {
                 throw new InvalidOperationException( $"Cannot register migration for mod '{attr.ModID}' because the mod is not loaded. Mods shouldn't register migrations for other mods." );
             }

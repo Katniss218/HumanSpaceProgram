@@ -227,7 +227,7 @@ namespace HSP.Timelines
 
             CurrentTimeline.SaveToDisk();
             scenario.FileVersion = ScenarioMetadata.CURRENT_SCENARIO_FILE_VERSION;
-            scenario.ModVersions = ModManager.GetCurrentSaveModVersions();
+            scenario.ModVersions = HumanSpaceProgramModLoader.GetCurrentSaveModVersions();
             scenario.SaveToDisk();
             HSPEvent.EventManager.TryInvoke( HSPEvent_AFTER_SCENARIO_SAVE.ID, eScenario );
         }
@@ -272,7 +272,7 @@ namespace HSP.Timelines
 
             CurrentTimeline.SaveToDisk();
             save.FileVersion = SaveMetadata.CURRENT_SAVE_FILE_VERSION;
-            save.ModVersions = ModManager.GetCurrentSaveModVersions();
+            save.ModVersions = HumanSpaceProgramModLoader.GetCurrentSaveModVersions();
             save.SaveToDisk();
             instance._currentSave = save;
             HSPEvent.EventManager.TryInvoke( HSPEvent_AFTER_TIMELINE_SAVE.ID, eSave );
@@ -315,7 +315,7 @@ namespace HSP.Timelines
             {
                 throw new ScenarioNotFoundException( loadedTimeline.ScenarioID, ex );
             }
-            if( !ModManager.AreRequiredModsLoaded( loadedScenario.ModVersions ) )
+            if( !HumanSpaceProgramModLoader.AreRequiredModsLoaded( loadedScenario.ModVersions ) )
             {
                 throw new IncompatibleSaveException();
             }
@@ -328,7 +328,7 @@ namespace HSP.Timelines
             {
                 throw new SaveNotFoundException( timelineId, saveId, ex );
             }
-            if( !ModManager.AreRequiredModsLoaded( loadedSave.ModVersions ) )
+            if( !HumanSpaceProgramModLoader.AreRequiredModsLoaded( loadedSave.ModVersions ) )
             {
                 throw new IncompatibleSaveException();
             }
@@ -383,7 +383,7 @@ namespace HSP.Timelines
             {
                 throw new ScenarioNotFoundException( timeline.ScenarioID, ex );
             }
-            if( !ModManager.AreRequiredModsLoaded( loadedScenario.ModVersions ) )
+            if( !HumanSpaceProgramModLoader.AreRequiredModsLoaded( loadedScenario.ModVersions ) )
             {
                 throw new IncompatibleSaveException();
             }
@@ -436,7 +436,7 @@ namespace HSP.Timelines
                 return false;
             }
 
-            var loadedModVersions = ModManager.GetCurrentModVersions();
+            var loadedModVersions = HumanSpaceProgramModLoader.GetCurrentModVersions();
 
             foreach( var modVersion in loadedModVersions )
             {
@@ -480,7 +480,7 @@ namespace HSP.Timelines
         /// </summary>
         private static void MigrateSaveData( string directory, Dictionary<string, Version> modVersions, bool force )
         {
-            var currentVersions = ModManager.GetCurrentModVersions();
+            var currentVersions = HumanSpaceProgramModLoader.GetCurrentModVersions();
 
 #warning TODO - maybe use some sort of 'window' to view the files instead of operating on the file system directly? that way we have more control over the files.
             // that same window could be used for the patches as it's basically equivalent to what I came up with for the addressing of different data files.

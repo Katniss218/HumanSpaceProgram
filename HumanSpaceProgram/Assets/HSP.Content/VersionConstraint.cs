@@ -132,7 +132,8 @@ namespace HSP.Content
             // Exact version must be a single part.
             if( parts.Length == 1 && !parts[0].Contains( ">" ) && !parts[0].Contains( "<" ) )
             {
-                Version exactVersion = Version.Parse( parts[0].Trim() );
+                if( !Version.TryParse( parts[0], out Version exactVersion ) )
+                    return false;
                 result = new VersionConstraint( exactVersion );
                 return true;
             }

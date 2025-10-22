@@ -20,35 +20,84 @@ namespace HSP.Content.Mods
         /// </summary>
         public static IReadOnlyDictionary<string, ModMetadata> LoadedMods => _loadedMods;
 
-        private static void LoadAssembliesRecursive( string path )
+        /// <summary>
+        /// Gets the metadata for a loaded mod.
+        /// </summary>
+        /// <param name="modId">The ID of the mod to retrieve.</param>
+        /// <returns>The mod metadata, or null if not loaded.</returns>
+        public static ModMetadata GetLoadedMod( string modId )
         {
-            foreach( var dllPath in Directory.GetFiles( path, "*.dll" ) )
-            {
-                try
-                {
-                    byte[] assemblyBytes = File.ReadAllBytes( dllPath );
-                    Assembly.Load( assemblyBytes );
-                }
-                catch( Exception ex )
-                {
-                    Debug.LogError( $"Failed to load assembly '{dllPath}': {ex.Message}" );
-                    Debug.LogException( ex );
-                }
-            }
+            if( string.IsNullOrEmpty( modId ) )
+                return null;
 
-            foreach( var subfolder in Directory.GetDirectories( path ) )
-            {
-                LoadAssembliesRecursive( subfolder );
-            }
+            return HumanSpaceProgramModLoader.LoadedMods.TryGetValue( modId, out ModMetadata mod ) ? mod : null;
         }
 
-        public const string LOAD_MOD_ASSEMBLIES = HSPEvent.NAMESPACE_HSP + ".load_mod_assemblies";
+        /// <summary>
+        /// Checks if a mod is currently loaded.
+        /// </summary>
+        /// <param name="modId">The ID of the mod to check.</param>
+        /// <returns>True if the mod is loaded.</returns>
+        public static bool IsModLoaded( string modId )
+        {
+            return !string.IsNullOrEmpty( modId ) && HumanSpaceProgramModLoader.LoadedMods.ContainsKey( modId );
+        }
+
+        /// <summary>
+        /// Gets the current versions of all loaded mods.
+        /// </summary>
+        /// <returns>Dictionary mapping mod IDs to their current versions.</returns>
+        public static Dictionary<string, Version> GetCurrentModVersions()
+        {
+            return HumanSpaceProgramModLoader.LoadedMods.ToDictionary( kvp => kvp.Key, kvp => kvp.Value.ModVersion );
+        }
+
+        /// <summary>
+        /// Gets the current versions of all loaded mods.
+        /// </summary>
+        /// <returns>Dictionary mapping mod IDs to their current versions.</returns>
+        public static Dictionary<string, Version> GetCurrentSaveModVersions()
+        {
+            return HumanSpaceProgramModLoader.LoadedMods.Where( kvp => !kvp.Value.ExcludeFromSaves ).ToDictionary( kvp => kvp.Key, kvp => kvp.Value.ModVersion );
+        }
+
+        /// <summary>
+        /// Validates that all required mod versions are loaded and compatible.
+        /// </summary>
+        /// <param name="required">Dictionary of required mod versions.</param>
+        /// <returns>True if all required mods are loaded with compatible versions.</returns>
+        public static bool AreRequiredModsLoaded( Dictionary<string, Version> required )
+        {
+            if( required == null )
+                return true;
+
+            foreach( var kvp in required )
+            {
+                string modId = kvp.Key;
+                Version requiredVersion = kvp.Value;
+
+                if( !IsModLoaded( modId ) )
+                {
+                    return false;
+                }
+
+                ModMetadata loadedMod = GetLoadedMod( modId );
+                if( loadedMod == null || loadedMod.ModVersion != requiredVersion )
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        public const string LOAD_MODS = HSPEvent.NAMESPACE_HSP + ".load_mods";
 
         /// <summary>
         /// Loads all mods and their assemblies from the GameData directory.
         /// </summary>
-        [HSPEventListener( HSPEvent_STARTUP_LOAD_MOD_ASSEMBLIES.ID, LOAD_MOD_ASSEMBLIES )]
-        private static void LoadModAssemblies()
+        [HSPEventListener( HSPEvent_STARTUP_LOAD_MOD_ASSEMBLIES.ID, LOAD_MODS )]
+        private static void LoadMods()
         {
             string gameDataDirectory = HumanSpaceProgramContent.GetContentDirectoryPath();
 
@@ -89,14 +138,21 @@ namespace HSP.Content.Mods
                 }
 
                 modsToLoad.Add( metadata );
-                Debug.Log( $"Discovered mod: {metadata.Name} v{metadata.ModVersion} ({modId})" );
+                Debug.Log( $"Discovered mod: {metadata.Name} v{metadata.ModVersion} ({directory})" );
             }
 
             // Topologically sort mods by dependencies.
-            List<ModMetadata> sortedMods = ITopologicallySortable_Ex.SortDependencies<ModMetadata, string>( modsToLoad, mod => mod.ModID, mod => null, mod => mod.Dependencies?.Select( d => d.ID ), out bool hasCircularDependency );
-            if( hasCircularDependency )
+            List<ModMetadata> sortedMods = modsToLoad.SortDependencies(
+                mod => mod.ModID,
+                mod => null,
+                mod => mod.Dependencies?.Select( d => d.ID ),
+                out IEnumerable<ModMetadata> circularDependencies );
+            if( circularDependencies.Any() )
             {
-#warning TODO - log which mods are involved in the circular dependency.
+                foreach( var cycle in circularDependencies )
+                {
+                    Debug.LogError( $"Circular dependency detected in mod '{cycle}'" );
+                }
                 throw new ModLoaderException( "Circular dependency detected among mods, aborting mod loading." );
             }
 
@@ -113,7 +169,7 @@ namespace HSP.Content.Mods
                 string modDirectory = modDirectories.First( d => HumanSpaceProgramContent.GetModID( d ) == mod.ModID );
                 try
                 {
-                    LoadAssembliesRecursive( modDirectory );
+                    LoadAssemblies( modDirectory );
                 }
                 catch( Exception ex )
                 {
@@ -126,6 +182,76 @@ namespace HSP.Content.Mods
             }
 
             Debug.Log( $"Loaded {_loadedMods.Count} mods successfully." );
+        }
+
+        private static void LoadAssemblies( string path )
+        {
+            var dlls = Directory.GetFiles( path, "*.dll", SearchOption.AllDirectories );
+            if( dlls.Length == 0 )
+                return;
+            Debug.Log( $"Found {dlls.Length} {(dlls.Length == 1 ? "DLL" : "DLLs")} in mod directory '{path}'." );
+            foreach( var dllPath in dlls )
+            {
+                AssemblyName assemblyName;
+                try
+                {
+                    assemblyName = AssemblyName.GetAssemblyName( dllPath );
+                }
+                catch( BadImageFormatException )
+                {
+                    // Unmanaged DLL (or corrupted/couldn't be read).
+                    Debug.Log( $"Skipping unmanaged DLL: '{dllPath}'." );
+                    continue;
+                }
+                catch( FileLoadException ex )
+                {
+                    Debug.LogWarning( $"Failed to inspect assembly '{dllPath}': {ex.Message}." );
+                    Debug.LogException( ex );
+                    continue;
+                }
+                catch( Exception ex )
+                {
+                    Debug.LogWarning( $"Unexpected exception inspecting '{dllPath}': {ex.Message}." );
+                    Debug.LogException( ex );
+                    continue;
+                }
+
+                try
+                {
+                    // Don't try to re-load an assembly with the same identity that's already loaded in the AppDomain.
+                    Assembly alreadyLoadedAssembly = AppDomain.CurrentDomain.GetAssemblies()
+                        .FirstOrDefault( a =>
+                        {
+                            try { return AssemblyName.ReferenceMatchesDefinition( a.GetName(), assemblyName ); }
+                            catch { return false; }
+                        } );
+                    if( alreadyLoadedAssembly != null )
+                    {
+                        Debug.LogWarning( $"Duplicate assembly '{assemblyName.FullName}' already loaded (from {alreadyLoadedAssembly.Location ?? "in-memory"}), skipping." );
+                        continue;
+                    }
+
+                    byte[] assemblyBytes = File.ReadAllBytes( dllPath );
+                    Assembly.Load( assemblyBytes );
+                }
+                catch( BadImageFormatException )
+                {
+                    Debug.LogError( $"Failed to load managed assembly '{dllPath}'. The assembly is corrupted or unreadable." );
+                    continue;
+                }
+                catch( FileLoadException ex )
+                {
+                    Debug.LogError( $"Failed to load managed assembly '{dllPath}': {ex.Message}" );
+                    Debug.LogException( ex );
+                    continue;
+                }
+                catch( Exception ex )
+                {
+                    Debug.LogError( $"Unexpected exception loading managed assembly '{dllPath}': {ex.Message}" );
+                    Debug.LogException( ex );
+                    continue;
+                }
+            }
         }
     }
 }
