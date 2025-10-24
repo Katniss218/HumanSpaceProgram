@@ -4,8 +4,6 @@ using HSP.Input;
 using HSP.SceneManagement;
 using HSP.ScreenCapturing;
 using HSP.Time;
-using HSP.Timelines;
-using HSP.Vanilla.Scenes.MainMenuScene;
 using UnityPlus.Input;
 
 namespace HSP.Vanilla.Scenes.AlwaysLoadedScene
@@ -13,7 +11,6 @@ namespace HSP.Vanilla.Scenes.AlwaysLoadedScene
     public static class OnStartup
     {
         public const string ADD_TIME_MANAGER = HSPEvent.NAMESPACE_HSP + ".add_time_manager";
-        public const string ADD_TIMELINE_MANAGER = HSPEvent.NAMESPACE_HSP + ".add_timeline_manager";
         public const string ADD_SCREENSHOT_MANAGER = HSPEvent.NAMESPACE_HSP + ".add_screenshot_manager";
         public const string ADD_AUDIO_EFFECT_MANAGER = HSPEvent.NAMESPACE_HSP + ".add_audio_effect_manager";
         public const string ADD_PARTICLE_EFFECT_MANAGER = HSPEvent.NAMESPACE_HSP + ".add_particle_effect_manager";
@@ -23,12 +20,6 @@ namespace HSP.Vanilla.Scenes.AlwaysLoadedScene
         private static void AddTimeManager()
         {
             SceneManagement.AlwaysLoadedScene.Instance.gameObject.AddComponent<TimeManager>();
-        }
-
-        [HSPEventListener( HSPEvent_STARTUP_IMMEDIATELY.ID, ADD_TIMELINE_MANAGER )]
-        private static void AddTimelineManager()
-        {
-            SceneManagement.AlwaysLoadedScene.Instance.gameObject.AddComponent<TimelineManager>();
         }
 
         [HSPEventListener( HSPEvent_STARTUP_IMMEDIATELY.ID, ADD_SCREENSHOT_MANAGER )]

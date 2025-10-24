@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using UnityEngine;
 using UnityEngine.Profiling;
-using static UnityEngine.Networking.UnityWebRequest;
 
 namespace HSP.Trajectories
 {
@@ -244,7 +244,8 @@ namespace HSP.Trajectories
             if( transform == null )
                 throw new ArgumentNullException( nameof( transform ) );
 
-            if( _bodies.ContainsKey( transform ) )
+            Debug.LogWarning( $"Adding body {transform} to simulator. " + _staleToAdd.Count );
+            if( _bodies.ContainsKey( transform ) && !_staleToRemove.Contains( transform ) )
                 return false;
 
             if( !_staleToAdd.Add( transform ) )
@@ -260,6 +261,7 @@ namespace HSP.Trajectories
             if( transform == null )
                 throw new ArgumentNullException( nameof( transform ) );
 
+            Debug.LogWarning( $"Removing body {transform} from simulator." );
             if( !_bodies.TryGetValue( transform, out var entry ) )
                 return false;
 
@@ -393,7 +395,7 @@ namespace HSP.Trajectories
             }
         }
 
-        private void FixStale( SimulationDirection direction )
+        public void FixStale( SimulationDirection direction )
         {
             if( !_isStale )
                 return;
@@ -405,8 +407,9 @@ namespace HSP.Trajectories
 
             // Update attractor cache
             _attractorCache = _bodies.Keys
+#warning TODO - There's a problem with this. When a body changes from attractor to follower or vice versa, or when a body is removed and re-added.
                 .Union( _staleToAdd )
-                .Except( _staleToRemove )
+                .Except( _staleToRemove ) // TODO - include the ones that are in both sets.
                 .Where( t => t.IsAttractor )
                 .ToArray();
 
@@ -414,12 +417,18 @@ namespace HSP.Trajectories
             int attractorIndex = _attractors?.Length ?? 0;
             int followerIndex = _followers?.Length ?? 0;
 
+            Debug.Log( "STALE" );
             // Copy the old data to the new arrays first.
             //   This will 'defragment' the gaps where existing bodies were removed.
             // The attractor/follower indices will point at the end of the copied section,
             //   and the arrays will have space for the new bodies after that.
             if( bodyCountChanged )
             {
+                Debug.Log( _attractorCache.Length );
+                Debug.Log( _bodies.Count );
+                Debug.Log( _staleToAdd.Count );
+                Debug.Log( _staleToRemove.Count );
+                Debug.Log( _staleExisting.Count );
                 int totalBodies = _bodies.Count + _staleToAdd.Count - _staleToRemove.Count;
                 int numAttractors = _attractorCache.Length;
                 int numFollowers = totalBodies - numAttractors;
@@ -457,16 +466,16 @@ namespace HSP.Trajectories
                 int sourceFollowerIndex = -1;
                 foreach( var (body, entry) in _bodies )
                 {
+                    // Only copy existing bodies that were not removed.
+                    if( _staleToRemove.Contains( body ) )
+                        continue;
+
                     // `entry.isAttractor` - what it was when it was added.
                     // `body.IsAttractor`  - what it is now.
                     if( entry.isAttractor )
                         sourceAttractorIndex++;
                     else
                         sourceFollowerIndex++;
-
-                    // Only copy existing bodies that were not removed.
-                    if( _staleToRemove.Contains( body ) )
-                        continue;
 
                     if( body.IsAttractor )
                     {
@@ -503,8 +512,6 @@ namespace HSP.Trajectories
                         followerIndex++;
                     }
                 }
-
-                _staleToRemove.Clear();
             }
 
             // Update stale bodies with current data
@@ -513,6 +520,8 @@ namespace HSP.Trajectories
                 foreach( var body in _staleExisting )
                 {
                     if( _staleToAdd.Contains( body ) )
+                        continue;
+                    if( _staleToRemove.Contains( body ) )
                         continue;
 
                     if( !_bodies.TryGetValue( body, out var entry ) )
@@ -575,6 +584,8 @@ namespace HSP.Trajectories
 
                 _staleToAdd.Clear();
             }
+
+            _staleToRemove.Clear();
 
             // ephemeris of a stale body needs to be reset, and the body needs to be resimulated.
             // the 'head' UT of the simulation needs to be rolled back to the min() of the bodies' head UT.

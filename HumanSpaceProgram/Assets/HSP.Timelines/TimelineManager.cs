@@ -160,19 +160,19 @@ namespace HSP.Timelines
         /// <summary>
         /// Gets the scenario that the currently active timeline is based on.
         /// </summary>
-        public static ScenarioMetadata CurrentScenario => instance._currentScenario;
+        public static ScenarioMetadata CurrentScenario => instanceExists ? instance._currentScenario : null;
 
         private TimelineMetadata _currentTimeline;
         /// <summary>
         /// Gets the currently active timeline.
         /// </summary>
-        public static TimelineMetadata CurrentTimeline => instance._currentTimeline;
+        public static TimelineMetadata CurrentTimeline => instanceExists ? instance._currentTimeline : null;
 
         private SaveMetadata _currentSave;
         /// <summary>
         /// Gets the currently active save (if any).
         /// </summary>
-        public static SaveMetadata CurrentSave => instance._currentSave;
+        public static SaveMetadata CurrentSave => instanceExists ? instance._currentSave : null;
 
 
         private static bool _wasPausedBeforeSerializing = false;
