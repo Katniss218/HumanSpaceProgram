@@ -1,5 +1,6 @@
 using HSP.SceneManagement;
 using UnityEngine;
+using static HSP.Vanilla.Scenes.GameplayScene.GameplaySceneM;
 
 namespace HSP.Vanilla.Scenes.GameplayScene
 {
@@ -38,8 +39,13 @@ namespace HSP.Vanilla.Scenes.GameplayScene
     /// <summary>
     /// A Manager whose responsibility is to invoke the events relating to creation/destruction of the `gameplay` scene.
     /// </summary>
-    public sealed class GameplaySceneM : HSPScene<GameplaySceneM>
+    public sealed class GameplaySceneM : HSPScene<GameplaySceneM, LoadData>
     {
+        public sealed class LoadData
+        {
+            // Intentionally left blank for now.
+        }
+
         public static new string UNITY_SCENE_NAME => "Testing And Shit"; // TODO - swap out for "Gameplay" when the part with creating and loading rockets is done.
 
         /// <summary>
@@ -53,9 +59,9 @@ namespace HSP.Vanilla.Scenes.GameplayScene
         /// </summary>
         public static GameObject GameObject => instance.gameObject;
 
-        protected override void OnLoad()
+        protected override void OnLoad( LoadData loadData )
         {
-            HSPEvent.EventManager.TryInvoke( HSPEvent_GAMEPLAY_SCENE_LOAD.ID );
+            HSPEvent.EventManager.TryInvoke( HSPEvent_GAMEPLAY_SCENE_LOAD.ID, loadData );
         }
 
         protected override void OnUnload()

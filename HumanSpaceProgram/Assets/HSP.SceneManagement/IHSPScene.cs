@@ -21,4 +21,17 @@ namespace HSP.SceneManagement
         void _onactivate();
         void _ondeactivate();
     }
+
+    public interface IHSPScene<TLoadData> : IHSPScene
+    {
+        /// <summary>
+        /// The loaded Unity scene associated with this HSP scene instance
+        /// </summary>
+        Scene UnityScene { get; }
+
+        void _onload( TLoadData data );
+        void _onunload();
+        void _onactivate();
+        void _ondeactivate();
+    }
 }
