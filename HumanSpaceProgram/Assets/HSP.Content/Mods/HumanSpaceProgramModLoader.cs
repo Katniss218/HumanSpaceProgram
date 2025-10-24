@@ -8,6 +8,11 @@ using UnityPlus;
 
 namespace HSP.Content.Mods
 {
+    public static class HSPEvent_ON_MOD_LOADING_ABORTED
+    {
+        public const string ID = HSPEvent.NAMESPACE_HSP + ".on_mod_loading_aborted";
+    }
+
     /// <summary>
     /// Handles loading and validation of mods for HSP.
     /// </summary>
@@ -99,89 +104,94 @@ namespace HSP.Content.Mods
         [HSPEventListener( HSPEvent_STARTUP_LOAD_MOD_ASSEMBLIES.ID, LOAD_MODS )]
         private static void LoadMods()
         {
-            string gameDataDirectory = HumanSpaceProgramContent.GetContentDirectoryPath();
-
-            if( !Directory.Exists( gameDataDirectory ) )
-                Directory.CreateDirectory( gameDataDirectory );
-
-            Debug.Log( $"The content directory is: '{gameDataDirectory}'" );
-
-            // Discover and load all mod metadata
-            HashSet<ModMetadata> modsToLoad = new();
-            List<string> modDirectories = new();
-
-            foreach( var directory in HumanSpaceProgramContent.GetAllModDirectories() )
+            try
             {
-                string modId = HumanSpaceProgramContent.GetModID( directory );
-                modDirectories.Add( directory );
+                string gameDataDirectory = HumanSpaceProgramContent.GetContentDirectoryPath();
 
-                ModMetadata metadata = null;
-                try
+                if( !Directory.Exists( gameDataDirectory ) )
+                    Directory.CreateDirectory( gameDataDirectory );
+
+                Debug.Log( $"The content directory is: '{gameDataDirectory}'" );
+
+                // Discover and load all mod metadata
+                List<ModMetadata> modsToLoad = new();
+                List<string> modDirectories = new();
+                HashSet<string> loadedModIDs = new();
+
+                foreach( var directory in HumanSpaceProgramContent.GetAllModDirectories() )
                 {
-                    metadata = ModMetadata.LoadFromDisk( directory );
-                }
-                catch( FileNotFoundException )
-                {
-                    Debug.LogWarning( $"Mod directory '{directory}' is missing a mod manifest file, skipping." );
-                    continue;
-                }
-                catch( Exception ex )
-                {
-                    Debug.LogError( $"Failed to load mod metadata file from '{directory}': {ex.Message}" );
-                    Debug.LogException( ex );
-                    continue;
+                    string modId = HumanSpaceProgramContent.GetModID( directory );
+                    modDirectories.Add( directory );
+
+                    ModMetadata metadata = null;
+                    try
+                    {
+                        metadata = ModMetadata.LoadFromDisk( directory );
+                    }
+                    catch( FileNotFoundException )
+                    {
+                        Debug.LogWarning( $"Mod directory '{directory}' is missing a mod manifest file, skipping." );
+                        continue;
+                    }
+                    catch( Exception ex )
+                    {
+                        Debug.LogError( $"Failed to load mod metadata file from '{directory}': {ex.Message}" );
+                        Debug.LogException( ex );
+                        continue;
+                    }
+
+                    if( loadedModIDs.Contains( metadata.ID ) )
+                    {
+                        throw new ModLoaderException( $"Duplicate mod ID '{modId}' found in directory '{directory}', aborting mod loading." );
+                    }
+
+                    modsToLoad.Add( metadata );
+                    loadedModIDs.Add( metadata.ID );
+                    Debug.Log( $"Discovered mod: {metadata.Name} v{metadata.Version} ({directory})" );
                 }
 
-                if( modsToLoad.Contains( metadata ) )
+                // Topologically sort mods by dependencies.
+                List<ModMetadata> sortedMods = modsToLoad.SortDependencies(
+                    mod => mod.ID,
+                    mod => null,
+                    mod => mod.Dependencies?.Where( d => d.DependencyType == ModDependencyType.Required ).Select( d => d.ID ),
+                    out IEnumerable<ModMetadata> circularDependencies );
+                if( circularDependencies.Any() )
                 {
-                    throw new ModLoaderException( $"Duplicate mod ID '{modId}' found in directory '{directory}', aborting mod loading." );
+                    throw new ModLoaderException( $"Circular dependency detected among mods: {string.Join( ", ", circularDependencies.Select( d => d.ID ) )}, aborting mod loading." );
                 }
 
-                modsToLoad.Add( metadata );
-                Debug.Log( $"Discovered mod: {metadata.Name} v{metadata.Version} ({directory})" );
+                // Load mods in sorted order.
+                foreach( var mod in sortedMods )
+                {
+                    IEnumerable<ModDependency> unsatisfiedDeps = mod.GetUnsatisfiedDependencies( _loadedMods );
+                    if( unsatisfiedDeps.Any() )
+                    {
+                        Debug.LogError( $"Mod '{mod.ID}' has unsatisfied dependencies: {string.Join( ", ", unsatisfiedDeps )}" );
+                        continue;
+                    }
+
+                    string modDirectory = modDirectories.First( d => HumanSpaceProgramContent.GetModID( d ) == mod.ID );
+                    try
+                    {
+                        LoadAssemblies( modDirectory );
+                    }
+                    catch( Exception ex )
+                    {
+                        // Abort because this could potentially cause a very bad state internally (failed dependencies, etc) if it were allowed to continue.
+                        throw new ModLoaderException( $"Failed to load assemblies for mod '{mod.ID}', aborting mod loading.", ex );
+                    }
+
+                    _loadedMods[mod.ID] = mod;
+                    Debug.Log( $"Loaded mod: {mod.Name} v{mod.Version} ({mod.ID})" );
+                }
+
+                Debug.Log( $"Loaded {_loadedMods.Count} mods successfully." );
             }
-
-            // Topologically sort mods by dependencies.
-            List<ModMetadata> sortedMods = modsToLoad.SortDependencies(
-                mod => mod.ID,
-                mod => null,
-                mod => mod.Dependencies?.Select( d => d.ID ),
-                out IEnumerable<ModMetadata> circularDependencies );
-            if( circularDependencies.Any() )
+            catch( Exception ex )
             {
-                foreach( var cycle in circularDependencies )
-                {
-                    Debug.LogError( $"Circular dependency detected in mod '{cycle}'" );
-                }
-                throw new ModLoaderException( "Circular dependency detected among mods, aborting mod loading." );
+                HSPEvent.EventManager.TryInvoke( HSPEvent_ON_MOD_LOADING_ABORTED.ID, ex );
             }
-
-            // Load mods in sorted order.
-            foreach( var mod in sortedMods )
-            {
-                IEnumerable<ModDependency> unsatisfiedDeps = mod.GetUnsatisfiedDependencies( _loadedMods );
-                if( unsatisfiedDeps.Any() )
-                {
-                    Debug.LogError( $"Mod '{mod.ID}' has unsatisfied dependencies: {string.Join( ", ", unsatisfiedDeps )}" );
-                    continue;
-                }
-
-                string modDirectory = modDirectories.First( d => HumanSpaceProgramContent.GetModID( d ) == mod.ID );
-                try
-                {
-                    LoadAssemblies( modDirectory );
-                }
-                catch( Exception ex )
-                {
-                    // Abort because this could potentially cause a very bad state internally (failed dependencies, etc) if it were allowed to continue.
-                    throw new ModLoaderException( $"Failed to load assemblies for mod '{mod.ID}', aborting mod loading.", ex );
-                }
-
-                _loadedMods[mod.ID] = mod;
-                Debug.Log( $"Loaded mod: {mod.Name} v{mod.Version} ({mod.ID})" );
-            }
-
-            Debug.Log( $"Loaded {_loadedMods.Count} mods successfully." );
         }
 
         private static void LoadAssemblies( string path )

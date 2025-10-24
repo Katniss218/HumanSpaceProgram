@@ -4,5 +4,6 @@
     "name": "Vanilla HSP",
     "author": "Katniss",
     "description": "This is the base game.",
+    "license": "AGPLv3",
     "dependencies": null
 }

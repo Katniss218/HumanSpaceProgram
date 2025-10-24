@@ -1,8 +1,25 @@
 using System;
+using System.Collections.Generic;
 using UnityPlus.Serialization;
 
 namespace HSP.Content
 {
+    public enum ModDependencyType : byte
+    {
+        /// <summary>
+        /// This mod is required for the mod to function properly.
+        /// </summary>
+        Required,
+        /// <summary>
+        /// This mod is optional, the mod may provide functionality or interface with it.
+        /// </summary>
+        Supported,
+        /// <summary>
+        /// This mod is incompatible with the mod.
+        /// </summary>
+        Incompatible
+    }
+
     /// <summary>
     /// Represents a dependency on another mod with optional version constraints.
     /// </summary>
@@ -15,15 +32,12 @@ namespace HSP.Content
         public string ID { get; set; }
 
         /// <summary>
-        /// The version constraint for the required mod. Null means any version is acceptable.
+        /// The version constraint for the required mod. Null means any version is acceptable. <br/>
+        /// This member can be null if the <see cref="DependencyType"/> is <see cref="ModDependencyType.Incompatible"/>, or if the version doesn't matter.
         /// </summary>
         public VersionConstraint? Version { get; set; }
 
-        /// <summary>
-        /// Whether this dependency is optional. If a dependency is missing, the mod will not load, unless the missing dependency is optional. <br/>
-        /// Use to mark a mod as "supported but not required".
-        /// </summary>
-        public bool IsOptional { get; set; } = false;
+        public ModDependencyType DependencyType { get; set; } = ModDependencyType.Required;
 
         public ModDependency()
         {
@@ -33,13 +47,6 @@ namespace HSP.Content
         {
             this.ID = id;
             this.Version = versions;
-        }
-
-        public ModDependency( string id, VersionConstraint? versions, bool isOptional )
-        {
-            this.ID = id;
-            this.Version = versions;
-            this.IsOptional = isOptional;
         }
 
         /// <summary>
@@ -53,6 +60,25 @@ namespace HSP.Content
             return Version.Value.IsSatisfiedBy( version );
         }
 
+        public bool IsSatisfiedBy( Dictionary<string, ModMetadata> loadedMods )
+        {
+            if( this.DependencyType == ModDependencyType.Incompatible )
+            {
+                return !loadedMods.ContainsKey( this.ID );
+            }
+
+            if( this.DependencyType == ModDependencyType.Required )
+            {
+                if( !loadedMods.TryGetValue( this.ID, out ModMetadata requiredMod ) )
+                    return false;
+
+                if( !this.IsSatisfiedBy( requiredMod.Version ) )
+                    return false;
+            }
+
+            return true;
+        }
+
         public override string ToString()
         {
             string result = ID;
@@ -60,10 +86,7 @@ namespace HSP.Content
             {
                 result += $" {Version.Value}";
             }
-            if( IsOptional )
-            {
-                result += " (optional)";
-            }
+            result += $" ({DependencyType})";
             return result;
         }
 
@@ -73,7 +96,7 @@ namespace HSP.Content
             return new MemberwiseSerializationMapping<ModDependency>()
                 .WithMember( "id", o => o.ID )
                 .WithMember( "version", o => o.Version )
-                .WithMember( "optional", o => o.IsOptional );
+                .WithMember( "type", o => o.DependencyType );
         }
     }
 }

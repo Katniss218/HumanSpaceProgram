@@ -4,6 +4,7 @@
     "name": "Test Mod",
     "author": "Katniss",
     "description": "This is a test mod with some dummy functionality.",
+    "license": "AGPLv3",
     "dependencies": {
         "value": [
             {

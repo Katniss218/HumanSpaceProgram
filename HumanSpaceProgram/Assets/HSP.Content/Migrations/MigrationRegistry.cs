@@ -69,8 +69,8 @@ namespace HSP.Content.Migrations
                                     if( !StructuralMigrationAttribute.IsValidMethodSignature( method ) )
                                         throw new InvalidOperationException( $"Structural migration method '{method.Name}' in type '{type.Name}' has invalid signature. Expected `static void Method(IMigrationContext context)`" );
 
-                                    if( !HumanSpaceProgramModLoader.IsModLoaded( attr.ModID ) )
-                                        throw new InvalidOperationException( $"Cannot register migration for mod '{attr.ModID}' because the mod is not loaded. Mods shouldn't register migrations for other mods." );
+                                    if( !HumanSpaceProgramModLoader.IsModLoaded( attr2.ModID ) )
+                                        throw new InvalidOperationException( $"Cannot register migration for mod '{attr2.ModID}' because the mod is not loaded. Mods shouldn't register migrations for other mods." );
 
                                     RegisterMigration( attr2, method );
                                 }

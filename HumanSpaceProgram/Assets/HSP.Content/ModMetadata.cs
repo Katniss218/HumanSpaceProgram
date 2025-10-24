@@ -52,7 +52,7 @@ namespace HSP.Content
         /// <summary>
         /// The URL to the website about this mod, if applicable.
         /// </summary>
-        public string Website { get; set; }
+        public string Homepage { get; set; }
 
         /// <summary>
         /// Whether to exclude this mod from being saved in the save mods. <br/>
@@ -63,7 +63,7 @@ namespace HSP.Content
         /// <summary>
         /// The dependencies of this mod.
         /// </summary>
-        public List<ModDependency> Dependencies { get; set; } = new List<ModDependency>();
+        public List<ModDependency> Dependencies { get; set; } = new();
 
         public ModMetadata()
         {
@@ -125,23 +125,7 @@ namespace HSP.Content
         /// <returns>True if all dependencies are satisfied</returns>
         public bool AreDependenciesSatisfied( Dictionary<string, ModMetadata> loadedMods )
         {
-            foreach( var dependency in Dependencies )
-            {
-                if( dependency.IsOptional )
-                    continue;
-
-                if( !loadedMods.TryGetValue( dependency.ID, out ModMetadata requiredMod ) )
-                {
-                    return false;
-                }
-
-                if( !dependency.IsSatisfiedBy( requiredMod.Version ) )
-                {
-                    return false;
-                }
-            }
-
-            return true;
+            return !Dependencies.Any( d => !d.IsSatisfiedBy( loadedMods ) );
         }
 
         /// <summary>
@@ -154,26 +138,9 @@ namespace HSP.Content
             if( Dependencies == null || Dependencies.Count == 0 )
                 return Enumerable.Empty<ModDependency>();
 
-            List<ModDependency> unsatisfied = new List<ModDependency>();
-
-            foreach( var dependency in Dependencies )
-            {
-                if( dependency.IsOptional )
-                    continue;
-
-                if( !loadedMods.TryGetValue( dependency.ID, out ModMetadata requiredMod ) )
-                {
-                    unsatisfied.Add( dependency );
-                    continue;
-                }
-
-                if( !dependency.IsSatisfiedBy( requiredMod.Version ) )
-                {
-                    unsatisfied.Add( dependency );
-                }
-            }
-
-            return unsatisfied;
+            return Dependencies
+                .Where( d => !d.IsSatisfiedBy( loadedMods ) )
+                .ToList();
         }
 
         [MapsInheritingFrom( typeof( ModMetadata ) )]
@@ -186,7 +153,7 @@ namespace HSP.Content
                 .WithMember( "version", o => o.Version )
                 .WithMember( "author", o => o.Author )
                 .WithMember( "license", o => o.License )
-                .WithMember( "website", o => o.Website )
+                .WithMember( "homepage", o => o.Homepage )
                 .WithMember( "exclude_from_saves", o => o.ExcludeFromSaves )
                 .WithMember( "dependencies", o => o.Dependencies );
         }
