@@ -94,7 +94,7 @@ namespace HSP.Vanilla.UI.Timelines
 
         public static void LoadAsync( SaveMetadata save )
         {
-            HSPSceneManager.ReplaceForegroundScene<GameplaySceneM>( onAfterLoaded: () =>
+            HSPSceneManager.ReplaceForegroundScene<GameplaySceneM, GameplaySceneM.LoadData>( new GameplaySceneM.LoadData(), onAfterLoaded: () =>
             {
                 TimelineManager.BeginLoadAsync( save.TimelineID, save.SaveID );
             } );
