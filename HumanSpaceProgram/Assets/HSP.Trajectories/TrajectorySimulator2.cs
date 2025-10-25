@@ -58,7 +58,7 @@ namespace HSP.Trajectories
             Backward
         }
 
-        // Timestepper stuff (individual arrays).
+        // Timestepper part (attractor/follower arrays).
 
         /// <summary>
         /// Gets or sets the maximum step size for the simulation, in [s]. <br/>
@@ -67,11 +67,6 @@ namespace HSP.Trajectories
         public double MaxStepSize { get; set; } = 1.0;
 
         public double DefaultStepSize { get; set; } = 1.0;
-
-        /// <summary>
-        /// Gets the number of bodies in the simulation.
-        /// </summary>
-        public int BodyCount => _bodies.Count;
 
         public ReadOnlySpan<ITrajectoryTransform> Attractors => _attractorCache;
 
@@ -97,7 +92,9 @@ namespace HSP.Trajectories
         private double _ephemerisMaxError = 0.02;
         private double _ephemerisDuration = 1000000;
 
-        // Storage stuff.
+        private ITrajectoryTransform[] _attractorCache;
+
+        // Bookkeeping part.
 
         private class Entry
         {
@@ -105,6 +102,14 @@ namespace HSP.Trajectories
             public int timestepperIndex;
             public Ephemeris2 ephemeris;
         }
+
+        /// <summary>
+        /// Gets the number of bodies in the simulation.
+        /// </summary>
+        public int BodyCount => _bodies.Count;
+
+        public int AttractorCount => _attractors?.Length ?? 0;
+        public int FollowerCount => _followers?.Length ?? 0;
 
         private Dictionary<ITrajectoryTransform, Entry> _bodies = new();
 
@@ -115,8 +120,6 @@ namespace HSP.Trajectories
         private bool _isStale = true;
         private volatile bool _isSimulating = false; // thread safety thing.
         private readonly object _simulationLock = new object();
-
-        private ITrajectoryTransform[] _attractorCache;
 
         public bool IsSimulating => _isSimulating;
 
@@ -217,7 +220,8 @@ namespace HSP.Trajectories
             if( transform == null )
                 throw new ArgumentNullException( nameof( transform ) );
 
-            return _bodies.ContainsKey( transform ) && !_staleToRemove.Contains( transform ) || _staleToAdd.Contains( transform );
+            // Exists and not scheduled to be removed, OR explicitly scheduled to be added.
+            return (_bodies.ContainsKey( transform ) && !_staleToRemove.Contains( transform )) || _staleToAdd.Contains( transform );
         }
 
         public IEnumerable<(ITrajectoryTransform t, IReadonlyEphemeris e)> GetBodies()
@@ -244,7 +248,18 @@ namespace HSP.Trajectories
             if( transform == null )
                 throw new ArgumentNullException( nameof( transform ) );
 
-            Debug.LogWarning( $"Adding body {transform} to simulator. " + _staleToAdd.Count );
+            // If the body is scheduled to be removed, cancel the removal.
+            // - Unless its attractor state changed, because that means it has to switch which array set it's in (_attractors...[] vs _followers...[]).
+            // Else, if the body doesn't exist, schedule an addition.
+            if( _staleToRemove.Contains( transform ) && _bodies.TryGetValue( transform, out var existingEntry )
+                && existingEntry.isAttractor == transform.IsAttractor )
+            {
+                _staleToRemove.Remove( transform );
+                _isStale = true;
+                return true;
+            }
+
+            // If the body exists and is not scheduled for removal, cannot add.
             if( _bodies.ContainsKey( transform ) && !_staleToRemove.Contains( transform ) )
                 return false;
 
@@ -261,7 +276,14 @@ namespace HSP.Trajectories
             if( transform == null )
                 throw new ArgumentNullException( nameof( transform ) );
 
-            Debug.LogWarning( $"Removing body {transform} from simulator." );
+            // If the body is scheduled to be added, cancel the add.
+            // Else, if the body exists, schedule a removal.
+            if( _staleToAdd.Remove( transform ) )
+            {
+                _isStale = true;
+                return true;
+            }
+
             if( !_bodies.TryGetValue( transform, out var entry ) )
                 return false;
 
@@ -405,31 +427,28 @@ namespace HSP.Trajectories
                 ResetToCurrent();
             }
 
-            // Update attractor cache
-            _attractorCache = _bodies.Keys
-#warning TODO - There's a problem with this. When a body changes from attractor to follower or vice versa, or when a body is removed and re-added.
-                .Union( _staleToAdd )
-                .Except( _staleToRemove ) // TODO - include the ones that are in both sets.
+            // Compute the resulting set of bodies after applying add/remove.
+            // Bodies that are in both sets (remove + add) are treated as "re-add".
+            var resultingBodies = _bodies.Keys
+                .Except( _staleToRemove )   // remove scheduled removals
+                .Union( _staleToAdd )       // add scheduled adds
+                .ToArray();
+
+            _attractorCache = resultingBodies
                 .Where( t => t.IsAttractor )
                 .ToArray();
 
-            bool bodyCountChanged = _staleToAdd.Count > 0 || _staleToRemove.Count > 0;
+            int totalBodies = resultingBodies.Length;
+            bool bodyCountChanged = _staleToAdd.Count > 0 || _staleToRemove.Count > 0; // Reallocate bodies that need to change arrays, not just on raw count sum.
             int attractorIndex = _attractors?.Length ?? 0;
             int followerIndex = _followers?.Length ?? 0;
 
-            Debug.Log( "STALE" );
             // Copy the old data to the new arrays first.
             //   This will 'defragment' the gaps where existing bodies were removed.
             // The attractor/follower indices will point at the end of the copied section,
             //   and the arrays will have space for the new bodies after that.
             if( bodyCountChanged )
             {
-                Debug.Log( _attractorCache.Length );
-                Debug.Log( _bodies.Count );
-                Debug.Log( _staleToAdd.Count );
-                Debug.Log( _staleToRemove.Count );
-                Debug.Log( _staleExisting.Count );
-                int totalBodies = _bodies.Count + _staleToAdd.Count - _staleToRemove.Count;
                 int numAttractors = _attractorCache.Length;
                 int numFollowers = totalBodies - numAttractors;
 
@@ -585,7 +604,15 @@ namespace HSP.Trajectories
                 _staleToAdd.Clear();
             }
 
-            _staleToRemove.Clear();
+            if( _staleToRemove.Count > 0 )
+            {
+                foreach( var body in _staleToRemove )
+                {
+                    _bodies.Remove( body );
+                }
+
+                _staleToRemove.Clear();
+            }
 
             // ephemeris of a stale body needs to be reset, and the body needs to be resimulated.
             // the 'head' UT of the simulation needs to be rolled back to the min() of the bodies' head UT.
