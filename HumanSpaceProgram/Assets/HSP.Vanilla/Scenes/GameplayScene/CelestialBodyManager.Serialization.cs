@@ -37,7 +37,7 @@ namespace HSP.Vanilla.Scenes.GameplayScene
 
                 var su = SerializationUnit.FromObjects( celestialBody.gameObject );
                 SerializationResult result = su.Serialize( TimelineManager.RefStore );
-                if( result.HasFlag( SerializationResult.Failed ) )
+                if( result.HasFlag( SerializationResult.Failed ) || result.HasFlag( SerializationResult.HasFailures ) )
                 {
                     Debug.LogError( $"Failed to serialize celestial body '{celestialBody.name}'." );
                     e.AddMessage( LogType.Error, $"Failed to serialize celestial body '{celestialBody.name}'." );
@@ -71,7 +71,7 @@ namespace HSP.Vanilla.Scenes.GameplayScene
                 var data = dataHandler.Read();
                 var su = SerializationUnit.FromData<GameObject>( data );
                 SerializationResult result = su.Deserialize( TimelineManager.RefStore );
-                if( result.HasFlag( SerializationResult.Failed ) )
+                if( result.HasFlag( SerializationResult.Failed ) || result.HasFlag( SerializationResult.HasFailures ) )
                 {
                     Debug.LogError( $"Failed to deserialize celestial body from '{dir}'." );
                     e.AddMessage( LogType.Error, $"Failed to deserialize celestial body from '{dir}'." );

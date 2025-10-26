@@ -32,7 +32,8 @@ namespace HSP.Vanilla.Scenes.GameplayScene
 
             var su = SerializationUnit.FromObjects( UnityEngine.Object.FindObjectOfType<ActiveVesselManager>() );
             SerializationResult result = su.Serialize( TimelineManager.RefStore );
-            if( result.HasFlag( SerializationResult.Failed ) )
+#warning TODO - standardize the 'is failure' check in unityplus.
+            if( result.HasFlag( SerializationResult.Failed ) || result.HasFlag( SerializationResult.HasFailures ) )
             {
                 Debug.LogError( $"Failed to serialize ActiveVesselManager." );
                 e.AddMessage( LogType.Error, $"Failed to serialize ActiveVesselManager." );
@@ -61,7 +62,7 @@ namespace HSP.Vanilla.Scenes.GameplayScene
             var data = dataHandler.Read();
             var su = SerializationUnit.PopulateObject( UnityEngine.Object.FindObjectOfType<ActiveVesselManager>(), data );
             SerializationResult result = su.Populate( TimelineManager.RefStore );
-            if( result.HasFlag( SerializationResult.Failed ) )
+            if( result.HasFlag( SerializationResult.Failed ) || result.HasFlag( SerializationResult.HasFailures ) )
             {
                 Debug.LogError( $"Failed to deserialize ActiveVesselManager." );
                 e.AddMessage( LogType.Error, $"Failed to deserialize ActiveVesselManager." );

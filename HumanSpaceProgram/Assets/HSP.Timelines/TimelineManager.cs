@@ -449,20 +449,6 @@ namespace HSP.Timelines
 #warning TODO - check if newer version
             if( NeedsMigration( loadedSave ) )
             {
-                /*try
-                {
-                    BackupSave( loadedSave );
-                    MigrateSave( loadedSave );
-                }
-                catch( IncompatibleSaveException )
-                {
-                    throw; // Re-throw as-is
-                }
-                catch( Exception ex )
-                {
-                    throw new IncompatibleSaveException( $"Failed to validate or migrate save file: {ex.Message}", ex );
-                }*/
-
                 throw new IncompatibleSaveException( $"Tried to load an unmigrated save." );
             }
 
@@ -485,7 +471,6 @@ namespace HSP.Timelines
                 return;
             }
             SaveLoadFinishUnlockUnpause();
-#warning TODO - exit to main menu instead of leaving the game in a partially loaded and fucked state.
 
             instance._currentScenario = loadedScenario;
             instance._currentTimeline = loadedTimeline;
@@ -546,7 +531,6 @@ namespace HSP.Timelines
                 return;
             }
             SaveLoadFinishUnlockUnpause();
-#warning TODO - exit to main menu instead of leaving the game in a partially loaded and fucked state.
 
             instance._currentScenario = loadedScenario;
             instance._currentTimeline = timeline;

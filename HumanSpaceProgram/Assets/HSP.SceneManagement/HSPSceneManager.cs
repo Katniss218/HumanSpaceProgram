@@ -332,6 +332,7 @@ namespace HSP.SceneManagement
         /// <typeparam name="TNewScene">The type specifying the scene to load.</typeparam>
         public static void ReplaceForegroundScene<TNewScene>( Action onAfterUnloaded = null, Action onAfterLoaded = null ) where TNewScene : IHSPScene
         {
+#error TODO - block execution if already in the middle of loading/unloading the same scene. A strongly typed HSP scene can only be loaded once. To load a new one, make a new subclass.
             if( _foregroundScene == null )
             {
                 throw new InvalidOperationException( "There is currently no loaded foreground scene." );
@@ -442,6 +443,10 @@ namespace HSP.SceneManagement
                     MethodInfo method = newSceneType.GetMethod( "GetOrCreateSceneManagerInActiveScene", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.FlattenHierarchy );
                     IHSPScene newScene = (IHSPScene)method.Invoke( null, new object[] { newlyLoadedScene } );
                     _loadedScenes.Add( newScene );
+                    if( asForeground )
+                    {
+                        _foregroundScene = newScene;
+                    }
 
                     if( implementsGenericIHSPScene )
                     {
@@ -456,8 +461,7 @@ namespace HSP.SceneManagement
 
                     if( asForeground )
                     {
-                        _foregroundScene = newScene;
-                        _foregroundScene._onactivate();
+                        newScene._onactivate();
                     }
                 };
 
@@ -487,6 +491,10 @@ namespace HSP.SceneManagement
                 MethodInfo method = newSceneType.GetMethod( "GetOrCreateSceneManagerInActiveScene", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.FlattenHierarchy );
                 IHSPScene newScene = (IHSPScene)method.Invoke( null, new object[] { newlyLoadedScene } );
                 _loadedScenes.Add( newScene );
+                if( asForeground )
+                {
+                    _foregroundScene = newScene;
+                }
 
                 if( implementsGenericIHSPScene )
                 {
@@ -501,8 +509,7 @@ namespace HSP.SceneManagement
 
                 if( asForeground )
                 {
-                    _foregroundScene = newScene;
-                    _foregroundScene._onactivate();
+                    newScene._onactivate();
                 }
             }
 

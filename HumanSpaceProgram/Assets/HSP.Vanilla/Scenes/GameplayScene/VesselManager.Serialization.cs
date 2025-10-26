@@ -36,7 +36,7 @@ namespace HSP.Vanilla.Scenes.GameplayScene
 
                 var su = SerializationUnit.FromObjects( vessel.gameObject );
                 SerializationResult result = su.Serialize( TimelineManager.RefStore );
-                if( result.HasFlag( SerializationResult.Failed ) )
+                if( result.HasFlag( SerializationResult.Failed ) || result.HasFlag( SerializationResult.HasFailures ) )
                 {
                     Debug.LogError( $"Failed to serialize vessel '{vessel.name}'." );
                     e.AddMessage( LogType.Error, $"Failed to serialize vessel '{vessel.name}'." );
@@ -70,7 +70,7 @@ namespace HSP.Vanilla.Scenes.GameplayScene
                 SerializedData data = dataHandler.Read();
                 var su = SerializationUnit.FromData<GameObject>( data );
                 SerializationResult result = su.Deserialize( TimelineManager.RefStore );
-                if( result.HasFlag( SerializationResult.Failed ) )
+                if( result.HasFlag( SerializationResult.Failed ) || result.HasFlag( SerializationResult.HasFailures ) )
                 {
                     Debug.LogError( $"Failed to deserialize vessel from '{dir}'." );
                     e.AddMessage( LogType.Error, $"Failed to deserialize vessel from '{dir}'." );

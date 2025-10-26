@@ -249,6 +249,7 @@ namespace HSP.Vanilla.Scenes.GameplayScene.Cameras
         [HSPEventListener( HSPEvent_GAMEPLAY_SCENE_LOAD.ID, CREATE_CAMERA )]
         private static void OnGameplaySceneLoad()
         {
+#warning TODO - guard against spawning if gameplay scene has started unloading.
             GameObject cameraPivotGameObject = new GameObject( "Camera Pivot" );
             _cameraPivot = cameraPivotGameObject;
 
