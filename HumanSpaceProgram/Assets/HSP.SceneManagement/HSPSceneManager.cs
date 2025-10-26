@@ -487,7 +487,17 @@ namespace HSP.SceneManagement
                 MethodInfo method = newSceneType.GetMethod( "GetOrCreateSceneManagerInActiveScene", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.FlattenHierarchy );
                 IHSPScene newScene = (IHSPScene)method.Invoke( null, new object[] { newlyLoadedScene } );
                 _loadedScenes.Add( newScene );
-                newScene._onload();
+
+                if( implementsGenericIHSPScene )
+                {
+                    //newScene._onload( loadData );
+                    method = newSceneType.GetMethod( "_onload", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.FlattenHierarchy, null, new Type[] { loadData.GetType() }, null );
+                    method.Invoke( newScene, new object[] { loadData } );
+                }
+                else
+                {
+                    newScene._onload();
+                }
 
                 if( asForeground )
                 {

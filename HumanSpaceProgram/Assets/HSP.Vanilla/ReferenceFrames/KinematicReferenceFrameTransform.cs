@@ -33,14 +33,15 @@ namespace HSP.Vanilla
         {
             get
             {
-                return _rb.position;
+                // Apparently, rigidbody values get set to 0 when disabled...
+                return this.gameObject.activeInHierarchy ? _rb.position : (Vector3)SceneReferenceFrameProvider.GetSceneReferenceFrame().InverseTransformPosition( _actualAbsolutePosition );
             }
             set
             {
                 // Set both absolute and rigidbody because the call might happen after physics/fixedupdate.
                 _rb.position = value;
                 transform.position = value;
-                var absolutePos = SceneReferenceFrameProvider.GetSceneReferenceFrame().InverseTransformPosition( value );
+                var absolutePos = SceneReferenceFrameProvider.GetSceneReferenceFrame().TransformPosition( value );
                 _actualAbsolutePosition = absolutePos;
                 _requestedAbsolutePosition = absolutePos;
             }
@@ -69,14 +70,15 @@ namespace HSP.Vanilla
         {
             get
             {
-                return _rb.rotation;
+                // Apparently, rigidbody values get set to 0 when disabled...
+                return this.gameObject.activeInHierarchy ? _rb.rotation : (Quaternion)SceneReferenceFrameProvider.GetSceneReferenceFrame().InverseTransformRotation( _actualAbsoluteRotation );
             }
             set
             {
                 // Set both absolute and rigidbody because the call might happen after physics/fixedupdate.
                 _rb.rotation = value;
                 transform.rotation = value;
-                var absoluteRot = SceneReferenceFrameProvider.GetSceneReferenceFrame().InverseTransformRotation( value );
+                var absoluteRot = SceneReferenceFrameProvider.GetSceneReferenceFrame().TransformRotation( value );
                 _actualAbsoluteRotation = absoluteRot;
                 _requestedAbsoluteRotation = absoluteRot;
             }

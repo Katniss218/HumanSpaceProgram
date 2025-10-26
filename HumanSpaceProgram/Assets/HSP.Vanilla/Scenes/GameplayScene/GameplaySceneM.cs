@@ -1,4 +1,5 @@
 using HSP.SceneManagement;
+using HSP.Timelines.Serialization;
 using UnityEngine;
 using static HSP.Vanilla.Scenes.GameplayScene.GameplaySceneM;
 
@@ -41,9 +42,28 @@ namespace HSP.Vanilla.Scenes.GameplayScene
     /// </summary>
     public sealed class GameplaySceneM : HSPScene<GameplaySceneM, LoadData>
     {
-        public sealed class LoadData
+        public sealed class LoadData // TODO - maybe change to 2 subclasses?
         {
-            // Intentionally left blank for now.
+            public TimelineMetadata newTimeline;
+            public string loadTimelineId;
+            public string loadSaveId;
+        }
+
+        public static LoadData NewTimelineLoadData( TimelineMetadata newTimeline )
+        {
+            return new LoadData
+            {
+                newTimeline = newTimeline
+            };
+        }
+
+        public static LoadData LoadSaveLoadData( string timelineId, string saveId = null )
+        {
+            return new LoadData
+            {
+                loadTimelineId = timelineId,
+                loadSaveId = saveId
+            };
         }
 
         public static new string UNITY_SCENE_NAME => "Testing And Shit"; // TODO - swap out for "Gameplay" when the part with creating and loading rockets is done.

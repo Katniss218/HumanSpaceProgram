@@ -26,6 +26,9 @@ void Awake()
 Object pooling is very useful when you have a lot of very similar objects that live for a bit and then die, only to be respawned later.
 Unity already has an object pool class - `ObjectPool<T>`, and UnityPlus implements one as well - Use it when applicable - `ObjectPool<TItem, TItemData>`.
 
+#### 4. Rigidbody:
+Rigidbodies return 0 / identity if the gameobject is disabled - `if( !gameObject.activeInHierarchy )`.
+Use the transform values, store the value pre-disabled and return that if the object is disabled.
 
 
 ## HSP-specific:

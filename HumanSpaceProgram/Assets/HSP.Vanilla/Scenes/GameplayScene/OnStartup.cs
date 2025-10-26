@@ -118,8 +118,23 @@ namespace HSP.Vanilla.Scenes.GameplayScene
         [HSPEventListener( HSPEvent_GAMEPLAY_SCENE_LOAD.ID, RESET_UT )]
         private static void ResetUT()
         {
-#warning TODO - don't. save in scenario instead.
+#warning TODO - don't. save in scenario/save instead.
             TimeManager.SetUT( 0 );
+        }
+
+        public const string LOAD_OR_CREATE_TIMELINE = HSPEvent.NAMESPACE_HSP + ".load_or_create_timeline";
+
+        [HSPEventListener( HSPEvent_GAMEPLAY_SCENE_LOAD.ID, LOAD_OR_CREATE_TIMELINE )]
+        private static void LoadOrCreateTimeline( GameplaySceneM.LoadData loadData )
+        {
+            if( loadData.newTimeline != null )
+            {
+                TimelineManager.BeginNewTimelineAsync( loadData.newTimeline );
+            }
+            else if( loadData.loadTimelineId != null && loadData.loadSaveId != null )
+            {
+                TimelineManager.BeginLoadAsync( loadData.loadTimelineId, loadData.loadSaveId );
+            }
         }
     }
 }

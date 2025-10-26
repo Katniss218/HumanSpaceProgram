@@ -34,7 +34,11 @@ namespace HSP.Vanilla
 
         public Vector3 Position
         {
-            get => this._rb.position;
+            get
+            {
+                // Apparently, rigidbody values get set to 0 when disabled...
+                return this.gameObject.activeInHierarchy ? _rb.position : transform.position;
+            }
             set
             {
                 this._cachedAbsolutePosition = SceneReferenceFrameProvider.GetSceneReferenceFrame().TransformPosition( value );
@@ -65,7 +69,11 @@ namespace HSP.Vanilla
 
         public Quaternion Rotation
         {
-            get => this._rb.rotation;
+            get
+            {
+                // Apparently, rigidbody values get set to 0 when disabled...
+                return this.gameObject.activeInHierarchy ? _rb.rotation : transform.rotation;
+            }
             set
             {
                 this._cachedAbsoluteRotation = SceneReferenceFrameProvider.GetSceneReferenceFrame().TransformRotation( value );
@@ -96,7 +104,11 @@ namespace HSP.Vanilla
 
         public Vector3 Velocity
         {
-            get => this._rb.velocity;
+            get
+            {
+                // Apparently, rigidbody values get set to 0 when disabled...
+                return this.gameObject.activeInHierarchy ? _rb.velocity : (Vector3)SceneReferenceFrameProvider.GetSceneReferenceFrame().InverseTransformVelocity( _cachedAbsoluteVelocity );
+            }
             set
             {
                 this._cachedAbsoluteVelocity = SceneReferenceFrameProvider.GetSceneReferenceFrame().TransformVelocity( value );
@@ -126,7 +138,11 @@ namespace HSP.Vanilla
 
         public Vector3 AngularVelocity
         {
-            get => this._rb.angularVelocity;
+            get
+            {
+                // Apparently, rigidbody values get set to 0 when disabled...
+                return this.gameObject.activeInHierarchy ? _rb.angularVelocity : (Vector3)SceneReferenceFrameProvider.GetSceneReferenceFrame().InverseTransformAngularVelocity( _cachedAbsoluteAngularVelocity );
+            }
             set
             {
                 this._cachedAbsoluteAngularVelocity = SceneReferenceFrameProvider.GetSceneReferenceFrame().TransformAngularVelocity( value );
@@ -316,10 +332,14 @@ namespace HSP.Vanilla
 
         protected void RecalculateCache( IReferenceFrame sceneReferenceFrame )
         {
-            _cachedAbsolutePosition = sceneReferenceFrame.TransformPosition( _rb.position );
-            _cachedAbsoluteRotation = sceneReferenceFrame.TransformRotation( this.gameObject.activeInHierarchy ? _rb.rotation : transform.rotation ); // Apparently, rigidbody.rotation gets set to identity when disabled...
-            _cachedAbsoluteVelocity = sceneReferenceFrame.TransformVelocity( _rb.velocity );
-            _cachedAbsoluteAngularVelocity = sceneReferenceFrame.TransformAngularVelocity( _rb.angularVelocity );
+            bool active = this.gameObject.activeInHierarchy;
+            _cachedAbsolutePosition = sceneReferenceFrame.TransformPosition( active ? _rb.position : transform.position );
+            _cachedAbsoluteRotation = sceneReferenceFrame.TransformRotation( active ? _rb.rotation : transform.rotation ); // Apparently, rigidbody values get set to 0 when disabled...
+            if( active )
+            {
+                _cachedAbsoluteVelocity = sceneReferenceFrame.TransformVelocity( _rb.velocity );
+                _cachedAbsoluteAngularVelocity = sceneReferenceFrame.TransformAngularVelocity( _rb.angularVelocity );
+            }
             // Don't cache acceleration, since it's impossible to compute it here for a dynamic body. Acceleration is recalculated on every fixedupdate instead.
             _cachedSceneReferenceFrame = sceneReferenceFrame;
         }
