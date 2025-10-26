@@ -34,7 +34,7 @@ namespace HSP.Vanilla
         public static SerializationMapping PinnedCelestialBodyReferenceFrameTransformMapping()
         {
             return new MemberwiseSerializationMapping<PinnedCelestialBodyReferenceFrameTransform>()
-                .WithMember( "reference_transform", o => (object)null, ( o, value ) => { } ) // removes the base member because we use the celestialbody instead.
+                .ExcludeMember( "reference_transform" ) // removes the base member because we use the celestialbody instead.
                 .WithMember( "reference_body", o => o.ReferenceBody == null ? null : o.ReferenceBody.ID, ( o, value ) => o.ReferenceBody = value == null ? null : CelestialBodyManager.Get( value ) );
         }
     }

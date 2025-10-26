@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityPlus.AssetManagement;
 using UnityPlus.UILib;
 using UnityPlus.UILib.UIElements;
@@ -12,7 +7,6 @@ namespace HSP.UI.Windows
 {
     public class UIAlertWindow : UIWindow
     {
-#warning TODO - these should probably be available from main code, not just from the UI project.
         protected internal static T Create<T>( UICanvas parent, UILayoutInfo layoutInfo, string title, string text ) where T : UIAlertWindow
         {
             T uiWindow = (T)UIWindow.Create<T>( parent, layoutInfo, AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/window" ) )

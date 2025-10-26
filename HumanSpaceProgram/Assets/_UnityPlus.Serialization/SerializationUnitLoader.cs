@@ -29,7 +29,7 @@ namespace UnityPlus.Serialization
         internal SerializationUnitLoader( T[] objects, SerializedData[] data, int context )
         {
             if( objects.Length != data.Length )
-                throw new ArgumentException( $"The length of '{nameof( objects )}' ({objects.Length}) must match the length of '{nameof(data)}' ({data.Length})." );
+                throw new ArgumentException( $"The length of '{nameof( objects )}' ({objects.Length}) must match the length of '{nameof( data )}' ({data.Length})." );
 
             this.RefMap = new BidirectionalReferenceStore();
             this._objects = objects;
@@ -49,75 +49,95 @@ namespace UnityPlus.Serialization
         /// <summary>
         /// Performs deserialization of the previously specified objects.
         /// </summary>
-        public void Deserialize( int maxIters = 10 )
+        public SerializationResult Deserialize( int maxIters = 10 )
         {
+            if( maxIters <= 0 )
+                throw new ArgumentOutOfRangeException( nameof( maxIters ), $"The maximum number of iterations must be greater than zero." );
+
             this._objects = new T[_data.Length];
             this.CurrentPass = -1;
 
+            SerializationResult result = SerializationResult.NoChange;
             for( int i = 0; i < maxIters; i++ )
             {
                 this.CurrentPass++;
-                SerializationResult result = this.LoadOrPopulateCallback( false );
+                result = this.LoadOrPopulateCallback( false );
                 if( result.HasFlag( SerializationResult.Finished ) )
-                    return;
+                    return result;
             }
+
+            return result;
         }
 
         /// <summary>
         /// Performs deserialization of the previously specified objects.
         /// </summary>
-        public void Deserialize( IForwardReferenceMap l, int maxIters = 10 )
+        public SerializationResult Deserialize( IForwardReferenceMap l, int maxIters = 10 )
         {
             if( l == null )
                 throw new ArgumentNullException( nameof( l ), $"The reference map to use can't be null." );
+            if( maxIters <= 0 )
+                throw new ArgumentOutOfRangeException( nameof( maxIters ), $"The maximum number of iterations must be greater than zero." );
 
             this._objects = new T[_data.Length];
             this.CurrentPass = -1;
             this.RefMap = l;
 
+            SerializationResult result = SerializationResult.NoChange;
             for( int i = 0; i < maxIters; i++ )
             {
                 this.CurrentPass++;
-                SerializationResult result = this.LoadOrPopulateCallback( false );
+                result = this.LoadOrPopulateCallback( false );
                 if( result.HasFlag( SerializationResult.Finished ) )
-                    return;
+                    return result;
             }
+
+            return result;
         }
 
         /// <summary>
         /// Performs population of members of the previously specified objects.
         /// </summary>
-        public void Populate( int maxIters = 10 )
+        public SerializationResult Populate( int maxIters = 10 )
         {
+            if( maxIters <= 0 )
+                throw new ArgumentOutOfRangeException( nameof( maxIters ), $"The maximum number of iterations must be greater than zero." );
             this.CurrentPass = -1;
 
+            SerializationResult result = SerializationResult.NoChange;
             for( int i = 0; i < maxIters; i++ )
             {
                 this.CurrentPass++;
-                SerializationResult result = this.LoadOrPopulateCallback( true );
+                result = this.LoadOrPopulateCallback( true );
                 if( result.HasFlag( SerializationResult.Finished ) )
-                    return;
+                    return result;
             }
+
+            return result;
         }
 
         /// <summary>
         /// Performs population of members of the previously specified objects.
         /// </summary>
-        public void Populate( IForwardReferenceMap l, int maxIters = 10 )
+        public SerializationResult Populate( IForwardReferenceMap l, int maxIters = 10 )
         {
             if( l == null )
                 throw new ArgumentNullException( nameof( l ), $"The reference map to use can't be null." );
+            if( maxIters <= 0 )
+                throw new ArgumentOutOfRangeException( nameof( maxIters ), $"The maximum number of iterations must be greater than zero." );
 
             this.CurrentPass = -1;
             this.RefMap = l;
 
+            SerializationResult result = SerializationResult.NoChange;
             for( int i = 0; i < maxIters; i++ )
             {
                 this.CurrentPass++;
-                SerializationResult result = this.LoadOrPopulateCallback( true );
+                result = this.LoadOrPopulateCallback( true );
                 if( result.HasFlag( SerializationResult.Finished ) )
-                    return;
+                    return result;
             }
+            return result;
         }
 
         //
