@@ -83,7 +83,7 @@ namespace HSP_Tests_PlayMode
             ITrajectoryTransform obj = CreateObject( new GameplaySceneReferenceFrameProvider(), true );
 
             sut.TryAddBody( obj );
-            sut.FixStale( TrajectorySimulator2.SimulationDirection.Forward );
+            sut.FixStale();
             yield return new WaitForFixedUpdate();
 
             Assert.That( sut.BodyCount, Is.EqualTo( 1 ) );
@@ -111,7 +111,7 @@ namespace HSP_Tests_PlayMode
             sut.TryAddBody( b );
             sut.TryAddBody( c );
             sut.TryAddBody( d );
-            sut.FixStale( TrajectorySimulator2.SimulationDirection.Forward );
+            sut.FixStale();
             yield return new WaitForFixedUpdate();
 
             Assert.That( sut.BodyCount, Is.EqualTo( 4 ) );
@@ -137,7 +137,7 @@ namespace HSP_Tests_PlayMode
 
             // remove without ever adding
             sut.TryRemoveBody( obj );
-            sut.FixStale( TrajectorySimulator2.SimulationDirection.Forward );
+            sut.FixStale();
             yield return new WaitForFixedUpdate();
 
             Assert.That( sut.BodyCount, Is.EqualTo( 0 ) );
@@ -160,7 +160,7 @@ namespace HSP_Tests_PlayMode
 
             sut.TryAddBody( obj );
             sut.TryRemoveBody( obj ); // cancel before FixStale
-            sut.FixStale( TrajectorySimulator2.SimulationDirection.Forward );
+            sut.FixStale();
 
             yield return new WaitForFixedUpdate();
 
@@ -191,7 +191,7 @@ namespace HSP_Tests_PlayMode
             sut.TryAddBody( d );
             sut.TryRemoveBody( a ); // cancel before FixStale
             sut.TryRemoveBody( c );
-            sut.FixStale( TrajectorySimulator2.SimulationDirection.Forward );
+            sut.FixStale();
 
             yield return new WaitForFixedUpdate();
 
@@ -218,14 +218,14 @@ namespace HSP_Tests_PlayMode
 
             // make sure the object is present in the simulator first
             sut.TryAddBody( obj );
-            sut.FixStale( TrajectorySimulator2.SimulationDirection.Forward );
+            sut.FixStale();
             yield return new WaitForFixedUpdate();
             Assert.That( sut.BodyCount, Is.EqualTo( 1 ) );
 
             // schedule remove then add (remove cancelled by add)
             sut.TryRemoveBody( obj );
             sut.TryAddBody( obj );
-            sut.FixStale( TrajectorySimulator2.SimulationDirection.Forward );
+            sut.FixStale();
 
             yield return new WaitForFixedUpdate();
 
@@ -248,9 +248,9 @@ namespace HSP_Tests_PlayMode
             ITrajectoryTransform obj = CreateObject( new GameplaySceneReferenceFrameProvider(), true );
 
             sut.TryAddBody( obj );
-            sut.FixStale( TrajectorySimulator2.SimulationDirection.Forward );
-            sut.FixStale( TrajectorySimulator2.SimulationDirection.Forward );
-            sut.FixStale( TrajectorySimulator2.SimulationDirection.Forward );
+            sut.FixStale();
+            sut.FixStale();
+            sut.FixStale();
             yield return new WaitForFixedUpdate();
 
             Assert.That( sut.BodyCount, Is.EqualTo( 1 ) );
@@ -282,7 +282,7 @@ namespace HSP_Tests_PlayMode
             }
 
             sut.TryAddBody( obj );
-            sut.FixStale( TrajectorySimulator2.SimulationDirection.Forward );
+            sut.FixStale();
             yield return new WaitForFixedUpdate();
 
             Assert.That( sut.BodyCount, Is.EqualTo( 1 ) );
@@ -307,7 +307,7 @@ namespace HSP_Tests_PlayMode
             sut.TryAddBody( obj );
             sut.TryAddBody( obj );
 
-            sut.FixStale( TrajectorySimulator2.SimulationDirection.Forward );
+            sut.FixStale();
             yield return new WaitForFixedUpdate();
 
             Assert.That( sut.BodyCount, Is.EqualTo( 1 ) );
@@ -330,7 +330,7 @@ namespace HSP_Tests_PlayMode
             ITrajectoryTransform obj = CreateObject( new GameplaySceneReferenceFrameProvider(), true );
 
             sut.TryAddBody( obj );
-            sut.FixStale( TrajectorySimulator2.SimulationDirection.Forward );
+            sut.FixStale();
             yield return new WaitForFixedUpdate();
             Assert.That( sut.BodyCount, Is.EqualTo( 1 ) );
             Assert.That( sut.AttractorCount, Is.EqualTo( 1 ) );
@@ -340,7 +340,7 @@ namespace HSP_Tests_PlayMode
             sut.TryRemoveBody( obj );
             sut.TryRemoveBody( obj );
 
-            sut.FixStale( TrajectorySimulator2.SimulationDirection.Forward );
+            sut.FixStale();
             yield return new WaitForFixedUpdate();
 
             Assert.That( sut.BodyCount, Is.EqualTo( 0 ) );
@@ -366,7 +366,7 @@ namespace HSP_Tests_PlayMode
             sut.TryRemoveBody( obj );
             sut.TryAddBody( obj );
 
-            sut.FixStale( TrajectorySimulator2.SimulationDirection.Forward );
+            sut.FixStale();
             yield return new WaitForFixedUpdate();
 
             Assert.That( sut.BodyCount, Is.EqualTo( 1 ) );
@@ -388,7 +388,7 @@ namespace HSP_Tests_PlayMode
             ITrajectoryTransform obj = CreateObject( new GameplaySceneReferenceFrameProvider(), true );
 
             sut.TryAddBody( obj );
-            sut.FixStale( TrajectorySimulator2.SimulationDirection.Forward );
+            sut.FixStale();
             yield return new WaitForFixedUpdate();
 
             int before = sut.BodyCount;
@@ -396,8 +396,8 @@ namespace HSP_Tests_PlayMode
             int followersBefore = sut.FollowerCount;
 
             // call FixStale repeatedly with no changes
-            sut.FixStale( TrajectorySimulator2.SimulationDirection.Forward );
-            sut.FixStale( TrajectorySimulator2.SimulationDirection.Forward );
+            sut.FixStale();
+            sut.FixStale();
 
             Assert.That( sut.BodyCount, Is.EqualTo( before ) );
             Assert.That( sut.AttractorCount, Is.EqualTo( attractorsBefore ) );
@@ -435,7 +435,7 @@ namespace HSP_Tests_PlayMode
             }
 
             sut.TryAddBody( obj );
-            sut.FixStale( TrajectorySimulator2.SimulationDirection.Forward );
+            sut.FixStale();
             yield return new WaitForFixedUpdate();
 
             Assert.That( sut.BodyCount, Is.EqualTo( 1 ) );
@@ -458,7 +458,7 @@ namespace HSP_Tests_PlayMode
             ITrajectoryTransform obj = CreateObject( provider, true );
 
             sut.TryAddBody( obj );
-            sut.FixStale( TrajectorySimulator2.SimulationDirection.Forward );
+            sut.FixStale();
             yield return new WaitForFixedUpdate();
             Assert.That( sut.BodyCount, Is.EqualTo( 1 ) );
             Assert.That( sut.AttractorCount, Is.EqualTo( 1 ) );
@@ -476,7 +476,7 @@ namespace HSP_Tests_PlayMode
             }
 
             // should not throw and should keep the object present
-            sut.FixStale( TrajectorySimulator2.SimulationDirection.Forward );
+            sut.FixStale();
             yield return new WaitForFixedUpdate();
 
             Assert.That( sut.BodyCount, Is.EqualTo( 1 ) );
@@ -485,6 +485,97 @@ namespace HSP_Tests_PlayMode
 
             GameObject.DestroyImmediate( manager );
             GameObject.DestroyImmediate( (obj as Component).gameObject );
+        }
+
+        [UnityTest]
+        public IEnumerator SimulateSimple()
+        {
+            yield return new WaitForFixedUpdate();
+
+            var (manager, _, _, _) = CreateTestScene();
+            TrajectorySimulator2 sut = new TrajectorySimulator2( 0.5, 10 );
+            sut.SetInitialTime( TimeManager.UT );
+
+            var provider = new GameplaySceneReferenceFrameProvider();
+            ITrajectoryTransform obj = CreateObject( provider, true );
+            ITrajectoryTransform obj2 = CreateObject( provider, false );
+
+            sut.TryAddBody( obj );
+            sut.TryAddBody( obj2 );
+            yield return new WaitForFixedUpdate();
+
+            sut.Simulate( TimeManager.UT + 10.0 );
+            Assert.That( sut.BodyCount, Is.EqualTo( 2 ) );
+            Assert.That( sut.AttractorCount, Is.EqualTo( 1 ) );
+            Assert.That( sut.FollowerCount, Is.EqualTo( 1 ) );
+
+            GameObject.DestroyImmediate( manager );
+            GameObject.DestroyImmediate( (obj as Component).gameObject );
+            GameObject.DestroyImmediate( (obj2 as Component).gameObject );
+        }
+
+        [UnityTest]
+        public IEnumerator SimulateAttractorFirst()
+        {
+            yield return new WaitForFixedUpdate();
+
+            var (manager, _, _, _) = CreateTestScene();
+            TrajectorySimulator2 sut = new TrajectorySimulator2( 0.5, 10 );
+            sut.SetInitialTime( TimeManager.UT );
+
+            var provider = new GameplaySceneReferenceFrameProvider();
+            ITrajectoryTransform obj = CreateObject( provider, true );
+            sut.TryAddBody( obj );
+            yield return new WaitForFixedUpdate();
+
+            sut.Simulate( TimeManager.UT + 10.0 );
+
+            ITrajectoryTransform obj2 = CreateObject( provider, false );
+            sut.TryAddBody( obj2 );
+
+            sut.Simulate( TimeManager.UT + 10.0 );
+
+            Assert.DoesNotThrow( () => sut.GetStateVector( TimeManager.UT, obj ) );
+            Assert.DoesNotThrow( () => sut.GetStateVector( TimeManager.UT + 10, obj ) );
+            Assert.DoesNotThrow( () => sut.GetStateVector( TimeManager.UT, obj2 ) );
+            Assert.DoesNotThrow( () => sut.GetStateVector( TimeManager.UT + 10, obj2 ) );
+
+            GameObject.DestroyImmediate( manager );
+            GameObject.DestroyImmediate( (obj as Component).gameObject );
+            GameObject.DestroyImmediate( (obj2 as Component).gameObject );
+        }
+
+        [UnityTest]
+        public IEnumerator SimulateAttractorResetFollower()
+        {
+            yield return new WaitForFixedUpdate();
+
+            var (manager, _, _, _) = CreateTestScene();
+            TrajectorySimulator2 sut = new TrajectorySimulator2( 0.5, 10 );
+            sut.SetInitialTime( TimeManager.UT );
+
+            var provider = new GameplaySceneReferenceFrameProvider();
+            ITrajectoryTransform obj = CreateObject( provider, true );
+            ITrajectoryTransform obj2 = CreateObject( provider, false );
+            sut.TryAddBody( obj );
+            sut.TryAddBody( obj2 );
+            yield return new WaitForFixedUpdate();
+
+            sut.Simulate( TimeManager.UT + 10.0 );
+
+            sut.MarkStale( obj2 );
+#warning TODO - how to tell it where the start should be now? the start should be at Timemanager.UT, since that's where the GetBodyState() is.
+
+            sut.Simulate( TimeManager.UT + 10.0 );
+
+            Assert.DoesNotThrow( () => sut.GetStateVector( TimeManager.UT, obj ) );
+            Assert.DoesNotThrow( () => sut.GetStateVector( TimeManager.UT + 10, obj ) );
+            Assert.DoesNotThrow( () => sut.GetStateVector( TimeManager.UT, obj2 ) );
+            Assert.DoesNotThrow( () => sut.GetStateVector( TimeManager.UT + 10, obj2 ) );
+
+            GameObject.DestroyImmediate( manager );
+            GameObject.DestroyImmediate( (obj as Component).gameObject );
+            GameObject.DestroyImmediate( (obj2 as Component).gameObject );
         }
     }
 }

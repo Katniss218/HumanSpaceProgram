@@ -134,16 +134,17 @@ namespace HSP.Trajectories
         }
 
         /// <summary>
-        /// Computes the interval where the ephemerides are valid.
+        /// Computes the interval where the ephemerides of all selected bodies are valid. <br/>
+        /// The resulting interval is the intersection of the ephemerides of all selected bodies.
         /// </summary>
         public TimeInterval GetSimulatedInterval( SimulatedIntervalOptions options = SimulatedIntervalOptions.IncludeAttractorsAndFollowers )
         {
             if( _bodies.Count == 0 )
                 return new TimeInterval( _initialUT, _initialUT );
 
-            double headUT = double.MinValue;
-            double tailUT = double.MaxValue;
-            foreach( var (_, entry) in _bodies )
+            double headUT = double.MaxValue;
+            double tailUT = double.MinValue;
+            foreach( var entry in _bodies.Values )
             {
                 if( entry.isAttractor && !options.HasFlag( SimulatedIntervalOptions.IncludeAttractors ) )
                     continue;
@@ -151,11 +152,12 @@ namespace HSP.Trajectories
                     continue;
 
                 if( entry.ephemeris.Count == 0 )
+                {
                     return new TimeInterval( _initialUT, _initialUT );
-
-                if( entry.ephemeris.HighUT > headUT )
+                }
+                if( entry.ephemeris.HighUT < headUT )
                     headUT = entry.ephemeris.HighUT;
-                if( entry.ephemeris.LowUT < tailUT )
+                if( entry.ephemeris.LowUT > tailUT )
                     tailUT = entry.ephemeris.LowUT;
             }
 
@@ -226,7 +228,7 @@ namespace HSP.Trajectories
 
         public IEnumerable<(ITrajectoryTransform t, IReadonlyEphemeris e)> GetBodies()
         {
-            FixStale( _direction );
+            FixStale();
 
             return _bodies.Select( kvp => (kvp.Key, (IReadonlyEphemeris)kvp.Value.ephemeris) );
         }
@@ -236,7 +238,7 @@ namespace HSP.Trajectories
             if( transform == null )
                 throw new ArgumentNullException( nameof( transform ) );
 
-            FixStale( _direction );
+            FixStale();
 
             bool x = _bodies.TryGetValue( transform, out var entry );
             ephemeris = entry?.ephemeris;
@@ -310,7 +312,7 @@ namespace HSP.Trajectories
             if( transform == null )
                 throw new ArgumentNullException( nameof( transform ) );
 
-            FixStale( _direction );
+            FixStale();
 
             if( !_bodies.TryGetValue( transform, out var entry ) )
                 throw new ArgumentException( $"The trajectory transform '{transform}' is not registered in the simulator.", nameof( transform ) );
@@ -323,7 +325,7 @@ namespace HSP.Trajectories
             if( transform == null )
                 throw new ArgumentNullException( nameof( transform ) );
 
-            FixStale( _direction );
+            FixStale();
 
             if( !_bodies.TryGetValue( transform, out var entry ) )
                 throw new ArgumentException( $"The trajectory transform '{transform}' is not registered in the simulator.", nameof( transform ) );
@@ -344,7 +346,7 @@ namespace HSP.Trajectories
             if( transform == null )
                 throw new ArgumentNullException( nameof( transform ) );
 
-            FixStale( _direction );
+            FixStale();
             if( !_bodies.TryGetValue( transform, out var bodyEntry ) )
                 throw new ArgumentException( $"The trajectory transform '{transform}' is not registered in the simulator.", nameof( transform ) );
 
@@ -403,6 +405,8 @@ namespace HSP.Trajectories
         {
             foreach( var entry in _bodies.Values )
             {
+#warning TODO - this is invoked when saving (when the bodies have been removed), causing an exception.
+                // possible solution - allow custom ephemerides to be registered/stored/restored outside of the simulator.
                 if( !entry.isAttractor )
                     _currentStateFollowers[entry.timestepperIndex] = entry.ephemeris.Evaluate( ut );
             }
@@ -417,7 +421,7 @@ namespace HSP.Trajectories
             }
         }
 
-        public void FixStale( SimulationDirection direction )
+        public void FixStale()
         {
             if( !_isStale )
                 return;
@@ -566,6 +570,16 @@ namespace HSP.Trajectories
                 _staleExisting.Clear();
             }
 
+            if( _staleToRemove.Count > 0 )
+            {
+                foreach( var body in _staleToRemove )
+                {
+                    _bodies.Remove( body );
+                }
+
+                _staleToRemove.Clear();
+            }
+
             if( _staleToAdd.Count > 0 )
             {
                 foreach( var body in _staleToAdd )
@@ -602,16 +616,6 @@ namespace HSP.Trajectories
                 }
 
                 _staleToAdd.Clear();
-            }
-
-            if( _staleToRemove.Count > 0 )
-            {
-                foreach( var body in _staleToRemove )
-                {
-                    _bodies.Remove( body );
-                }
-
-                _staleToRemove.Clear();
             }
 
             // ephemeris of a stale body needs to be reset, and the body needs to be resimulated.
@@ -653,6 +657,8 @@ namespace HSP.Trajectories
 
                 Profiler.BeginSample( "TrajectorySimulator.Simulate_Internal" );
 
+                FixStale();
+
                 TimeInterval interval = GetSimulatedInterval( SimulatedIntervalOptions.IncludeAttractorsAndFollowers );
 
                 double startUT = GetMiddleValue( interval.minUT, interval.maxUT, endUT );
@@ -666,9 +672,6 @@ namespace HSP.Trajectories
                 if( Math.Abs( endUT - startUT ) > 1e-10 )
                     newDirection = endUT > startUT ? SimulationDirection.Forward : SimulationDirection.Backward;
 
-                FixStale( newDirection );
-
-                // Move the timestepper arrays to the end of the valid interval.
                 _direction = newDirection;
 
                 const double STEP_EPSILON = 1e-4;
@@ -677,19 +680,26 @@ namespace HSP.Trajectories
 
                 // Simulate attractors.
 
+                double attractorStartUT = _initialUT;
+                TimeInterval attractorInterval = GetSimulatedInterval( SimulatedIntervalOptions.IncludeAttractors );
                 if( _attractors != null && _attractors.Length > 0 )
                 {
-                    var attractorInterval = GetSimulatedInterval( SimulatedIntervalOptions.IncludeAttractors );
-                    if( attractorInterval.maxUT != _initialUT && interval.minUT != _initialUT )
+                    // Move the timestepper arrays to the end of the valid interval.
+                    if( forward )
                     {
-                        if( forward )
+                        attractorStartUT = attractorInterval.maxUT;
+                        if( attractorInterval.maxUT != _initialUT && attractorInterval.minUT != _initialUT )
                             MoveAttractorsTo( attractorInterval.maxUT );
-                        else
+                    }
+                    else
+                    {
+                        attractorStartUT = attractorInterval.minUT;
+                        if( attractorInterval.maxUT != _initialUT && attractorInterval.minUT != _initialUT )
                             MoveAttractorsTo( attractorInterval.minUT );
                     }
 
                     double step = originalStep;
-                    double ut = startUT;
+                    double ut = attractorStartUT;
                     while( Math.Abs( endUT - ut ) > STEP_EPSILON )
                     {
                         if( Math.Abs( step ) > MaxStepSize )
@@ -746,16 +756,25 @@ namespace HSP.Trajectories
                 }
 
                 // Simulate followers in parallel.
-                // The simulation can include only followers (e.g. path-based, or maneuver-based, etc).
+                // The simulation can technically include just followers, without attractors (e.g. path-based, or maneuver-based, etc).
 
                 if( _followers != null && _followers.Length > 0 )
                 {
+                    double followerStartUT = attractorStartUT;
+                    interval = GetSimulatedInterval( SimulatedIntervalOptions.IncludeFollowers );
                     if( interval.maxUT != _initialUT && interval.minUT != _initialUT )
                     {
+                        // Move the timestepper arrays to the end of the valid interval.
                         if( forward )
+                        {
                             MoveFollowersTo( interval.maxUT );
+                            followerStartUT = interval.maxUT;
+                        }
                         else
+                        {
                             MoveFollowersTo( interval.minUT );
+                            followerStartUT = interval.minUT;
+                        }
                     }
 
                     Parallel.For( 0, _followers.Length, bodyIndex =>
@@ -765,7 +784,7 @@ namespace HSP.Trajectories
                         TrajectoryStateVector[] currentStateFollowers = _currentStateFollowers;
                         TrajectoryStateVector[] nextStateFollowers = _nextStateFollowers;
 
-                        double localUT = startUT;
+                        double localUT = followerStartUT;
                         double localStep = originalStep;
                         while( Math.Abs( endUT - localUT ) > STEP_EPSILON )
                         {
