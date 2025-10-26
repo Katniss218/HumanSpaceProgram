@@ -17,7 +17,7 @@ namespace HSP.UI.Windows
             uiWindow.AddStdText( new UILayoutInfo( UIFill.Horizontal(), UIAnchor.Top, 0, 30 ), title )
                 .WithAlignment( TMPro.HorizontalAlignmentOptions.Center );
 
-            uiWindow.AddStdText( new UILayoutInfo( UIFill.Fill( 2, 2, 32, 19 ) ), text );
+            uiWindow.AddStdText( new UILayoutInfo( UIFill.Fill( 8, 8, 32, 19 ) ), text );
 
             uiWindow.AddButton( new UILayoutInfo( UIAnchor.BottomRight, (-2, 2), (60, 15) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_horizontal" ), () =>
             {
@@ -34,11 +34,11 @@ namespace HSP.UI.Windows
     {
         public static UIAlertWindow AddAlertWindow( this UICanvas parent, string title, string text )
         {
-            return UIAlertWindow.Create<UIAlertWindow>( parent, new UILayoutInfo( UIAnchor.Center, (0, 0), (250, 100) ), title, text );
+            return UIAlertWindow.Create<UIAlertWindow>( parent, new UILayoutInfo( UIAnchor.Center, (0, 0), (300, 120) ), title, text );
         }
         public static UIAlertWindow AddAlertWindow( this UICanvas parent, string text )
         {
-            return UIAlertWindow.Create<UIAlertWindow>( parent, new UILayoutInfo( UIAnchor.Center, (0, 0), (250, 100) ), "", text );
+            return UIAlertWindow.Create<UIAlertWindow>( parent, new UILayoutInfo( UIAnchor.Center, (0, 0), (300, 120) ), "", text );
         }
     }
 }

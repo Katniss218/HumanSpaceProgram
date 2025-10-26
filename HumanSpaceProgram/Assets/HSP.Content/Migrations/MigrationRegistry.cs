@@ -107,9 +107,6 @@ namespace HSP.Content.Migrations
             if( filePath == null || fromVersions == null || toVersions == null )
                 return;
 
-            if( File.Exists( filePath ) == false )
-                throw new MigrationException( $"Save file '{filePath}' does not exist." );
-
             foreach( var kvp in fromVersions )
             {
                 string modId = kvp.Key;

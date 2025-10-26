@@ -6,9 +6,9 @@ using UnityPlus.UILib.UIElements;
 
 namespace HSP.UI.Windows
 {
-    public class UIConfirmWindow : UIWindow
+    public class UIConfirmCancelWindow : UIWindow
     {
-        protected internal static T Create<T>( UICanvas parent, UILayoutInfo layoutInfo, string title, string text, Action onSubmit ) where T : UIConfirmWindow
+        protected internal static T Create<T>( UICanvas parent, UILayoutInfo layoutInfo, string title, string text, Action onSubmit ) where T : UIConfirmCancelWindow
         {
             T uiWindow = (T)UIWindow.Create<T>( parent, layoutInfo, AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/window" ) )
                 .Draggable()
@@ -19,6 +19,13 @@ namespace HSP.UI.Windows
                 .WithAlignment( TMPro.HorizontalAlignmentOptions.Center );
 
             uiWindow.AddStdText( new UILayoutInfo( UIFill.Fill( 8, 8, 32, 19 ) ), text );
+
+            uiWindow.AddButton( new UILayoutInfo( UIAnchor.BottomRight, (-2 - 60 - 2, 2), (60, 15) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_horizontal" ), () =>
+            {
+                uiWindow.Destroy();
+            } )
+                .AddStdText( new UILayoutInfo( UIFill.Fill() ), "Cancel" )
+                .WithAlignment( TMPro.HorizontalAlignmentOptions.Center, TMPro.VerticalAlignmentOptions.Middle );
 
             uiWindow.AddButton( new UILayoutInfo( UIAnchor.BottomRight, (-2, 2), (60, 15) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_horizontal" ), () =>
             {
@@ -32,11 +39,11 @@ namespace HSP.UI.Windows
         }
     }
 
-    public static class UIConfirmWindow_Ex
+    public static class UIConfirmCancelWindow_Ex
     {
-        public static UIConfirmWindow AddConfirmWindow( this UICanvas parent, string title, string text, Action onSubmit )
+        public static UIConfirmCancelWindow AddConfirmCancelWindow( this UICanvas parent, string title, string text, Action onSubmit )
         {
-            return UIConfirmWindow.Create<UIConfirmWindow>( parent, new UILayoutInfo( UIAnchor.Center, (0, 0), (300, 120) ), title, text, onSubmit );
+            return UIConfirmCancelWindow.Create<UIConfirmCancelWindow>( parent, new UILayoutInfo( UIAnchor.Center, (0, 0), (300, 120) ), title, text, onSubmit );
         }
     }
 }

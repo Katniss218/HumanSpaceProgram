@@ -71,7 +71,7 @@ namespace HSP.Content.Mods
         /// </summary>
         /// <param name="required">Dictionary of required mod versions.</param>
         /// <returns>True if all required mods are loaded with compatible versions.</returns>
-        public static bool AreRequiredModsLoaded( Dictionary<string, Version> required )
+        public static bool AreCompatibleModsLoaded( Dictionary<string, Version> required )
         {
             if( required == null )
                 return true;
@@ -87,7 +87,7 @@ namespace HSP.Content.Mods
                 }
 
                 ModMetadata loadedMod = GetLoadedMod( modId );
-                if( loadedMod == null || loadedMod.Version != requiredVersion )
+                if( loadedMod == null || !Version.AreCompatible( loadedMod.Version, requiredVersion ) )
                 {
                     return false;
                 }

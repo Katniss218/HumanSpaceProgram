@@ -9,6 +9,8 @@ using UnityPlus.AssetManagement;
 using UnityPlus.UILib;
 using UnityPlus.UILib.Layout;
 using UnityPlus.UILib.UIElements;
+using HSP.UI.Windows;
+using HSP.Content.Migrations;
 
 namespace HSP.Vanilla.UI.Timelines
 {
@@ -102,6 +104,43 @@ namespace HSP.Vanilla.UI.Timelines
 
         void OnLoad()
         {
+            if( TimelineManager.NeedsMigration( _selectedSave.Save ) )
+            {
+                // show confirm window and migrate + close
+
+                (this.Parent as UICanvas).AddConfirmCancelWindow( "Migrate Save",
+                    "This save file needs to be migrated to the latest version in order to be loaded. Do you want to migrate it now? A backup will be created automatically.", () =>
+                    {
+                        try
+                        {
+                            try
+                            {
+                                TimelineManager.BackupSave( _selectedSave.Save );
+                            }
+                            catch( System.Exception ex )
+                            {
+                                (this.Parent as UICanvas).AddAlertWindow( "Migration Failed", $"Failed to create backup of save file: {ex.Message}" );
+                                return;
+                            }
+
+                            TimelineManager.MigrateSave( _selectedSave.Save );
+                            LoadAsync( _selectedSave.Save );
+                        }
+                        catch( MigrationException ex )
+                        {
+                            (this.Parent as UICanvas).AddAlertWindow( "Migration Failed", $"Failed to validate or migrate save file: {ex.Message}" );
+                            TimelineManager.RestoreBackup( _selectedSave.Save );
+                        }
+                        catch( System.Exception ex )
+                        {
+                            (this.Parent as UICanvas).AddAlertWindow( "Migration Failed", $"Failed to validate or migrate save file: {ex.Message}" );
+                            TimelineManager.RestoreBackup( _selectedSave.Save );
+                        }
+                    } );
+
+                return;
+            }
+
             LoadAsync( _selectedSave.Save );
         }
 

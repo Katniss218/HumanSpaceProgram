@@ -38,7 +38,7 @@ namespace HSP.UI.Windows
     {
         public static UIPromptWindow AddPromptWindow( this UICanvas parent, string title, string placeholder, Action<string> onSubmit )
         {
-            return UIPromptWindow.Create<UIPromptWindow>( parent, new UILayoutInfo( UIAnchor.Center, (0, 0), (250, 100) ), title, placeholder, onSubmit );
+            return UIPromptWindow.Create<UIPromptWindow>( parent, new UILayoutInfo( UIAnchor.Center, (0, 0), (300, 120) ), title, placeholder, onSubmit );
         }
     }
 }

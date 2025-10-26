@@ -428,7 +428,7 @@ namespace HSP.Timelines
             {
                 throw new ScenarioNotFoundException( loadedTimeline.ScenarioID, ex );
             }
-            if( !HumanSpaceProgramModLoader.AreRequiredModsLoaded( loadedScenario.ModVersions ) )
+            if( !HumanSpaceProgramModLoader.AreCompatibleModsLoaded( loadedScenario.ModVersions ) )
             {
                 throw new IncompatibleSaveException();
             }
@@ -441,15 +441,15 @@ namespace HSP.Timelines
             {
                 throw new SaveNotFoundException( timelineId, saveId, ex );
             }
-            if( !HumanSpaceProgramModLoader.AreRequiredModsLoaded( loadedSave.ModVersions ) )
+            if( !HumanSpaceProgramModLoader.AreCompatibleModsLoaded( loadedSave.ModVersions ) )
             {
                 throw new IncompatibleSaveException();
             }
 
+#warning TODO - check if newer version
             if( NeedsMigration( loadedSave ) )
             {
-#warning TODO - throw error instead. require saves to be migrated behorehand (from the UI layer).
-                try
+                /*try
                 {
                     BackupSave( loadedSave );
                     MigrateSave( loadedSave );
@@ -461,7 +461,9 @@ namespace HSP.Timelines
                 catch( Exception ex )
                 {
                     throw new IncompatibleSaveException( $"Failed to validate or migrate save file: {ex.Message}", ex );
-                }
+                }*/
+
+                throw new IncompatibleSaveException( $"Tried to load an unmigrated save." );
             }
 
             TimelineLoadEventData eventData = new TimelineLoadEventData( loadedScenario, loadedTimeline, loadedSave );
@@ -510,7 +512,6 @@ namespace HSP.Timelines
             {
                 throw new InvalidOperationException( $"Can't create a new timeline while already saving or loading." );
             }
-#warning TODO - validation for already existing timelines, possibly overwrite, but prompt user (elsewhere, code here shouldn't interact with gui)
 
             ScenarioMetadata loadedScenario;
             try
@@ -521,7 +522,7 @@ namespace HSP.Timelines
             {
                 throw new ScenarioNotFoundException( timeline.ScenarioID, ex );
             }
-            if( !HumanSpaceProgramModLoader.AreRequiredModsLoaded( loadedScenario.ModVersions ) )
+            if( !HumanSpaceProgramModLoader.AreCompatibleModsLoaded( loadedScenario.ModVersions ) )
             {
                 throw new IncompatibleSaveException();
             }
@@ -583,6 +584,22 @@ namespace HSP.Timelines
             BackupUtil.BackupDirectory( save.GetRootDirectory(), Path.GetDirectoryName( save.GetRootDirectory() ) );
         }
 
+        public static void RestoreBackup( ScenarioMetadata scenario )
+        {
+            if( scenario == null )
+                throw new ArgumentNullException( nameof( scenario ) );
+
+            BackupUtil.RestoreBackup( BackupUtil.GetLatestBackupFile( scenario.GetRootDirectory(), Path.GetDirectoryName( scenario.GetRootDirectory() ) ), scenario.GetRootDirectory() );
+        }
+
+        public static void RestoreBackup( SaveMetadata save )
+        {
+            if( save == null )
+                throw new ArgumentNullException( nameof( save ) );
+
+            BackupUtil.RestoreBackup( BackupUtil.GetLatestBackupFile( save.GetRootDirectory(), Path.GetDirectoryName( save.GetRootDirectory() ) ), save.GetRootDirectory() );
+        }
+
 
         public static bool NeedsMigration( SaveMetadata save )
         {
@@ -627,15 +644,7 @@ namespace HSP.Timelines
         /// <param name="save">The save metadata to migrate</param>
         public static void MigrateSave( SaveMetadata save, bool force = false )
         {
-            try
-            {
-                MigrationRegistry.Migrate( save.GetRootDirectory(), save.ModVersions, HumanSpaceProgramModLoader.GetCurrentModVersions(), force );
-            }
-            catch( Exception ex )
-            {
-                Debug.LogError( $"Failed to migrate save `{save.TimelineID}/{save.SaveID}`: {ex.Message}" );
-                Debug.LogException( ex );
-            }
+            MigrationRegistry.Migrate( save.GetRootDirectory(), save.ModVersions, HumanSpaceProgramModLoader.GetCurrentModVersions(), force );
         }
 
         /// <summary>
@@ -644,15 +653,7 @@ namespace HSP.Timelines
         /// <param name="scenario">The scenario to migrate</param>
         public static void MigrateScenario( ScenarioMetadata scenario, bool force = false )
         {
-            try
-            {
-                MigrationRegistry.Migrate( scenario.GetRootDirectory(), scenario.ModVersions, HumanSpaceProgramModLoader.GetCurrentModVersions(), force );
-            }
-            catch( Exception ex )
-            {
-                Debug.LogError( $"Failed to migrate scenario `{scenario.ScenarioID}`: {ex.Message}" );
-                Debug.LogException( ex );
-            }
+            MigrationRegistry.Migrate( scenario.GetRootDirectory(), scenario.ModVersions, HumanSpaceProgramModLoader.GetCurrentModVersions(), force );
         }
     }
 }
