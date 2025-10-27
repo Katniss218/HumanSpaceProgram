@@ -4,6 +4,7 @@ using HSP.UI.Windows;
 using HSP.Vanilla.Scenes.GameplayScene;
 using HSP.Vanilla.Scenes.MainMenuScene;
 using HSP.Vanilla.UI.Components;
+using UnityEngine;
 using UnityPlus.UILib.UIElements;
 
 namespace HSP.Vanilla.UI.Scenes.GameplayScene
@@ -27,9 +28,6 @@ namespace HSP.Vanilla.UI.Scenes.GameplayScene
         {
             // load mainmenu.
             // show popup when loaded.
-
-#warning TODO - something to do with scene management, gameplay scene is unloaded too soon and doesn't unload fully (while lod spheres are building and camera is being created).
-            // 'there is no foreground scene' means that the scene loading has not finished yet and we're trying to unload it.
 
             HSPSceneManager.ReplaceForegroundScene<MainMenuSceneM>( onAfterLoaded: () =>
             {

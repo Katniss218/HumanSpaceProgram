@@ -18,6 +18,36 @@ namespace HSP.SceneManagement
     {
         private static List<IHSPScene> _loadedScenes = new();
 
+        private static HashSet<Type> _loadingScenes = new();
+        private static HashSet<Type> _unloadingScenes = new();
+
+        private sealed class PendingLoad
+        {
+            public object LoadData;
+            public bool AsForeground;
+            public Action OnAfterLoaded;
+
+            public PendingLoad( object loadData, bool asForeground, Action onAfterLoaded )
+            {
+                LoadData = loadData;
+                AsForeground = asForeground;
+                OnAfterLoaded = onAfterLoaded;
+            }
+        }
+
+        private sealed class PendingUnload
+        {
+            public Action OnAfterUnloaded;
+
+            public PendingUnload( Action onAfterUnloaded )
+            {
+                OnAfterUnloaded = onAfterUnloaded;
+            }
+        }
+
+        private static Dictionary<Type, PendingLoad> _pendingLoads = new();
+        private static Dictionary<Type, PendingUnload> _pendingUnloads = new();
+
         private static IHSPScene _foregroundScene = null;
 
         /// <summary>
@@ -103,6 +133,15 @@ namespace HSP.SceneManagement
         public static bool IsLoaded<TScene>() where TScene : IHSPScene
         {
             return _loadedScenes.Any( s => s.GetType() == typeof( TScene ) );
+        }
+        public static bool IsLoading<TScene>() where TScene : IHSPScene
+        {
+            return _loadingScenes.Contains( typeof( TScene ) );
+        }
+
+        public static bool IsUnloading<TScene>() where TScene : IHSPScene
+        {
+            return _unloadingScenes.Contains( typeof( TScene ) );
         }
 
         /// <summary>
@@ -332,7 +371,6 @@ namespace HSP.SceneManagement
         /// <typeparam name="TNewScene">The type specifying the scene to load.</typeparam>
         public static void ReplaceForegroundScene<TNewScene>( Action onAfterUnloaded = null, Action onAfterLoaded = null ) where TNewScene : IHSPScene
         {
-#error TODO - block execution if already in the middle of loading/unloading the same scene. A strongly typed HSP scene can only be loaded once. To load a new one, make a new subclass.
             if( _foregroundScene == null )
             {
                 throw new InvalidOperationException( "There is currently no loaded foreground scene." );
@@ -369,21 +407,45 @@ namespace HSP.SceneManagement
         private static void StartSceneLoadCoroutine( Type sceneType, object loadData, bool asForeground, Action onAfterLoaded )
         {
             if( _loadedScenes.Any( s => s.GetType() == sceneType ) )
-            {
                 throw new InvalidOperationException( $"Can't load the scene '{sceneType.Name}' that is already loaded." );
+
+            if( _loadingScenes.Contains( sceneType ) )
+                throw new InvalidOperationException( $"Can't load the scene '{sceneType.Name}' that is already loading." );
+
+            // Queue for immediate load if that scene is still being unloaded (call came from within one of the scene unload callbacks).
+            if( _unloadingScenes.Contains( sceneType ) )
+            {
+                if( _pendingLoads.ContainsKey( sceneType ) )
+                    throw new InvalidOperationException( $"Load for scene '{sceneType.Name}' has already been queued while unloading." );
+
+                _pendingLoads[sceneType] = new PendingLoad( loadData, asForeground, onAfterLoaded );
+                return;
             }
 
+            _loadingScenes.Add( sceneType );
             instance.StartCoroutine( LoadCoroutine( sceneType, loadData, asForeground, onAfterLoaded ) );
         }
 
         private static void StartSceneUnloadCoroutine( Type sceneType, Action onAfterUnloaded )
         {
-            IHSPScene scene = _loadedScenes.FirstOrDefault( s => s.GetType() == sceneType );
-            if( scene == null )
+            if( _unloadingScenes.Contains( sceneType ) )
+                throw new InvalidOperationException( $"Can't unload the scene '{sceneType.Name}' that is already unloading." );
+
+            // Queue for immediate unload if that scene is still being loaded (call came from within one of the scene load callbacks).
+            if( _loadingScenes.Contains( sceneType ) )
             {
-                throw new InvalidOperationException( $"Can't unload the scene '{sceneType.Name}' that is not loaded." );
+                if( _pendingUnloads.ContainsKey( sceneType ) )
+                    throw new InvalidOperationException( $"Unload for scene '{sceneType.Name}' has already been queued while loading." );
+
+                _pendingUnloads[sceneType] = new PendingUnload( onAfterUnloaded );
+                return;
             }
 
+            IHSPScene scene = _loadedScenes.FirstOrDefault( s => s.GetType() == sceneType );
+            if( scene == null )
+                throw new InvalidOperationException( $"Can't unload the scene '{sceneType.Name}' that is not loaded." );
+
+            _unloadingScenes.Add( sceneType );
             instance.StartCoroutine( UnloadCoroutine( scene, onAfterUnloaded ) );
         }
 
@@ -419,18 +481,78 @@ namespace HSP.SceneManagement
 
             Scene previousActiveScene = SceneManager.GetActiveScene();
 
-            if( unitySceneName != null )
+            try
             {
-                if( asForeground )
-                    Debug.Log( $"Loading Unity scene '{unitySceneName}' as part of the HSP scene '{newSceneType.Name}' (loading as foreground)." );
-                else
-                    Debug.Log( $"Loading Unity scene '{unitySceneName}' as part of the HSP scene '{newSceneType.Name}'." );
-
-                AsyncOperation op = SceneManager.LoadSceneAsync( unitySceneName, new LoadSceneParameters( lm, lp ) );
-                op.completed += ( x ) =>
+                if( unitySceneName != null )
                 {
-                    // When the load finishes, the unity scene gets set as 'active' automatically.
-                    Scene newlyLoadedScene = SceneManager.GetSceneByName( unitySceneName );
+                    if( asForeground )
+                        Debug.Log( $"Loading Unity scene '{unitySceneName}' as part of the HSP scene '{newSceneType.Name}' (loading as foreground)." );
+                    else
+                        Debug.Log( $"Loading Unity scene '{unitySceneName}' as part of the HSP scene '{newSceneType.Name}'." );
+
+                    AsyncOperation op = SceneManager.LoadSceneAsync( unitySceneName, new LoadSceneParameters( lm, lp ) );
+                    op.completed += ( x ) =>
+                    {
+                        // When the load finishes, the unity scene gets set as 'active' automatically.
+                        Scene newlyLoadedScene = SceneManager.GetSceneByName( unitySceneName );
+                        if( asForeground )
+                        {
+                            if( _foregroundScene != null )
+                            {
+                                _foregroundScene._ondeactivate();
+                            }
+                            SceneManager.SetActiveScene( newlyLoadedScene );
+                        }
+
+                        MethodInfo method = newSceneType.GetMethod( "GetOrCreateSceneManagerInActiveScene", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.FlattenHierarchy );
+                        IHSPScene newScene = (IHSPScene)method.Invoke( null, new object[] { newlyLoadedScene } );
+                        _loadedScenes.Add( newScene );
+                        if( asForeground )
+                        {
+                            _foregroundScene = newScene;
+                        }
+
+                        if( implementsGenericIHSPScene )
+                        {
+                            //newScene._onload( loadData );
+                            method = newSceneType.GetMethod( "_onload", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.FlattenHierarchy, null, new Type[] { loadData.GetType() }, null );
+                            method.Invoke( newScene, new object[] { loadData } );
+                        }
+                        else
+                        {
+                            newScene._onload();
+                        }
+
+                        if( asForeground )
+                        {
+                            newScene._onactivate();
+                        }
+
+                        onAfterLoaded?.Invoke();
+                        _loadingScenes.Remove( newSceneType );
+
+                        // Check for any pending unloads that were queued while loading
+                        if( _pendingUnloads.TryGetValue( newSceneType, out var pendingUnload ) )
+                        {
+                            _pendingUnloads.Remove( newSceneType );
+                            StartSceneUnloadCoroutine( newSceneType, pendingUnload.OnAfterUnloaded );
+                        }
+                    };
+
+                    // Wait until the asynchronous scene fully loads
+                    while( !op.isDone )
+                    {
+                        yield return null;
+                    }
+                }
+                else
+                {
+                    if( asForeground )
+                        Debug.Log( $"Creating a new Unity scene '{newSceneType.Name}' as part of the HSP scene '{newSceneType.Name}' (loading as foreground)." );
+                    else
+                        Debug.Log( $"Creating a new Unity scene '{newSceneType.Name}' as part of the HSP scene '{newSceneType.Name}'." );
+
+                    Scene newlyLoadedScene = SceneManager.CreateScene( newSceneType.Name, new CreateSceneParameters( lp ) );
                     if( asForeground )
                     {
                         if( _foregroundScene != null )
@@ -442,6 +564,7 @@ namespace HSP.SceneManagement
 
                     MethodInfo method = newSceneType.GetMethod( "GetOrCreateSceneManagerInActiveScene", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.FlattenHierarchy );
                     IHSPScene newScene = (IHSPScene)method.Invoke( null, new object[] { newlyLoadedScene } );
+                    _loadingScenes.Remove( newSceneType );
                     _loadedScenes.Add( newScene );
                     if( asForeground )
                     {
@@ -463,82 +586,72 @@ namespace HSP.SceneManagement
                     {
                         newScene._onactivate();
                     }
-                };
+
+                    onAfterLoaded?.Invoke();
+                    _loadingScenes.Remove( newSceneType );
+
+                    // Check for any pending unloads that were queued while loading
+                    if( _pendingUnloads.TryGetValue( newSceneType, out var pendingUnload ) )
+                    {
+                        _pendingUnloads.Remove( newSceneType );
+                        StartSceneUnloadCoroutine( newSceneType, pendingUnload.OnAfterUnloaded );
+                    }
+                }
+            }
+            finally
+            {
+                _loadingScenes.Remove( newSceneType );
+            }
+        }
+
+        private static IEnumerator UnloadCoroutine( IHSPScene scene, Action onAfterUnloaded )
+        {
+            Scene unityScene = scene.UnityScene;
+            Type sceneType = scene.GetType();
+
+            Debug.Log( $"Unloading Unity scene '{unityScene.name}' as part of the HSP scene '{scene.GetType().Name}'." );
+
+            try
+            {
+                if( _foregroundScene == scene )
+                {
+                    _foregroundScene._ondeactivate();
+                    _foregroundScene = null;
+                }
+
+                // Stops Unity calling `Start()` on gameobjects if we immediately unload the scene.
+                // This is important, because someone might spawn more gameobjects inside Start, which will then leak into the wrong scene (they'll spawn in the always loaded scene).
+                foreach( var gameObject in unityScene.GetRootGameObjects() )
+                {
+                    gameObject.SetActive( false );
+                }
+
+                SceneManager.SetActiveScene( AlwaysLoadedScene.Instance.UnityScene );
+                scene._onunload();
+
+                AsyncOperation op = SceneManager.UnloadSceneAsync( unityScene );
 
                 // Wait until the asynchronous scene fully loads
                 while( !op.isDone )
                 {
                     yield return null;
                 }
+
+                _loadedScenes.Remove( scene );
+                onAfterUnloaded?.Invoke();
+                _unloadingScenes.Remove( sceneType );
+
+                // Check for any pending unloads that were queued while loading
+                if( _pendingLoads.TryGetValue( sceneType, out var pendingLoad ) )
+                {
+                    _pendingLoads.Remove( sceneType );
+                    StartSceneLoadCoroutine( sceneType, pendingLoad.LoadData, pendingLoad.AsForeground, pendingLoad.OnAfterLoaded );
+                }
             }
-            else
+            finally
             {
-                if( asForeground )
-                    Debug.Log( $"Creating a new Unity scene '{newSceneType.Name}' as part of the HSP scene '{newSceneType.Name}' (loading as foreground)." );
-                else
-                    Debug.Log( $"Creating a new Unity scene '{newSceneType.Name}' as part of the HSP scene '{newSceneType.Name}'." );
-
-                Scene newlyLoadedScene = SceneManager.CreateScene( newSceneType.Name, new CreateSceneParameters( lp ) );
-                if( asForeground )
-                {
-                    if( _foregroundScene != null )
-                    {
-                        _foregroundScene._ondeactivate();
-                    }
-                    SceneManager.SetActiveScene( newlyLoadedScene );
-                }
-
-                MethodInfo method = newSceneType.GetMethod( "GetOrCreateSceneManagerInActiveScene", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.FlattenHierarchy );
-                IHSPScene newScene = (IHSPScene)method.Invoke( null, new object[] { newlyLoadedScene } );
-                _loadedScenes.Add( newScene );
-                if( asForeground )
-                {
-                    _foregroundScene = newScene;
-                }
-
-                if( implementsGenericIHSPScene )
-                {
-                    //newScene._onload( loadData );
-                    method = newSceneType.GetMethod( "_onload", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.FlattenHierarchy, null, new Type[] { loadData.GetType() }, null );
-                    method.Invoke( newScene, new object[] { loadData } );
-                }
-                else
-                {
-                    newScene._onload();
-                }
-
-                if( asForeground )
-                {
-                    newScene._onactivate();
-                }
+                _unloadingScenes.Remove( sceneType );
             }
-
-            onAfterLoaded?.Invoke();
-        }
-
-        private static IEnumerator UnloadCoroutine( IHSPScene scene, Action onAfterUnloaded )
-        {
-            Scene unityScene = scene.UnityScene;
-
-            Debug.Log( $"Unloading Unity scene '{unityScene.name}' as part of the HSP scene '{scene.GetType().Name}'." );
-
-            AsyncOperation op = SceneManager.UnloadSceneAsync( unityScene );
-            if( _foregroundScene == scene )
-            {
-                _foregroundScene._ondeactivate();
-                _foregroundScene = null;
-            }
-            SceneManager.SetActiveScene( AlwaysLoadedScene.Instance.UnityScene );
-            scene._onunload();
-
-            // Wait until the asynchronous scene fully loads
-            while( !op.isDone )
-            {
-                yield return null;
-            }
-
-            _loadedScenes.Remove( scene );
-            onAfterUnloaded?.Invoke();
         }
 
         private static bool ImplementsGenericIHSPScene( Type type )

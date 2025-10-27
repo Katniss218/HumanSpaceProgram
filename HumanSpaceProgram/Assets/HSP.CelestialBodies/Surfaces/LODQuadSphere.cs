@@ -180,8 +180,6 @@ namespace HSP.CelestialBodies.Surfaces
             TryCreateQuadParentGameObject();
         }
 
-        bool disable = false;
-
         void Update()
         {
             if( PoIGetter == null )
@@ -251,18 +249,8 @@ namespace HSP.CelestialBodies.Surfaces
             _currentTree = new LODQuadTree( MaxDepth );
         }
 
-        bool _canBuild = true;
-
         private void TryRebuild()
         {
-#warning TODO removeme later
-            if( UnityEngine.Input.GetKey(KeyCode.F))
-            {
-                _canBuild = false;
-            }
-            if( !_canBuild )
-                return;
-
             if( _builder != null )
                 throw new InvalidOperationException( $"Tried to start building while already building." );
             if( PoIGetter == null )
