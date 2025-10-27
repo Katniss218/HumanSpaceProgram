@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using UnityPlus.Serialization;
 
 namespace HSP.ResourceFlow
 {
@@ -26,5 +27,15 @@ namespace HSP.ResourceFlow
         public Color UIColor { get; set; }
         // Need to figure out how gasses will work too.
         // how about pre-mixed stuff, like air being nitrogen + oxygen, or kerosene being a mix of hydrocarbons?
+
+
+        [MapsInheritingFrom( typeof( Substance ) )]
+        public static SerializationMapping SubstanceMapping()
+        {
+            return new MemberwiseSerializationMapping<Substance>()
+                .WithMember( "display_name", o => o.DisplayName )
+                .WithMember( "density", o => o.Density )
+                .WithMember( "display_color", o => o.UIColor );
+        }
     }
 }

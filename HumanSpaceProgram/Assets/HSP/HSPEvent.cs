@@ -12,7 +12,7 @@ namespace HSP
 
     /// <summary>
     /// Invoked immediately after loading the mod assemblies. <br/>
-    /// Use this event to set up objects that should exist before everything else is loaded.
+    /// Use this event to set up objects that should exist before everything else is loaded, and for other game initialization logic.
     /// </summary>
     public static class HSPEvent_STARTUP_IMMEDIATELY
     {

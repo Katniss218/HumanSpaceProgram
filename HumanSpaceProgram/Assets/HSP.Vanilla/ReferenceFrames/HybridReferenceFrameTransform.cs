@@ -95,7 +95,11 @@ namespace HSP.Vanilla
 
         public Vector3 Position
         {
-            get => this._rb.position;
+            get
+            {
+                // Apparently, rigidbody values get set to 0 when disabled...
+                return this.gameObject.activeInHierarchy ? _rb.position : transform.position;
+            }
             set
             {
                 if( _isSceneSpace && (Math.Abs( value.x ) > PositionRange || Math.Abs( value.y ) > PositionRange || Math.Abs( value.z ) > PositionRange) )
@@ -119,7 +123,7 @@ namespace HSP.Vanilla
             get
             {
                 if( _isSceneSpace )
-                    return SceneReferenceFrameProvider.GetSceneReferenceFrame().TransformPosition( _rb.position );
+                    return SceneReferenceFrameProvider.GetSceneReferenceFrame().TransformPosition( transform.position );
                 else
                     return _actualAbsolutePosition;
             }
@@ -141,7 +145,11 @@ namespace HSP.Vanilla
 
         public Quaternion Rotation
         {
-            get => this._rb.rotation;
+            get
+            {
+                // Apparently, rigidbody values get set to 0 when disabled...
+                return this.gameObject.activeInHierarchy ? _rb.rotation : transform.rotation;
+            }
             set
             {
                 // Set both absolute and rigidbody because the call might happen after physics/fixedupdate.
@@ -180,7 +188,7 @@ namespace HSP.Vanilla
         {
             get
             {
-                if( _isSceneSpace )
+                if( _isSceneSpace && this.gameObject.activeInHierarchy )
                     return this._rb.velocity;
 
                 return (Vector3)SceneReferenceFrameProvider.GetSceneReferenceFrame().InverseTransformVelocity( _absoluteVelocity );
@@ -231,7 +239,7 @@ namespace HSP.Vanilla
         {
             get
             {
-                if( _isSceneSpace )
+                if( _isSceneSpace && this.gameObject.activeInHierarchy )
                     return this._rb.angularVelocity;
 
                 return (Vector3)SceneReferenceFrameProvider.GetSceneReferenceFrame().InverseTransformAngularVelocity( _absoluteAngularVelocity );

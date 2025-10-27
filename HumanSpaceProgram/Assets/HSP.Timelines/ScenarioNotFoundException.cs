@@ -4,6 +4,9 @@ using System.Runtime.Serialization;
 
 namespace HSP.Timelines
 {
+    /// <summary>
+    /// Exception thrown when a specific scenario cannot be found.
+    /// </summary>
     public class ScenarioNotFoundException : Exception
     {
         public NamespacedID ScenarioID { get; }

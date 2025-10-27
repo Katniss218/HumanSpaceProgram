@@ -1,8 +1,10 @@
 using HSP.CelestialBodies;
 using HSP.SceneManagement;
 using HSP.Timelines;
+using HSP.Vessels;
 using System;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 using UnityPlus.Serialization;
 using UnityPlus.Serialization.DataHandlers;
@@ -16,12 +18,12 @@ namespace HSP.Vanilla.Scenes.GameplayScene
 
         [HSPEventListener( HSPEvent_ON_TIMELINE_SAVE.ID, SERIALIZE_CELESTIAL_BODIES )]
         [HSPEventListener( HSPEvent_ON_SCENARIO_SAVE.ID, SERIALIZE_CELESTIAL_BODIES )]
-        private static void SerializeCelestialBodies( object e )
+        private static void SerializeCelestialBodies( IMessageEventData e )
         {
             string celestialBodiesPath;
-            if( e is TimelineManager.SaveEventData e2 )
+            if( e is TimelineSaveEventData e2 )
                 celestialBodiesPath = Path.Combine( e2.save.GetRootDirectory(), "CelestialBodies" );
-            else if( e is TimelineManager.SaveScenarioEventData e3 )
+            else if( e is ScenarioSaveEventData e3 )
                 celestialBodiesPath = Path.Combine( e3.scenario.GetRootDirectory(), "CelestialBodies" );
             else
                 throw new ArgumentException();
@@ -33,7 +35,15 @@ namespace HSP.Vanilla.Scenes.GameplayScene
             {
                 JsonSerializedDataHandler dataHandler = new JsonSerializedDataHandler( Path.Combine( celestialBodiesPath, $"{i}", "gameobjects.json" ) );
 
-                var data = SerializationUnit.Serialize( celestialBody.gameObject, TimelineManager.RefStore );
+                var su = SerializationUnit.FromObjects( celestialBody.gameObject );
+                SerializationResult result = su.Serialize( TimelineManager.RefStore );
+                if( result.HasFlag( SerializationResult.Failed ) || result.HasFlag( SerializationResult.HasFailures ) )
+                {
+                    Debug.LogError( $"Failed to serialize celestial body '{celestialBody.name}'." );
+                    e.AddMessage( LogType.Error, $"Failed to serialize celestial body '{celestialBody.name}'." );
+                    continue;
+                }
+                var data = su.GetData().First();
                 dataHandler.Write( data );
                 i++;
             }
@@ -41,12 +51,12 @@ namespace HSP.Vanilla.Scenes.GameplayScene
 
         [HSPEventListener( HSPEvent_ON_TIMELINE_NEW.ID, DESERIALIZE_CELESTIAL_BODIES )]
         [HSPEventListener( HSPEvent_ON_TIMELINE_LOAD.ID, DESERIALIZE_CELESTIAL_BODIES )]
-        private static void DeserializeCelestialBodies( object e )
+        private static void DeserializeCelestialBodies( IMessageEventData e )
         {
             string celestialBodiesPath;
-            if( e is TimelineManager.LoadEventData e2 )
+            if( e is TimelineLoadEventData e2 )
                 celestialBodiesPath = Path.Combine( e2.save.GetRootDirectory(), "CelestialBodies" );
-            else if( e is TimelineManager.StartNewEventData e3 )
+            else if( e is TimelineNewEventData e3 )
                 celestialBodiesPath = Path.Combine( e3.scenario.GetRootDirectory(), "CelestialBodies" );
             else
                 throw new ArgumentException();
@@ -59,7 +69,15 @@ namespace HSP.Vanilla.Scenes.GameplayScene
                 JsonSerializedDataHandler dataHandler = new JsonSerializedDataHandler( Path.Combine( dir, "gameobjects.json" ) );
 
                 var data = dataHandler.Read();
-                var go = SerializationUnit.Deserialize<GameObject>( data, TimelineManager.RefStore );
+                var su = SerializationUnit.FromData<GameObject>( data );
+                SerializationResult result = su.Deserialize( TimelineManager.RefStore );
+                if( result.HasFlag( SerializationResult.Failed ) || result.HasFlag( SerializationResult.HasFailures ) )
+                {
+                    Debug.LogError( $"Failed to deserialize celestial body from '{dir}'." );
+                    e.AddMessage( LogType.Error, $"Failed to deserialize celestial body from '{dir}'." );
+                    continue;
+                }
+                GameObject go = su.GetObjects().First();
                 HSPSceneManager.MoveGameObjectToScene<GameplaySceneM>( go );
             }
         }

@@ -6,7 +6,16 @@
     "file_version": "0.0",
     "mod_versions": {
         "$type": "System.Collections.Generic.Dictionary`2[[System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[HSP.Content.Version, HSP.Content, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089",
-        "$id": "7ac03815-5c80-4b40-bb6b-dee26e3175ed",
-        "value": []
+        "$id": "8969e0e1-6c12-4e3f-a8b1-ab23c6ac4499",
+        "value": [
+            {
+                "key": "Vanilla",
+                "value": "1.0"
+            },
+            {
+                "key": "TestMod",
+                "value": "0.0"
+            }
+        ]
     }
 }

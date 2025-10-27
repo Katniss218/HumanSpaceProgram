@@ -9,6 +9,9 @@ using UnityPlus.AssetManagement;
 using UnityPlus.UILib;
 using UnityPlus.UILib.Layout;
 using UnityPlus.UILib.UIElements;
+using HSP.UI.Windows;
+using HSP.Content.Migrations;
+using HSP.Content;
 
 namespace HSP.Vanilla.UI.Timelines
 {
@@ -56,7 +59,9 @@ namespace HSP.Vanilla.UI.Timelines
             _timelines = new UITimelineMetadata[timelines.Length];
             for( int i = 0; i < _timelines.Length; i++ )
             {
-                _timelines[i] = _timelineListUI.AddTimelineMetadata( new UILayoutInfo( UIFill.Horizontal(), UIAnchor.Bottom, 0, 40 ), timelines[i], ( ui ) =>
+                TimelineMetadata timeline = timelines[i];
+                ScenarioMetadata scenario = ScenarioMetadata.LoadFromDisk( timeline.ScenarioID );
+                _timelines[i] = _timelineListUI.AddTimelineMetadata( new UILayoutInfo( UIFill.Horizontal(), UIAnchor.Bottom, 0, 40 ), scenario, timeline, ( ui ) =>
                 {
                     _selectedTimeline = ui;
                     RefreshSaveList();
@@ -94,14 +99,103 @@ namespace HSP.Vanilla.UI.Timelines
 
         public static void LoadAsync( SaveMetadata save )
         {
-            HSPSceneManager.ReplaceForegroundScene<GameplaySceneM>( onAfterLoaded: () =>
-            {
-                TimelineManager.BeginLoadAsync( save.TimelineID, save.SaveID );
-            } );
+            HSPSceneManager.ReplaceForegroundScene<GameplaySceneM, GameplaySceneM.LoadData>( GameplaySceneM.LoadSaveLoadData( save.TimelineID, save.SaveID ) );
         }
 
         void OnLoad()
         {
+            bool migrateScenario = TimelineManager.NeedsMigration( _selectedTimeline.Scenario );
+            bool migrateSave = TimelineManager.NeedsMigration( _selectedSave.Save );
+            if( migrateSave || migrateScenario )
+            {
+                // show confirm window and migrate + close
+
+                var msgPart = "";
+                if( migrateSave && migrateScenario )
+                    msgPart += "save and scenario files need";
+                else if( migrateSave )
+                    msgPart += "save file needs";
+                else if( migrateScenario )
+                    msgPart += "scenario file needs";
+
+                (this.Parent as UICanvas).AddConfirmCancelWindow( "Migrate Save",
+                    $"This {msgPart} to be migrated to the latest version in order to be loaded. Do you want to migrate it now? A backup will be created automatically.", () =>
+                    {
+                        if( TimelineManager.NeedsMigration( _selectedTimeline.Scenario ) )
+                        {
+                            try
+                            {
+                                try
+                                {
+                                    TimelineManager.BackupScenario( _selectedTimeline.Scenario );
+                                }
+                                catch( System.Exception ex )
+                                {
+                                    Debug.LogError( $"Failed to create backup of scenario file '{_selectedTimeline.Scenario.ScenarioID}'" );
+                                    Debug.LogException( ex );
+                                    (this.Parent as UICanvas).AddAlertWindow( "Migration Failed", $"Failed to create backup of scenario file: {ex.Message}" );
+                                    return;
+                                }
+
+                                TimelineManager.MigrateScenario( _selectedTimeline.Scenario );
+                                Debug.Log( $"Migrated scenario file '{_selectedTimeline.Scenario.ScenarioID}'." );
+                            }
+                            catch( MigrationException ex )
+                            {
+                                Debug.LogError( $"Migration failed: '{_selectedTimeline.Scenario.ScenarioID}'" );
+                                Debug.LogException( ex );
+                                (this.Parent as UICanvas).AddAlertWindow( "Migration Failed", $"Failed to migrate scenario file: {ex.Message}" );
+                                TimelineManager.RestoreBackup( _selectedTimeline.Scenario );
+                            }
+                            catch( System.Exception ex )
+                            {
+                                Debug.LogError( $"An error occurred while trying to migrate scenario '{_selectedTimeline.Scenario.ScenarioID}'" );
+                                Debug.LogException( ex );
+                                (this.Parent as UICanvas).AddAlertWindow( "Migration Failed", $"An error occurred while trying to migrate scenario '{_selectedTimeline.Scenario.ScenarioID}': {ex.Message}" );
+                                TimelineManager.RestoreBackup( _selectedTimeline.Scenario );
+                            }
+                        }
+
+                        if( TimelineManager.NeedsMigration( _selectedSave.Save ) )
+                        {
+                            try
+                            {
+                                try
+                                {
+                                    TimelineManager.BackupSave( _selectedSave.Save );
+                                }
+                                catch( System.Exception ex )
+                                {
+                                    Debug.LogError( $"Failed to create backup of save file '{_selectedSave.Save.TimelineID}/{_selectedSave.Save.SaveID}'" );
+                                    Debug.LogException( ex );
+                                    (this.Parent as UICanvas).AddAlertWindow( "Migration Failed", $"Failed to create backup of save file: {ex.Message}" );
+                                    return;
+                                }
+
+                                TimelineManager.MigrateSave( _selectedSave.Save );
+                                Debug.Log( $"Migrated save file '{_selectedSave.Save.TimelineID}/{_selectedSave.Save.SaveID}'. Loading now..." );
+                                LoadAsync( _selectedSave.Save );
+                            }
+                            catch( MigrationException ex )
+                            {
+                                Debug.LogError( $"Migration failed: '{_selectedSave.Save.TimelineID}/{_selectedSave.Save.SaveID}'" );
+                                Debug.LogException( ex );
+                                (this.Parent as UICanvas).AddAlertWindow( "Migration Failed", $"Failed to migrate save file: {ex.Message}" );
+                                TimelineManager.RestoreBackup( _selectedSave.Save );
+                            }
+                            catch( System.Exception ex )
+                            {
+                                Debug.LogError( $"An error occurred while trying to migrate save '{_selectedSave.Save.TimelineID}/{_selectedSave.Save.SaveID}'" );
+                                Debug.LogException( ex );
+                                (this.Parent as UICanvas).AddAlertWindow( "Migration Failed", $"An error occurred while trying to migrate save '{_selectedSave.Save.TimelineID}/{_selectedSave.Save.SaveID}': {ex.Message}" );
+                                TimelineManager.RestoreBackup( _selectedSave.Save );
+                            }
+                        }
+                    } );
+
+                return;
+            }
+
             LoadAsync( _selectedSave.Save );
         }
 

@@ -1,16 +1,17 @@
 # Common Mistakes
 
 Or how to avoid unnecessary edits during a code review :)
+(and just general tips)
 
 ## Unity:
 Pitfalls related to Unity itself, common across different projects.
 
 #### 1. Material vs SharedMaterial:
-Use `.sharedMaterial` instead of `.material` (unless you know what you're doing).
 The `.material` accessor lazily creates a copy of the Material instance (even if you're just reading its value!), impacting the performance compared to using `.sharedMaterial`.
+Use `.sharedMaterial` instead of `.material` (unless you're sure you know what you're doing).
 
 #### 2. GetComponent<T> and similar:
-Certain Unity methods (like `GetComponent<T>`, `FindObjectsOfType<T>`, etc) are expensive.
+Certain Unity methods (like `GetComponent<T>`, `FindObjectsOfType<T>`, etc) perform expensive scans over potentially large sets of objects.
 If you are using the result frequently - cache it in a field instead of re-getting it every frame.
 
 Example:
@@ -26,20 +27,27 @@ void Awake()
 Object pooling is very useful when you have a lot of very similar objects that live for a bit and then die, only to be respawned later.
 Unity already has an object pool class - `ObjectPool<T>`, and UnityPlus implements one as well - Use it when applicable - `ObjectPool<TItem, TItemData>`.
 
+#### 4. Rigidbody:
+Disabled GameObjects make Rigidbodies return zero/identity values. 
+Check `!gameObject.activeInHierarchy` first, and fall back to the Transform values or cache the real value before the object is disabled.
 
+#### 5. Scene lifecycle:
+Unity will call Start() on gameobjects in a scene that has started being unloaded.
+Example: you create the object, you immediately unload the scene it's in. Start will still be called.
+HSP.SceneManagement addresses that by preemptively disabling gameobjects in the scene that's being unloaded.
 
 ## HSP-specific:
 Pitfalls specific to HSP and HSP only.
 
 #### Unity Editor:
-Try to not rely on the editor, and (important) never add objects/components to the unity scenes (main menu, gameplay, design, etc).
-These scenes are intended to be populated by HSPEvents listening to the respective scene lifetime HSPEvents.
-Implementing things that way has the benefit of letting mods disable the function and replace it with their own easily.
+Avoid relying on the Editor for runtime setup, and (important!) never add objects/components to the unity scenes in the project (main menu, gameplay, design, etc).
+These scenes are intended to be populated by HSPEventListeners listening to the appropriate scene lifetime HSPEvents.
+Implementing things that way has the benefit of letting mods disable the function and replace it with their own easily, and it removes the dependence on the Unity's scene serializer.
 
 Example:
 - Someone makes a mod that replaces the sequencer UI panel with their own.
 
-#### Singletons:
+#### 1. Singletons:
 Use `SingletonMonoBehaviour<T>` (global singleton) or `SingletonPerSceneMonoBehaviour<T>` (one per scene) instead of reimplementing your own.
 
 Example:
@@ -56,11 +64,11 @@ public class MyPerSceneManager : SingletonMonoBehaviour<MyPerSceneManager>
 }
 ```
 
-#### HSPEvents:
-The `HSPEvent` lies at the core of Human Space Program. It binds a lot of the systems together and lets the game consist of mostly self-contained modules.
+#### 2. HSPEvents:
+The `HSPEvents` lay at the core of Human Space Program. They bind a lot of the systems together and let the game consist of (mostly) self-contained modules.
 Use HSPEvents if you want to respond to all the event invocations.
-Use plain C# events (instance events) when you're interested in listening to only one object.
-HSPEvents support ordering (`Before`, `After`) and blocking (`Blacklist`). See `HSP.HSPEventListenerAttribute` for more.
+Use plain C# events (instance events) when you're interested in one specific invoker.
+HSPEvents support topological ordering (`Before = `, `After = `) and overriding/blocking (`Blacklist = `). See `HSP.HSPEventListenerAttribute` for more.
 
 Raising HSPEvents:
 ```csharp
@@ -79,37 +87,37 @@ private void ListenerMethod()
 }
 
 [HSPEventListener(HSPEvent_GAMEPLAY_SCENE_LOAD.ID, LISTENER_ID, After = new[] { DevUtilsGameplayManager.LOAD_PLACEHOLDER_CONTENT })]
-private void ListenerMethod( data )
+private void ListenerMethod( EventDataType data )
 {
-    // Method that takes event parameters.
+    // Method that takes event parameters. The argument type must match (or be the base class/interface of) the data which will be passed into the event.
     // ...
 }
 ```
 Some commonly used HSPEvents:
-- `HSPEvent_STARTUP_IMMEDIATELY`
-- `HSPEvent_<scene_name>_SCENE_LOAD`, `_UNLOAD`, `_ACTIVATE`, `_DEACTIVATE`
+- `HSPEvent_STARTUP_IMMEDIATELY` - immediately after all mods are loaded.
+- `HSPEvent_<scene_name>_SCENE_LOAD`, `..._UNLOAD`, `..._ACTIVATE`, `..._DEACTIVATE` - scene lifecycle.
 - `HSPEvent_ON_VESSEL_CREATED`
 - `HSPEvent_ON_CELESTIAL_BODY_CREATED`
 
-#### Asset Handling:
-HSP manages assets using the `AssetRegistry` class. It's applicable for the vast majority of cases - instead of loading files directly, using `Resources.Load()`, or other.
+#### 3. Asset Handling:
+HSP manages assets using the `AssetRegistry` class. Ideal to use when you need an externally-defined piece of data - instead of loading files directly, using `Resources.Load()`, or other.
 - `AssetRegistry.Get<T>(assetID)` - Retrieve assets by ID.
 - `AssetRegistry.Register(id, obj)` - Register runtime objects.
 - `AssetRegistry.RegisterLazy(id, loader, isCacheable)` - Register lazy-loaded assets.
 - Assets can be loaded from both in-project files (including `Resources/`) and `GameData/` mod directories.
 GameData file asset loaders are in `HSP.Vanilla.Content.AssetLoaders`.
 
-#### Serialization:
-You don't have to like it, but please use `SerializationUnit.Serialize<T>( ... )` and `SerializationUnit.Deserialize<T>( ... )` instead of Newtonsoft.JSON, or - god forbid - Unity's builtin serializer.
+#### 4. Serialization:
+You don't have to like it, but please use `SerializationUnit.Serialize<T>( ... )` and `SerializationUnit.Deserialize<T>( ... )` instead of Newtonsoft.JSON, or - god forbid - Unity's builtin serializer!
 Newtonsoft is very good, but UnityPlus also has some advantages:
-- Time-budgeted serialization - saving and loading 'in the background' on any thread, without blocking the thread.
-- Context-based serialization - change behaviour when specified.
-- Native support for immutable types, non-default constructors, and removing members inherited from the base class.
+- Time-budgeted serialization - saving and loading 'in the background' on any thread (including the main thread), without fully blocking the thread.
+- Context-based serialization - change how a member is serialized.
+- Native support for immutable types, constructors with parameters, and removing members inherited from the base class.
 - Native support for Unity types, including GameObjects.
 - Robust support for reference handling and remapping references.
 And a lot of things HSP uses can't be (easily or at all) serialized by the Unity's serializer.
 
-**IMPORTANT**: Unfortunately, for every type you create must manually define a serialization mapping, or serialization will fail.
+**IMPORTANT**: Unfortunately, every custom type you create needs a defined serialization mapping, or serialization will fail.
 
 Use `ObjectContext`, `ArrayContext`, and `KeyValueContext` to seamlessly serialize e.g. references and assets. You can also create your own contexts if you need to.
 
@@ -134,16 +142,18 @@ public static SerializationMapping MyGenericClassMapping<T1, T2>()
 public static SerializationMapping MyPartiallyImmutableClassMapping()
 {
     return new MemberwiseSerializationMapping<MyPartiallyImmutableClass>()
+        .ExcludeMember( "base_member" ) // Removes the inherited base member, can go anywhere.
         .WithReadonlyMember( "immutable_member", o => o.immutableMember )
-        .WithFactory<string>( ( immutableMember ) => new MyPartiallyImmutableClass( immutableMember ) ) // Order is important here.
+        .WithFactory<string>( ( immutableMember ) => new MyPartiallyImmutableClass( immutableMember ) ) // Order is important - used to determine which members to pass into the callback.
         .WithMember( "my_member2", o => o._myMember2 );
 }
 ```
 
-In the future, HSP will also get a data manipulation system (and probably a Domain-Specific Language) that will operate on the `SerializedData` and perform 'patching'. As well as a managed object inspector/editor for mod making.
+In the future, HSP will also get a data manipulation system (and probably a Domain-Specific Language) for 'patching', as well as a managed object inspector/editor for mod making.
+Those will all tie into the `SerializedData` system.
 
-#### Input System:
-Prefer the `HierarchicalInputManager` over raw Unity input system:
+#### 5. Input System:
+Prefer the custom `HierarchicalInputManager` over raw Unity input system:
 - Use `HierarchicalInputManager.BindInput(channelId, IInputBinding)` to bind inputs to channels.
 - Use predefined bindings: `KeyDownBinding`, `KeyUpBinding`, `KeyHoldBinding`, `MouseClickBinding`, `AxisBinding`, etc.
 - Enable/disable channels for context-sensitive input, and more.
@@ -157,14 +167,14 @@ There are several 'approved' ways to create GameObjects:
 - Use `AssetRegistry.Get<GameObject>()` for GameObjects that are assets.
 - Remember to move root objects to the correct HSP scene - `HSPSceneManager.MoveGameObjectToScene()`.
 
-#### ScriptableObjects:
+#### 6. ScriptableObjects:
 Avoid using ScriptableObjects entirely, use plain C# objects loaded as assets from `GameData/` instead. They're exposed to the player as files and make it easier to mod/change the game.
 
-#### Effects:
+#### 7. Effects:
 HSP has an `Effects` module, which implements configurable pooled effects (audio, particle, meshes, lights).
 Use them where applicable instead the raw Unity particles, audio sources, etc.
 
-#### HSP Scenes vs Unity Scenes:
+#### 8. HSP Scenes vs Unity Scenes:
 HSPScenes are strongly-typed scenes with the type doubling as the scene manager for that particular scene.
 
 Don't use Unity's `SceneManager` directly. Use `HSPSceneManager` instead:
@@ -175,19 +185,19 @@ Don't use Unity's `SceneManager` directly. Use `HSPSceneManager` instead:
 
 The `_AlwaysLoaded_` scene contains core services and should never be unloaded
 
-#### Reference Frames vs Unity Transforms:
+#### 9. Reference Frames vs Unity Transforms:
 HSP uses 64-bit double precision reference frames to avoid floating-point precision issues.
 - `IReferenceFrameTransform.AbsolutePosition` - 'absolute' coordinates
 - `IReferenceFrameTransform.Position` - scene-space coordinates (Unity's 32-bit space)
-There are appropriate 64-bit APIs - `Vector3Dbl`, `QuaternionDbl` for working with 64-bit transform math.
+Appropriate types - `Vector3Dbl`, `QuaternionDbl` for working with 64-bit transform math are also provided.
 
-#### UI and Layout:
-Use UnityPlus' `UILib` instead of using the UGUI elements (from the `UnityEngine.UI` namespace) directly.
-The library is a wrapper around UGUI, greatly simplifying the process of creating UI elements through code. 
+#### 10. UI and Layout:
+Use UnityPlus' `UILib` (`UnityPlus.UILib`) instead of rawdogging the UGUI elements (`UnityEngine.UI`), or UI Toolkit.
+This library is a wrapper around UGUI, greatly simplifying the process of creating UI elements through C# code.
 
-It uses modular and reusable controls for its UI elements, and also has a custom layout engine which is faster than the UGUI one.
+It uses modular and reusable controls for its UI elements, and also has a custom layout engine which doesn't "lag", unlike the UGUI one (UGUI performs layout at 1 frame per hierarchy level, UILib is immediate).
 
-#### F-Prefixed Components:
+#### 11. F-Prefixed Components:
 HSP uses F-prefixed components for 'vessel **f**unctionalities' (hence the F)
 They're largely analogous to 'part modules' from KSP.
 
@@ -204,5 +214,5 @@ Examples:
 
 *This document is intended to be a living reference. Feel free to propose additions/changes!*
 
-*Last change: 2025/09/05*
+*Last change: 2025/10/27*
 

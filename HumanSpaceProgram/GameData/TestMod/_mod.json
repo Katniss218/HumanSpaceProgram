@@ -1,0 +1,16 @@
+﻿{
+    "mod_id": "TestMod",
+    "version": "0.0",
+    "name": "Test Mod",
+    "author": "Katniss",
+    "description": "This is a test mod with some dummy functionality.",
+    "license": "AGPLv3",
+    "dependencies": {
+        "value": [
+            {
+                "id": "Vanilla",
+                "version": ">=0.0"
+            }
+        ]
+    }
+}

@@ -538,6 +538,25 @@ namespace UnityPlus.Serialization
             this._members.Add( member );
         }
 
+        private void RemoveMember( string name )
+        {
+            // If member already exists - replace it, otherwise append as new.
+            for( int i = 0; i < _members.Count; i++ )
+            {
+                if( _members[i].Name == name )
+                {
+                    _members.RemoveAt( i );
+                    return;
+                }
+            }
+        }
+
+        public MemberwiseSerializationMapping<TSource> ExcludeMember( string serializedName )
+        {
+            RemoveMember( serializedName );
+            return this;
+        }
+
         public MemberwiseSerializationMapping<TSource> WithMember<TMember>( string serializedName, Expression<Func<TSource, TMember>> member )
         {
             IncludeMember( new Member<TSource, TMember>( serializedName, ObjectContext.Default, member ) );

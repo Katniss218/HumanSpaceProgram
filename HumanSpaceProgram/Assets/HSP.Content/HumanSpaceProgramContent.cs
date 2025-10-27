@@ -1,5 +1,4 @@
-﻿using HSP.Content.Mods;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using Version = HSP.Content.Version;
@@ -7,14 +6,14 @@ using Version = HSP.Content.Version;
 namespace HSP.Content
 {
     /// <summary>
-    /// Contains utility methods relating to the structure of HSP's content / files.
+    /// Provides utilities relating to the structure of HSP's content / files.
     /// </summary>
     public class HumanSpaceProgramContent
     {
         /// <summary>
         /// The name of the folder that contains the external game assets, including mods.
         /// </summary>
-        public const string ContentDirectoryName = "GameData";
+        public const string CONTENT_DIRECTORY_NAME = "GameData";
 
         /// <summary>
         /// Computes the path to the directory where the external game assets, including mods, are located.
@@ -24,7 +23,7 @@ namespace HSP.Content
         /// </remarks>
         public static string GetContentDirectoryPath()
         {
-            string path = Path.Combine( ApplicationUtils.GetBaseDirectoryPath(), ContentDirectoryName );
+            string path = Path.Combine( ApplicationUtils.GetBaseDirectoryPath(), CONTENT_DIRECTORY_NAME );
 
             if( !Directory.Exists( path ) )
                 Directory.CreateDirectory( path );
@@ -99,6 +98,9 @@ namespace HSP.Content
             return $"{modId}::{relPath}";
         }
 
+        /// <summary>
+        /// Gets the asset path that's associated with the given asset ID. The extension is provided separately, as asset IDs don't use it.
+        /// </summary>
         public static string GetAssetPath( string assetId, string extension )
         {
             string[] split = assetId.Split( "::" );

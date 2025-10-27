@@ -187,6 +187,7 @@ namespace HSP_Tests_PlayMode
             yield return new WaitForSeconds( 1 );
 
             UnityEngine.Object.DestroyImmediate( manager );
+            UnityEngine.Object.DestroyImmediate( sut.gameObject );
         }
 
 
@@ -263,6 +264,7 @@ namespace HSP_Tests_PlayMode
             yield return new WaitForSeconds( 1.5f );
 
             UnityEngine.Object.DestroyImmediate( manager );
+            UnityEngine.Object.DestroyImmediate( sut.gameObject );
         }
 
 
@@ -349,6 +351,7 @@ namespace HSP_Tests_PlayMode
             yield return new WaitForSeconds( 1.5f );
 
             UnityEngine.Object.DestroyImmediate( manager );
+            UnityEngine.Object.DestroyImmediate( sut.gameObject );
         }
 
         [TestCase( typeof( FreeReferenceFrameTransform ), 1, 2, 3, ExpectedResult = null )]
@@ -434,6 +437,7 @@ namespace HSP_Tests_PlayMode
             yield return new WaitForSeconds( 2f );
 
             UnityEngine.Object.DestroyImmediate( manager );
+            UnityEngine.Object.DestroyImmediate( sut.gameObject );
         }
 
         [TestCase( typeof( FreeReferenceFrameTransform ), 1, 2, 3, ExpectedResult = null )]
@@ -523,6 +527,7 @@ namespace HSP_Tests_PlayMode
             yield return new WaitForSeconds( 2f );
 
             UnityEngine.Object.DestroyImmediate( manager );
+            UnityEngine.Object.DestroyImmediate( sut.gameObject );
         }
 
         // ----- Force-at-position application tests -----
@@ -641,6 +646,7 @@ namespace HSP_Tests_PlayMode
             yield return new WaitForSeconds( 2f );
 
             UnityEngine.Object.DestroyImmediate( manager );
+            UnityEngine.Object.DestroyImmediate( sut.gameObject );
         }
 
         [TestCase( typeof( FreeReferenceFrameTransform ), ExpectedResult = null )]
@@ -680,6 +686,9 @@ namespace HSP_Tests_PlayMode
                     Vector3Dbl testAbsVel = new Vector3Dbl( 1, 2, 3 );
                     Vector3Dbl testAbsAngVel = new Vector3Dbl( 0.1, 0.2, 0.3 );
 
+                    Vector3 testLocalPos = (Vector3)currentFrame.InverseTransformPosition( testAbsPos );
+                    Quaternion testLocalRot = (Quaternion)currentFrame.InverseTransformRotation( testAbsRot );
+
                     sut.AbsolutePosition = testAbsPos;
                     sut.AbsoluteRotation = testAbsRot;
                     sut.AbsoluteVelocity = testAbsVel;
@@ -695,9 +704,14 @@ namespace HSP_Tests_PlayMode
                     Assert.That( sut.AbsoluteAngularVelocity, Is.EqualTo( testAbsAngVel ).Using( vector3DblApproxComparer ),
                         $"Absolute angular velocity not set correctly in FixedUpdate for frame {currentFrame.GetType().Name}" );
 
+                    Assert.That( sut.transform.position, Is.EqualTo( testLocalPos ).Using( vector3ApproxComparer ),
+                        $"Local position not set correctly in Update for frame {currentFrame.GetType().Name}" );
+                    Assert.That( sut.transform.rotation, Is.EqualTo( testLocalRot ).Using( quaternionApproxComparer ),
+                        $"Local rotation not set correctly in Update for frame {currentFrame.GetType().Name}" );
+
                     // Test local value setting
-                    Vector3 testLocalPos = new Vector3( 5, 10, 15 );
-                    Quaternion testLocalRot = Quaternion.Euler( 10, 20, 30 );
+                    testLocalPos = new Vector3( 5, 10, 15 );
+                    testLocalRot = Quaternion.Euler( 10, 20, 30 );
                     Vector3 testLocalVel = new Vector3( 0.5f, 1.0f, 1.5f );
                     Vector3 testLocalAngVel = new Vector3( 0.05f, 0.1f, 0.15f );
 
@@ -715,6 +729,11 @@ namespace HSP_Tests_PlayMode
                         $"Local velocity not set correctly in FixedUpdate for frame {currentFrame.GetType().Name}" );
                     Assert.That( sut.AngularVelocity, Is.EqualTo( testLocalAngVel ).Using( vector3ApproxComparer ),
                         $"Local angular velocity not set correctly in FixedUpdate for frame {currentFrame.GetType().Name}" );
+
+                    Assert.That( sut.transform.position, Is.EqualTo( testLocalPos ).Using( vector3ApproxComparer ),
+                        $"Local position not set correctly in Update for frame {currentFrame.GetType().Name}" );
+                    Assert.That( sut.transform.rotation, Is.EqualTo( testLocalRot ).Using( quaternionApproxComparer ),
+                        $"Local rotation not set correctly in Update for frame {currentFrame.GetType().Name}" );
                 }
 
                 // Switch to next reference frame if both tests are complete
@@ -755,6 +774,9 @@ namespace HSP_Tests_PlayMode
                     Vector3Dbl testAbsVel = new Vector3Dbl( 2, 3, 4 );
                     Vector3Dbl testAbsAngVel = new Vector3Dbl( 0.2, 0.3, 0.4 );
 
+                    Vector3 testLocalPos = (Vector3)currentFrame.InverseTransformPosition( testAbsPos );
+                    Quaternion testLocalRot = (Quaternion)currentFrame.InverseTransformRotation( testAbsRot );
+
                     sut.AbsolutePosition = testAbsPos;
                     sut.AbsoluteRotation = testAbsRot;
                     sut.AbsoluteVelocity = testAbsVel;
@@ -770,9 +792,14 @@ namespace HSP_Tests_PlayMode
                     Assert.That( sut.AbsoluteAngularVelocity, Is.EqualTo( testAbsAngVel ).Using( vector3DblApproxComparer ),
                         $"Absolute angular velocity not set correctly in Update for frame {currentFrame.GetType().Name}" );
 
+                    Assert.That( sut.transform.position, Is.EqualTo( testLocalPos ).Using( vector3ApproxComparer ),
+                        $"Local position not set correctly in Update for frame {currentFrame.GetType().Name}" );
+                    Assert.That( sut.transform.rotation, Is.EqualTo( testLocalRot ).Using( quaternionApproxComparer ),
+                        $"Local rotation not set correctly in Update for frame {currentFrame.GetType().Name}" );
+
                     // Test local value setting
-                    Vector3 testLocalPos = new Vector3( 8, 12, 16 );
-                    Quaternion testLocalRot = Quaternion.Euler( 15, 25, 35 );
+                    testLocalPos = new Vector3( 8, 12, 16 );
+                    testLocalRot = Quaternion.Euler( 15, 25, 35 );
                     Vector3 testLocalVel = new Vector3( 0.8f, 1.2f, 1.6f );
                     Vector3 testLocalAngVel = new Vector3( 0.08f, 0.12f, 0.16f );
 
@@ -790,6 +817,11 @@ namespace HSP_Tests_PlayMode
                         $"Local velocity not set correctly in Update for frame {currentFrame.GetType().Name}" );
                     Assert.That( sut.AngularVelocity, Is.EqualTo( testLocalAngVel ).Using( vector3ApproxComparer ),
                         $"Local angular velocity not set correctly in Update for frame {currentFrame.GetType().Name}" );
+
+                    Assert.That( sut.transform.position, Is.EqualTo( testLocalPos ).Using( vector3ApproxComparer ),
+                        $"Local position not set correctly in Update for frame {currentFrame.GetType().Name}" );
+                    Assert.That( sut.transform.rotation, Is.EqualTo( testLocalRot ).Using( quaternionApproxComparer ),
+                        $"Local rotation not set correctly in Update for frame {currentFrame.GetType().Name}" );
                 }
             } );
 
@@ -798,6 +830,207 @@ namespace HSP_Tests_PlayMode
             yield return new WaitForSeconds( 1f );
 
             UnityEngine.Object.DestroyImmediate( manager );
+            UnityEngine.Object.DestroyImmediate( sut.gameObject );
+        }
+
+        [TestCase( typeof( FreeReferenceFrameTransform ), ExpectedResult = null )]
+        [TestCase( typeof( KinematicReferenceFrameTransform ), ExpectedResult = null )]
+        [TestCase( typeof( HybridReferenceFrameTransform ), ExpectedResult = null )]
+        [UnityTest]
+        public IEnumerator ManualValueSetting_WhenDisabled( Type transformType )
+        {
+            var (manager, timeManager, refFrameManager, assertMonoBeh) = CreateTestScene();
+
+            IReferenceFrameTransform sut = CreateObject( transformType, new GameplaySceneReferenceFrameProvider() );
+
+            yield return new WaitForFixedUpdate();
+
+            // Test setting values in different reference frames
+            var testReferenceFrames = new Func<IReferenceFrame>[]
+            {
+                () => new CenteredReferenceFrame( TimeManager.UT, Vector3Dbl.zero ),
+                () => new OrientedReferenceFrame( TimeManager.UT, Vector3Dbl.zero, QuaternionDbl.Euler( 0, 45, 0 ) ),
+                () => new CenteredInertialReferenceFrame( TimeManager.UT, Vector3Dbl.zero, new Vector3Dbl( 100, 0, 0 ) ),
+                () => new OrientedInertialReferenceFrame( TimeManager.UT, Vector3Dbl.zero, QuaternionDbl.Euler( 0, 90, 0 ), new Vector3Dbl( 0, 0, 50 ) ),
+            };
+            IReferenceFrame currentFrame = null;
+            bool updateHappened = true;
+            bool fixedUpdateHappened = true;
+
+            assertMonoBeh.AddAssert( AssertMonoBehaviour.Step.FixedUpdate, ( frameInfo ) =>
+            {
+                // Test setting values in FixedUpdate for the current reference frame
+                if( currentFrame != null && !fixedUpdateHappened )
+                {
+                    fixedUpdateHappened = true;
+
+                    // Test absolute value setting
+                    Vector3Dbl testAbsPos = new Vector3Dbl( 10, 20, 30 );
+                    QuaternionDbl testAbsRot = QuaternionDbl.Euler( 15, 30, 45 );
+                    Vector3Dbl testAbsVel = new Vector3Dbl( 1, 2, 3 );
+                    Vector3Dbl testAbsAngVel = new Vector3Dbl( 0.1, 0.2, 0.3 );
+
+                    Vector3 testLocalPos = (Vector3)currentFrame.InverseTransformPosition( testAbsPos );
+                    Quaternion testLocalRot = (Quaternion)currentFrame.InverseTransformRotation( testAbsRot );
+
+                    sut.AbsolutePosition = testAbsPos;
+                    sut.AbsoluteRotation = testAbsRot;
+                    sut.AbsoluteVelocity = testAbsVel;
+                    sut.AbsoluteAngularVelocity = testAbsAngVel;
+
+                    sut.gameObject.SetActive( false );
+
+                    // Assert immediately after setting absolute values
+                    Assert.That( sut.AbsolutePosition, Is.EqualTo( testAbsPos ).Using( vector3DblApproxComparer ),
+                        $"Absolute position not set correctly in FixedUpdate for frame {currentFrame.GetType().Name}" );
+                    Assert.That( sut.AbsoluteRotation, Is.EqualTo( testAbsRot ).Using( quaternionDblApproxComparer ),
+                        $"Absolute rotation not set correctly in FixedUpdate for frame {currentFrame.GetType().Name}" );
+                    Assert.That( sut.AbsoluteVelocity, Is.EqualTo( testAbsVel ).Using( vector3DblApproxComparer ),
+                        $"Absolute velocity not set correctly in FixedUpdate for frame {currentFrame.GetType().Name}" );
+                    Assert.That( sut.AbsoluteAngularVelocity, Is.EqualTo( testAbsAngVel ).Using( vector3DblApproxComparer ),
+                        $"Absolute angular velocity not set correctly in FixedUpdate for frame {currentFrame.GetType().Name}" );
+
+                    Assert.That( sut.transform.position, Is.EqualTo( testLocalPos ).Using( vector3ApproxComparer ),
+                        $"Local position not set correctly in Update for frame {currentFrame.GetType().Name}" );
+                    Assert.That( sut.transform.rotation, Is.EqualTo( testLocalRot ).Using( quaternionApproxComparer ),
+                        $"Local rotation not set correctly in Update for frame {currentFrame.GetType().Name}" );
+
+                    sut.gameObject.SetActive( true );
+
+                    // Test local value setting
+                    testLocalPos = new Vector3( 5, 10, 15 );
+                    testLocalRot = Quaternion.Euler( 10, 20, 30 );
+                    Vector3 testLocalVel = new Vector3( 0.5f, 1.0f, 1.5f );
+                    Vector3 testLocalAngVel = new Vector3( 0.05f, 0.1f, 0.15f );
+
+                    sut.Position = testLocalPos;
+                    sut.Rotation = testLocalRot;
+                    sut.Velocity = testLocalVel;
+                    sut.AngularVelocity = testLocalAngVel;
+
+                    sut.gameObject.SetActive( false );
+
+                    // Assert immediately after setting local values
+                    Assert.That( sut.Position, Is.EqualTo( testLocalPos ).Using( vector3ApproxComparer ),
+                        $"Local position not set correctly in FixedUpdate for frame {currentFrame.GetType().Name}" );
+                    Assert.That( sut.Rotation, Is.EqualTo( testLocalRot ).Using( quaternionApproxComparer ),
+                        $"Local rotation not set correctly in FixedUpdate for frame {currentFrame.GetType().Name}" );
+                    Assert.That( sut.Velocity, Is.EqualTo( testLocalVel ).Using( vector3ApproxComparer ),
+                        $"Local velocity not set correctly in FixedUpdate for frame {currentFrame.GetType().Name}" );
+                    Assert.That( sut.AngularVelocity, Is.EqualTo( testLocalAngVel ).Using( vector3ApproxComparer ),
+                        $"Local angular velocity not set correctly in FixedUpdate for frame {currentFrame.GetType().Name}" );
+
+                    Assert.That( sut.transform.position, Is.EqualTo( testLocalPos ).Using( vector3ApproxComparer ),
+                        $"Local position not set correctly in Update for frame {currentFrame.GetType().Name}" );
+                    Assert.That( sut.transform.rotation, Is.EqualTo( testLocalRot ).Using( quaternionApproxComparer ),
+                        $"Local rotation not set correctly in Update for frame {currentFrame.GetType().Name}" );
+
+                    sut.gameObject.SetActive( true );
+                }
+
+                // Switch to next reference frame if both tests are complete
+                if( fixedUpdateHappened && updateHappened )
+                {
+                    int currentIndex = Array.IndexOf( testReferenceFrames, currentFrame != null ?
+                        Array.Find( testReferenceFrames, f => f.Invoke().GetType() == currentFrame.GetType() ) : null );
+
+                    if( currentIndex >= 0 && currentIndex < testReferenceFrames.Length - 1 )
+                    {
+                        // Switch to next reference frame
+                        refFrameManager.RequestReferenceFrameSwitch( testReferenceFrames[currentIndex + 1].Invoke() );
+                        currentFrame = testReferenceFrames[currentIndex + 1].Invoke();
+                        fixedUpdateHappened = false;
+                        updateHappened = false;
+                    }
+                    else if( currentIndex == -1 )
+                    {
+                        // Start with first reference frame
+                        refFrameManager.RequestReferenceFrameSwitch( testReferenceFrames[0].Invoke() );
+                        currentFrame = testReferenceFrames[0].Invoke();
+                        fixedUpdateHappened = false;
+                        updateHappened = false;
+                    }
+                }
+            } );
+
+            assertMonoBeh.AddAssert( AssertMonoBehaviour.Step.Update, ( frameInfo ) =>
+            {
+                // Test setting values in Update for the current reference frame
+                if( currentFrame != null && !updateHappened )
+                {
+                    updateHappened = true;
+
+                    // Test absolute value setting
+                    Vector3Dbl testAbsPos = new Vector3Dbl( 25, 35, 45 );
+                    QuaternionDbl testAbsRot = QuaternionDbl.Euler( 25, 40, 55 );
+                    Vector3Dbl testAbsVel = new Vector3Dbl( 2, 3, 4 );
+                    Vector3Dbl testAbsAngVel = new Vector3Dbl( 0.2, 0.3, 0.4 );
+
+                    Vector3 testLocalPos = (Vector3)currentFrame.InverseTransformPosition( testAbsPos );
+                    Quaternion testLocalRot = (Quaternion)currentFrame.InverseTransformRotation( testAbsRot );
+
+                    sut.AbsolutePosition = testAbsPos;
+                    sut.AbsoluteRotation = testAbsRot;
+                    sut.AbsoluteVelocity = testAbsVel;
+                    sut.AbsoluteAngularVelocity = testAbsAngVel;
+
+                    sut.gameObject.SetActive( false );
+
+                    // Assert immediately after setting absolute values
+                    Assert.That( sut.AbsolutePosition, Is.EqualTo( testAbsPos ).Using( vector3DblApproxComparer ),
+                        $"Absolute position not set correctly in Update for frame {currentFrame.GetType().Name}" );
+                    Assert.That( sut.AbsoluteRotation, Is.EqualTo( testAbsRot ).Using( quaternionDblApproxComparer ),
+                        $"Absolute rotation not set correctly in Update for frame {currentFrame.GetType().Name}" );
+                    Assert.That( sut.AbsoluteVelocity, Is.EqualTo( testAbsVel ).Using( vector3DblApproxComparer ),
+                        $"Absolute velocity not set correctly in Update for frame {currentFrame.GetType().Name}" );
+                    Assert.That( sut.AbsoluteAngularVelocity, Is.EqualTo( testAbsAngVel ).Using( vector3DblApproxComparer ),
+                        $"Absolute angular velocity not set correctly in Update for frame {currentFrame.GetType().Name}" );
+
+                    Assert.That( sut.transform.position, Is.EqualTo( testLocalPos ).Using( vector3ApproxComparer ),
+                        $"Local position not set correctly in Update for frame {currentFrame.GetType().Name}" );
+                    Assert.That( sut.transform.rotation, Is.EqualTo( testLocalRot ).Using( quaternionApproxComparer ),
+                        $"Local rotation not set correctly in Update for frame {currentFrame.GetType().Name}" );
+
+                    sut.gameObject.SetActive( true );
+
+                    // Test local value setting
+                    testLocalPos = new Vector3( 8, 12, 16 );
+                    testLocalRot = Quaternion.Euler( 15, 25, 35 );
+                    Vector3 testLocalVel = new Vector3( 0.8f, 1.2f, 1.6f );
+                    Vector3 testLocalAngVel = new Vector3( 0.08f, 0.12f, 0.16f );
+
+                    sut.Position = testLocalPos;
+                    sut.Rotation = testLocalRot;
+                    sut.Velocity = testLocalVel;
+                    sut.AngularVelocity = testLocalAngVel;
+
+                    sut.gameObject.SetActive( false );
+
+                    // Assert immediately after setting local values
+                    Assert.That( sut.Position, Is.EqualTo( testLocalPos ).Using( vector3ApproxComparer ),
+                        $"Local position not set correctly in Update for frame {currentFrame.GetType().Name}" );
+                    Assert.That( sut.Rotation, Is.EqualTo( testLocalRot ).Using( quaternionApproxComparer ),
+                        $"Local rotation not set correctly in Update for frame {currentFrame.GetType().Name}" );
+                    Assert.That( sut.Velocity, Is.EqualTo( testLocalVel ).Using( vector3ApproxComparer ),
+                        $"Local velocity not set correctly in Update for frame {currentFrame.GetType().Name}" );
+                    Assert.That( sut.AngularVelocity, Is.EqualTo( testLocalAngVel ).Using( vector3ApproxComparer ),
+                        $"Local angular velocity not set correctly in Update for frame {currentFrame.GetType().Name}" );
+
+                    Assert.That( sut.transform.position, Is.EqualTo( testLocalPos ).Using( vector3ApproxComparer ),
+                        $"Local position not set correctly in Update for frame {currentFrame.GetType().Name}" );
+                    Assert.That( sut.transform.rotation, Is.EqualTo( testLocalRot ).Using( quaternionApproxComparer ),
+                        $"Local rotation not set correctly in Update for frame {currentFrame.GetType().Name}" );
+
+                    sut.gameObject.SetActive( true );
+                }
+            } );
+
+            assertMonoBeh.Enable();
+
+            yield return new WaitForSeconds( 1f );
+
+            UnityEngine.Object.DestroyImmediate( manager );
+            UnityEngine.Object.DestroyImmediate( sut.gameObject );
         }
 
         // test in non-inertial reference scene frames.

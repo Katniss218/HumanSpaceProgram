@@ -9,7 +9,7 @@ namespace HSP.Content
     /// <remarks>
     /// Can be used to compare if 2 versions are compatible with each other, or if breaking changes occurred.
     /// </remarks>
-    public struct Version
+    public readonly struct Version : IEquatable<Version>, IComparable<Version>
     {
         /// <summary>
         /// The number indicating the major (breaking) part of the version.
@@ -28,41 +28,19 @@ namespace HSP.Content
         }
 
         /// <summary>
-        /// Checks if two versions (of the same thing) are compatible with each other.
+        /// Checks if two versions are compatible with each other.
         /// </summary>
         /// <remarks>
         /// Versions are compatible if they don't have any breaking changes between them (major is the same).
         /// </remarks>
-        /// <param name="v1">The first version.</param>
-        /// <param name="v2">The second version.</param>
-        /// <returns>True if the versions are compatible. False otherwise.</returns>
         public static bool AreCompatible( Version v1, Version v2 )
         {
             return v1.Major == v2.Major;
         }
 
-        public static bool operator <( Version v1, Version v2 )
+        public bool Equals( Version other )
         {
-            if( v1.Major < v2.Major ) return true;
-            if( v1.Major > v2.Major ) return false;
-            return v1.Minor < v2.Minor;
-        }
-
-        public static bool operator >( Version v1, Version v2 )
-        {
-            if( v1.Major > v2.Major ) return true;
-            if( v1.Major < v2.Major ) return false;
-            return v1.Minor > v2.Minor;
-        }
-
-        public static bool operator ==( Version v1, Version v2 )
-        {
-            return v1.Minor == v2.Minor && v1.Major == v2.Major;
-        }
-
-        public static bool operator !=( Version v1, Version v2 )
-        {
-            return v1.Minor != v2.Minor || v1.Major != v2.Major;
+            return this == other;
         }
 
         public override bool Equals( object obj )
@@ -74,6 +52,16 @@ namespace HSP.Content
             return this == v;
         }
 
+        public int CompareTo( Version other )
+        {
+            int majorCmp = Major.CompareTo( other.Major );
+            if( majorCmp != 0 )
+            {
+                return majorCmp;
+            }
+            return Minor.CompareTo( other.Minor );
+        }
+
         public override int GetHashCode()
         {
             return HashCode.Combine( Major, Minor );
@@ -81,7 +69,7 @@ namespace HSP.Content
 
         public override string ToString()
         {
-            return Major.ToString( "#########0" ) + "." + Minor.ToString( "#########0" );
+            return Major.ToString() + "." + Minor.ToString();
         }
 
         /// <summary>
@@ -90,14 +78,60 @@ namespace HSP.Content
         /// <exception cref="ArgumentException">The string doesn't match any known valid version format.</exception>
         public static Version Parse( string s )
         {
-            string[] strings = s.Split( '.' );
-            if( strings.Length != 2 )
+            string[] parts = s.Split( '.' );
+            if( parts.Length != 2 || !int.TryParse( parts[0], out int major ) || !int.TryParse( parts[1], out int minor ) )
             {
-                throw new ArgumentException( $"String to parse must be a valid version ('n.n').", nameof( s ) );
+                throw new ArgumentException( "The version string must be two integers separated by a '.' dot.", nameof( s ) );
             }
-            int major = int.Parse( strings[0] );
-            int minor = int.Parse( strings[1] );
+
             return new Version( major, minor );
+        }
+
+        /// <summary>
+        /// Attempts to parse a version from its string representation.
+        /// </summary>
+        public static bool TryParse( string s, out Version result )
+        {
+            string[] parts = s.Split( '.' );
+            if( parts.Length != 2 || !int.TryParse( parts[0], out int major ) || !int.TryParse( parts[1], out int minor ) )
+            {
+                result = default;
+                return false;
+            }
+
+            result = new Version( major, minor );
+            return true;
+        }
+
+        public static bool operator <( Version v1, Version v2 )
+        {
+            return v1.Major < v2.Major || (v1.Major == v2.Major && v1.Minor < v2.Minor);
+        }
+
+        public static bool operator >( Version v1, Version v2 )
+        {
+            return v1.Major > v2.Major || (v1.Major == v2.Major && v1.Minor > v2.Minor);
+        }
+
+        public static bool operator <=( Version v1, Version v2 )
+        {
+            return v1.Major < v2.Major || (v1.Major == v2.Major && v1.Minor <= v2.Minor);
+        }
+
+        public static bool operator >=( Version v1, Version v2 )
+        {
+            return v1.Major > v2.Major || (v1.Major == v2.Major && v1.Minor >= v2.Minor);
+        }
+
+
+        public static bool operator ==( Version v1, Version v2 )
+        {
+            return v1.Major == v2.Major && v1.Minor == v2.Minor;
+        }
+
+        public static bool operator !=( Version v1, Version v2 )
+        {
+            return v1.Major != v2.Major || v1.Minor != v2.Minor;
         }
 
 

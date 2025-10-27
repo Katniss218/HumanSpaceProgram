@@ -1,0 +1,9 @@
+﻿{
+    "mod_id": "Vanilla",
+    "version": "1.0",
+    "name": "Vanilla HSP",
+    "author": "Katniss",
+    "description": "This is the base game.",
+    "license": "AGPLv3",
+    "dependencies": null
+}

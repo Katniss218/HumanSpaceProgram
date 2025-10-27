@@ -59,13 +59,6 @@ namespace HSP._DevUtils
         public const string LOAD_PLACEHOLDER_CONTENT = "devutils.load_game_data";
         public const string CREATE_PLACEHOLDER_UNIVERSE = "devutils.timeline.new.after";
 
-        [HSPEventListener( HSPEvent_STARTUP_IMMEDIATELY.ID, LOAD_PLACEHOLDER_CONTENT )]
-        private static void LoadGameData()
-        {
-            AssetRegistry.Register( "substance.f", new Substance() { Density = 1000, DisplayName = "Fuel", UIColor = new Color( 1.0f, 0.3764706f, 0.2509804f ) } );
-            AssetRegistry.Register( "substance.ox", new Substance() { Density = 1000, DisplayName = "Oxidizer", UIColor = new Color( 0.2509804f, 0.5607843f, 1.0f ) } );
-        }
-
         void Awake()
         {
         }

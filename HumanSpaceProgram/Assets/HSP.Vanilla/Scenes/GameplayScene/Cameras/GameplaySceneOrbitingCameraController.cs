@@ -151,6 +151,9 @@ namespace HSP.Vanilla.Scenes.GameplayScene.Cameras
         [HSPEventListener( HSPEvent_AFTER_ACTIVE_VESSEL_CHANGED.ID, SNAP_CAMERA_TO_ACTIVE_OBJECT )]
         private static void SnapToActiveObject()
         {
+            if( !instanceExists )
+                return;
+
             var referenceObject = (ActiveVesselManager.ActiveObject == null)
                 ? null
                 : ActiveVesselManager.ActiveObject;

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace UnityPlus
@@ -6,86 +7,154 @@ namespace UnityPlus
     public static class ITopologicallySortable_Ex
     {
         /// <summary>
-        /// Sorts the specified values in topological order.
+        /// Sorts the specified values in topological order. <br/>
+        /// This sort is stable.
         /// </summary>
-        public static List<ITopologicallySortable<T>> SortDependencies<T>( this IEnumerable<ITopologicallySortable<T>> values )
+        public static List<ITopologicallySortable<TId>> SortDependencies<TId>( this IEnumerable<ITopologicallySortable<TId>> values )
         {
-            return SortDependencies<T>( values, out _ );
+            return values.SortDependencies(
+                node => node.ID,
+                node => node.Before,
+                node => node.After,
+                out _ );
         }
 
         /// <summary>
         /// Sorts the specified values in topological order. <br/>
-        /// Returns a value indicating whether any circular dependencies exist in the graph.
+        /// Returns an enumerable that can enumerate over any circular dependencies found. <br/>
+        /// This sort is stable.
         /// </summary>
-        public static List<ITopologicallySortable<T>> SortDependencies<T>( this IEnumerable<ITopologicallySortable<T>> values, out bool hasCircularDependency )
+        public static List<ITopologicallySortable<TId>> SortDependencies<TId>( this IEnumerable<ITopologicallySortable<TId>> values, out IEnumerable<ITopologicallySortable<TId>> circularDependencies )
         {
-            Dictionary<T, List<T>> graph = new();
-            Dictionary<T, int> indegree = new();
+            return values.SortDependencies(
+                node => node.ID,
+                node => node.Before,
+                node => node.After,
+                out circularDependencies );
+        }
+
+        /// <summary>
+        /// Sorts the specified values in topological order. <br/>
+        /// This sort is stable.
+        /// </summary>
+        /// <param name="idGetter">The function that will return the ID for each element. Must not return null.</param>
+        /// <param name="afterIdsGetter">The function that will return the IDs of elements that should come AFTER the CURRENT element. Must not return null.</param>
+        /// <param name="beforeIdsGetter">The function that will return the IDs of elements that should come BEFORE the CURRENT element. Must not return null.</param>
+        public static List<TNode> SortDependencies<TNode, TId>(
+            this IEnumerable<TNode> values,
+            Func<TNode, TId> idGetter,
+            Func<TNode, IEnumerable<TId>> beforeIdsGetter,
+            Func<TNode, IEnumerable<TId>> afterIdsGetter )
+        {
+            return SortDependencies( values, idGetter, beforeIdsGetter, afterIdsGetter, out _ );
+        }
+
+        /// <summary>
+        /// Sorts the specified values in topological order. <br/>
+        /// Returns an enumerable that can enumerate over any circular dependencies found. <br/>
+        /// This sort is stable.
+        /// </summary>
+        /// <param name="idGetter">The function that will return the ID for each element. Must not return null.</param>
+        /// <param name="afterIdsGetter">The function that will return the IDs of elements that should come AFTER the CURRENT element. Must not return null.</param>
+        /// <param name="beforeIdsGetter">The function that will return the IDs of elements that should come BEFORE the CURRENT element. Must not return null.</param>
+        public static List<TNode> SortDependencies<TNode, TId>(
+            this IEnumerable<TNode> values,
+            Func<TNode, TId> idGetter,
+            Func<TNode, IEnumerable<TId>> beforeIdsGetter,
+            Func<TNode, IEnumerable<TId>> afterIdsGetter,
+            out IEnumerable<TNode> circularDependencies )
+        {
+            if( values == null )
+                throw new ArgumentNullException( nameof( values ) );
+            if( idGetter == null )
+                throw new ArgumentNullException( nameof( idGetter ) );
+            if( beforeIdsGetter == null )
+                throw new ArgumentNullException( nameof( beforeIdsGetter ) );
+            if( afterIdsGetter == null )
+                throw new ArgumentNullException( nameof( afterIdsGetter ) );
+
+            Dictionary<TId, TNode> availableNodes = new Dictionary<TId, TNode>();
+            foreach( var node in values )
+            {
+                TId id = idGetter( node );
+                if( id == null )
+                    throw new ArgumentException( "idGetter returned null for a node; null ids are not supported.", nameof( idGetter ) );
+                if( !availableNodes.TryAdd( id, node ) )
+                    throw new ArgumentException( $"Duplicate node id detected: {id}. Each node must have a unique id.", nameof( idGetter ) );
+            }
+
+            Dictionary<TId, HashSet<TId>> graph = new( availableNodes.Count );
+            Dictionary<TId, int> indegree = new( availableNodes.Count );
+
+            foreach( var id in availableNodes.Keys )
+            {
+                graph[id] = new HashSet<TId>();
+                indegree[id] = 0;
+            }
 
             // Initialize the graph and in-degrees.
-            foreach( var listener in values )
+            foreach( var (id, node) in availableNodes )
             {
-                if( !graph.ContainsKey( listener.ID ) )
-                    graph[listener.ID] = new List<T>();
-
-                if( !indegree.ContainsKey( listener.ID ) )
-                    indegree[listener.ID] = 0;
-
                 // Nodes that go before the current node.
-                //   Naming is confusing here, because the nodes follow a more user-friendly convention than the graph.
-                foreach( var beforeId in listener.After )
+                //   The naming is swapped here, because the nodes follow a more user-friendly convention than the graph (graph is reversed).
+                foreach( TId beforeId in afterIdsGetter( node ) ?? Enumerable.Empty<TId>() )
                 {
-                    if( !graph.ContainsKey( beforeId ) )
-                        graph[beforeId] = new List<T>();
-                    graph[beforeId].Add( listener.ID );
+                    if( !graph.ContainsKey( beforeId ) ) // missing nodes.
+                        graph[beforeId] = new HashSet<TId>();
+                    graph[beforeId].Add( id );
 
-                    indegree[listener.ID]++;
+                    indegree[id] = indegree.TryGetValue( id, out var cur ) ? cur + 1 : 1;
                 }
 
                 // Nodes that go after the current node.
-                //   Naming is confusing here, because the nodes follow a more user-friendly convention than the graph.
-                foreach( var afterId in listener.Before )
+                //   The naming is swapped here, because the nodes follow a more user-friendly convention than the graph (graph is reversed).
+                foreach( TId afterId in beforeIdsGetter( node ) ?? Enumerable.Empty<TId>() )
                 {
-                    graph[listener.ID].Add( afterId );
+                    graph[id].Add( afterId );
 
-                    if( !indegree.ContainsKey( afterId ) )
+                    if( !indegree.ContainsKey( afterId ) ) // missing nodes.
                         indegree[afterId] = 0;
-                    indegree[afterId]++;
+
+                    indegree[afterId] = indegree.TryGetValue( afterId, out var cur ) ? cur + 1 : 1;
                 }
             }
 
-            var listenerDict = values.ToDictionary( listener => listener.ID );
-
-            // Kahn's algorithm.
-            Queue<T> zeroIndegreeQueue = new Queue<T>( indegree.Where( kvp => kvp.Value == 0 ).Select( kvp => kvp.Key ) );
-            List<ITopologicallySortable<T>> sortedListeners = new();
+            // Kahn's algorithm
+            Queue<TId> zeroIndegreeQueue = new Queue<TId>( indegree.Where( kvp => kvp.Value == 0 ).Select( kvp => kvp.Key ) );
+            List<TNode> sortedNodes = new();
 
             while( zeroIndegreeQueue.Count > 0 )
             {
-                T id = zeroIndegreeQueue.Dequeue();
-                sortedListeners.Add( listenerDict[id] );
+                TId id = zeroIndegreeQueue.Dequeue();
 
-                foreach( var neighbor in graph[id] )
+                if( !availableNodes.TryGetValue( id, out var node ) )
+                    continue;
+
+                sortedNodes.Add( node );
+
+                if( !graph.TryGetValue( id, out var neighbors ) )
+                    continue;
+
+                foreach( var neighbor in neighbors )
                 {
-                    indegree[neighbor]--;
+                    if( !indegree.TryGetValue( neighbor, out var cur ) )
+                        continue;
 
-                    if( indegree[neighbor] == 0 )
+                    cur--;
+                    indegree[neighbor] = cur;
+
+                    if( cur == 0 )
                     {
                         zeroIndegreeQueue.Enqueue( neighbor );
                     }
                 }
             }
 
-            hasCircularDependency = indegree.Any( kvp => kvp.Value > 0 );
+            circularDependencies = indegree
+                .Where( kvp => kvp.Value > 0 && availableNodes.ContainsKey( kvp.Key ) )
+                .Select( kvp => availableNodes[kvp.Key] );
 
-            if( hasCircularDependency )
-            {
-                // Optionally, handle circular dependencies
-                // For example, log the issue or throw an exception
-            }
-
-            return sortedListeners;
+            return sortedNodes;
         }
-
     }
 }
