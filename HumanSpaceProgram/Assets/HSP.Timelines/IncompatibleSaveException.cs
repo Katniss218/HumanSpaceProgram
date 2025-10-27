@@ -5,7 +5,7 @@ namespace HSP.Timelines
 {
     public class IncompatibleSaveException : Exception
     {
-        public IncompatibleSaveException() : base( $"The save nad mods that are missing from the game." )
+        public IncompatibleSaveException() : base( $"The save had mods that are missing from the game." )
         {
         }
 
@@ -13,7 +13,7 @@ namespace HSP.Timelines
         {
         }
 
-        public IncompatibleSaveException( Exception innerException ) : base( $"The save nad mods that are missing from the game.", innerException )
+        public IncompatibleSaveException( Exception innerException ) : base( $"The save had mods that are missing from the game.", innerException )
         {
         }
 

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HSP.SceneManagement;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -231,6 +232,10 @@ namespace HSP.CelestialBodies.Surfaces
         private void TryCreateQuadParentGameObject()
         {
             if( QuadParent != null )
+                return;
+
+            var scene = gameObject.GetHSPScene();
+            if( !HSPSceneManager.IsLoaded( scene ) || HSPSceneManager.IsUnloading( scene ) )
                 return;
 
             GameObject parent = new GameObject( $"QUADPARENT-{this.CelestialBody.ID}" );

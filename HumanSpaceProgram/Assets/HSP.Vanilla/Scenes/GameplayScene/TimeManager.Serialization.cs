@@ -1,3 +1,4 @@
+using HSP.Time;
 using HSP.Timelines;
 using System;
 using System.IO;
@@ -8,10 +9,10 @@ using UnityPlus.Serialization.DataHandlers;
 
 namespace HSP.Vanilla.Scenes.GameplayScene
 {
-    public static class ActiveVesselManager_Serialization
+    public static class TimeManager_Serialization
     {
-        public const string SERIALIZE_ACTIVE_OBJECT_MANAGER = HSPEvent.NAMESPACE_HSP + ".serialize_active_object_manager";
-        public const string DESERIALIZE_ACTIVE_OBJECT_MANAGER = HSPEvent.NAMESPACE_HSP + ".deserialize_active_object_manager";
+        public const string SERIALIZE_ACTIVE_OBJECT_MANAGER = HSPEvent.NAMESPACE_HSP + ".48c13913-b8ee-419a-8463-5eb4095a1935";
+        public const string DESERIALIZE_ACTIVE_OBJECT_MANAGER = HSPEvent.NAMESPACE_HSP + ".f3d227c1-a3ef-4b6a-a61e-2f705aa8d908";
 
         [HSPEventListener( HSPEvent_AFTER_SCENARIO_SAVE.ID, SERIALIZE_ACTIVE_OBJECT_MANAGER )]
         [HSPEventListener( HSPEvent_AFTER_TIMELINE_SAVE.ID, SERIALIZE_ACTIVE_OBJECT_MANAGER )]
@@ -27,15 +28,14 @@ namespace HSP.Vanilla.Scenes.GameplayScene
 
             Directory.CreateDirectory( savePath );
 
-            JsonSerializedDataHandler dataHandler = new JsonSerializedDataHandler( Path.Combine( savePath, $"{nameof( ActiveVesselManager )}.json" ) );
+            JsonSerializedDataHandler dataHandler = new JsonSerializedDataHandler( Path.Combine( savePath, $"{nameof( TimeManager )}.json" ) );
 
-            var su = SerializationUnit.FromObjects( UnityEngine.Object.FindObjectOfType<ActiveVesselManager>() );
+            var su = SerializationUnit.FromObjects( UnityEngine.Object.FindObjectOfType<TimeManager>() );
             SerializationResult result = su.Serialize( TimelineManager.RefStore );
-#warning TODO - standardize the 'is failure' check in unityplus.
             if( result.HasFlag( SerializationResult.Failed ) || result.HasFlag( SerializationResult.HasFailures ) )
             {
-                Debug.LogError( $"Failed to serialize ActiveVesselManager." );
-                e.AddMessage( LogType.Error, $"Failed to serialize ActiveVesselManager." );
+                Debug.LogError( $"Failed to serialize TimeManager." );
+                e.AddMessage( LogType.Error, $"Failed to serialize TimeManager." );
                 return;
             }
             var data = su.GetData().First();
@@ -56,15 +56,15 @@ namespace HSP.Vanilla.Scenes.GameplayScene
 
             Directory.CreateDirectory( savePath );
 
-            JsonSerializedDataHandler dataHandler = new JsonSerializedDataHandler( Path.Combine( savePath, $"{nameof( ActiveVesselManager )}.json" ) );
+            JsonSerializedDataHandler dataHandler = new JsonSerializedDataHandler( Path.Combine( savePath, $"{nameof( TimeManager )}.json" ) );
 
             var data = dataHandler.Read();
-            var su = SerializationUnit.PopulateObject( UnityEngine.Object.FindObjectOfType<ActiveVesselManager>(), data );
+            var su = SerializationUnit.PopulateObject( UnityEngine.Object.FindObjectOfType<TimeManager>(), data );
             SerializationResult result = su.Populate( TimelineManager.RefStore );
             if( result.HasFlag( SerializationResult.Failed ) || result.HasFlag( SerializationResult.HasFailures ) )
             {
-                Debug.LogError( $"Failed to deserialize ActiveVesselManager." );
-                e.AddMessage( LogType.Error, $"Failed to deserialize ActiveVesselManager." );
+                Debug.LogError( $"Failed to deserialize TimeManager." );
+                e.AddMessage( LogType.Error, $"Failed to deserialize TimeManager." );
                 return;
             }
         }

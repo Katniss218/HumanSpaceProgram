@@ -90,7 +90,7 @@ namespace HSP.SceneManagement
                 throw new ArgumentNullException( nameof( gameObject ), "GameObject cannot be null." );
             }
 
-            Scene scene = gameObject.scene;
+            UnityEngine.SceneManagement.Scene scene = gameObject.scene;
             if( !scene.isLoaded )
             {
                 throw new InvalidOperationException( $"The scene '{scene.name}' is not loaded." );
@@ -119,9 +119,10 @@ namespace HSP.SceneManagement
         /// <typeparam name="TLoadedScene">The type specifying the scene to use.</typeparam>
         public static UnityEngine.SceneManagement.Scene UnityScene<TLoadedScene>() where TLoadedScene : IHSPScene
         {
-            IHSPScene scene = _loadedScenes.FirstOrDefault( s => s.GetType() == typeof( TLoadedScene ) );
+            Type sceneType = typeof( TLoadedScene );
+            IHSPScene scene = _loadedScenes.FirstOrDefault( s => s.GetType() == sceneType );
             if( scene == null )
-                throw new InvalidOperationException( $"The scene '{typeof( TLoadedScene ).Name}' is not loaded." );
+                throw new InvalidOperationException( $"The scene '{sceneType.Name}' is not loaded." );
 
             return scene.UnityScene;
         }
@@ -132,16 +133,37 @@ namespace HSP.SceneManagement
         /// <typeparam name="TScene">The type specifying the scene to check.</typeparam>
         public static bool IsLoaded<TScene>() where TScene : IHSPScene
         {
-            return _loadedScenes.Any( s => s.GetType() == typeof( TScene ) );
+            Type sceneType = typeof( TScene );
+            return _loadedScenes.Any( s => s.GetType() == sceneType );
         }
+        /// <summary>
+        /// Checks if the given HSP scene is currently loaded.
+        /// </summary>
+        /// <typeparam name="TScene">The type specifying the scene to check.</typeparam>
+        public static bool IsLoaded( IHSPScene scene )
+        {
+            Type sceneType = scene.GetType();
+            return _loadedScenes.Any( s => s.GetType() == sceneType );
+        }
+
         public static bool IsLoading<TScene>() where TScene : IHSPScene
         {
             return _loadingScenes.Contains( typeof( TScene ) );
         }
 
+        public static bool IsLoading( IHSPScene scene )
+        {
+            return _loadingScenes.Contains( scene.GetType() );
+        }
+
         public static bool IsUnloading<TScene>() where TScene : IHSPScene
         {
             return _unloadingScenes.Contains( typeof( TScene ) );
+        }
+
+        public static bool IsUnloading( IHSPScene scene )
+        {
+            return _unloadingScenes.Contains( scene.GetType() );
         }
 
         /// <summary>
@@ -156,7 +178,8 @@ namespace HSP.SceneManagement
         /// <typeparam name="TScene">The type specifying the scene to check.</typeparam>
         public static bool IsForeground<TScene>() where TScene : IHSPScene
         {
-            IHSPScene scene = _loadedScenes.FirstOrDefault( s => s.GetType() == typeof( TScene ) );
+            Type sceneType = typeof( TScene );
+            IHSPScene scene = _loadedScenes.FirstOrDefault( s => s.GetType() == sceneType );
             if( scene == null )
                 return false;
 
@@ -169,7 +192,8 @@ namespace HSP.SceneManagement
         /// <typeparam name="TScene">The type specifying the scene to check.</typeparam>
         public static bool IsBackground<TScene>() where TScene : IHSPScene
         {
-            IHSPScene scene = _loadedScenes.FirstOrDefault( s => s.GetType() == typeof( TScene ) );
+            Type sceneType = typeof( TScene );
+            IHSPScene scene = _loadedScenes.FirstOrDefault( s => s.GetType() == sceneType );
             if( scene == null )
                 return false;
 
@@ -182,21 +206,22 @@ namespace HSP.SceneManagement
         /// <typeparam name="TLoadedScene">The type specifying the scene to set as foreground.</typeparam>
         public static void SetAsForeground<TLoadedScene>() where TLoadedScene : IHSPScene
         {
-            IHSPScene scene = _loadedScenes.FirstOrDefault( s => s.GetType() == typeof( TLoadedScene ) );
+            Type sceneType = typeof( TLoadedScene );
+            IHSPScene scene = _loadedScenes.FirstOrDefault( s => s.GetType() == sceneType );
             if( scene == null )
-                throw new InvalidOperationException( $"Can't set the foreground scene to '{typeof( TLoadedScene ).Name}' that is not loaded." );
+                throw new InvalidOperationException( $"Can't set the foreground scene to '{sceneType.Name}' that is not loaded." );
 
             if( scene == _foregroundScene )
                 return;
 
             if( _foregroundScene != null )
             {
-                Debug.Log( $"Setting the HSP scene '{scene.GetType().Name}' as foreground. The current foreground HSP scene '{_foregroundScene.GetType().Name}' will be set as background." );
+                Debug.Log( $"Setting the HSP scene '{sceneType.Name}' as foreground. The current foreground HSP scene '{_foregroundScene.GetType().Name}' will be set as background." );
                 _foregroundScene._ondeactivate();
             }
             else
             {
-                Debug.Log( $"Setting the HSP scene '{scene.GetType().Name}' as foreground." );
+                Debug.Log( $"Setting the HSP scene '{sceneType.Name}' as foreground." );
             }
 
             _foregroundScene = scene;
@@ -213,14 +238,15 @@ namespace HSP.SceneManagement
         /// <typeparam name="TLoadedScene">The type specifying the scene to set as background.</typeparam>
         public static void SetAsBackground<TLoadedScene>() where TLoadedScene : IHSPScene
         {
-            IHSPScene scene = _loadedScenes.FirstOrDefault( s => s.GetType() == typeof( TLoadedScene ) );
+            Type sceneType = typeof( TLoadedScene );
+            IHSPScene scene = _loadedScenes.FirstOrDefault( s => s.GetType() == sceneType );
             if( scene == null )
-                throw new InvalidOperationException( $"Can't set the background scene to '{typeof( TLoadedScene ).Name}' that is not loaded." );
+                throw new InvalidOperationException( $"Can't set the background scene to '{sceneType.Name}' that is not loaded." );
 
             if( scene != _foregroundScene ) // Scene is already background.
                 return;
 
-            Debug.Log( $"Setting the HSP scene '{scene.GetType().Name}' as background." );
+            Debug.Log( $"Setting the HSP scene '{sceneType.Name}' as background." );
 
             _foregroundScene._ondeactivate();
             _foregroundScene = null;

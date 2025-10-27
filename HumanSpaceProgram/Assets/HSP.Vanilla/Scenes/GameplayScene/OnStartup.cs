@@ -115,13 +115,6 @@ namespace HSP.Vanilla.Scenes.GameplayScene
 
         public const string RESET_UT = HSPEvent.NAMESPACE_HSP + ".reset_ut";
 
-        [HSPEventListener( HSPEvent_GAMEPLAY_SCENE_LOAD.ID, RESET_UT )]
-        private static void ResetUT()
-        {
-#warning TODO - don't. save in scenario/save instead.
-            TimeManager.SetUT( 0 );
-        }
-
         public const string LOAD_OR_CREATE_TIMELINE = HSPEvent.NAMESPACE_HSP + ".load_or_create_timeline";
 
         [HSPEventListener( HSPEvent_GAMEPLAY_SCENE_LOAD.ID, LOAD_OR_CREATE_TIMELINE )]

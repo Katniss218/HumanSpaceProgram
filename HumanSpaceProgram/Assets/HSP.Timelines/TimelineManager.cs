@@ -46,7 +46,7 @@ namespace HSP.Timelines
         }
         public const string ID = HSPEvent.NAMESPACE_HSP + ".scenario.save.error";
     }
-    public static class HSPEvent_ON_SCENARIO_SAVE_SUCCESSFUL
+    public static class HSPEvent_ON_SCENARIO_SAVE_SUCCESS
     {
         public sealed class EventData
         {
@@ -95,7 +95,7 @@ namespace HSP.Timelines
         }
         public const string ID = HSPEvent.NAMESPACE_HSP + ".timeline.save.error";
     }
-    public static class HSPEvent_ON_TIMELINE_SAVE_SUCCESSFUL
+    public static class HSPEvent_ON_TIMELINE_SAVE_SUCCESS
     {
         public sealed class EventData
         {
@@ -144,7 +144,7 @@ namespace HSP.Timelines
         }
         public const string ID = HSPEvent.NAMESPACE_HSP + ".timeline.load.error";
     }
-    public static class HSPEvent_ON_TIMELINE_LOAD_SUCCESSFUL
+    public static class HSPEvent_ON_TIMELINE_LOAD_SUCCESS
     {
         public sealed class EventData
         {
@@ -193,7 +193,7 @@ namespace HSP.Timelines
         }
         public const string ID = HSPEvent.NAMESPACE_HSP + ".timeline.new.error";
     }
-    public static class HSPEvent_ON_TIMELINE_NEW_SUCCESSFUL
+    public static class HSPEvent_ON_TIMELINE_NEW_SUCCESS
     {
         public sealed class EventData
         {
@@ -320,7 +320,7 @@ namespace HSP.Timelines
 
             // Important that this runs after, as a separate event. Otherwise we might show the UI success dialog before there is an error in the next listener.
             // Also saves on needless sorting of listeners.
-            HSPEvent.EventManager.TryInvoke( HSPEvent_ON_SCENARIO_SAVE_SUCCESSFUL.ID, new HSPEvent_ON_SCENARIO_SAVE_SUCCESSFUL.EventData( eventData ) );
+            HSPEvent.EventManager.TryInvoke( HSPEvent_ON_SCENARIO_SAVE_SUCCESS.ID, new HSPEvent_ON_SCENARIO_SAVE_SUCCESS.EventData( eventData ) );
         }
 
         /// <summary>
@@ -388,7 +388,7 @@ namespace HSP.Timelines
 
             // Important that this runs after, as a separate event. Otherwise we might show the UI success dialog before there is an error in the next listener.
             // Also saves on needless sorting of listeners.
-            HSPEvent.EventManager.TryInvoke( HSPEvent_ON_TIMELINE_SAVE_SUCCESSFUL.ID, new HSPEvent_ON_TIMELINE_SAVE_SUCCESSFUL.EventData( eventData ) );
+            HSPEvent.EventManager.TryInvoke( HSPEvent_ON_TIMELINE_SAVE_SUCCESS.ID, new HSPEvent_ON_TIMELINE_SAVE_SUCCESS.EventData( eventData ) );
         }
 
         /// <summary>
@@ -485,7 +485,7 @@ namespace HSP.Timelines
 
             // Important that this runs after, as a separate event. Otherwise we might show the UI success dialog before there is an error in the next listener.
             // Also saves on needless sorting of listeners.
-            HSPEvent.EventManager.TryInvoke( HSPEvent_ON_TIMELINE_LOAD_SUCCESSFUL.ID, new HSPEvent_ON_TIMELINE_LOAD_SUCCESSFUL.EventData( eventData ) );
+            HSPEvent.EventManager.TryInvoke( HSPEvent_ON_TIMELINE_LOAD_SUCCESS.ID, new HSPEvent_ON_TIMELINE_LOAD_SUCCESS.EventData( eventData ) );
         }
 
         /// <summary>
@@ -545,7 +545,7 @@ namespace HSP.Timelines
 
             // Important that this runs after, as a separate event. Otherwise we might show the UI success dialog before there is an error in the next listener.
             // Also saves on needless sorting of listeners.
-            HSPEvent.EventManager.TryInvoke( HSPEvent_ON_TIMELINE_NEW_SUCCESSFUL.ID, new HSPEvent_ON_TIMELINE_NEW_SUCCESSFUL.EventData( eventData ) );
+            HSPEvent.EventManager.TryInvoke( HSPEvent_ON_TIMELINE_NEW_SUCCESS.ID, new HSPEvent_ON_TIMELINE_NEW_SUCCESS.EventData( eventData ) );
         }
 
         //
@@ -629,6 +629,8 @@ namespace HSP.Timelines
         public static void MigrateSave( SaveMetadata save, bool force = false )
         {
             MigrationRegistry.Migrate( save.GetRootDirectory(), save.ModVersions, HumanSpaceProgramModLoader.GetCurrentModVersions(), force );
+            save.ModVersions = GetCurrentMatching( save.ModVersions );
+            save.SaveToDisk();
         }
 
         /// <summary>
@@ -638,6 +640,18 @@ namespace HSP.Timelines
         public static void MigrateScenario( ScenarioMetadata scenario, bool force = false )
         {
             MigrationRegistry.Migrate( scenario.GetRootDirectory(), scenario.ModVersions, HumanSpaceProgramModLoader.GetCurrentModVersions(), force );
+            scenario.ModVersions = GetCurrentMatching( scenario.ModVersions );
+            scenario.SaveToDisk();
+        }
+
+        public static Dictionary<string, Version> GetCurrentMatching( Dictionary<string, Version> modVersions )
+        {
+            Dictionary<string, Version> newDict = new Dictionary<string, Version>();
+            foreach( var modId in modVersions.Keys )
+            {
+                newDict.Add( modId, HumanSpaceProgramModLoader.GetLoadedMod( modId ).Version );
+            }
+            return newDict;
         }
     }
 }

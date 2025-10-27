@@ -41,6 +41,8 @@ namespace HSP.Content.Migrations
 
         public void RenameFile( string oldPath, string newPath )
         {
+            oldPath = Path.GetFullPath( oldPath, RootPath );
+            newPath = Path.GetFullPath( newPath, RootPath );
             if( !File.Exists( oldPath ) )
                 throw new FileNotFoundException( $"File not found: {oldPath}" );
 
@@ -49,6 +51,8 @@ namespace HSP.Content.Migrations
 
         public void MoveFile( string sourcePath, string destPath )
         {
+            sourcePath = Path.GetFullPath( sourcePath, RootPath );
+            destPath = Path.GetFullPath( destPath, RootPath );
             if( !File.Exists( sourcePath ) )
                 throw new FileNotFoundException( $"File not found: {sourcePath}" );
 
@@ -58,18 +62,21 @@ namespace HSP.Content.Migrations
 
         public void DeleteFile( string path )
         {
+            path = Path.GetFullPath( path, RootPath );
             if( File.Exists( path ) )
                 File.Delete( path );
         }
 
         public SerializedData ReadFile( string path )
         {
+            path = Path.GetFullPath( path, RootPath );
             var handler = new JsonSerializedDataHandler( path );
             return handler.Read();
         }
 
         public void WriteFile( string path, SerializedData data )
         {
+            path = Path.GetFullPath( path, RootPath );
             var handler = new JsonSerializedDataHandler( path );
             handler.Write( data );
         }
@@ -78,11 +85,13 @@ namespace HSP.Content.Migrations
 
         public void CreateDirectory( string path )
         {
+            path = Path.GetFullPath( path, RootPath );
             Directory.CreateDirectory( path );
         }
 
         public void DeleteDirectory( string path, bool recursive )
         {
+            path = Path.GetFullPath( path, RootPath );
             if( Directory.Exists( path ) )
                 Directory.Delete( path, recursive );
         }

@@ -1,1 +1,21 @@
-﻿{"$id":"5c1ff8bd-96b5-4374-8aad-bbaa19bd818f","name":"The default scenario","description":"","author":"Katniss","file_version":"0.0","mod_versions":{"$type":"System.Collections.Generic.Dictionary`2[[System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[HSP.Content.Version, HSP.Content, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089","$id":"9f2f3e1f-a30a-4fd1-a29e-00adaf4c72c3","value":[{"key":"Vanilla","value":"0.0"},{"key":"TestMod","value":"0.0"}]}}
+﻿{
+    "$id": "b2596b92-2df1-423c-ad14-0b811c1488c2",
+    "name": "The default scenario",
+    "description": "",
+    "author": "Katniss",
+    "file_version": "0.0",
+    "mod_versions": {
+        "$type": "System.Collections.Generic.Dictionary`2[[System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[HSP.Content.Version, HSP.Content, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089",
+        "$id": "0b3b7192-3da7-450a-af70-038e2ef9c49e",
+        "value": [
+            {
+                "key": "Vanilla",
+                "value": "1.0"
+            },
+            {
+                "key": "TestMod",
+                "value": "0.0"
+            }
+        ]
+    }
+}

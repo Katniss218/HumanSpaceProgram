@@ -6,6 +6,9 @@ using UnityPlus.UILib.UIElements;
 
 namespace HSP.UI.Windows
 {
+    /// <summary>
+    /// 'confirm' or 'cancel' window.
+    /// </summary>
     public class UIConfirmCancelWindow : UIWindow
     {
         protected internal static T Create<T>( UICanvas parent, UILayoutInfo layoutInfo, string title, string text, Action onSubmit ) where T : UIConfirmCancelWindow
