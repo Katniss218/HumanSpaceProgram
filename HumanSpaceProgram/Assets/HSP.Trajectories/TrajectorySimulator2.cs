@@ -804,6 +804,11 @@ namespace HSP.Trajectories
                             }
 
                             for( int i = 0; i < currentStateAttractors.Length; i++ )
+#warning TODO - still something is busted here. when saving this tries to evaluate the ephemeris at a point where the attractor doesn't have data.
+                                // ArgumentOutOfRangeException: Time '0,019999999552965164' is out of the range of this ephemeris: [1,6599999628961086, 1].
+                                // ArgumentOutOfRangeException: Time '1,6599999628961086' is out of the range of this ephemeris: [10,259999770671129, 2,6399999633431435].
+                                // ArgumentOutOfRangeException: Time '10,259999770671129' is out of the range of this ephemeris: [20,559999540448189, 11,239999771118164].
+                                // the requested time is the same as the previous error's maxUT
                                 currentStateAttractors[i] = _attractorEphemerides[i].Evaluate( localUT );
 
                             ITrajectoryIntegrator integrator = _followers[bodyIndex];
