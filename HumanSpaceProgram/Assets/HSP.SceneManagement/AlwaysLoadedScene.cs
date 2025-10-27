@@ -40,14 +40,14 @@ namespace HSP.SceneManagement
 
         void Awake()
         {
-            IEnumerable<Assembly> assemblies = AppDomain.CurrentDomain.GetAssemblies();
-            HSPEventListenerAttribute.CreateEventsForAutorunningMethods( assemblies );
+            IEnumerable<Assembly> baseAssemblies = AppDomain.CurrentDomain.GetAssemblies();
+            HSPEventListenerAttribute.CreateEventsForAutorunningMethods( baseAssemblies );
 
             HSPEvent.EventManager.TryInvoke( HSPEvent_STARTUP_LOAD_MOD_ASSEMBLIES.ID );
 
-            assemblies = AppDomain.CurrentDomain.GetAssemblies() // Mod assemblies.
-                .Except( assemblies );
-            HSPEventListenerAttribute.CreateEventsForAutorunningMethods( assemblies );
+            var modAssemblies = AppDomain.CurrentDomain.GetAssemblies()
+                .Except( baseAssemblies );
+            HSPEventListenerAttribute.CreateEventsForAutorunningMethods( modAssemblies );
 
             // Invoke after mods are loaded (because mods may want use it).
             HSPEvent.EventManager.TryInvoke( HSPEvent_STARTUP_IMMEDIATELY.ID );

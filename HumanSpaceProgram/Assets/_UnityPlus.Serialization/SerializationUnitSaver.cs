@@ -39,39 +39,48 @@ namespace UnityPlus.Serialization
         /// <summary>
         /// Performs serialization of the previously specified objects.
         /// </summary>
-        public void Serialize( int maxIters = 10 )
+        public SerializationResult Serialize( int maxIters = 10 )
         {
+            if( maxIters <= 0 )
+                throw new ArgumentOutOfRangeException( nameof( maxIters ), $"The maximum number of iterations must be greater than zero." );
+
             this._data = new SerializedData[_objects.Length];
             this.CurrentPass = -1;
 
+            SerializationResult result = SerializationResult.NoChange;
             for( int i = 0; i < maxIters; i++ )
             {
                 this.CurrentPass++;
-                SerializationResult result = this.SaveCallback();
+                result = this.SaveCallback();
                 if( result.HasFlag( SerializationResult.Finished ) )
-                    return;
+                    return result;
             }
+            return result;
         }
 
         /// <summary>
         /// Performs serialization of the previously specified objects.
         /// </summary>
-        public void Serialize( IReverseReferenceMap s, int maxIters = 10 )
+        public SerializationResult Serialize( IReverseReferenceMap s, int maxIters = 10 )
         {
             if( s == null )
                 throw new ArgumentNullException( nameof( s ), $"The reference map to use can't be null." );
+            if( maxIters <= 0 )
+                throw new ArgumentOutOfRangeException( nameof( maxIters ), $"The maximum number of iterations must be greater than zero." );
 
             this._data = new SerializedData[_objects.Length];
             this.CurrentPass = -1;
             this.RefMap = s;
 
+            SerializationResult result = SerializationResult.NoChange;
             for( int i = 0; i < maxIters; i++ )
             {
                 this.CurrentPass++;
-                SerializationResult result = this.SaveCallback();
+                result = this.SaveCallback();
                 if( result.HasFlag( SerializationResult.Finished ) )
-                    return;
+                    return result;
             }
+            return result;
         }
 
         //

@@ -1,5 +1,6 @@
 using HSP.CelestialBodies;
 using HSP.Time;
+using HSP.Timelines;
 using HSP.Trajectories;
 using HSP.Vanilla.Scenes.GameplayScene.Cameras;
 using HSP.Vessels;
@@ -18,6 +19,7 @@ namespace HSP.Vanilla.Scenes.GameplayScene
         }
 
         public const string ADD_TIMESCALE_INPUT_CONTROLLER = HSPEvent.NAMESPACE_HSP + ".add_timescale_input_controller";
+        public const string ADD_TIMELINE_MANAGER = HSPEvent.NAMESPACE_HSP + ".add_timeline_manager";
         public const string ADD_VESSEL_MANAGER = HSPEvent.NAMESPACE_HSP + ".add_vessel_manager";
         public const string ADD_CELESTIAL_BODY_MANAGER = HSPEvent.NAMESPACE_HSP + ".add_celestial_body_manager";
         public const string ADD_GAMEPLAY_SCENE_TOOL_MANAGER = HSPEvent.NAMESPACE_HSP + ".add_gameplay_scene_tool_manager";
@@ -33,6 +35,12 @@ namespace HSP.Vanilla.Scenes.GameplayScene
         private static void AddTimescaleInputController()
         {
             GameplaySceneM.Instance.gameObject.AddComponent<TimeScaleInputController>();
+        }
+
+        [HSPEventListener( HSPEvent_GAMEPLAY_SCENE_LOAD.ID, ADD_TIMELINE_MANAGER )]
+        private static void AddTimelineManager()
+        {
+            GameplaySceneM.Instance.gameObject.AddComponent<TimelineManager>();
         }
 
         [HSPEventListener( HSPEvent_GAMEPLAY_SCENE_LOAD.ID, ADD_VESSEL_MANAGER )]
@@ -107,11 +115,19 @@ namespace HSP.Vanilla.Scenes.GameplayScene
 
         public const string RESET_UT = HSPEvent.NAMESPACE_HSP + ".reset_ut";
 
-        [HSPEventListener( HSPEvent_GAMEPLAY_SCENE_LOAD.ID, RESET_UT )]
-        private static void ResetUT()
+        public const string LOAD_OR_CREATE_TIMELINE = HSPEvent.NAMESPACE_HSP + ".load_or_create_timeline";
+
+        [HSPEventListener( HSPEvent_GAMEPLAY_SCENE_LOAD.ID, LOAD_OR_CREATE_TIMELINE )]
+        private static void LoadOrCreateTimeline( GameplaySceneM.LoadData loadData )
         {
-#warning TODO - don't. save in scenario instead.
-            TimeManager.SetUT( 0 );
+            if( loadData.newTimeline != null )
+            {
+                TimelineManager.BeginNewTimelineAsync( loadData.newTimeline );
+            }
+            else if( loadData.loadTimelineId != null && loadData.loadSaveId != null )
+            {
+                TimelineManager.BeginLoadAsync( loadData.loadTimelineId, loadData.loadSaveId );
+            }
         }
     }
 }

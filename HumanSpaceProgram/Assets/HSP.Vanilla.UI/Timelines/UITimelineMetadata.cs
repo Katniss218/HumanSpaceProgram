@@ -12,6 +12,7 @@ namespace HSP.Vanilla.UI.Timelines
 {
     public class UITimelineMetadata : UIPanel, IPointerClickHandler
     {
+        public ScenarioMetadata Scenario { get; private set; }
         public TimelineMetadata Timeline { get; private set; }
 
         public Action<UITimelineMetadata> onClick;
@@ -24,13 +25,14 @@ namespace HSP.Vanilla.UI.Timelines
             }
         }
 
-        public static T Create<T>( IUIElementContainer parent, UILayoutInfo layout, TimelineMetadata timeline, Action<UITimelineMetadata> onClick ) where T : UITimelineMetadata
+        public static T Create<T>( IUIElementContainer parent, UILayoutInfo layout, ScenarioMetadata scenario, TimelineMetadata timeline, Action<UITimelineMetadata> onClick ) where T : UITimelineMetadata
         {
             T uiSaveMetadata = (T)UIPanel.Create<T>( parent, layout, AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/panel" ) )
                 .Raycastable();
 
             uiSaveMetadata.LayoutDriver = new VerticalLayoutDriver() { FitToSize = true };
             uiSaveMetadata.Timeline = timeline;
+            uiSaveMetadata.Scenario = scenario;
             uiSaveMetadata.onClick = onClick;
 
             UIText nameText = uiSaveMetadata.AddStdText( new UILayoutInfo( UIFill.Horizontal(), UIAnchor.Bottom, 0, 0.5f ), timeline.Name );
@@ -49,9 +51,9 @@ namespace HSP.Vanilla.UI.Timelines
 
     public static class UITimelineMetadata_Ex
     {
-        public static UITimelineMetadata AddTimelineMetadata( this IUIElementContainer parent, UILayoutInfo layout, TimelineMetadata timeline, Action<UITimelineMetadata> onClick )
+        public static UITimelineMetadata AddTimelineMetadata( this IUIElementContainer parent, UILayoutInfo layout, ScenarioMetadata scenario, TimelineMetadata timeline, Action<UITimelineMetadata> onClick )
         {
-            return UITimelineMetadata.Create<UITimelineMetadata>( parent, layout, timeline, onClick );
+            return UITimelineMetadata.Create<UITimelineMetadata>( parent, layout, scenario, timeline, onClick );
         }
     }
 }

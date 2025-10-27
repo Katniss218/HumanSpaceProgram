@@ -62,10 +62,6 @@ namespace HSP.Vanilla.Trajectories
 
                 _integrator = value;
 
-                //TrajectoryBodyState trajectoryState = value.Step(...);
-                //_referenceFrameTransform.AbsolutePosition = trajectoryState.AbsolutePosition;
-                //_referenceFrameTransform.AbsoluteVelocity = trajectoryState.AbsoluteVelocity;
-
                 TrajectoryManager.MarkBodyDirty( this );
             }
         }

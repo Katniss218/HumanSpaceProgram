@@ -3,6 +3,9 @@ using System.Runtime.Serialization;
 
 namespace HSP.Timelines
 {
+    /// <summary>
+    /// Exception thrown when a specific timeline cannot be found.
+    /// </summary>
     public class TimelineNotFoundException : Exception
     {
         public string TimelineID { get; }

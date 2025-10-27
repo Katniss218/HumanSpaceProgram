@@ -1,4 +1,5 @@
 ﻿using HSP.ReferenceFrames;
+using System;
 using UnityEngine;
 
 namespace HSP.CelestialBodies.Surfaces
@@ -94,7 +95,10 @@ namespace HSP.CelestialBodies.Surfaces
 
         public static LODQuad CreateInactive( LODQuadSphere sphere, LODQuadTreeNode node, Mesh mesh )
         {
-            GameObject gameObject = new GameObject( $"LODQuad {node.Face}, L{node.SubdivisionLevel}, ({node.FaceCenter.x:#0.################}, {node.FaceCenter.y:#0.################})" );
+            if( sphere.QuadParent == null )
+                throw new InvalidOperationException( $"Can't create a {nameof( LODQuad )} - sphere parent is null." );
+
+            GameObject gameObject = new GameObject( $"{nameof( LODQuad )} {node.Face}, L{node.SubdivisionLevel}, ({node.FaceCenter.x:#0.################}, {node.FaceCenter.y:#0.################})" );
             gameObject.transform.localPosition = (Vector3)(node.SphereCenter * sphere.CelestialBody.Radius);
             gameObject.transform.localRotation = Quaternion.identity;
             gameObject.transform.localScale = Vector3.one;

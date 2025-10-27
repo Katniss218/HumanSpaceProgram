@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityPlus.AssetManagement;
 using UnityPlus.UILib;
@@ -22,7 +18,7 @@ namespace HSP.UI.Windows
             uiWindow.AddStdText( new UILayoutInfo( UIFill.Horizontal(), UIAnchor.Top, 0, 30 ), title )
                 .WithAlignment( TMPro.HorizontalAlignmentOptions.Center );
 
-            uiWindow.AddStdText( new UILayoutInfo( UIFill.Fill( 2, 2, 32, 19 ) ), text );
+            uiWindow.AddStdText( new UILayoutInfo( UIFill.Fill( 8, 8, 32, 19 ) ), text );
 
             uiWindow.AddButton( new UILayoutInfo( UIAnchor.BottomRight, (-2, 2), (60, 15) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_horizontal" ), () =>
             {
@@ -40,7 +36,7 @@ namespace HSP.UI.Windows
     {
         public static UIConfirmWindow AddConfirmWindow( this UICanvas parent, string title, string text, Action onSubmit )
         {
-            return UIConfirmWindow.Create<UIConfirmWindow>( parent, new UILayoutInfo( UIAnchor.Center, (0, 0), (250, 100) ), title, text, onSubmit );
+            return UIConfirmWindow.Create<UIConfirmWindow>( parent, new UILayoutInfo( UIAnchor.Center, (0, 0), (300, 120) ), title, text, onSubmit );
         }
     }
 }

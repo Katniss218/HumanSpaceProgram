@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HSP.SceneManagement;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -180,8 +181,6 @@ namespace HSP.CelestialBodies.Surfaces
             TryCreateQuadParentGameObject();
         }
 
-        bool disable = false;
-
         void Update()
         {
             if( PoIGetter == null )
@@ -235,6 +234,10 @@ namespace HSP.CelestialBodies.Surfaces
             if( QuadParent != null )
                 return;
 
+            var scene = gameObject.GetHSPScene();
+            if( !HSPSceneManager.IsLoaded( scene ) || HSPSceneManager.IsUnloading( scene ) )
+                return;
+
             GameObject parent = new GameObject( $"QUADPARENT-{this.CelestialBody.ID}" );
             QuadParent = parent.transform;
             HSPEvent.EventManager.TryInvoke( HSPEvent_ON_LOD_QUAD_PARENT_CREATED.ID, this );
@@ -251,18 +254,8 @@ namespace HSP.CelestialBodies.Surfaces
             _currentTree = new LODQuadTree( MaxDepth );
         }
 
-        bool _canBuild = true;
-
         private void TryRebuild()
         {
-#warning TODO removeme later
-            if( UnityEngine.Input.GetKey(KeyCode.F))
-            {
-                _canBuild = false;
-            }
-            if( !_canBuild )
-                return;
-
             if( _builder != null )
                 throw new InvalidOperationException( $"Tried to start building while already building." );
             if( PoIGetter == null )

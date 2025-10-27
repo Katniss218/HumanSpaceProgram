@@ -1,23 +1,63 @@
+using HSP.Content;
+using HSP.Content.Migrations;
+using HSP.Content.Mods;
 using HSP.Time;
 using HSP.Timelines.Serialization;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using UnityPlus.Serialization.ReferenceMaps;
+using Version = HSP.Content.Version;
 
 namespace HSP.Timelines
 {
+    /// <summary>
+    /// Invoked before saving the current scene as a scenario.
+    /// </summary>
     public static class HSPEvent_BEFORE_SCENARIO_SAVE
     {
         public const string ID = HSPEvent.NAMESPACE_HSP + ".scenario.save.before";
     }
+    /// <summary>
+    /// Invoked to save the current scene as a scenario.
+    /// </summary>
     public static class HSPEvent_ON_SCENARIO_SAVE
     {
         public const string ID = HSPEvent.NAMESPACE_HSP + ".scenario.save";
     }
+    /// <summary>
+    /// Invoked after saving the current scene as a scenario.
+    /// </summary>
     public static class HSPEvent_AFTER_SCENARIO_SAVE
     {
         public const string ID = HSPEvent.NAMESPACE_HSP + ".scenario.save.after";
+    }
+    public static class HSPEvent_ON_SCENARIO_SAVE_ERROR
+    {
+        public sealed class EventData
+        {
+            public readonly ScenarioSaveEventData data;
+
+            public EventData( ScenarioSaveEventData data )
+            {
+                this.data = data;
+            }
+        }
+        public const string ID = HSPEvent.NAMESPACE_HSP + ".scenario.save.error";
+    }
+    public static class HSPEvent_ON_SCENARIO_SAVE_SUCCESS
+    {
+        public sealed class EventData
+        {
+            public readonly ScenarioSaveEventData data;
+
+            public EventData( ScenarioSaveEventData data )
+            {
+                this.data = data;
+            }
+        }
+        public const string ID = HSPEvent.NAMESPACE_HSP + ".scenario.save.successful";
     }
 
 
@@ -42,6 +82,32 @@ namespace HSP.Timelines
     {
         public const string ID = HSPEvent.NAMESPACE_HSP + ".timeline.save.after";
     }
+    public static class HSPEvent_ON_TIMELINE_SAVE_ERROR
+    {
+        public sealed class EventData
+        {
+            public readonly TimelineSaveEventData data;
+
+            public EventData( TimelineSaveEventData data )
+            {
+                this.data = data;
+            }
+        }
+        public const string ID = HSPEvent.NAMESPACE_HSP + ".timeline.save.error";
+    }
+    public static class HSPEvent_ON_TIMELINE_SAVE_SUCCESS
+    {
+        public sealed class EventData
+        {
+            public readonly TimelineSaveEventData data;
+
+            public EventData( TimelineSaveEventData data )
+            {
+                this.data = data;
+            }
+        }
+        public const string ID = HSPEvent.NAMESPACE_HSP + ".timeline.save.successful";
+    }
 
 
     /// <summary>
@@ -64,6 +130,32 @@ namespace HSP.Timelines
     public static class HSPEvent_AFTER_TIMELINE_LOAD
     {
         public const string ID = HSPEvent.NAMESPACE_HSP + ".timeline.load.after";
+    }
+    public static class HSPEvent_ON_TIMELINE_LOAD_ERROR
+    {
+        public sealed class EventData
+        {
+            public readonly TimelineLoadEventData data;
+
+            public EventData( TimelineLoadEventData data )
+            {
+                this.data = data;
+            }
+        }
+        public const string ID = HSPEvent.NAMESPACE_HSP + ".timeline.load.error";
+    }
+    public static class HSPEvent_ON_TIMELINE_LOAD_SUCCESS
+    {
+        public sealed class EventData
+        {
+            public readonly TimelineLoadEventData data;
+
+            public EventData( TimelineLoadEventData data )
+            {
+                this.data = data;
+            }
+        }
+        public const string ID = HSPEvent.NAMESPACE_HSP + ".timeline.load.successful";
     }
 
 
@@ -88,62 +180,42 @@ namespace HSP.Timelines
     {
         public const string ID = HSPEvent.NAMESPACE_HSP + ".timeline.new.after";
     }
+    public static class HSPEvent_ON_TIMELINE_NEW_ERROR
+    {
+        public sealed class EventData
+        {
+            public readonly TimelineNewEventData data;
+
+            public EventData( TimelineNewEventData data )
+            {
+                this.data = data;
+            }
+        }
+        public const string ID = HSPEvent.NAMESPACE_HSP + ".timeline.new.error";
+    }
+    public static class HSPEvent_ON_TIMELINE_NEW_SUCCESS
+    {
+        public sealed class EventData
+        {
+            public readonly TimelineNewEventData data;
+
+            public EventData( TimelineNewEventData data )
+            {
+                this.data = data;
+            }
+        }
+        public const string ID = HSPEvent.NAMESPACE_HSP + ".timeline.new.successful";
+    }
+
+    //
+    //
+    //
 
     /// <summary>
     /// Manages the currently loaded timeline (i.e. a save or world). See <see cref="TimelineMetadata"/> and <see cref="SaveMetadata"/>.
     /// </summary>
     public class TimelineManager : SingletonMonoBehaviour<TimelineManager>
     {
-        public struct SaveScenarioEventData
-        {
-            public readonly ScenarioMetadata scenario;
-
-            public SaveScenarioEventData( ScenarioMetadata scenario )
-            {
-                this.scenario = scenario;
-            }
-        }
-
-        public struct SaveEventData
-        {
-            public readonly ScenarioMetadata scenario;
-            public readonly TimelineMetadata timeline;
-            public readonly SaveMetadata save;
-
-            public SaveEventData( ScenarioMetadata scenario, TimelineMetadata timeline, SaveMetadata save )
-            {
-                this.scenario = scenario;
-                this.timeline = timeline;
-                this.save = save;
-            }
-        }
-
-        public struct LoadEventData
-        {
-            public readonly ScenarioMetadata scenario;
-            public readonly TimelineMetadata timeline;
-            public readonly SaveMetadata save;
-
-            public LoadEventData( ScenarioMetadata scenario, TimelineMetadata timeline, SaveMetadata save )
-            {
-                this.scenario = scenario;
-                this.timeline = timeline;
-                this.save = save;
-            }
-        }
-
-        public struct StartNewEventData
-        {
-            public readonly ScenarioMetadata scenario;
-            public readonly TimelineMetadata timeline;
-
-            public StartNewEventData( ScenarioMetadata scenario, TimelineMetadata timeline )
-            {
-                this.scenario = scenario;
-                this.timeline = timeline;
-            }
-        }
-
         /// <summary>
         /// Checks if a timeline is currently being either saved or loaded.
         /// </summary>
@@ -153,25 +225,25 @@ namespace HSP.Timelines
         /// <summary>
         /// Gets the scenario that the currently active timeline is based on.
         /// </summary>
-        public static ScenarioMetadata CurrentScenario => instance._currentScenario;
+        public static ScenarioMetadata CurrentScenario => instanceExists ? instance._currentScenario : null;
 
         private TimelineMetadata _currentTimeline;
         /// <summary>
         /// Gets the currently active timeline.
         /// </summary>
-        public static TimelineMetadata CurrentTimeline => instance._currentTimeline;
+        public static TimelineMetadata CurrentTimeline => instanceExists ? instance._currentTimeline : null;
 
         private SaveMetadata _currentSave;
         /// <summary>
         /// Gets the currently active save (if any).
         /// </summary>
-        public static SaveMetadata CurrentSave => instance._currentSave;
+        public static SaveMetadata CurrentSave => instanceExists ? instance._currentSave : null;
 
 
         private static bool _wasPausedBeforeSerializing = false;
         public static BidirectionalReferenceStore RefStore { get; private set; }
 
-        public static void SaveLoadStartFunc()
+        public static void SaveLoadStartLockPause()
         {
             IsSavingOrLoading = true;
             _wasPausedBeforeSerializing = TimeManager.IsPaused;
@@ -179,7 +251,7 @@ namespace HSP.Timelines
             TimeManager.LockTimescale = true;
         }
 
-        public static void SaveLoadFinishFunc()
+        public static void SaveLoadFinishUnlockUnpause()
         {
             TimeManager.LockTimescale = false;
             if( !_wasPausedBeforeSerializing )
@@ -188,6 +260,10 @@ namespace HSP.Timelines
             }
             IsSavingOrLoading = false;
         }
+
+        //
+        //
+        //
 
         /// <summary>
         /// Asynchronously saves the current game state to a scenario over multiple frames. <br/>
@@ -211,17 +287,40 @@ namespace HSP.Timelines
             else
                 Directory.CreateDirectory( rootDirectory );
 
-            var eScenario = new SaveScenarioEventData( scenario );
+            ScenarioSaveEventData eventData = new ScenarioSaveEventData( scenario );
             RefStore = new BidirectionalReferenceStore();
 
-            HSPEvent.EventManager.TryInvoke( HSPEvent_BEFORE_SCENARIO_SAVE.ID, eScenario );
-            SaveLoadStartFunc();
-            HSPEvent.EventManager.TryInvoke( HSPEvent_ON_SCENARIO_SAVE.ID, eScenario );
-            SaveLoadFinishFunc();
+            HSPEvent.EventManager.TryInvoke( HSPEvent_BEFORE_SCENARIO_SAVE.ID, eventData );
+            if( eventData.HasErrors )
+            {
+                Debug.LogError( $"Aborting scenario save due to errors in {nameof( HSPEvent_BEFORE_SCENARIO_SAVE )} phase." );
+                HSPEvent.EventManager.TryInvoke( HSPEvent_ON_SCENARIO_SAVE_ERROR.ID, new HSPEvent_ON_SCENARIO_SAVE_ERROR.EventData( eventData ) );
+                return;
+            }
+            SaveLoadStartLockPause();
+            HSPEvent.EventManager.TryInvoke( HSPEvent_ON_SCENARIO_SAVE.ID, eventData );
+            if( eventData.HasErrors )
+            {
+                Debug.LogError( $"Aborting scenario save due to errors in {nameof( HSPEvent_ON_SCENARIO_SAVE )} phase." );
+                HSPEvent.EventManager.TryInvoke( HSPEvent_ON_SCENARIO_SAVE_ERROR.ID, new HSPEvent_ON_SCENARIO_SAVE_ERROR.EventData( eventData ) );
+                return;
+            }
+            SaveLoadFinishUnlockUnpause();
 
-            CurrentTimeline.SaveToDisk();
+            scenario.FileVersion = ScenarioMetadata.CURRENT_SCENARIO_FILE_VERSION;
+            scenario.ModVersions = HumanSpaceProgramModLoader.GetCurrentSaveModVersions();
             scenario.SaveToDisk();
-            HSPEvent.EventManager.TryInvoke( HSPEvent_AFTER_SCENARIO_SAVE.ID, eScenario );
+            HSPEvent.EventManager.TryInvoke( HSPEvent_AFTER_SCENARIO_SAVE.ID, eventData );
+            if( eventData.HasErrors )
+            {
+                Debug.LogError( $"Aborting scenario save due to errors in {nameof( HSPEvent_AFTER_SCENARIO_SAVE )} phase." );
+                HSPEvent.EventManager.TryInvoke( HSPEvent_ON_SCENARIO_SAVE_ERROR.ID, new HSPEvent_ON_SCENARIO_SAVE_ERROR.EventData( eventData ) );
+                return;
+            }
+
+            // Important that this runs after, as a separate event. Otherwise we might show the UI success dialog before there is an error in the next listener.
+            // Also saves on needless sorting of listeners.
+            HSPEvent.EventManager.TryInvoke( HSPEvent_ON_SCENARIO_SAVE_SUCCESS.ID, new HSPEvent_ON_SCENARIO_SAVE_SUCCESS.EventData( eventData ) );
         }
 
         /// <summary>
@@ -254,19 +353,42 @@ namespace HSP.Timelines
             else
                 Directory.CreateDirectory( rootDirectory );
 
-            var eSave = new SaveEventData( CurrentScenario, CurrentTimeline, save );
+            TimelineSaveEventData eventData = new TimelineSaveEventData( CurrentScenario, CurrentTimeline, save );
             RefStore = new BidirectionalReferenceStore();
 
-            HSPEvent.EventManager.TryInvoke( HSPEvent_BEFORE_TIMELINE_SAVE.ID, eSave );
-            SaveLoadStartFunc();
-            HSPEvent.EventManager.TryInvoke( HSPEvent_ON_TIMELINE_SAVE.ID, eSave );
-            SaveLoadFinishFunc();
+            HSPEvent.EventManager.TryInvoke( HSPEvent_BEFORE_TIMELINE_SAVE.ID, eventData );
+            if( eventData.HasErrors )
+            {
+                Debug.LogError( $"Aborting timeline save due to errors in {nameof( HSPEvent_BEFORE_TIMELINE_SAVE )} phase." );
+                HSPEvent.EventManager.TryInvoke( HSPEvent_ON_TIMELINE_SAVE_ERROR.ID, new HSPEvent_ON_TIMELINE_SAVE_ERROR.EventData( eventData ) );
+                return;
+            }
+            SaveLoadStartLockPause();
+            HSPEvent.EventManager.TryInvoke( HSPEvent_ON_TIMELINE_SAVE.ID, eventData );
+            if( eventData.HasErrors )
+            {
+                Debug.LogError( $"Aborting timeline save due to errors in {nameof( HSPEvent_ON_TIMELINE_SAVE )} phase." );
+                HSPEvent.EventManager.TryInvoke( HSPEvent_ON_TIMELINE_SAVE_ERROR.ID, new HSPEvent_ON_TIMELINE_SAVE_ERROR.EventData( eventData ) );
+                return;
+            }
+            SaveLoadFinishUnlockUnpause();
 
             CurrentTimeline.SaveToDisk();
             save.FileVersion = SaveMetadata.CURRENT_SAVE_FILE_VERSION;
+            save.ModVersions = HumanSpaceProgramModLoader.GetCurrentSaveModVersions();
             save.SaveToDisk();
             instance._currentSave = save;
-            HSPEvent.EventManager.TryInvoke( HSPEvent_AFTER_TIMELINE_SAVE.ID, eSave );
+            HSPEvent.EventManager.TryInvoke( HSPEvent_AFTER_TIMELINE_SAVE.ID, eventData );
+            if( eventData.HasErrors )
+            {
+                Debug.LogError( $"Aborting timeline save due to errors in {nameof( HSPEvent_AFTER_TIMELINE_SAVE )} phase." );
+                HSPEvent.EventManager.TryInvoke( HSPEvent_ON_TIMELINE_SAVE_ERROR.ID, new HSPEvent_ON_TIMELINE_SAVE_ERROR.EventData( eventData ) );
+                return;
+            }
+
+            // Important that this runs after, as a separate event. Otherwise we might show the UI success dialog before there is an error in the next listener.
+            // Also saves on needless sorting of listeners.
+            HSPEvent.EventManager.TryInvoke( HSPEvent_ON_TIMELINE_SAVE_SUCCESS.ID, new HSPEvent_ON_TIMELINE_SAVE_SUCCESS.EventData( eventData ) );
         }
 
         /// <summary>
@@ -306,6 +428,10 @@ namespace HSP.Timelines
             {
                 throw new ScenarioNotFoundException( loadedTimeline.ScenarioID, ex );
             }
+            if( !HumanSpaceProgramModLoader.AreCompatibleModsLoaded( loadedScenario.ModVersions ) )
+            {
+                throw new IncompatibleSaveException();
+            }
 
             try
             {
@@ -315,18 +441,51 @@ namespace HSP.Timelines
             {
                 throw new SaveNotFoundException( timelineId, saveId, ex );
             }
+            if( !HumanSpaceProgramModLoader.AreCompatibleModsLoaded( loadedSave.ModVersions ) )
+            {
+                throw new IncompatibleSaveException();
+            }
 
-            var eLoad = new LoadEventData( loadedScenario, loadedTimeline, loadedSave );
+#warning TODO - check if newer version
+            if( NeedsMigration( loadedSave ) )
+            {
+                throw new IncompatibleSaveException( $"Tried to load an unmigrated save." );
+            }
+
+            TimelineLoadEventData eventData = new TimelineLoadEventData( loadedScenario, loadedTimeline, loadedSave );
             RefStore = new BidirectionalReferenceStore();
 
-            HSPEvent.EventManager.TryInvoke( HSPEvent_BEFORE_TIMELINE_LOAD.ID, eLoad );
-            SaveLoadStartFunc();
-            HSPEvent.EventManager.TryInvoke( HSPEvent_ON_TIMELINE_LOAD.ID, eLoad );
-            SaveLoadFinishFunc();
+            HSPEvent.EventManager.TryInvoke( HSPEvent_BEFORE_TIMELINE_LOAD.ID, eventData );
+            if( eventData.HasErrors )
+            {
+                Debug.LogError( $"Aborting timeline load due to errors in {nameof( HSPEvent_BEFORE_TIMELINE_LOAD )} phase." );
+                HSPEvent.EventManager.TryInvoke( HSPEvent_ON_TIMELINE_LOAD_ERROR.ID, new HSPEvent_ON_TIMELINE_LOAD_ERROR.EventData( eventData ) );
+                return;
+            }
+            SaveLoadStartLockPause();
+            HSPEvent.EventManager.TryInvoke( HSPEvent_ON_TIMELINE_LOAD.ID, eventData );
+            if( eventData.HasErrors )
+            {
+                Debug.LogError( $"Aborting timeline load due to errors in {nameof( HSPEvent_ON_TIMELINE_LOAD )} phase." );
+                HSPEvent.EventManager.TryInvoke( HSPEvent_ON_TIMELINE_LOAD_ERROR.ID, new HSPEvent_ON_TIMELINE_LOAD_ERROR.EventData( eventData ) );
+                return;
+            }
+            SaveLoadFinishUnlockUnpause();
+
             instance._currentScenario = loadedScenario;
             instance._currentTimeline = loadedTimeline;
             instance._currentSave = loadedSave;
-            HSPEvent.EventManager.TryInvoke( HSPEvent_AFTER_TIMELINE_LOAD.ID, eLoad );
+            HSPEvent.EventManager.TryInvoke( HSPEvent_AFTER_TIMELINE_LOAD.ID, eventData );
+            if( eventData.HasErrors )
+            {
+                Debug.LogError( $"Aborting timeline load due to errors in {nameof( HSPEvent_AFTER_TIMELINE_LOAD )} phase." );
+                HSPEvent.EventManager.TryInvoke( HSPEvent_ON_TIMELINE_LOAD_ERROR.ID, new HSPEvent_ON_TIMELINE_LOAD_ERROR.EventData( eventData ) );
+                return;
+            }
+
+            // Important that this runs after, as a separate event. Otherwise we might show the UI success dialog before there is an error in the next listener.
+            // Also saves on needless sorting of listeners.
+            HSPEvent.EventManager.TryInvoke( HSPEvent_ON_TIMELINE_LOAD_SUCCESS.ID, new HSPEvent_ON_TIMELINE_LOAD_SUCCESS.EventData( eventData ) );
         }
 
         /// <summary>
@@ -338,7 +497,6 @@ namespace HSP.Timelines
             {
                 throw new InvalidOperationException( $"Can't create a new timeline while already saving or loading." );
             }
-#warning TODO - validation for already existing timelines, possibly overwrite, but prompt user (elsewhere, here doesnt prompt)
 
             ScenarioMetadata loadedScenario;
             try
@@ -349,18 +507,151 @@ namespace HSP.Timelines
             {
                 throw new ScenarioNotFoundException( timeline.ScenarioID, ex );
             }
+            if( !HumanSpaceProgramModLoader.AreCompatibleModsLoaded( loadedScenario.ModVersions ) )
+            {
+                throw new IncompatibleSaveException();
+            }
 
-            var eNew = new StartNewEventData( loadedScenario, timeline );
+            TimelineNewEventData eventData = new TimelineNewEventData( loadedScenario, timeline );
             RefStore = new BidirectionalReferenceStore();
 
-            HSPEvent.EventManager.TryInvoke( HSPEvent_BEFORE_TIMELINE_NEW.ID, eNew );
-            SaveLoadStartFunc();
-            HSPEvent.EventManager.TryInvoke( HSPEvent_ON_TIMELINE_NEW.ID, eNew );
-            SaveLoadFinishFunc();
+            HSPEvent.EventManager.TryInvoke( HSPEvent_BEFORE_TIMELINE_NEW.ID, eventData );
+            if( eventData.HasErrors )
+            {
+                Debug.LogError( $"Aborting new timeline creation due to errors in {nameof( HSPEvent_BEFORE_TIMELINE_NEW )} phase." );
+                HSPEvent.EventManager.TryInvoke( HSPEvent_ON_TIMELINE_NEW_ERROR.ID, new HSPEvent_ON_TIMELINE_NEW_ERROR.EventData( eventData ) );
+                return;
+            }
+            SaveLoadStartLockPause();
+            HSPEvent.EventManager.TryInvoke( HSPEvent_ON_TIMELINE_NEW.ID, eventData );
+            if( eventData.HasErrors )
+            {
+                Debug.LogError( $"Aborting new timeline creation due to errors in {nameof( HSPEvent_ON_TIMELINE_NEW )} phase." );
+                HSPEvent.EventManager.TryInvoke( HSPEvent_ON_TIMELINE_NEW_ERROR.ID, new HSPEvent_ON_TIMELINE_NEW_ERROR.EventData( eventData ) );
+                return;
+            }
+            SaveLoadFinishUnlockUnpause();
+
             instance._currentScenario = loadedScenario;
             instance._currentTimeline = timeline;
             instance._currentSave = new SaveMetadata( timeline.TimelineID );
-            HSPEvent.EventManager.TryInvoke( HSPEvent_AFTER_TIMELINE_NEW.ID, eNew );
+            HSPEvent.EventManager.TryInvoke( HSPEvent_AFTER_TIMELINE_NEW.ID, eventData );
+            if( eventData.HasErrors )
+            {
+                Debug.LogError( $"Aborting new timeline creation due to errors in {nameof( HSPEvent_AFTER_TIMELINE_NEW )} phase." );
+                HSPEvent.EventManager.TryInvoke( HSPEvent_ON_TIMELINE_NEW_ERROR.ID, new HSPEvent_ON_TIMELINE_NEW_ERROR.EventData( eventData ) );
+                return;
+            }
+
+            // Important that this runs after, as a separate event. Otherwise we might show the UI success dialog before there is an error in the next listener.
+            // Also saves on needless sorting of listeners.
+            HSPEvent.EventManager.TryInvoke( HSPEvent_ON_TIMELINE_NEW_SUCCESS.ID, new HSPEvent_ON_TIMELINE_NEW_SUCCESS.EventData( eventData ) );
+        }
+
+        //
+        //
+        //
+
+        public static void BackupScenario( ScenarioMetadata scenario )
+        {
+            if( scenario == null )
+                throw new ArgumentNullException( nameof( scenario ) );
+
+            BackupUtil.BackupDirectory( scenario.GetRootDirectory(), Path.GetDirectoryName( scenario.GetRootDirectory() ) );
+        }
+
+        public static void BackupSave( SaveMetadata save )
+        {
+            if( save == null )
+                throw new ArgumentNullException( nameof( save ) );
+
+            BackupUtil.BackupDirectory( save.GetRootDirectory(), Path.GetDirectoryName( save.GetRootDirectory() ) );
+        }
+
+        public static void RestoreBackup( ScenarioMetadata scenario )
+        {
+            if( scenario == null )
+                throw new ArgumentNullException( nameof( scenario ) );
+
+            BackupUtil.RestoreBackup( BackupUtil.GetLatestBackupFile( scenario.GetRootDirectory(), Path.GetDirectoryName( scenario.GetRootDirectory() ) ), scenario.GetRootDirectory() );
+        }
+
+        public static void RestoreBackup( SaveMetadata save )
+        {
+            if( save == null )
+                throw new ArgumentNullException( nameof( save ) );
+
+            BackupUtil.RestoreBackup( BackupUtil.GetLatestBackupFile( save.GetRootDirectory(), Path.GetDirectoryName( save.GetRootDirectory() ) ), save.GetRootDirectory() );
+        }
+
+
+        public static bool NeedsMigration( SaveMetadata save )
+        {
+            return NeedsMigration( save.ModVersions );
+        }
+
+        public static bool NeedsMigration( ScenarioMetadata scenario )
+        {
+            return NeedsMigration( scenario.ModVersions );
+        }
+
+        private static bool NeedsMigration( Dictionary<string, Version> modVersions )
+        {
+            if( modVersions == null || modVersions.Count == 0 )
+            {
+                return false;
+            }
+
+            var loadedModVersions = HumanSpaceProgramModLoader.GetCurrentModVersions();
+
+            foreach( var modVersion in loadedModVersions )
+            {
+                if( !modVersions.TryGetValue( modVersion.Key, out var savedVersion ) )
+                {
+                    // Mod is new, no migration needed.
+                    continue;
+                }
+
+                if( !Version.AreCompatible( modVersion.Value, savedVersion ) )
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+
+        /// <summary>
+        /// Applies migrations to a save file.
+        /// </summary>
+        /// <param name="save">The save metadata to migrate</param>
+        public static void MigrateSave( SaveMetadata save, bool force = false )
+        {
+            MigrationRegistry.Migrate( save.GetRootDirectory(), save.ModVersions, HumanSpaceProgramModLoader.GetCurrentModVersions(), force );
+            save.ModVersions = GetCurrentMatching( save.ModVersions );
+            save.SaveToDisk();
+        }
+
+        /// <summary>
+        /// Applies migrations to a save file.
+        /// </summary>
+        /// <param name="scenario">The scenario to migrate</param>
+        public static void MigrateScenario( ScenarioMetadata scenario, bool force = false )
+        {
+            MigrationRegistry.Migrate( scenario.GetRootDirectory(), scenario.ModVersions, HumanSpaceProgramModLoader.GetCurrentModVersions(), force );
+            scenario.ModVersions = GetCurrentMatching( scenario.ModVersions );
+            scenario.SaveToDisk();
+        }
+
+        public static Dictionary<string, Version> GetCurrentMatching( Dictionary<string, Version> modVersions )
+        {
+            Dictionary<string, Version> newDict = new Dictionary<string, Version>();
+            foreach( var modId in modVersions.Keys )
+            {
+                newDict.Add( modId, HumanSpaceProgramModLoader.GetLoadedMod( modId ).Version );
+            }
+            return newDict;
         }
     }
 }
