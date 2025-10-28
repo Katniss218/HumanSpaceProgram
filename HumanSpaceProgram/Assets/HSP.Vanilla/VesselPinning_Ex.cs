@@ -7,11 +7,20 @@ using UnityEngine;
 
 namespace HSP.Vanilla
 {
+    public static class HSPEvent_ON_VESSEL_PINNED
+    {
+        public const string ID = HSPEvent.NAMESPACE_HSP + ".e10261fb-a577-4c6c-90f5-bbfdd0f53bcf";
+    }
+    public static class HSPEvent_ON_VESSEL_UNPINNED
+    {
+        public const string ID = HSPEvent.NAMESPACE_HSP + ".337b9588-08cb-41ac-8c5b-cb2149bc1200";
+    }
+
     public static class VesselPinning_Ex
     {
         public static bool IsPinned( this Vessel vessel )
         {
-            return vessel.ReferenceFrameTransform is PinnedCelestialBodyReferenceFrameTransform;
+            return vessel.ReferenceFrameTransform is PinnedReferenceFrameTransform;
         }
 
         public static void Pin( this Vessel vessel )
@@ -41,6 +50,7 @@ namespace HSP.Vanilla
 
             TrajectoryTransform tt = vessel.gameObject.GetComponent<TrajectoryTransform>();
             tt.enabled = false;
+            HSPEvent.EventManager.TryInvoke( HSPEvent_ON_VESSEL_PINNED.ID, vessel );
         }
 
         /// <summary>
@@ -68,6 +78,7 @@ namespace HSP.Vanilla
 
             TrajectoryTransform tt = vessel.gameObject.GetComponent<TrajectoryTransform>();
             tt.enabled = true;
+            HSPEvent.EventManager.TryInvoke( HSPEvent_ON_VESSEL_UNPINNED.ID, vessel );
         }
     }
 }

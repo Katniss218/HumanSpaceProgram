@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HSP.Spatial;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityPlus.Serialization;
@@ -46,6 +47,49 @@ namespace HSP.CelestialBodies.Atmospheres
         {
             return new MemberwiseSerializationMapping<Atmosphere>()
                 .WithMember( "height", o => o.Height );
+        }
+
+        [SpatialValueProvider( "atmosphere" )] // keyed by tuple (param type, return type)
+        private static AtmosphereData ProvideAtmosphereData( Vector3 position )
+        {
+#warning TODO - allow multiple providers for the same key, based on priority/sum/combine all?
+            // basically needs to allow other types of atmosphere to also register themsleves as providers. and coexist side-by-side.
+
+
+            // Find the most influential atmosphere at the specified position.
+            AtmosphereData result = default;
+            float highestInfluence = 0f;
+
+            foreach( var atmosphere in _activeAtmospheres )
+            {
+                Vector3Dbl toPosition = (Vector3Dbl)position - atmosphere.CelestialBody.Position;
+                float altitude = (float)toPosition.magnitude - atmosphere.CelestialBody.Radius;
+
+                if( altitude < 0f || altitude > atmosphere.Height )
+                    continue;
+
+                // Simple linear influence based on altitude.
+                float influence = 1f - (altitude / atmosphere.Height);
+                if( influence > highestInfluence )
+                {
+                    highestInfluence = influence;
+
+                    // Simple exponential atmosphere model.
+                    float pressure = Mathf.Exp( -altitude / 8000f ) * 101325f; // Pa
+                    float temperature = 288.15f - (0.0065f * altitude); // K
+                    Vector3 windVelocity = Vector3.zero; // No wind for now.
+
+                    result = new AtmosphereData()
+                    {
+                        SpecificGasConstant = 287.05, // J/(kg·K) for dry air
+                        Pressure = pressure,
+                        Temperature = temperature,
+                        WindVelocity = windVelocity
+                    };
+                }
+            }
+
+            return result;
         }
     }
 }

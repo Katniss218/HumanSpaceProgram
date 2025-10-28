@@ -34,6 +34,8 @@ flight planning is inherently multithreaded.
 needs an acceleration provider and that in turn needs to know which body has which atmosphere data.
 - for now, just leave it.
 
+there are 2 spatial data provider systems - 'current', and 'trajectories'
+
 ## Trajectories vs Forces:
 
 Generally, trajectories are for 'simple' mechanics, like constant thrust, gravity, simplified aero, etc.
@@ -52,7 +54,19 @@ iaerointegrator goes in a new assembly `HSP.Aerodynamics`
 globalatmosphereprovider goes in core hsp? (the global spatial data system needs to be public across all assemblies I think)
 iatmosphereprovider goes next to global
 
+we want mods to be able to hide it. so overridable value providers?
+
 The initial drag/lift solver should be very simple and suitable to verify that the system is working correctly.
 a simple constant Cd + reference area maybe?
 
 
+
+get provider from registry using <TQuery, TResult> tuple. each provider is associated with that typed pair.
+```csharp
+OverridableValueProvider<TQuery, TResult>.GetValue( TQuery value )
+{
+    // find provider. this is already generic.
+}
+```
+
+// providers may register with attributes?
