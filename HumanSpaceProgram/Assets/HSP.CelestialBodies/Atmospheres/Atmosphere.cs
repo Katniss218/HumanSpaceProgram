@@ -1,4 +1,5 @@
-﻿using HSP.Spatial;
+﻿using HSP.ReferenceFrames;
+using HSP.Spatial;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -99,7 +100,7 @@ namespace HSP.CelestialBodies.Atmospheres
     [SpatialDataProvider( typeof( SpatialAtmosphere ), "default_atmosphere_provider" )]
     public static class AtmosphereProvider
     {
-        [SpatialValueProviderMode( "point" )]
+        [SpatialDataProviderMode( "point" )]
         public static AtmosphereData Point( Vector3 point )
         {
             // Find the most influential atmosphere at the specified position.
@@ -109,10 +110,11 @@ namespace HSP.CelestialBodies.Atmospheres
             foreach( var atmosphere in Atmosphere._activeAtmospheres )
             {
                 Vector3 toPosition = point - atmosphere.CelestialBody.ReferenceFrameTransform.Position;
-                double altitude = toPosition.magnitude - atmosphere.CelestialBody.Radius;
 
-                if( altitude < 0f || altitude > atmosphere.Height )
+                if( toPosition.magnitude < atmosphere.CelestialBody.Radius * 0.25 || toPosition.magnitude > atmosphere.CelestialBody.Radius + atmosphere.Height )
                     continue;
+
+                double altitude = toPosition.magnitude - atmosphere.CelestialBody.Radius;
 
                 // Simple linear influence based on altitude.
                 double influence = 1f - (altitude / atmosphere.Height);
@@ -123,25 +125,24 @@ namespace HSP.CelestialBodies.Atmospheres
                     // Simple exponential atmosphere model.
                     double pressure = Math.Exp( -altitude / 8000f ) * 101325f; // Pa
                     double temperature = 288.15f - (0.0065f * altitude); // K
-                    Vector3 windVelocity = Vector3.zero; // No wind for now.
 
-                    result = new AtmosphereData()
-                    {
-                        SpecificGasConstant = 287.05, // J/(kg·K) for dry air
-                        Pressure = pressure,
-                        Temperature = temperature,
-                        WindVelocity = windVelocity
-                    };
+                    var sceneFrame = atmosphere.CelestialBody.ReferenceFrameTransform.SceneReferenceFrameProvider.GetSceneReferenceFrame();
+
+                    var frame = atmosphere.CelestialBody.ReferenceFrameTransform.NonInertialReferenceFrame();
+                    var bodySpacePos = frame.InverseTransformPosition( sceneFrame.TransformPosition( point ) );
+                    Vector3 sceneWindVelocity = (Vector3)sceneFrame.InverseTransformVelocity( atmosphere.CelestialBody.ReferenceFrameTransform.AbsoluteVelocity + frame.GetTangentialVelocity( bodySpacePos ) );
+
+                    result = new AtmosphereData( 287.05, pressure, temperature, sceneWindVelocity );
                 }
             }
 
             return result;
         }
 
-       /* [SpatialValueProviderMode( "line" )]
-        public static AtmosphereData Line( (Vector3, Vector3) line )
-        {
-            throw new NotImplementedException();
-        }*/
+        /* [SpatialDataProviderMode( "line" )]
+         public static AtmosphereData Line( (Vector3, Vector3) line )
+         {
+             throw new NotImplementedException();
+         }*/
     }
 }

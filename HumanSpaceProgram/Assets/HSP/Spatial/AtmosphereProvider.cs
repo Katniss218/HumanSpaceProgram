@@ -6,13 +6,13 @@ namespace HSP.Spatial
 {
     public readonly struct AtmosphereData
     {
-        public float SpecificGasConstant { get; }
-        public float Pressure { get; }      // Pa
-        public float Density { get; }      // Pa
-        public float Temperature { get; }   // K
+        public double SpecificGasConstant { get; }
+        public double Pressure { get; }      // Pa
+        public double Density { get; }      // Kg/m3
+        public double Temperature { get; }   // K
         public Vector3 WindVelocity { get; } // m/s (scene space)
 
-        public AtmosphereData( float specificGasConstant, float pressure, float temperature, Vector3 windVelocity )
+        public AtmosphereData( double specificGasConstant, double pressure, double temperature, Vector3 windVelocity )
         {
             this.SpecificGasConstant = specificGasConstant;
             this.Pressure = pressure;
@@ -22,9 +22,12 @@ namespace HSP.Spatial
         }
     }
 
+    /// <summary>
+    /// Used to query atmospheric data at specific points or along lines in space.
+    /// </summary>
     public static class SpatialAtmosphere
     {
-        private class AtmosphereDataCombiner
+        private sealed class AtmosphereDataCombiner
         {
             public static AtmosphereData Combine( ReadOnlyMemory<AtmosphereData> mem )
             {
@@ -44,22 +47,10 @@ namespace HSP.Spatial
         {
             return _providers_point.TryGetValue( point, out value );
         }
+
         public static bool EvaluateLine( Vector3 start, Vector3 end, out AtmosphereData value )
         {
             return _providers_line.TryGetValue( (start, end), out value );
-        }
-    }
-
-    public class Test
-    {
-        public void Test2()
-        {
-            // spatial called like:
-
-            if( SpatialAtmosphere.EvaluatePoint( new Vector3( 0, 1000, 0 ), out AtmosphereData data ) )
-            {
-                Debug.Log( $"Atmosphere at point: Pressure={data.Pressure}, Temperature={data.Temperature}" );
-            }
         }
     }
 }

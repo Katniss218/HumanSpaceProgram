@@ -1,3 +1,4 @@
+using HSP.Spatial;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -40,16 +41,17 @@ namespace HSP.SceneManagement
 
         void Awake()
         {
-            IEnumerable<Assembly> baseAssemblies = AppDomain.CurrentDomain.GetAssemblies();
+            Assembly[] baseAssemblies = AppDomain.CurrentDomain.GetAssemblies();
             HSPEventListenerAttribute.CreateEventsForAutorunningMethods( baseAssemblies );
 
             HSPEvent.EventManager.TryInvoke( HSPEvent_STARTUP_LOAD_MOD_ASSEMBLIES.ID );
 
-            var modAssemblies = AppDomain.CurrentDomain.GetAssemblies()
-                .Except( baseAssemblies );
+            Assembly[] modAssemblies = baseAssemblies.Except( baseAssemblies ).ToArray();
             HSPEventListenerAttribute.CreateEventsForAutorunningMethods( modAssemblies );
+            SpatialDataProviderAttribute.RegisterValueProviders( baseAssemblies );
+            SpatialDataProviderAttribute.RegisterValueProviders( modAssemblies );
 
-            // Invoke after mods are loaded (because mods may want use it).
+            // Invoke HSPEvent_STARTUP_IMMEDIATELY after mods are loaded (because mods may want use it).
             HSPEvent.EventManager.TryInvoke( HSPEvent_STARTUP_IMMEDIATELY.ID );
         }
 

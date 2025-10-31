@@ -17,11 +17,29 @@ namespace HSP
     [AttributeUsage( AttributeTargets.Method, AllowMultiple = true )]
     public class HSPEventListenerAttribute : Attribute
     {
+        /// <summary>
+        /// The ID of the event (target) for this listener.
+        /// </summary>
         public string EventID { get; set; }
+
+        /// <summary>
+        /// The ID of this listener.
+        /// </summary>
         public string ID { get; set; }
+
+        /// <summary>
+        /// Optional, the list of all listeners that will be prevented from running when this listener is added.
+        /// </summary>
         public string[] Blacklist { get; set; }
 
+        /// <summary>
+        /// Optional, this listener will run before the specified listeners.
+        /// </summary>
         public string[] Before { get; set; }
+
+        /// <summary>
+        /// Optional, this listener will run after the specified listeners.
+        /// </summary>
         public string[] After { get; set; }
 
         public HSPEventListenerAttribute( string eventId, string id )
@@ -77,7 +95,7 @@ namespace HSP
 
             return (Action<object>)Expression.Lambda( methodCallExpression, parameter ).Compile();
         }
-        
+
         private static Action<object> GenerateLambdaCallingDowncasted( MethodInfo targetMethod, Type targetType )
         {
             // Generates a lambda that looks like this: `(object o) => targetMethod( (targetType)o );`
@@ -90,15 +108,23 @@ namespace HSP
             return (Action<object>)Expression.Lambda( methodCallExpression, parameter ).Compile();
         }
 
-        private static void ProcessMethod( IEnumerable<HSPEventListenerAttribute> attrs, MethodInfo method )
+        private static void ProcessMethod( IEnumerable<HSPEventListenerAttribute> attrs, Type type, MethodInfo method )
         {
             ParameterInfo[] parameters = method.GetParameters();
 
             ListenerType listenerType = CheckValidSignatures( method );
             if( listenerType == ListenerType.Invalid )
             {
-                Debug.LogWarning( $"Ignoring a `{nameof( HSPEventListenerAttribute )}` attribute applied to method `{method.Name}` which has an incorrect signature." );
+                Debug.LogWarning( $"`{nameof( HSPEventListenerAttribute )}` attribute on method `{type.FullName}.{method.Name}` with an incorrect signature." );
                 return;
+            }
+            foreach( var param in parameters )
+            {
+                if( param.IsOut || param.ParameterType.IsByRef )
+                {
+                    Debug.LogWarning( $"`{nameof( HSPEventListenerAttribute )}` {param.Name} parameter on method `{type.FullName}.{method.Name}` cannot be ref/out." );
+                    return;
+                }
             }
 
             Action<object> methodDelegate;
@@ -134,35 +160,43 @@ namespace HSP
         /// </summary>
         public static void CreateEventsForAutorunningMethods( IEnumerable<Assembly> assemblies )
         {
-#warning TODO - this is public because I made it public temporarily . FIX LATER
             foreach( var assembly in assemblies )
             {
                 Type[] assemblyTypes = assembly.GetTypes();
                 foreach( var type in assemblyTypes )
                 {
-                    MethodInfo[] methods = type.GetMethods( BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static );
-                    foreach( var method in methods )
+                    try
                     {
-                        try
+                        MethodInfo[] methods = type.GetMethods( BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static );
+                        foreach( var listenerMethod in methods )
                         {
-                            IEnumerable<HSPEventListenerAttribute> attrs = method.GetCustomAttributes<HSPEventListenerAttribute>();
-                            if( attrs == null || !attrs.Any() )
+                            try
                             {
-                                continue;
-                            }
+                                IEnumerable<HSPEventListenerAttribute> attrs = listenerMethod.GetCustomAttributes<HSPEventListenerAttribute>();
+                                if( attrs == null || !attrs.Any() )
+                                {
+                                    continue;
+                                }
 
-                            ProcessMethod( attrs, method );
+                                ProcessMethod( attrs, type, listenerMethod );
+                            }
+                            catch( Exception ex )
+                            {
+                                Debug.LogError( $"Error processing listener method `{listenerMethod.Name}` in class `{type.FullName}` from assembly `{assembly.FullName}`: {ex.Message}." );
+                                Debug.LogException( ex );
+                            }
                         }
-                        catch( TypeLoadException ex )
-                        {
-                            Debug.LogError( $"The mod `{assembly.FullName}` expected a type `{ex.TypeName}` to exist, but it didn't.: {ex.Message}." );
-                            Debug.LogException( ex );
-                        }
-                        catch( Exception ex )
-                        {
-                            Debug.LogError( $"The mod `{assembly.FullName}` couldn't be loaded.: {ex.Message}." );
-                            Debug.LogException( ex );
-                        }
+
+                    }
+                    catch( TypeLoadException ex )
+                    {
+                        Debug.LogError( $"Failed to load type `{ex.TypeName}` in assembly `{assembly.FullName}` (e.g., missing dependency): {ex.Message}. Ensure all referenced types/assemblies are available." );
+                        Debug.LogException( ex );
+                    }
+                    catch( Exception ex )
+                    {
+                        Debug.LogError( $"Error loading/processing types in assembly `{assembly.FullName}`: {ex.Message}. Verify that the assembly is compatible and hasn't been corrupted." );
+                        Debug.LogException( ex );
                     }
                 }
             }

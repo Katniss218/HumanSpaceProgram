@@ -1,3 +1,4 @@
+using HSP.Aerodynamics;
 using HSP.SceneManagement;
 using HSP.Trajectories.AccelerationProviders;
 using HSP.Trajectories.Components;
@@ -18,6 +19,7 @@ namespace HSP.Vanilla
         public const float VESSEL_MAX_TIMESCALE = 64f;
 
         public const string ADD_REFERENCE_FRAME_TRANSFORM = HSPEvent.NAMESPACE_HSP + ".add_reference_frame_transform";
+        public const string ADD_AERODYNAMIC_INTEGRATOR = HSPEvent.NAMESPACE_HSP + ".598269da-eb9e-4eaf-8511-4d7072791f47";
         public const string ADD_TRAJECTORY_TRANSFORM = HSPEvent.NAMESPACE_HSP + ".add_trajectory_transform";
         public const string TRY_PIN_PHYSICS_OBJECT = HSPEvent.NAMESPACE_HSP + ".try_pin_physics_object";
 
@@ -50,6 +52,22 @@ namespace HSP.Vanilla
                 comp.SetAccelerationProviders( new NBodyAccelerationProvider() );
                 comp.IsAttractor = false;
                 // no need to recalculate the mass of the vessel because it's not an attractor.
+            }
+        }
+
+        [HSPEventListener( HSPEvent_ON_VESSEL_CREATED.ID, ADD_AERODYNAMIC_INTEGRATOR )]
+        private static void AddAerodynamicIntegrator( Vessel v )
+        {
+            if( HSPSceneManager.IsLoaded<GameplaySceneM>() )
+            {
+                var comp = v.gameObject.AddComponent<SimpleAerodynamicIntegrator>();
+                comp.DragCoefficient = 0.2;
+                comp.ReferenceArea = 10.0;
+            }
+            else if( HSPSceneManager.IsLoaded<DesignSceneM>() )
+            {
+                var comp = v.gameObject.AddComponent<FixedReferenceFrameTransform>();
+                comp.SceneReferenceFrameProvider = new GameplaySceneReferenceFrameProvider();
             }
         }
 

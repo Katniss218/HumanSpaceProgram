@@ -1,7 +1,7 @@
 using HSP.ReferenceFrames;
-using System.Collections;
-using System.Collections.Generic;
+using HSP.Time;
 using UnityEngine;
+using UnityPlus.Serialization;
 
 namespace HSP.Aerodynamics
 {
@@ -30,6 +30,10 @@ namespace HSP.Aerodynamics
             {
                 Vector3 sceneForce = CalculateNetAerodynamicForce( atmosphereData );
                 physicsTransform.AddForce( sceneForce );
+                if( this.gameObject.name == "a" )
+                {
+                    Debug.Log( TimeManager.UT + " : " + atmosphereData.Pressure + " : " + atmosphereData.Density + " : " + this.gameObject.name );
+                }
             }
         }
 
@@ -37,18 +41,25 @@ namespace HSP.Aerodynamics
         {
             Vector3 velocity = referenceFrameTransform.Velocity;
             Vector3 relativeWind = velocity - atmosphereData.WindVelocity;
-
             float speed = relativeWind.magnitude;
             if( speed < 0.01 )
                 return Vector3.zero;
-
-            // Drag force: Fd = 0.5 * rho * v^2 * Cd * A
+#warning TODO it jolts at times. Possibly due to large opposing forces/numerical precision / rounding errors.
             float dragMagnitude = (float)(0.5 * atmosphereData.Density * speed * speed * DragCoefficient * ReferenceArea);
 
             Vector3 dragDirection = -relativeWind.normalized;
             Vector3 dragForce = dragDirection * dragMagnitude;
 
             return dragForce;
+        }
+
+
+        [MapsInheritingFrom( typeof( SimpleAerodynamicIntegrator ) )]
+        public static SerializationMapping SimpleAerodynamicIntegratorMapping()
+        {
+            return new MemberwiseSerializationMapping<SimpleAerodynamicIntegrator>()
+                .WithMember( "drag_coefficient", o => o.DragCoefficient )
+                .WithMember( "reference_area", o => o.ReferenceArea );
         }
     }
 }

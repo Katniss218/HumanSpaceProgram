@@ -166,6 +166,13 @@ namespace HSP._DevUtils
                 new LODQuadModifier_FinalizeMesh()
             } );
 
+            ExponentialScaleHeightAtmosphere atm = cb.gameObject.AddComponent<ExponentialScaleHeightAtmosphere>();
+            atm.Height = 140_000;
+            atm.SpecificGasConstant = 287.05f;
+            atm.ScaleHeight = 8000f;
+            atm.SurfacePressure = 101325f;
+            atm.SurfaceTemperature = 288.15f;
+
             TrajectoryTransform comp = cb.gameObject.AddComponent<TrajectoryTransform>();
             comp.IsAttractor = true;
             comp.Integrator = new VerletIntegrator();
