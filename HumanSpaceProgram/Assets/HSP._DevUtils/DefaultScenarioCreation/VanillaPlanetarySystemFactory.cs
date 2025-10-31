@@ -166,6 +166,13 @@ namespace HSP._DevUtils
                 new LODQuadModifier_FinalizeMesh()
             } );
 
+            ExponentialScaleHeightAtmosphere atm = cb.gameObject.AddComponent<ExponentialScaleHeightAtmosphere>();
+            atm.Height = 140_000;
+            atm.SpecificGasConstant = 287.05f;
+            atm.ScaleHeight = 8000f;
+            atm.SurfacePressure = 101325f;
+            atm.SurfaceTemperature = 288.15f;
+
             TrajectoryTransform comp = cb.gameObject.AddComponent<TrajectoryTransform>();
             comp.IsAttractor = true;
             comp.Integrator = new VerletIntegrator();
@@ -205,7 +212,7 @@ namespace HSP._DevUtils
             CelestialBody cbSun = CreateCB( "sun", Vector3Dbl.zero, orientation );
             //CelestialBody cb = CreateCB( "main", "sun", 150_000_000_000, 0, 0, 0, 0, 0, orientation );
             CelestialBody cb = CreateCB( "main", new Vector3Dbl( 150_000_000_000, 0, 0 ), new Vector3Dbl( 0, 29749.1543788567, 0 ), orientation );
-            var atm = cb.gameObject.AddComponent<Atmosphere>();
+            var atm = cb.gameObject.AddComponent<AtmosphereRenderer>();
             atm.Height = 140_000;
             atm.sharedMaterial = AssetRegistry.Get<Material>( "builtin::Resources/Materials/Atmosphere" );
             CelestialBody additionalCB = CreateCB( "cb1", new Vector3Dbl( 250_000_000_000, 0, 0 ), new Vector3Dbl( 0, 29749.1543788567, 0 ), orientation );

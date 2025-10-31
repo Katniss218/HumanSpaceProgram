@@ -107,7 +107,7 @@ namespace HSP.Vanilla.Scenes.GameplayScene
             After = new[] { GameplaySceneCameraManager.CREATE_CAMERA } )]
         private static void AddAtmosphereRenderer()
         {
-            AtmosphereRenderer atmosphereRenderer = GameplaySceneCameraManager.EffectCamera.gameObject.GetOrAddComponent<AtmosphereRenderer>();
+            AtmosphereRenderManager atmosphereRenderer = GameplaySceneCameraManager.EffectCamera.gameObject.GetOrAddComponent<AtmosphereRenderManager>();
             atmosphereRenderer.light = GameObject.Find( "CBLight" ).GetComponent<Light>();
             atmosphereRenderer.ColorRenderTextureGetter = () => GameplaySceneCameraManager.ColorRenderTexture;
             atmosphereRenderer.DepthRenderTextureGetter = () => GameplaySceneDepthBufferCombiner.CombinedDepthRenderTexture;

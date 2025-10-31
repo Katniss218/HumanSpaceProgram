@@ -1,107 +1,81 @@
-using HSP.CelestialBodies.Atmospheres;
-using System;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityPlus.Serialization;
 
-namespace HSP.CelestialBodies
+namespace HSP.CelestialBodies.Atmospheres
 {
-    [ExecuteInEditMode, ImageEffectAllowedInSceneView]
-    [RequireComponent( typeof( Camera ) )]
-    public class AtmosphereRenderer : SingletonMonoBehaviour<AtmosphereRenderer>
+    public class AtmosphereRenderer : MonoBehaviour
     {
-        Camera _camera;
-        CommandBuffer _cmdAtmospheres;
-        CommandBuffer _cmdComposition;
+#warning TODO - potentially use the Atmosphere (physical) class to get the params like height, etc?
+        internal static List<AtmosphereRenderer> _activeAtmospheres = new();
 
-        [SerializeField]
-        new public Light light { get; set; }
+        /// <summary>
+        /// The material used to render the atmosphere.
+        /// </summary>
+        public Material sharedMaterial { get; set; }
 
-        [SerializeField]
-        RenderTexture _rt;
+        /// <summary>
+        /// Clone of <see cref="sharedMaterial"/>, contains runtime properties for this atmosphere.
+        /// </summary>
+        internal Material material { get; private set; }
 
-        public Func<RenderTexture> ColorRenderTextureGetter { get; set; }
-        public Func<RenderTexture> DepthRenderTextureGetter { get; set; }
+        /// <summary>
+        /// The height of the atmosphere above the celestial body's surface.
+        /// </summary>
+        public float Height { get; set; } = 100_000f;
+
+        /// <summary>
+        /// Gets the celestial body that this LOD sphere belongs to.
+        /// </summary>
+        public ICelestialBody CelestialBody { get; private set; }
 
         void Awake()
         {
-            _camera = this.GetComponent<Camera>();
-
-            _cmdAtmospheres = new CommandBuffer()
-            {
-                name = "HSP - Atmospheres - Render"
-            };
-            _cmdComposition = new CommandBuffer()
-            {
-                name = "HSP - Atmospheres - Composition"
-            };
+            CelestialBody = this.GetComponent<ICelestialBody>();
         }
 
-        void OnDestroy()
+        void OnEnable()
         {
-            if( _rt != null )
-                RenderTexture.ReleaseTemporary( _rt );
-
-            _cmdAtmospheres?.Release();
-            _cmdComposition?.Release();
+            _activeAtmospheres.Add( this );
         }
 
-        void Update()
+        void OnDisable()
         {
-            _camera.depthTextureMode &= ~DepthTextureMode.Depth; // NO DEPTH. this breaks (for now?).
+            _activeAtmospheres.Remove( this );
         }
 
-        void OnPreRender()
+        internal void UpdateMaterialValues( Func<RenderTexture> ColorRenderTextureGetter, Func<RenderTexture> DepthRenderTextureGetter, Light light )
         {
-            if( Atmosphere._activeAtmospheres.Count == 0 )
+            if( sharedMaterial == null )
                 return;
 
-            this._rt = RenderTexture.GetTemporary( Screen.width, Screen.height, 0, RenderTextureFormat.ARGB32 );
+            if( material == null )
+                material = new Material( sharedMaterial );
 
-            foreach( var atmosphere in Atmosphere._activeAtmospheres )
-            {
-                atmosphere.UpdateMaterialValues( ColorRenderTextureGetter, DepthRenderTextureGetter, light );
-            }
+            // The `_Texture` property name gets overriden by something else... Unity... >:{
+            material.SetTexture( Shader.PropertyToID( "_texgsfs" ), ColorRenderTextureGetter.Invoke() );
+            material.SetTexture( Shader.PropertyToID( "_DepthBuffer" ), DepthRenderTextureGetter.Invoke(), RenderTextureSubElement.Depth );
 
-            this._camera.RemoveCommandBuffer( CameraEvent.AfterForwardOpaque, _cmdAtmospheres );
-            this._camera.RemoveCommandBuffer( CameraEvent.AfterForwardOpaque, _cmdComposition );
-
-            UpdateCommandBuffers();
-            this._camera.AddCommandBuffer( CameraEvent.AfterForwardOpaque, _cmdAtmospheres );
-            this._camera.AddCommandBuffer( CameraEvent.AfterForwardOpaque, _cmdComposition );
-        }
-
-        void OnPostRender()
-        {
-            // if doesn't work, move to the front of onprecull. Here it should allow others to reuse these textures.
-            if( _rt != null )
-            {
-                RenderTexture.ReleaseTemporary( _rt );
-                _rt = null;
-            }
-        }
-
-        public void UpdateCommandBuffers()
-        {
-            _cmdAtmospheres.Clear();
-            _cmdAtmospheres.SetRenderTarget( _rt );
-
-            foreach( var atmosphere in Atmosphere._activeAtmospheres )
-            {
-                if( atmosphere.material == null )
-                    continue;
-
-                _cmdAtmospheres.Blit( null, _rt, atmosphere.material, 0 );
-            }
-
-            _cmdComposition.Clear();
-            _cmdComposition.Blit( _rt, (RenderTexture)null );
+            material.SetVector( Shader.PropertyToID( "_Center" ), CelestialBody.ReferenceFrameTransform.Position );
+            material.SetVector( Shader.PropertyToID( "_SunDirection" ), -light.transform.forward );
+            material.SetVector( Shader.PropertyToID( "_ScatteringWavelengths" ), new Vector3( 675, 530, 400 ) );
+            material.SetFloat( Shader.PropertyToID( "_ScatteringStrength" ), 128 );
+            material.SetFloat( Shader.PropertyToID( "_TerminatorFalloff" ), 32 );
+            material.SetFloat( Shader.PropertyToID( "_MinRadius" ), (float)CelestialBody.Radius );
+            material.SetFloat( Shader.PropertyToID( "_MaxRadius" ), (float)(CelestialBody.Radius + Height) );
+            material.SetFloat( Shader.PropertyToID( "_InScatteringPointCount" ), 16 );
+            material.SetFloat( Shader.PropertyToID( "_OpticalDepthPointCount" ), 8 );
+            material.SetFloat( Shader.PropertyToID( "_DensityFalloffPower" ), 13.7f );
         }
 
         [MapsInheritingFrom( typeof( AtmosphereRenderer ) )]
         public static SerializationMapping AtmosphereRendererMapping()
         {
-            return new MemberwiseSerializationMapping<AtmosphereRenderer>();
+            return new MemberwiseSerializationMapping<AtmosphereRenderer>()
+                .WithMember( "height", o => o.Height )
+                .WithMember( "shared_material", ObjectContext.Asset, o => o.sharedMaterial );
         }
     }
 }

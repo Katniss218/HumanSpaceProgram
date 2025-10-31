@@ -24,6 +24,7 @@ namespace HSP.Vanilla.Effects
 
             Engine.OnAfterIgnite += OnIgnitionListener;
             Engine.OnAfterShutdown += OnShutdownListener;
+            Engine.OnAfterThrustChanged += OnThrustChangedListener;
         }
 
         void OnDisable()
@@ -33,10 +34,14 @@ namespace HSP.Vanilla.Effects
 
             Engine.OnAfterIgnite -= OnIgnitionListener;
             Engine.OnAfterShutdown -= OnShutdownListener;
+            Engine.OnAfterThrustChanged -= OnThrustChangedListener;
         }
+
+        bool isFiring = false;
 
         void OnIgnitionListener()
         {
+            isFiring = true;
             if( this._ignitionHandles != null )
             {
                 foreach( var handle in this._ignitionHandles )
@@ -90,6 +95,7 @@ namespace HSP.Vanilla.Effects
 
         void OnShutdownListener()
         {
+            isFiring = false;
             if( this._ignitionHandles != null )
             {
                 foreach( var handle in this._ignitionHandles )
@@ -123,6 +129,18 @@ namespace HSP.Vanilla.Effects
                         onShutdown.TargetTransform = t;
                     _shutdownHandles[i] = onShutdown.Play();
                 }
+            }
+        }
+
+        void OnThrustChangedListener()
+        {
+            if( Engine.Thrust <= 0 && isFiring )
+            {
+                OnShutdownListener();
+            }
+            else if( Engine.Thrust > 0 && !isFiring )
+            {
+                OnIgnitionListener();
             }
         }
 

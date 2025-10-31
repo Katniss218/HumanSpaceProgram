@@ -16,6 +16,7 @@ namespace HSP.Vanilla.Components
 
         event Action OnAfterIgnite;
         event Action OnAfterShutdown;
+        event Action OnAfterThrustChanged;
     }
 
     [Serializable]

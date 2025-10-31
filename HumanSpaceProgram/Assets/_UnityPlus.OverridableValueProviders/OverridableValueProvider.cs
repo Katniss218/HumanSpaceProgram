@@ -1,13 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
 
 namespace UnityPlus.OverridableValueProviders
 {
-    public abstract class OverridableValueProvider<T, TResult> : ITopologicallySortable<string>, IOverridable<string>
+    public class OverridableValueProvider<T, TResult> : ITopologicallySortable<string>, IOverridable<string>
     {
         public string ID { get; }
 
@@ -17,16 +12,20 @@ namespace UnityPlus.OverridableValueProviders
 
         public string[] After { get; }
 
-#warning TODO - maybe a delegate instead of inheritance?
+        private readonly Func<T, TResult> _getter;
 
-        protected OverridableValueProvider( string id, string[] blacklist, string[] before, string[] after )
+        public OverridableValueProvider( string id, Func<T, TResult> getter, string[] blacklist, string[] before, string[] after )
         {
             this.ID = id;
             this.Blacklist = blacklist;
             this.Before = before;
             this.After = after;
+            this._getter = getter;
         }
 
-        public abstract TResult GetValue( T input1 );
+        public TResult GetValue( T input )
+        {
+            return _getter( input );
+        }
     }
 }
