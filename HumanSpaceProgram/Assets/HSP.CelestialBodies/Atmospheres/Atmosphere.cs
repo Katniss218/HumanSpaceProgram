@@ -37,7 +37,7 @@ namespace HSP.CelestialBodies.Atmospheres
             _activeAtmospheres.Remove( this );
         }
 
-        public abstract AtmosphereData GetData( float altitude );
+        public abstract AtmosphereData GetData( Vector3 scenePoint );
 
         [MapsInheritingFrom( typeof( Atmosphere ) )]
         public static SerializationMapping AtmosphereMapping()
@@ -76,12 +76,19 @@ namespace HSP.CelestialBodies.Atmospheres
         /// </summary>
         public float SurfaceTemperature { get; set; } = 288.15f;
 
-        public override AtmosphereData GetData( float altitude )
+        public override AtmosphereData GetData( Vector3 scenePoint )
         {
-            altitude = Mathf.Clamp( altitude, 0, Height );
-            float P = SurfacePressure * Mathf.Exp( -altitude / ScaleHeight );
+            var sceneFrame = this.CelestialBody.ReferenceFrameTransform.SceneReferenceFrameProvider.GetSceneReferenceFrame();
 
-            return new AtmosphereData( SpecificGasConstant, P, SurfaceTemperature, Vector3.zero );
+            var frame = this.CelestialBody.ReferenceFrameTransform.NonInertialReferenceFrame();
+            var bodySpacePos = frame.InverseTransformPosition( sceneFrame.TransformPosition( scenePoint ) );
+
+            var altitude = Math.Clamp( bodySpacePos.magnitude - this.CelestialBody.Radius, 0, Height );
+            double P = SurfacePressure * Math.Exp( -altitude / ScaleHeight );
+
+            Vector3 sceneWindVelocity = (Vector3)sceneFrame.InverseTransformVelocity( this.CelestialBody.ReferenceFrameTransform.AbsoluteVelocity + frame.GetTangentialVelocity( bodySpacePos ) );
+
+            return new AtmosphereData( SpecificGasConstant, P, SurfaceTemperature, sceneWindVelocity );
         }
 
 
@@ -103,40 +110,20 @@ namespace HSP.CelestialBodies.Atmospheres
         [SpatialDataProviderMode( "point" )]
         public static AtmosphereData Point( Vector3 point )
         {
-            // Find the most influential atmosphere at the specified position.
-            AtmosphereData result = default;
-            double highestInfluence = 0f;
+            double closestDistanceSq = double.MaxValue;
+            Atmosphere closest = null;
 
             foreach( var atmosphere in Atmosphere._activeAtmospheres )
             {
-                Vector3 toPosition = point - atmosphere.CelestialBody.ReferenceFrameTransform.Position;
-
-                if( toPosition.magnitude < atmosphere.CelestialBody.Radius * 0.25 || toPosition.magnitude > atmosphere.CelestialBody.Radius + atmosphere.Height )
-                    continue;
-
-                double altitude = toPosition.magnitude - atmosphere.CelestialBody.Radius;
-
-                // Simple linear influence based on altitude.
-                double influence = 1f - (altitude / atmosphere.Height);
-                if( influence > highestInfluence )
+                double distSq = (atmosphere.CelestialBody.ReferenceFrameTransform.Position - point).sqrMagnitude;
+                if( distSq < closestDistanceSq )
                 {
-                    highestInfluence = influence;
-
-                    // Simple exponential atmosphere model.
-                    double pressure = Math.Exp( -altitude / 8000f ) * 101325f; // Pa
-                    double temperature = 288.15f - (0.0065f * altitude); // K
-
-                    var sceneFrame = atmosphere.CelestialBody.ReferenceFrameTransform.SceneReferenceFrameProvider.GetSceneReferenceFrame();
-
-                    var frame = atmosphere.CelestialBody.ReferenceFrameTransform.NonInertialReferenceFrame();
-                    var bodySpacePos = frame.InverseTransformPosition( sceneFrame.TransformPosition( point ) );
-                    Vector3 sceneWindVelocity = (Vector3)sceneFrame.InverseTransformVelocity( atmosphere.CelestialBody.ReferenceFrameTransform.AbsoluteVelocity + frame.GetTangentialVelocity( bodySpacePos ) );
-
-                    result = new AtmosphereData( 287.05, pressure, temperature, sceneWindVelocity );
+                    closest = atmosphere;
+                    closestDistanceSq = distSq;
                 }
             }
 
-            return result;
+            return closest.GetData( point );
         }
 
         /* [SpatialDataProviderMode( "line" )]

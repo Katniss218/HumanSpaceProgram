@@ -61,8 +61,8 @@ namespace HSP.Vanilla
             if( HSPSceneManager.IsLoaded<GameplaySceneM>() )
             {
                 var comp = v.gameObject.AddComponent<SimpleAerodynamicIntegrator>();
-                comp.DragCoefficient = 0.2;
-                comp.ReferenceArea = 10.0;
+                comp.DragCoefficient = 0.08;
+                comp.ReferenceArea = 5.0;
             }
             else if( HSPSceneManager.IsLoaded<DesignSceneM>() )
             {
