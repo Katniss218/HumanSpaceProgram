@@ -28,8 +28,8 @@ serialization of vessels needs to change.
 {
     now uses 3 separate files
     vessel stub/meta
-    gameobjects
-    attachment graph? maybe not? I guess that could be stored in the gameobjects file.
+    gameobjects/parts (stored flat)
+    attachment graph?
     each part/island maybe separate? hmm...
 }
 

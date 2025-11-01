@@ -14,6 +14,7 @@ namespace HSP.ResourceFlow
         /// The physical/chemical data about the specific resource.
         /// </summary>
         [field: SerializeField]
+#warning TODO - volume/density depends on where it's stored and needs to be mutable.
         public Substance Substance { get; private set; } // private setter for Unity inspector
 
         /// <summary>
