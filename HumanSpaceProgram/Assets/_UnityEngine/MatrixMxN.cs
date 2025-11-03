@@ -2,11 +2,11 @@
 
 namespace UnityEngine
 {
-	/// <summary>
-	/// An arbitrary-size matrix with M rows and N columns. <br/>
-	/// Also an arbitrary-size row or column vector.
-	/// </summary>
-	public struct MatrixMxN
+    /// <summary>
+    /// An arbitrary-size matrix with M rows and N columns. <br/>
+    /// Also an arbitrary-size row or column vector.
+    /// </summary>
+    public struct MatrixMxN
 	{
 		private float[] _data;
 
@@ -105,10 +105,22 @@ namespace UnityEngine
 			}
 		}
 
-		/// <summary>
-		/// Creates a row vector with 1 row, and the specified number of columns.
-		/// </summary>
-		public static MatrixMxN RowVector( int columns )
+        /// <summary>
+        /// Private helper: creates a deep copy of a matrix.
+        /// </summary>
+        private static MatrixMxN Copy( MatrixMxN src )
+        {
+            MatrixMxN copy = new MatrixMxN( src.Rows, src.Cols );
+            for( int i = 0; i < src.Rows; i++ )
+                for( int j = 0; j < src.Cols; j++ )
+                    copy[i, j] = src[i, j];
+            return copy;
+        }
+
+        /// <summary>
+        /// Creates a row vector with 1 row, and the specified number of columns.
+        /// </summary>
+        public static MatrixMxN RowVector( int columns )
 		{
 			return new MatrixMxN( 1, columns );
 		}
@@ -194,8 +206,8 @@ namespace UnityEngine
 		/// </remarks>
 		/// <exception cref="InvalidOperationException"></exception>
 		public static MatrixMxN Multiply( MatrixMxN lhs, MatrixMxN rhs )
-		{
-			if( lhs.Rows != rhs.Cols )
+        {
+            if( lhs.Cols != rhs.Rows )
 			{
 				throw new InvalidOperationException( $"Can't multiply a Matrix{lhs.Rows}x{lhs.Cols} with a Matrix{rhs.Rows}x{rhs.Cols}." );
 			}
@@ -216,8 +228,225 @@ namespace UnityEngine
 			return result;
 		}
 
-		
-		public static (MatrixMxN Q, MatrixMxN R) QRDecomposition( MatrixMxN mat )
+        public static MatrixMxN Solve( MatrixMxN A, MatrixMxN b )
+        {
+            if( A.Rows != A.Cols )
+                throw new InvalidOperationException( "Solve requires a square coefficient matrix A." );
+            if( b.Cols != 1 || b.Rows != A.Rows )
+                throw new InvalidOperationException( "Right-hand side b must be a column vector with the same number of rows as A." );
+
+            int n = A.Rows;
+            MatrixMxN aug = new MatrixMxN( n, n + 1 );
+
+            // build augmented matrix [A | b]
+            for( int r = 0; r < n; r++ )
+            {
+                for( int c = 0; c < n; c++ )
+                    aug[r, c] = A[r, c];
+                aug[r, n] = b[r, 0];
+            }
+
+            const float EPS = 1e-9f;
+
+            // forward elimination with partial pivoting
+            for( int col = 0; col < n; col++ )
+            {
+                // find pivot row
+                int pivot = col;
+                float maxAbs = Mathf.Abs( aug[pivot, col] );
+                for( int r = col + 1; r < n; r++ )
+                {
+                    float v = Mathf.Abs( aug[r, col] );
+                    if( v > maxAbs )
+                    {
+                        maxAbs = v;
+                        pivot = r;
+                    }
+                }
+
+                if( maxAbs < EPS )
+                    throw new InvalidOperationException( "Matrix is singular or nearly singular (no unique solution)." );
+
+                // swap if needed
+                if( pivot != col )
+                {
+                    for( int c = col; c < n + 1; c++ )
+                    {
+                        float tmp = aug[col, c];
+                        aug[col, c] = aug[pivot, c];
+                        aug[pivot, c] = tmp;
+                    }
+                }
+
+                // normalize pivot row and eliminate below
+                float pivotVal = aug[col, col];
+                for( int c = col; c < n + 1; c++ )
+                    aug[col, c] = aug[col, c] / pivotVal;
+
+                for( int r = col + 1; r < n; r++ )
+                {
+                    float factor = aug[r, col];
+                    if( factor == 0f ) continue;
+                    for( int c = col; c < n + 1; c++ )
+                        aug[r, c] -= factor * aug[col, c];
+                }
+            }
+
+            // back substitution (since we normalized rows, diagonal is 1)
+            MatrixMxN x = MatrixMxN.ColumnVector( n );
+            for( int r = n - 1; r >= 0; r-- )
+            {
+                float val = aug[r, n]; // RHS
+                for( int c = r + 1; c < n; c++ )
+                    val -= aug[r, c] * x[c, 0];
+                x[r, 0] = val; // diagonal is 1
+            }
+
+            return x;
+        }
+
+        /// <summary>
+        /// Computes the inverse of a square matrix using Gauss-Jordan elimination with partial pivoting.
+        /// Throws InvalidOperationException if matrix is not square or singular.
+        /// </summary>
+        public static MatrixMxN Inverse( MatrixMxN input )
+        {
+            if( input.Rows != input.Cols )
+                throw new InvalidOperationException( "Inverse requires a square matrix." );
+
+            int n = input.Rows;
+            const float EPS = 1e-9f;
+
+            // augmented [A | I]
+            MatrixMxN aug = new MatrixMxN( n, 2 * n );
+            for( int r = 0; r < n; r++ )
+            {
+                for( int c = 0; c < n; c++ )
+                    aug[r, c] = input[r, c];
+                for( int c = 0; c < n; c++ )
+                    aug[r, n + c] = (r == c) ? 1f : 0f;
+            }
+
+            // Gauss-Jordan with partial pivoting
+            for( int col = 0; col < n; col++ )
+            {
+                // pivot selection
+                int pivot = col;
+                float maxAbs = Mathf.Abs( aug[pivot, col] );
+                for( int r = col + 1; r < n; r++ )
+                {
+                    float v = Mathf.Abs( aug[r, col] );
+                    if( v > maxAbs )
+                    {
+                        maxAbs = v;
+                        pivot = r;
+                    }
+                }
+
+                if( maxAbs < EPS )
+                    throw new InvalidOperationException( "Matrix is singular or nearly singular (cannot compute inverse)." );
+
+                // swap
+                if( pivot != col )
+                {
+                    for( int c = 0; c < 2 * n; c++ )
+                    {
+                        float tmp = aug[col, c];
+                        aug[col, c] = aug[pivot, c];
+                        aug[pivot, c] = tmp;
+                    }
+                }
+
+                // normalize pivot row
+                float pv = aug[col, col];
+                for( int c = 0; c < 2 * n; c++ )
+                    aug[col, c] /= pv;
+
+                // eliminate all other rows
+                for( int r = 0; r < n; r++ )
+                {
+                    if( r == col ) continue;
+                    float factor = aug[r, col];
+                    if( factor == 0f ) continue;
+                    for( int c = 0; c < 2 * n; c++ )
+                        aug[r, c] -= factor * aug[col, c];
+                }
+            }
+
+            // extract right half as inverse
+            MatrixMxN inv = new MatrixMxN( n, n );
+            for( int r = 0; r < n; r++ )
+                for( int c = 0; c < n; c++ )
+                    inv[r, c] = aug[r, n + c];
+
+            return inv;
+        }
+
+        /// <summary>
+        /// Computes the determinant of a square matrix using LU-style elimination with partial pivoting.
+        /// The algorithm performs row operations and counts row swaps to adjust the sign.
+        /// </summary>
+        public static float Determinant( MatrixMxN mat )
+        {
+            if( mat.Rows != mat.Cols )
+                throw new InvalidOperationException( "Determinant requires a square matrix." );
+
+            int n = mat.Rows;
+            MatrixMxN a = Copy( mat );
+            const float EPS = 1e-12f;
+            float detSign = 1f;
+            float detProd = 1f;
+
+            for( int col = 0; col < n; col++ )
+            {
+                // find pivot
+                int pivot = col;
+                float maxAbs = Mathf.Abs( a[pivot, col] );
+                for( int r = col + 1; r < n; r++ )
+                {
+                    float v = Mathf.Abs( a[r, col] );
+                    if( v > maxAbs )
+                    {
+                        maxAbs = v;
+                        pivot = r;
+                    }
+                }
+
+                if( maxAbs < EPS )
+                {
+                    // singular -> determinant is zero
+                    return 0f;
+                }
+
+                if( pivot != col )
+                {
+                    // swap rows
+                    for( int c = col; c < n; c++ )
+                    {
+                        float tmp = a[col, c];
+                        a[col, c] = a[pivot, c];
+                        a[pivot, c] = tmp;
+                    }
+                    detSign = -detSign;
+                }
+
+                float pivotVal = a[col, col];
+                detProd *= pivotVal;
+
+                // eliminate below
+                for( int r = col + 1; r < n; r++ )
+                {
+                    float factor = a[r, col] / pivotVal;
+                    if( factor == 0f ) continue;
+                    for( int c = col; c < n; c++ )
+                        a[r, c] -= factor * a[col, c];
+                }
+            }
+
+            return detSign * detProd;
+        }
+
+        public static (MatrixMxN Q, MatrixMxN R) QRDecomposition( MatrixMxN mat )
 		{
 			// https://visualstudiomagazine.com/Articles/2024/01/03/matrix-inverse.aspx
 			// QR decomposition, Householder algorithm.

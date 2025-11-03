@@ -9,10 +9,10 @@ namespace UnityEngine
 
             if( instances.Length == 0 )
                 throw new SingletonInstanceException( $"Requested {nameof( MonoBehaviour )} {typeof( T ).Name} was not found." );
-            
+
             if( instances.Length > 1 )
                 throw new SingletonInstanceException( $"Too many instances of {nameof( MonoBehaviour )} {typeof( T ).Name}." );
-            
+
             return instances[0];
         }
 
@@ -50,7 +50,7 @@ namespace UnityEngine
             {
                 if( __instance == null )
                     __instance = SingletonMonoBehaviourUtils.FindInstance<T>();
-                
+
                 return __instance;
             }
             set // Use with care. Allows custom logic. Allows being set to a nonnull value when another different instance still exists.
@@ -68,7 +68,7 @@ namespace UnityEngine
             {
                 if( __instance == null )
                     return SingletonMonoBehaviourUtils.InstanceExists<T>( out __instance );
-                
+
                 return __instance != null;
             }
         }

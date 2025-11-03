@@ -12,6 +12,7 @@ namespace HSP.ResourceFlow
     [Serializable]
     public class SubstanceStateCollection
     {
+#warning TODO - add a 'view' or something to not need to copy the entire collection and allocate garbage when viewing a flow from a pipe that is just the tank's contents scaled by a number.
         [field: SerializeField]
         List<SubstanceState> _substances;
 

@@ -1,28 +1,30 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace HSP.ResourceFlow
 {
-    public struct FlowEdge
+    public readonly struct FlowEdge
     {
-        public FlowNode end1;
-        public FlowNode end2;
+        public readonly FlowNode end1;
+        public readonly FlowNode end2;
 
-        public double Volume { get; set; }
+        public double Volume { get; }
 
-        public FlowEdge( FlowNode end1, FlowNode end2 )
+        public FlowEdge( FlowNode end1, FlowNode end2, double volume )
         {
             this.end1 = end1;
             this.end2 = end2;
+            this.Volume = volume;
         }
 
         public float GetLength()
         {
             return Vector3.Distance( end1.pos, end2.pos );
+        }
+
+        public float GetProjectedHeight( Vector3 accelerationDir )
+        {
+            Vector3 edgeDir = (end2.pos - end1.pos).normalized;
+            return Mathf.Abs( Vector3.Dot( edgeDir, accelerationDir.normalized ) ) * GetLength();
         }
     }
 }
