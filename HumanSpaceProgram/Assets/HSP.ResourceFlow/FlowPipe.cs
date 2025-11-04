@@ -27,6 +27,7 @@ namespace HSP.ResourceFlow
         // we cap and handle negative deltaP
         public float ComputeFlowRate()
         {
+            throw new NotImplementedException();/*
             // get pressures at the inlet nodes. If null, use 0
             var pFrom = FromTank?.GetPressureAtOutlet() ?? 0f;
             var pTo = ToTank?.GetPressureAtInlet() ?? 0f;
@@ -37,7 +38,7 @@ namespace HSP.ResourceFlow
             if( deltaP <= 0f ) return 0f; // no backflow in passive pipe for Phase1
             var velocity = Mathf.Sqrt( 2f * deltaP / rho );
             var q = (CrossSectionArea * ValveOpenFraction) * velocity;
-            return q;
+            return q;*/
         }
     }
 }

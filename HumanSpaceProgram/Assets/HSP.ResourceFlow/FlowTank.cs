@@ -12,6 +12,39 @@ namespace HSP.ResourceFlow
         Vector3 _triangulationPositions; // initial pos for triangulation.
 
         FlowTank _tank;
+
+
+
+        public float MaxVolume => throw new NotImplementedException();
+
+        public SubstanceStateCollection Contents => throw new NotImplementedException();
+
+        public float Mass => throw new NotImplementedException();
+
+        public UnityEngine.Transform transform => throw new NotImplementedException();
+
+        public UnityEngine.GameObject gameObject => throw new NotImplementedException();
+
+        public SubstanceStateCollection Outflow => throw new NotImplementedException();
+
+        public SubstanceStateCollection Inflow => throw new NotImplementedException();
+
+        public event IHasMass.MassChange OnAfterMassChanged;
+
+        public void ClampIn( SubstanceStateCollection inflow, float dt )
+        {
+            throw new NotImplementedException();
+        }
+
+        public FluidState Sample( UnityEngine.Vector3 localPosition, UnityEngine.Vector3 localAcceleration, float holeArea )
+        {
+            throw new NotImplementedException();
+        }
+
+        public (SubstanceStateCollection, FluidState) SampleFlow( UnityEngine.Vector3 localPosition, UnityEngine.Vector3 localAcceleration, float holeArea, float dt, FluidState opposingFluid )
+        {
+            throw new NotImplementedException();
+        }
     }
 
     public sealed class FlowInlet
@@ -51,7 +84,7 @@ namespace HSP.ResourceFlow
 
         private FlowInlet CreateInlet( Vector3 localPos, float area )
         {
-
+            throw new NotImplementedException();
         }
 
         private void RemoveInlet( FlowInlet node )
