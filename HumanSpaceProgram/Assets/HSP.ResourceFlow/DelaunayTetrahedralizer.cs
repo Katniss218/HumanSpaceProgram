@@ -6,10 +6,12 @@ namespace HSP.ResourceFlow
 {
     public static class DelaunayTetrahedralizer
     {
-        // A triangular face used for boundary extraction. order-independent dedup using sorted indices.
+        /// <summary>
+        /// A triangular face used for boundary extraction. Order-independent (deduplication) via sorted indices.
+        /// </summary>
         private readonly struct Face : IEquatable<Face>
         {
-            public readonly int i0, i1, i2;
+            public readonly int a, b, c;
 
             public Face( int a, int b, int c )
             {
@@ -18,18 +20,21 @@ namespace HSP.ResourceFlow
                 if( c < a ) (c, a) = (a, c);
                 if( c < b ) (c, b) = (b, c);
 
-                this.i0 = a;
-                this.i1 = b;
-                this.i2 = c;
+                this.a = a;
+                this.b = b;
+                this.c = c;
             }
 
-            public bool Equals( Face other ) => i0 == other.i0 && i1 == other.i1 && i2 == other.i2;
+            public bool Equals( Face other ) => a == other.a && b == other.b && c == other.c;
 
-            public override int GetHashCode() => HashCode.Combine( i0, i1, i2 );
+            public override bool Equals( object obj ) => obj is Face f && Equals( f );
+
+            public override int GetHashCode() => HashCode.Combine( a, b, c );
         }
 
         /// <summary>
         /// Internal tetra struct for math and caching circumsphere.
+        /// Tracks degeneracy and supports circumsphere queries.
         /// </summary>
         private sealed class Tetra
         {
@@ -40,37 +45,64 @@ namespace HSP.ResourceFlow
             private bool _circumsphereComputed;
             private readonly List<FlowNode> _nodesRef;
 
+            public bool IsDegenerate { get; private set; }
+
             public Tetra( int i0, int i1, int i2, int i3, List<FlowNode> nodesRef )
             {
-                Vector3 p0 = nodesRef[i0].pos;
-                Vector3 p1 = nodesRef[i1].pos;
-                Vector3 p2 = nodesRef[i2].pos;
-                Vector3 p3 = nodesRef[i3].pos;
-
-                if( FlowTetrahedron.GetVolume( p0, p3, p2, p1 ) <= 1e-6f )
-                {
-                    throw new InvalidOperationException( "Degenerate tetrahedron with zero or negative volume encountered when computing circumsphere." );
-                }
-
                 this.i0 = i0;
                 this.i1 = i1;
                 this.i2 = i2;
                 this.i3 = i3;
                 this._nodesRef = nodesRef;
-                _circumsphereComputed = false;
+                this._circumsphereComputed = false;
+                this.IsDegenerate = false;
+
+                Vector3 p0 = nodesRef[i0].pos;
+                Vector3 p1 = nodesRef[i1].pos;
+                Vector3 p2 = nodesRef[i2].pos;
+                Vector3 p3 = nodesRef[i3].pos;
+
+                float absVolume = FlowTetrahedron.GetVolume( p0, p1, p2, p3 );
+
+                // Choose characteristic scale: max edge length among the tetra edges.
+                float maxEdgeLengthSq = 0f;
+
+                void CheckEdge( Vector3 a, Vector3 b )
+                {
+                    float lengthSq = (a - b).sqrMagnitude;
+                    if( lengthSq > maxEdgeLengthSq )
+                        maxEdgeLengthSq = lengthSq;
+                }
+
+                CheckEdge( p0, p1 );
+                CheckEdge( p0, p2 );
+                CheckEdge( p0, p3 );
+                CheckEdge( p1, p2 );
+                CheckEdge( p1, p3 );
+                CheckEdge( p2, p3 );
+
+                float maxEdgeLength = (maxEdgeLengthSq > 0f) ? Mathf.Sqrt( maxEdgeLengthSq ) : 0f;
+
+                // threshold (scale-aware): scalarTriple scales as edge^3.
+                const float EPSILON = 1e-7f;
+                float volumeEps = EPSILON * Math.Max( 1.0f, maxEdgeLength * maxEdgeLength * maxEdgeLength );
+
+                if( absVolume < volumeEps )
+                {
+                    IsDegenerate = true;
+                }
             }
 
             public bool HasVertexIndex( int idx ) => i0 == idx || i1 == idx || i2 == idx || i3 == idx;
 
-            private void SetAsDegenerate()
-            {
-                _sphereCenterCache = new Vector3( float.MaxValue, float.MaxValue, float.MaxValue );
-                _radiusSqCache = float.PositiveInfinity;
-                _circumsphereComputed = true;
-            }
-
             public void ComputeCircumsphere()
             {
+                if( IsDegenerate )
+                {
+                    _circumsphereComputed = true;
+                    return;
+                }
+
                 Vector3 p0 = _nodesRef[i0].pos;
                 Vector3 p1 = _nodesRef[i1].pos;
                 Vector3 p2 = _nodesRef[i2].pos;
@@ -88,38 +120,30 @@ namespace HSP.ResourceFlow
                 {
                     invA = A.inverse;
                 }
-                catch( InvalidOperationException ex ) // Singular matrix.
+                catch( InvalidOperationException )
                 {
-                    SetAsDegenerate();
-                    return;
-                }
-
-                if( float.IsNaN( invA.m00 ) || float.IsNaN( invA.m01 ) || float.IsNaN( invA.m02 ) ||
-                    float.IsNaN( invA.m10 ) || float.IsNaN( invA.m11 ) || float.IsNaN( invA.m12 ) ||
-                    float.IsNaN( invA.m20 ) || float.IsNaN( invA.m21 ) || float.IsNaN( invA.m22 ) ||
-                    float.IsInfinity( invA.m00 ) || float.IsInfinity( invA.m01 ) || float.IsInfinity( invA.m02 ) ||
-                    float.IsInfinity( invA.m10 ) || float.IsInfinity( invA.m11 ) || float.IsInfinity( invA.m12 ) ||
-                    float.IsInfinity( invA.m20 ) || float.IsInfinity( invA.m21 ) || float.IsInfinity( invA.m22 ) )
-                {
-                    SetAsDegenerate();
+                    // Singular matrix -> degenerate tetra (coplanar / nearly-coplanar)
+                    IsDegenerate = true;
                     return;
                 }
 
                 // Build b = [|x1|^2 - |x0|^2, |x2|^2 - |x0|^2, |x3|^2 - |x0|^2]
-                float norm0 = p0.x * p0.x + p0.y * p0.y + p0.z * p0.z;
-                float norm1 = p1.x * p1.x + p1.y * p1.y + p1.z * p1.z;
-                float norm2 = p2.x * p2.x + p2.y * p2.y + p2.z * p2.z;
-                float norm3 = p3.x * p3.x + p3.y * p3.y + p3.z * p3.z;
+                float norm0 = p0.sqrMagnitude;
+                float norm1 = p1.sqrMagnitude;
+                float norm2 = p2.sqrMagnitude;
+                float norm3 = p3.sqrMagnitude;
                 Vector3 b = new Vector3( (norm1 - norm0), (norm2 - norm0), (norm3 - norm0) );
 
                 Vector3 center = invA * b;
 
+                _radiusSqCache = (center - p0).sqrMagnitude;
+                // Sanity check.
+                if( float.IsNaN( _radiusSqCache ) || float.IsInfinity( _radiusSqCache ) )
+                {
+                    IsDegenerate = true;
+                    return;
+                }
                 _sphereCenterCache = center;
-
-                float dx = center.x - p0.x;
-                float dy = center.y - p0.y;
-                float dz = center.z - p0.z;
-                _radiusSqCache = (dx * dx) + (dy * dy) + (dz * dz);
                 _circumsphereComputed = true;
             }
 
@@ -128,17 +152,14 @@ namespace HSP.ResourceFlow
                 if( !_circumsphereComputed )
                     ComputeCircumsphere();
 
-                if( float.IsInfinity( _radiusSqCache ) )
+                if( IsDegenerate )
                     return false; // degenerate case treat as not containing
 
-                float dx = _sphereCenterCache.x - p.x;
-                float dy = _sphereCenterCache.y - p.y;
-                float dz = _sphereCenterCache.z - p.z;
-                float distSq = dx * dx + dy * dy + dz * dz;
+                float distanceSq = (_sphereCenterCache - p).sqrMagnitude;
 
-                // Use a tiny epsilon to avoid floating point issues: consider point inside if distSq <= radiusSq*(1 + eps)
-                const float eps = 1e-6f;
-                return distSq <= _radiusSqCache * (1.0 + eps);
+                const float REL_EPS = 1e-3f;
+                float tolerance = REL_EPS * Math.Max( 1f, _radiusSqCache );
+                return distanceSq <= _radiusSqCache + tolerance;
             }
         }
 
@@ -178,12 +199,14 @@ namespace HSP.ResourceFlow
                 InsertPoint( i, nodes, tetraList );
             }
 
-            // Remove any tetrahedron that references a super vertex. Also removes degenerate tetras.
             tetraList.RemoveAll( t => t.HasVertexIndex( super0 ) || t.HasVertexIndex( super1 ) || t.HasVertexIndex( super2 ) || t.HasVertexIndex( super3 ) );
+            tetraList.RemoveAll( t => t.IsDegenerate );
+
             if( tetraList.Count == 0 )
             {
                 return (new List<FlowNode>(), new List<FlowEdge>(), new List<FlowTetrahedron>());
             }
+
             nodes.RemoveRange( nodes.Count - 4, 4 );
 
             // Build FlowTetrahedron list and edges.
@@ -233,8 +256,12 @@ namespace HSP.ResourceFlow
         private static void BuildSuperTetrahedron( List<FlowNode> nodes, out int idx0, out int idx1, out int idx2, out int idx3 )
         {
             // Find the max/min bounds of existing points.
-            float minX = nodes[0].pos.x, minY = nodes[0].pos.y, minZ = nodes[0].pos.z;
-            float maxX = minX, maxY = minY, maxZ = minZ;
+            float minX = nodes[0].pos.x;
+            float minY = nodes[0].pos.y;
+            float minZ = nodes[0].pos.z;
+            float maxX = minX;
+            float maxY = minY;
+            float maxZ = minZ;
             foreach( var node in nodes )
             {
                 Vector3 pos = node.pos;
@@ -283,74 +310,79 @@ namespace HSP.ResourceFlow
         {
             Vector3 pointPos = nodes[pointIndex].pos;
 
-            // 1) Find all tetrahedra whose circumsphere contains the point ('bad' tetra) - need to be removed/split.
-            List<Tetra> tetrahedraWithPointInCircumsphere = new();
+            // 1 - Find all tetrahedra whose circumsphere contains the point ('bad' tetra) - need to be removed/split.
+            HashSet<Tetra> badTetra = new();
             foreach( var tetra in tetraList )
             {
                 if( tetra.PointInsideCircumsphere( pointPos ) )
                 {
-                    tetrahedraWithPointInCircumsphere.Add( tetra );
+                    badTetra.Add( tetra );
                 }
             }
 
-            // This will never be true because the super tetra is made big enough (unless the points are literally near the float limit).
-            if( tetrahedraWithPointInCircumsphere.Count == 0 )
+            if( badTetra.Count == 0 )
                 return;
 
-            // 2) Find boundary faces (faces that are shared by exactly one bad tetra)
-            Dictionary<Face, int> faceCounts = new();
-            Dictionary<Face, (int, int, int)> faceToOrigin = new(); // store original indices (not sorted) for deterministic new tetra creation if needed
-            foreach( var badTetra in tetrahedraWithPointInCircumsphere )
+            // 2 - Find boundary faces (faces that are shared by exactly one bad tetra)
+            Dictionary<Face, (int count, (int a, int b, int c) origin)> faceInfo = new();
+
+            foreach( var bad in badTetra )
             {
-                Face[] faces = new[]
+                var faces = new[]
                 {
-                    new Face( badTetra.i0, badTetra.i1, badTetra.i2 ),
-                    new Face( badTetra.i0, badTetra.i1, badTetra.i3 ),
-                    new Face( badTetra.i0, badTetra.i2, badTetra.i3 ),
-                    new Face( badTetra.i1, badTetra.i2, badTetra.i3 )
+                    (face: new Face(bad.i0, bad.i1, bad.i2), orig: (bad.i0, bad.i1, bad.i2)),
+                    (face: new Face(bad.i0, bad.i1, bad.i3), orig: (bad.i0, bad.i1, bad.i3)),
+                    (face: new Face(bad.i0, bad.i2, bad.i3), orig: (bad.i0, bad.i2, bad.i3)),
+                    (face: new Face(bad.i1, bad.i2, bad.i3), orig: (bad.i1, bad.i2, bad.i3))
                 };
 
-                (int, int, int)[] originals = new[]
+                foreach( var (face, orig) in faces )
                 {
-                    (badTetra.i0, badTetra.i1, badTetra.i2),
-                    (badTetra.i0, badTetra.i1, badTetra.i3),
-                    (badTetra.i0, badTetra.i2, badTetra.i3),
-                    (badTetra.i1, badTetra.i2, badTetra.i3)
-                };
-
-                for( int i = 0; i < faces.Length; ++i )
-                {
-                    Face face = faces[i];
-                    faceCounts.TryGetValue( face, out int faceCount );
-                    faceCounts[face] = faceCount + 1;
-
-                    if( !faceToOrigin.ContainsKey( face ) )
-                    {
-                        faceToOrigin[face] = originals[i];
-                    }
+                    if( faceInfo.TryGetValue( face, out var val ) )
+                        faceInfo[face] = (val.count + 1, val.origin);
+                    else
+                        faceInfo[face] = (1, orig);
                 }
             }
 
-            List<(int, int, int)> boundaryFaces = new();
-            foreach( (Face face, int count) in faceCounts )
+            List<(int a, int b, int c)> boundaryFaces = new();
+            foreach( var kv in faceInfo )
             {
-                if( count == 1 )
+                if( kv.Value.count == 1 )
+                    boundaryFaces.Add( kv.Value.origin );
+            }
+
+            // 3 - Remove bad tetrahedra from tetraList efficiently.
+            tetraList.RemoveAll( t => badTetra.Contains( t ) );
+
+            // 4 - Create new tetrahedra by connecting point to each boundary face.
+            foreach( var (a, b, c) in boundaryFaces )
+            {
+                int d = pointIndex;
+
+                Tetra newTetra = new Tetra( a, b, c, d, nodes );
+
+                // If newTetra is degenerate or has negative orientation, attempt to fix by swapping vertices.
+                if( newTetra.IsDegenerate )
                 {
-                    (int, int, int) orig = faceToOrigin[face];
-                    boundaryFaces.Add( orig );
+                    newTetra = new Tetra( b, a, c, d, nodes );
                 }
-            }
 
-            // 3) Remove bad tetrahedra from tetraList
-            foreach( var badTetra in tetrahedraWithPointInCircumsphere )
-            {
-                tetraList.Remove( badTetra );
-            }
+                // Still degenerate.
+                if( newTetra.IsDegenerate )
+                {
+                    continue;
+                }
 
-            // 4) Create new tetrahedra by connecting point to each boundary face
-            foreach( var boundaryFace in boundaryFaces )
-            {
-                Tetra newTetra = new Tetra( boundaryFace.Item1, boundaryFace.Item2, boundaryFace.Item3, pointIndex, nodes );
+                float signedVol = FlowTetrahedron.GetSignedVolume( nodes[newTetra.i0].pos, nodes[newTetra.i1].pos, nodes[newTetra.i2].pos, nodes[newTetra.i3].pos );
+                if( signedVol < 0f )
+                {
+                    // Flip winding: swap i1 and i2 (create a new tetra with flipped vertices).
+                    newTetra = new Tetra( newTetra.i0, newTetra.i2, newTetra.i1, newTetra.i3, nodes );
+                    if( newTetra.IsDegenerate )
+                        continue; // Flipping made it degenerate.
+                }
+
                 tetraList.Add( newTetra );
             }
         }

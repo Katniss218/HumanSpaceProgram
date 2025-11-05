@@ -22,6 +22,11 @@ namespace HSP.ResourceFlow
             float parallelepipedVolume = Vector3.Dot( v1Pos - v0Pos, Vector3.Cross( v2Pos - v0Pos, v3Pos - v0Pos ) );
             return Mathf.Abs( parallelepipedVolume ) / 6f;
         }
+        public static float GetSignedVolume( Vector3 v0Pos, Vector3 v1Pos, Vector3 v2Pos, Vector3 v3Pos )
+        {
+            float parallelepipedVolume = Vector3.Dot( v1Pos - v0Pos, Vector3.Cross( v2Pos - v0Pos, v3Pos - v0Pos ) );
+            return parallelepipedVolume / 6f;
+        }
 
         public float GetVolume()
         {
