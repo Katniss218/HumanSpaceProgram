@@ -7,9 +7,9 @@ namespace HSP.ResourceFlow
         public readonly FlowNode end1;
         public readonly FlowNode end2;
 
-        public double Volume { get; }
+        public float Volume { get; }
 
-        public FlowEdge( FlowNode end1, FlowNode end2, double volume )
+        public FlowEdge( FlowNode end1, FlowNode end2, float volume )
         {
             this.end1 = end1;
             this.end2 = end2;

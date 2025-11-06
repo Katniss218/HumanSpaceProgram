@@ -4,9 +4,7 @@ namespace HSP.ResourceFlow
 {
     public sealed class FlowNode
     {
-        public Vector3 pos;
-
-#warning MAYBE - maybe mark as inlet here
+        public readonly Vector3 pos;
 
         public FlowNode(Vector3 pos)
         {

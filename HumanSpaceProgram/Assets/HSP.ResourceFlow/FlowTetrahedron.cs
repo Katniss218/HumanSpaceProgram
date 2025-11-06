@@ -32,5 +32,10 @@ namespace HSP.ResourceFlow
         {
             return GetVolume( v0.pos, v1.pos, v2.pos, v3.pos );
         }
+
+        public float GetSignedVolume()
+        {
+            return GetSignedVolume( v0.pos, v1.pos, v2.pos, v3.pos );
+        }
     }
 }
