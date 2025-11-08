@@ -2,6 +2,9 @@
 
 namespace HSP.ResourceFlow
 {
+    /// <summary>
+    /// Holds fluid inside a <see cref="FlowTank"/>.
+    /// </summary>
     public readonly struct FlowEdge
     {
         public readonly FlowNode end1;
@@ -19,6 +22,11 @@ namespace HSP.ResourceFlow
         public float GetLength()
         {
             return Vector3.Distance( end1.pos, end2.pos );
+        }
+
+        public Vector3 GetCenter()
+        {
+            return (end1.pos + end2.pos) * 0.5f;
         }
 
         public float GetProjectedHeight( Vector3 accelerationDir )

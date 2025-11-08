@@ -121,7 +121,7 @@ namespace HSP.Vanilla.Components
 
             var oldFlow = _cacheFlow;
 
-            if( !SubstanceStateCollection.IsNullOrEmpty( oldFlow ) )
+            if( oldFlow != null && !oldFlow.IsEmpty() )
             {
                 (_, var inletP) = GetEnd( _cacheInlet ).ConnectedTo();
                 (var outletC, _) = GetEnd( _cacheOutlet ).ConnectedTo();
@@ -141,7 +141,7 @@ namespace HSP.Vanilla.Components
             _cacheInlet = inlet;
             _cacheOutlet = outlet;
 
-            if( !SubstanceStateCollection.IsNullOrEmpty( newFlow ) )
+            if( newFlow != null && !newFlow.IsEmpty() )
             {
                 (_, var inletP) = GetEnd( inlet ).ConnectedTo();
                 (var outletC, _) = GetEnd( outlet ).ConnectedTo();

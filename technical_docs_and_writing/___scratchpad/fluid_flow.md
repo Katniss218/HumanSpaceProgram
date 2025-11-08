@@ -67,14 +67,11 @@ If the inlet position is 'close enough' to an existing node, that node can be mo
 
 ## Implementation notes:
 
+Should handle a 100-tank network easily in realtime (if the tank consists of a reasonably-low amount of edges, like 10-20). And multiple smaller networks at once also easily.
+
 Each independent full network (vessel) could be solved in parallel (this necessitates the use of worker-thread-safe types and APIs - Unity annoyance).
 
 Precompute and cache as much as is viable.
-
-#### Flow solver:
-
-Ideally this would use a robust solver that can handle stiff systems. Possibly needs an extension to the `MatrixMxN` custom type, or a sparse matrix CSR/CSC.
-Needs to support abstract providers/consumers/containers in the large-scale graph (not inside the tank, just 'instead' of a tank/engine/etc).
 
 #### Resource producers and consumers:
 
@@ -105,19 +102,41 @@ Inlet edge creation/deletion shouldn't delete/duplicate fluid contents.
 Cavitation - pressure drops, liquid boils into a gas.
 Rapid acceleration changes - will generate pressure spikes.
 Needs a failure condition when tank exceeds allowed pressure.
+fluid of equal density at equilibrium pressures should diffuse across the tanks.
 
-## Uses:
+#### Solve Step:
 
-Should handle a 100-tank network easily in realtime (if the tank consists of a reasonably-low amount of edges, like 10-20). And multiple smaller networks at once also easily.
+no matrices yet.
+
+the solver runs on a separate thread, using snapshots?
+
+there are 2 basic solvers. the tank internal solver and the flow between tanks solver.
+
+every frame
+{
+    1. settle tanks
+    2. get pressures at each inlet
+    3. compute flowrates and iterate the solution for the 'next step' until none of the tanks are overfilled or negative.
+    - iterate all tanks, compute how much fluid would be in each, and if any are < 0 || > max, then adjust the flowrates between the affected tanks.
+    pressure will depend on how much fluid is inside ("everything is compressible" paradigm)?
+    so tanks are assumed to be in equilibrium at each step? - not necessarily. only if flowrate is enough to equilibrate in 1 step.
+    the tank is too full, if the pressure resulting from the compressed volume is > pressure feeding into the tank.
+}
+
+changes:
+- the 'clamp inflow' thing gets removed and replaced by compressibility (until pressure equilibrium or structural failure)
+
+substance needs a state (gas/liquid/solid)
+we only run settling if the tank contains a liquid or more than 1 gas. Single gas assumed uniform
+
+pressure is equal to the amount of mass (ideal volume) divided somehow by the actual available volume.
 
 
-## Potential solve step:
-retrieve 'current' pressures at every inlet/outlet (across every pipe).
-compute the desired flows in each pipe with those pressures.
-solve for the new pressures iteratively using the flows as initial conditions.
+FlowXYZ elements (flowtank/flowpipe) are the multithreaded data.
 
+ 
 
-
+flow builder could just register objects. those objects
 
 
 
