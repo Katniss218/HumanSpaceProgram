@@ -24,26 +24,34 @@ namespace HSP.ResourceFlow
 
         private Dictionary<FlowNode, float> _inletNodes; // inlets and outlets (ports/holes in the tank). If nothing is attached, the inlet is treated as a hole.
 
-        private SubstanceStateCollection _contents;
-        private SubstanceStateCollection _inflow;
-        private SubstanceStateCollection _outflow;
+        public SubstanceStateCollection Contents { get; private set; } // should always equal the sum of what is in the edges.
+        public SubstanceStateCollection Inflow { get; private set; }
+        public SubstanceStateCollection Outflow { get; private set; }
 
-        private Vector3 _acceleration; // in tank-space, acceleration of tank relative to fluid.
-        private Vector3 _angularVelocity;
-        private Vector3 localCenterOfMass;
+        public bool IsEmpty => Contents == null || Contents.IsEmpty();
 
-#warning TODO - mark whether node was an inlet or not (snapping) and don't remove it entirely if it wasn't.
+        /// <summary>
+        /// Gets the volume calculated from the tetrahedralization. Used for scaling.
+        /// </summary>
+        public float CalculatedVolume { get; private set; }
+        public float Volume { get; private set; }
 
-        private float _calculatedVolume; // volume calculated from tetrahedra
-        private float _volume;
+        public Vector3 Acceleration { get; set; } = Vector3.zero; // in tank-space, acceleration of tank relative to fluid.
+        public Vector3 AngularVelocity { get; set; } = Vector3.zero;
+       // public Vector3 LocalCenterOfMass { get; set; } = Vector3.zero;
 
         public IReadOnlyList<FlowNode> Nodes => _nodes;
         public IReadOnlyList<FlowEdge> Edges => _edges;
-        public SubstanceStateCollection[] ContentsInEdges => _contentsInEdges;
+        public IReadonlySubstanceStateCollection[] ContentsInEdges => _contentsInEdges;
 
+        /// <summary>
+        /// Gets the vector for the acceleration felt by the fluid at the specified point in local space of the tank.
+        /// </summary>
         public Vector3 GetAccelerationAtPoint( Vector3 localPoint )
         {
-            return _acceleration;
+           // Vector3 comPoint = localPoint - LocalCenterOfMass;
+            Vector3 angularAccel = Vector3.Cross( AngularVelocity, Vector3.Cross( AngularVelocity, localPoint ) );
+            return Acceleration + angularAccel;
         }
 
         private void SetTetrahedralization( List<FlowNode> nodes, List<FlowEdge> edges, List<FlowTetrahedron> tets )
@@ -102,7 +110,7 @@ namespace HSP.ResourceFlow
             {
                 for( int i = 0; i < _tetrahedra.Length; i++ )
                 {
-                    actualVolumes[i] = (desiredVolumes[i] / totalDesiredVolume) * _volume;
+                    actualVolumes[i] = (desiredVolumes[i] / totalDesiredVolume) * Volume;
                 }
             }
 
@@ -169,7 +177,7 @@ namespace HSP.ResourceFlow
             }
 
             // Calculate total calculated volume
-            _calculatedVolume = edgeVolumes.Values.Sum();
+            CalculatedVolume = edgeVolumes.Values.Sum();
         }
 
         public void SetNodes( Vector3[] localPositions, ResourceInlet[] inlets )
@@ -179,7 +187,7 @@ namespace HSP.ResourceFlow
             if( inlets == null ) inlets = new ResourceInlet[0];
 
             // Save old contents so we can re-distribute after re-tetrahedralizing.
-            SubstanceStateCollection oldContents = _contents?.Clone();
+            SubstanceStateCollection oldContents = Contents?.Clone();
 
             // Make sure internal arrays exist so other code won't null-ref.
             if( _nodes == null ) _nodes = new FlowNode[0];
@@ -304,7 +312,7 @@ namespace HSP.ResourceFlow
             // Restore old contents and redistribute (the caller may prefer different behavior; this preserves fluid as-is).
             if( oldContents != null && !oldContents.IsEmpty() )
             {
-                _contents = oldContents;
+                Contents = oldContents;
                 DistributeFluids();
             }
         }

@@ -9,7 +9,7 @@ namespace HSP.ResourceFlow
     /// State information about multiple resources.
     /// </summary>
     [Serializable]
-    public class SubstanceStateCollection : IEnumerable<SubstanceState>
+    public class SubstanceStateCollection : IReadonlySubstanceStateCollection, IEnumerable<SubstanceState>
     {
         const float EPSILON = 1e-3f;
 
@@ -129,7 +129,7 @@ namespace HSP.ResourceFlow
                 if( Mathf.Abs( newMass ) <= EPSILON )
                     _substances.RemoveAt( i );
                 else
-                    _substances[i] = new SubstanceState( newMass, s.Substance );
+                    _substances[i] = new SubstanceState( newMass, s.Substance, s.Temperature );
             }
         }
 
@@ -151,7 +151,7 @@ namespace HSP.ResourceFlow
                 if( Mathf.Abs( newMass ) <= EPSILON )
                     _substances.RemoveAt( i );
                 else
-                    _substances[i] = new SubstanceState( newMass, s.Substance );
+                    _substances[i] = new SubstanceState( newMass, s.Substance, s.Temperature );
             }
         }
 
@@ -187,27 +187,27 @@ namespace HSP.ResourceFlow
                 if( Mathf.Abs( newAmount ) <= EPSILON )
                     _substances.RemoveAt( idx );
                 else
-                    _substances[idx] = new SubstanceState( newAmount, _substances[idx].Substance );
+                    _substances[idx] = new SubstanceState( newAmount, _substances[idx].Substance, _substances[idx].Temperature );
             }
             else
             {
-                _substances.Add( new SubstanceState( delta, s.Substance ) );
+                _substances.Add( new SubstanceState( delta, s.Substance, s.Temperature ) );
             }
         }
 
         /// <summary>
         /// Add/remove all substances from other (dt scales the incoming mass).
         /// </summary>
-        public void Add( SubstanceStateCollection other, float dt = 1.0f )
+        public void Add( IReadonlySubstanceStateCollection other, float dt = 1.0f )
         {
             if( other == null )
                 return;
             if( other.IsEmpty() )
                 return;
 
-            for( int i = 0; i < other._substances.Count; i++ )
+            for( int i = 0; i < other.SubstanceCount; i++ )
             {
-                SubstanceState s = other._substances[i];
+                SubstanceState s = other[i];
                 float delta = s.MassAmount * dt;
                 if( Mathf.Abs( delta ) <= EPSILON )
                     continue;
@@ -219,11 +219,11 @@ namespace HSP.ResourceFlow
                     if( Mathf.Abs( newAmount ) <= EPSILON )
                         _substances.RemoveAt( idx );
                     else
-                        _substances[idx] = new SubstanceState( newAmount, _substances[idx].Substance );
+                        _substances[idx] = new SubstanceState( newAmount, _substances[idx].Substance, _substances[idx].Temperature );
                 }
                 else
                 {
-                    _substances.Add( new SubstanceState( delta, s.Substance ) );
+                    _substances.Add( new SubstanceState( delta, s.Substance, s.Temperature ) );
                 }
             }
         }

@@ -4,11 +4,12 @@ namespace HSP.ResourceFlow
 {
     /// <summary>
     /// Anything that can produce resources from external or internal sources. <br/>
-    /// E.g. tank, drilling machine, vacuum cleaner, etc.
+    /// E.g. tank, drilling machine, air intake, etc.
     /// </summary>
     public interface IResourceProducer
     {
-        Transform transform { get; }
+        Vector3 Acceleration { get; set; } // in tank-space, acceleration of tank relative to fluid.
+        Vector3 AngularVelocity { get; set; }
 
         /// <summary>
         /// Get or set the total outflow per 1 [s].
@@ -22,15 +23,12 @@ namespace HSP.ResourceFlow
         /// If possible, the pressure should be extrapolated, if the position falls out of bounds.
         /// </remarks>
         /// <param name="localPosition">The local position of the point to sample, in [m].</param>
-        /// <param name="localAcceleration">The local acceleration vector, in [m/s^2].</param>
         /// <param name="holeArea">The area of the hole, in [m^2].</param>
         FluidState Sample( Vector3 localPosition, Vector3 localAcceleration, float holeArea );
 
         /// <summary>
         /// Calculates the amount of resources that would flow out in 1 [s] is an orifice of given area was created at the specified position.
         /// </summary>
-        /// <param name="opposingPressure"></param>
-        /// <returns>A new <see cref="SubstanceStateCollection"/> object containing the resources that can flow out in 1 [s].</returns>
-        (SubstanceStateCollection, FluidState) SampleFlow( Vector3 localPosition, Vector3 localAcceleration, float holeArea, float dt, FluidState opposingFluid );
+        IReadonlySubstanceStateCollection SampleSubstances( Vector3 localPosition, float flowRate, float dt );
     }
 }

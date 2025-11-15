@@ -54,7 +54,7 @@ namespace HSP.ResourceFlow
         public float ComputeFlowRate( float pA, float pB )
         {
             float flowrate = Conductance * (pA - pB + HeadAdded);
-            if( !float.IsFinite( flowrate ) ) 
+            if( !float.IsFinite( flowrate ) )
                 flowrate = 0f;
 
             return flowrate;
@@ -63,7 +63,7 @@ namespace HSP.ResourceFlow
         /// <summary>
         /// Samples the actual flow that would occur through this pipe for the given flowrate (uses tanks' accelerations to determine solids flows).
         /// </summary>
-        public SubstanceStateCollection SampleFlowResources( float flowRate, float dt )
+        public IReadonlySubstanceStateCollection SampleFlowResources( float flowRate, float dt )
         {
             if( flowRate == 0f )
                 return SubstanceStateCollection.Empty;
@@ -81,11 +81,11 @@ namespace HSP.ResourceFlow
                 producer = FromInlet.Producer;
                 consumer = ToInlet.Consumer;
             }
+            // TODO - bidirectional flow later (diffusion)
 
             // Do not clamp. instead we'll use compressibility to determine whether the resources can fit / what flowrate is achievable until equilibrium hits.
-            SubstanceStateCollection available = FromInlet.Producer.Outflow.GetAvailableResources( FromInlet.pos, adjustedFlowRate, dt );
-            
-            SubstanceStateCollection flow = available.GetProportionalSubset( flowRate * dt );
+            IReadonlySubstanceStateCollection flow = producer.SampleSubstances( FromInlet.pos, Math.Abs( flowRate ), dt );
+
 
             return flow;
         }

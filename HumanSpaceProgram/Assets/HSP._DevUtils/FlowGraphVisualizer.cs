@@ -37,8 +37,8 @@ namespace HSP._DevUtils
 
         void LateUpdate()
         {
-            var edges = tank.tank.Edges;
-            var contentsInEdges = tank.tank.ContentsInEdges;
+            var edges = tank._cachedTank.Edges;
+            var contentsInEdges = tank._cachedTank.ContentsInEdges;
             if( lineRenderer == null || edges == null || contentsInEdges == null )
                 return;
             lineRenderer.Clear();

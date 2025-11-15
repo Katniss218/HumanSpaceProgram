@@ -7,7 +7,5 @@ namespace HSP.ResourceFlow
         public float nominalArea; // m^2
 
         public Vector3 LocalPosition;
-
-        public IBuildsFlowNetwork owner;
     }
 }

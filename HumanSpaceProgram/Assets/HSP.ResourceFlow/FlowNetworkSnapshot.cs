@@ -1,94 +1,10 @@
-﻿using HSP.Time;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using static UnityEngine.UI.GridLayoutGroup;
 
 namespace HSP.ResourceFlow
 {
-    public class FlowNetworkManager : SingletonMonoBehaviour<FlowNetworkManager>
-    {
-        FlowNetworkSnapshot[] _cachedFlowNetworks;
-
-        private void FixedUpdate()
-        {
-            for( int i = 0; i < _cachedFlowNetworks.Length; i++ )
-            {
-                var network = _cachedFlowNetworks[i]; // reuse built networks if valid.
-                if( !network.IsValid() )
-                {
-                    network = FlowNetworkSnapshot.GetNetworkSnapshot( network.RootObject );
-                    _cachedFlowNetworks[i] = network;
-                }
-
-                network.Step( TimeManager.FixedDeltaTime );
-            }
-        }
-    }
-
-    public class FlowNetworkBuilder
-    {
-        private readonly Dictionary<IBuildsFlowNetwork, List<IResourceConsumer>> _consumers = new();
-        private readonly Dictionary<IBuildsFlowNetwork, List<IResourceProducer>> _producers = new();
-        private readonly Dictionary<IBuildsFlowNetwork, List<FlowPipe>> _pipes = new();
-
-        // quick reverse lookup:
-        private readonly Dictionary<object, IBuildsFlowNetwork> _owner = new();
-#warning TODO - each IBuildsFlowNetwork can have multiple tanks/pipes. Also, the 'tank/pipe' is a producer/consumer.
-
-        public bool TryAdd( IBuildsFlowNetwork owner, object obj )
-        {
-            if( owner == null || obj == null )
-                throw new ArgumentNullException();
-
-            bool added = false;
-            if( obj is IResourceConsumer c )
-            {
-                if( !_consumers.TryGetValue( owner, out var list ) )
-                {
-                    list = new List<IResourceConsumer>();
-                    _consumers[owner] = list;
-                }
-                list.Add( c );
-                added = true;
-            }
-            if( obj is IResourceProducer p )
-            {
-                if( !_producers.TryGetValue( owner, out var list2 ) )
-                {
-                    list2 = new List<IResourceProducer>();
-                    _producers[owner] = list2;
-                }
-                list2.Add( p );
-                added = true;
-            }
-            if( obj is FlowPipe pipe )
-            {
-                if( !_pipes.TryGetValue( owner, out var list3 ) )
-                {
-                    list3 = new List<FlowPipe>();
-                    _pipes[owner] = list3;
-                }
-                list3.Add( pipe );
-                added = true;
-            }
-
-            if( added )
-                _owner[obj] = owner;
-            return added;
-        }
-
-        public bool TryGetOwner( object obj, out IBuildsFlowNetwork owner )
-        {
-            return _owner.TryGetValue( obj, out owner );
-        }
-
-        internal IEnumerable<IResourceConsumer> Consumers => _consumers.Values.SelectMany( n => n );
-        internal IEnumerable<IResourceProducer> Producers => _producers.Values.SelectMany( n => n );
-        internal IEnumerable<FlowPipe> Pipes => _pipes.Values.SelectMany( n => n );
-    }
-
     /// <summary>
     /// Represents a snapshot of the fluid network at a given time.
     /// </summary>
@@ -189,7 +105,7 @@ namespace HSP.ResourceFlow
                 tempPipeArray.Clear();
             }
 
-            return new FlowNetworkSnapshot( obj, applyTo, producers, producersAndPipes, consumers, consumersAndPipes, pipes );
+            return new FlowNetworkSnapshot( obj, builder.Owner, applyTo, producers, producersAndPipes, consumers, consumersAndPipes, pipes );
         }
 
         // In general, only parts of the 'real' full network that need solving/evaluating will/should be included here.
@@ -199,11 +115,12 @@ namespace HSP.ResourceFlow
         private readonly FlowPipe[] Pipes;
 
         private readonly IResourceProducer[] Producers;
-        private readonly int[][] ProducersAndPipes; // Indices to the Pipes array.
-        private readonly IResourceConsumer[] Consumers; 
+        private readonly int[][] ProducersAndPipes; // Lists indices to the Pipes array for each producer (which producer is connected to which pipes).
+        private readonly IResourceConsumer[] Consumers;
         private readonly int[][] ConsumersAndPipes;
+        private readonly IReadOnlyDictionary<object, object> _owner;
 
-        public FlowNetworkSnapshot( GameObject rootObject, IBuildsFlowNetwork[] applyTo, IResourceProducer[] producers, int[][] producersAndPipes, IResourceConsumer[] consumers, int[][] consumersAndPipes, FlowPipe[] pipes )
+        public FlowNetworkSnapshot( GameObject rootObject, IReadOnlyDictionary<object, object> owner, IBuildsFlowNetwork[] applyTo, IResourceProducer[] producers, int[][] producersAndPipes, IResourceConsumer[] consumers, int[][] consumersAndPipes, FlowPipe[] pipes )
         {
             RootObject = rootObject;
             this.applyTo = applyTo;
@@ -214,9 +131,29 @@ namespace HSP.ResourceFlow
             Pipes = pipes;
         }
 
+        public bool TryGetFlowObj<T>( object obj, out T flowObj )
+        {
+            if( _owner.TryGetValue( obj, out var rawOwner ) && rawOwner is T typedOwner )
+            {
+                flowObj = typedOwner;
+                return true;
+            }
+            flowObj = default;
+            return false;
+        }
+
+
         public bool IsValid()
         {
-            // invalid if 'real' objects moved/connections have been made, fluid was changed, etc.
+            // invalid if the 'real' objects moved/connections have been made, fluid was changed, etc.
+            // each 'real' object needs to validate whether the simulation snapshot is still valid for itself.
+            foreach( var a in applyTo )
+            {
+                if( !a.IsValid( this ) )
+                    return false;
+            }
+
+            return true;
         }
 
         /// <summary>
@@ -226,8 +163,9 @@ namespace HSP.ResourceFlow
         /// <param name="fluidAccelerationSceneSpace">Acceleration of fluid in scene space, in [m/s^2].</param>
         public void Step( float dt )
         {
-#warning TODO - figure out the correct values for every position/etc.
+#warning TODO - figure out the correct values for every tank, etc. Potentially cached across steps later.
             Vector3 fluidAccelerationSceneSpace = Vector3.zero;
+            Vector3 angularVelocity = Vector3.zero;
 
             const int MAX_ITERATIONS = 50;
             const float CONVERGENCE_THRESHOLD = 0.001f; // m^3/s
@@ -236,8 +174,8 @@ namespace HSP.ResourceFlow
             for( int i = 0; i < Producers.Length; i++ )
             {
                 IResourceProducer producer = Producers[i];
-                producer.SetFluidAcceleration( fluidAccelerationSceneSpace );
-                producer.SetAngularVelocity( angularVelocity );
+                producer.Acceleration = fluidAccelerationSceneSpace;
+                producer.AngularVelocity = angularVelocity;
 
                 if( producer is FlowTank tank ) // only settle tanks once, since they will be added to both producers and consumers.
                     tank.DistributeFluids();
@@ -245,8 +183,8 @@ namespace HSP.ResourceFlow
             for( int i = 0; i < Consumers.Length; i++ )
             {
                 IResourceConsumer consumer = Consumers[i];
-                consumer.SetFluidAcceleration( fluidAccelerationSceneSpace );
-                consumer.SetAngularVelocity( angularVelocity );
+                consumer.Acceleration = fluidAccelerationSceneSpace;
+                consumer.AngularVelocity = angularVelocity;
             }
 
             float[] currentFlowRates = new float[Pipes.Length];

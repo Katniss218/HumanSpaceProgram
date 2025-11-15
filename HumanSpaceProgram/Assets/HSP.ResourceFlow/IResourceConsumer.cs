@@ -3,19 +3,17 @@
 namespace HSP.ResourceFlow
 {
     /// <summary>
-    /// Anything that can consume resources. E.g. rocket engine, lightbulb (elec), vent, etc.
+    /// Anything that can consume resources. E.g. rocket engine, lightbulb (electricity), vent, etc.
     /// </summary>
-    public interface IResourceConsumer : IComponent
+    public interface IResourceConsumer
     {
+        Vector3 Acceleration { get; set; } // in tank-space, acceleration of tank relative to fluid.
+        Vector3 AngularVelocity { get; set; }
+
         /// <summary>
         /// Get or set the total inflow per 1 [s].
         /// </summary>
         SubstanceStateCollection Inflow { get; }
-
-        /// <summary>
-        /// Clamps the flow based on how much fluid can actually flow into the consumer object in 1 [s].
-        /// </summary>
-        void ClampIn( SubstanceStateCollection inflow, float dt );
 
         /// <summary>
         /// Calculates the pressure acting at any given point inside the container, as well as what species will want to `flow` out of the container.

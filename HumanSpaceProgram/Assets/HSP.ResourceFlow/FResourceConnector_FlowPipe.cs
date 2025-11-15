@@ -4,6 +4,8 @@ namespace HSP.ResourceFlow
 {
     public class FResourceConnector_FlowPipe : MonoBehaviour, IBuildsFlowNetwork
     {
+        public float CrossSectionArea = 0.1f;
+#warning TODO - store the object that it connects to?
         public ResourceInlet end1;
         public ResourceInlet end2;
 
@@ -14,19 +16,19 @@ namespace HSP.ResourceFlow
             // only add if valve open, etc.
             // inlets/outlets are to the tank which is built by the builder.
             // ordering issue, tanks must be built before pipes.
-            if( c.TryGetOwner( end1.owner, out  ) || c.TryGetOwner( end2.owner, out ) == null )
+            if( !c.TryGetFlowObj( end1, out FlowPipe.Port flowEnd1 ) || !c.TryGetFlowObj( end2, out FlowPipe.Port flowEnd2 ) )
             {
                 return BuildFlowResult.Retry;
             }
-#warning TODO - add offsets due to transform.
 
-            c.AddPipe( pipe );
+            FlowPipe pipe = new FlowPipe( flowEnd1, flowEnd2, CrossSectionArea );
+            c.TryAddFlowObj( this, pipe );
             return BuildFlowResult.Finished;
         }
 
         public virtual void ApplySnapshot( FlowNetworkSnapshot snapshot )
         {
-            // apply the snapshot to the tank.
+            // apply the snapshot to the pipe.
         }
     }
 
