@@ -129,7 +129,7 @@ namespace HSP.ResourceFlow
                 if( Mathf.Abs( newMass ) <= EPSILON )
                     _substances.RemoveAt( i );
                 else
-                    _substances[i] = new SubstanceState( newMass, s.Substance, s.Temperature );
+                    _substances[i] = new SubstanceState( newMass, s.Substance );
             }
         }
 
@@ -151,7 +151,7 @@ namespace HSP.ResourceFlow
                 if( Mathf.Abs( newMass ) <= EPSILON )
                     _substances.RemoveAt( i );
                 else
-                    _substances[i] = new SubstanceState( newMass, s.Substance, s.Temperature );
+                    _substances[i] = new SubstanceState( newMass, s.Substance );
             }
         }
 
@@ -187,11 +187,11 @@ namespace HSP.ResourceFlow
                 if( Mathf.Abs( newAmount ) <= EPSILON )
                     _substances.RemoveAt( idx );
                 else
-                    _substances[idx] = new SubstanceState( newAmount, _substances[idx].Substance, _substances[idx].Temperature );
+                    _substances[idx] = new SubstanceState( newAmount, _substances[idx].Substance );
             }
             else
             {
-                _substances.Add( new SubstanceState( delta, s.Substance, s.Temperature ) );
+                _substances.Add( new SubstanceState( delta, s.Substance ) );
             }
         }
 
@@ -219,11 +219,11 @@ namespace HSP.ResourceFlow
                     if( Mathf.Abs( newAmount ) <= EPSILON )
                         _substances.RemoveAt( idx );
                     else
-                        _substances[idx] = new SubstanceState( newAmount, _substances[idx].Substance, _substances[idx].Temperature );
+                        _substances[idx] = new SubstanceState( newAmount, _substances[idx].Substance );
                 }
                 else
                 {
-                    _substances.Add( new SubstanceState( delta, s.Substance, s.Temperature ) );
+                    _substances.Add( new SubstanceState( delta, s.Substance ) );
                 }
             }
         }
@@ -251,6 +251,11 @@ namespace HSP.ResourceFlow
             List<SubstanceState> copy = new( _substances.Count );
             copy.AddRange( _substances );
             return new SubstanceStateCollection( copy );
+        }
+        
+        public SubstanceState[] ToArray()
+        {
+            return _substances.ToArray();
         }
 
         public IEnumerator<SubstanceState> GetEnumerator() => _substances.GetEnumerator();

@@ -136,34 +136,34 @@ namespace HSP._DevUtils
             Transform engineP2 = DontInstantiateLocal( PartRegistry.Load( (NamespacedID)"Vanilla::engine" ), tankP, new Vector3( -2, -3.45533f, 0 ), Quaternion.identity ).transform;
             v.RootPart = root;
 
-            FBulkConnection conn = tankP.gameObject.AddComponent<FBulkConnection>();
-            conn.End1.ConnectTo( tankL1.GetComponent<FBulkContainer_Sphere>() );
-            conn.End1.Position = new Vector3( 0.0f, -2.5f, 0.0f );
-            conn.End2.ConnectTo( tankP.GetComponent<FBulkContainer_Sphere>() );
-            conn.End2.Position = new Vector3( 0.0f, 1.5f, 0.0f );
+            FResourceConnection_FlowPipe conn = tankP.gameObject.AddComponent<FResourceConnection_FlowPipe>();
+            conn.FromInlet = tankL1.GetComponent<FResourceContainer_FlowTank>().Inlets[0];
+            //conn.End1.Position = new Vector3( 0.0f, -2.5f, 0.0f );
+            conn.FromInlet = tankP.GetComponent<FResourceContainer_FlowTank>().Inlets[0];
+            //conn.End2.Position = new Vector3( 0.0f, 1.5f, 0.0f );
             conn.CrossSectionArea = 0.1f;
 
             Substance sbsF = AssetRegistry.Get<Substance>( "Vanilla::Assets/substances/fuel" );
             Substance sbsOX = AssetRegistry.Get<Substance>( "Vanilla::Assets/substances/oxidizer" );
 
-            var tankSmallTank = tankP.GetComponent<FBulkContainer_Sphere>();
+            var tankSmallTank = tankP.GetComponent<FResourceContainer_FlowTank>();
             tankSmallTank.Contents = new SubstanceStateCollection(
                 new SubstanceState[] {
                     new SubstanceState( tankSmallTank.MaxVolume * ((sbsF.Density + sbsOX.Density) / 2f) / 2f, sbsF ),
                     new SubstanceState( tankSmallTank.MaxVolume * ((sbsF.Density + sbsOX.Density) / 2f) / 2f, sbsOX )} );
 
-            FBulkConnection conn21 = engineP1.gameObject.AddComponent<FBulkConnection>();
-            conn21.End1.ConnectTo( tankP.GetComponent<FBulkContainer_Sphere>() );
-            conn21.End1.Position = new Vector3( 0.0f, -1.5f, 0.0f );
-            conn21.End2.ConnectTo( engineP1.GetComponent<FRocketEngine>() );
-            conn21.End2.Position = new Vector3( 0.0f, 0.0f, 0.0f );
+            FResourceConnection_FlowPipe conn21 = engineP1.gameObject.AddComponent<FResourceConnection_FlowPipe>();
+            conn21.FromInlet = tankP.GetComponent<FResourceContainer_FlowTank>().Inlets[1];
+            //conn21.End1.Position = new Vector3( 0.0f, -1.5f, 0.0f );
+            conn21.ToInlet = engineP1.GetComponent<FRocketEngine>().Inlets[0];
+            //conn21.End2.Position = new Vector3( 0.0f, 0.0f, 0.0f );
             conn21.CrossSectionArea = 60f;
 
-            FBulkConnection conn22 = engineP2.gameObject.AddComponent<FBulkConnection>();
-            conn22.End1.ConnectTo( tankP.GetComponent<FBulkContainer_Sphere>() );
-            conn22.End1.Position = new Vector3( 0.0f, -1.5f, 0.0f );
-            conn22.End2.ConnectTo( engineP2.GetComponent<FRocketEngine>() );
-            conn22.End2.Position = new Vector3( 0.0f, 0.0f, 0.0f );
+            FResourceConnection_FlowPipe conn22 = engineP2.gameObject.AddComponent<FResourceConnection_FlowPipe>();
+            conn22.FromInlet = tankP.GetComponent<FResourceContainer_FlowTank>().Inlets[2];
+            //conn22.End1.Position = new Vector3( 0.0f, -1.5f, 0.0f );
+            conn22.ToInlet = engineP2.GetComponent<FRocketEngine>().Inlets[0];
+            //conn22.End2.Position = new Vector3( 0.0f, 0.0f, 0.0f );
             conn22.CrossSectionArea = 60f;
 
             FVesselSeparator t1Sep = t1.gameObject.AddComponent<FVesselSeparator>();

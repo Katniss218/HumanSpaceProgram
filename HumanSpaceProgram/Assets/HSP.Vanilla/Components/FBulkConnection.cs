@@ -11,6 +11,7 @@ namespace HSP.Vanilla.Components
     /// <summary>
     /// An object that connects two containers and calculates the resource flow between them.
     /// </summary>
+    [Obsolete("Use FResourceConnection_FlowPipe instead.")]
     public class FBulkConnection : MonoBehaviour
     {
         /// <summary>
@@ -197,20 +198,20 @@ namespace HSP.Vanilla.Components
 
             if( endC[0] != null )
             {
-                endSamples[0] = endC[0].Sample( End1.Position, endC[0].transform.InverseTransformVector( fluidAccelerationSceneSpace ), CrossSectionArea );
+           //     endSamples[0] = endC[0].Sample( End1.Position, endC[0].transform.InverseTransformVector( fluidAccelerationSceneSpace ), CrossSectionArea );
             }
             else if( endP[0] != null )
             {
-                endSamples[0] = endP[0].Sample( End1.Position, endP[0].transform.InverseTransformVector( fluidAccelerationSceneSpace ), CrossSectionArea );
+           //     endSamples[0] = endP[0].Sample( End1.Position, endP[0].transform.InverseTransformVector( fluidAccelerationSceneSpace ), CrossSectionArea );
             }
 
             if( endC[1] != null )
             {
-                endSamples[1] = endC[1].Sample( End2.Position, endC[1].transform.InverseTransformVector( fluidAccelerationSceneSpace ), CrossSectionArea );
+           //     endSamples[1] = endC[1].Sample( End2.Position, endC[1].transform.InverseTransformVector( fluidAccelerationSceneSpace ), CrossSectionArea );
             }
             else if( endP[1] != null )
             {
-                endSamples[1] = endP[1].Sample( End2.Position, endP[1].transform.InverseTransformVector( fluidAccelerationSceneSpace ), CrossSectionArea );
+           //     endSamples[1] = endP[1].Sample( End2.Position, endP[1].transform.InverseTransformVector( fluidAccelerationSceneSpace ), CrossSectionArea );
             }
 
             float signedRelativePressure_Pa = endSamples[0].Pressure - endSamples[1].Pressure;
@@ -231,11 +232,11 @@ namespace HSP.Vanilla.Components
                 return;
             }
 
-            (SubstanceStateCollection flow, _) = inletProducer.SampleFlow( inletEnd.Position, inletProducer.transform.InverseTransformVector( fluidAccelerationSceneSpace ), CrossSectionArea, TimeManager.FixedDeltaTime, endSamples[outlet] );
+           // (SubstanceStateCollection flow, _) = inletProducer.SampleFlow( inletEnd.Position, inletProducer.transform.InverseTransformVector( fluidAccelerationSceneSpace ), CrossSectionArea, TimeManager.FixedDeltaTime, endSamples[outlet] );
 
-            outletConsumer.ClampIn( flow, TimeManager.FixedDeltaTime );
+           // outletConsumer.ClampIn( flow, TimeManager.FixedDeltaTime );
 
-            SetFlowAcrossConnection( flow, inlet, outlet );
+           // SetFlowAcrossConnection( flow, inlet, outlet );
         }
 
         Vector3 oldSceneAcceleration;

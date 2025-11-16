@@ -1,5 +1,6 @@
 ﻿using HSP.ResourceFlow;
 using HSP.Time;
+using System;
 using System.Diagnostics.Contracts;
 using UnityEngine;
 using UnityPlus.Serialization;
@@ -9,7 +10,8 @@ namespace HSP.Vanilla.Components
     /// <summary>
     /// A container for a <see cref="Substance"/>.
     /// </summary>
-    public class FBulkContainer_Sphere : MonoBehaviour, IResourceConsumer, IResourceProducer, IResourceContainer
+    [Obsolete("Use ResourceContainer_FlowTank instead.")]
+    public class FBulkContainer_Sphere : MonoBehaviour
     {
         /// <summary>
         /// Determines the center position of the container.

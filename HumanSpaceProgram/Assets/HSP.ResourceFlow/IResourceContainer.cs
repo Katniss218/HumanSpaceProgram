@@ -5,6 +5,7 @@
     /// </summary>
     public interface IResourceContainer : IHasMass
     {
+#warning TODO - move to vanilla / somewhere. has no purpose in flow anymore. only used for UI.
         /// <summary>
         /// The maximum volumetric capacity of this container.
         /// </summary>

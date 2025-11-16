@@ -20,7 +20,7 @@ namespace HSP.Vanilla.Components
     }
 
     [Serializable]
-    public class FRocketEngine : MonoBehaviour, IPropulsion, IResourceConsumer
+    public class FRocketEngine : MonoBehaviour, IPropulsion, IBuildsFlowNetwork
     {
         const float g = 9.80665f;
 
@@ -100,6 +100,8 @@ namespace HSP.Vanilla.Components
         [field: SerializeField]
         public SubstanceStateCollection Inflow { get; private set; } = SubstanceStateCollection.Empty;
 
+        public ResourceInlet[] Inlets { get; set; }
+
         public event Action OnAfterIgnite;
         public event Action OnAfterShutdown;
         public event Action OnAfterThrottleChanged;
@@ -140,6 +142,23 @@ namespace HSP.Vanilla.Components
         {
             return FluidState.Vacuum; // temp, inlet condition (possible backflow, etc).
         }
+        public BuildFlowResult BuildFlowNetwork( FlowNetworkBuilder c )
+        {
+            GenericConsumer consumer = new GenericConsumer();
+            consumer.FluidAcceleration = Vector3.zero; // handled in FixedUpdate.
+            consumer.FluidAngularVelocity = Vector3.zero;
+            throw new NotImplementedException();
+        }
+
+        public bool IsValid( FlowNetworkSnapshot snapshot )
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ApplySnapshot( FlowNetworkSnapshot snapshot )
+        {
+            throw new NotImplementedException();
+        }
 
 
         [MapsInheritingFrom( typeof( FRocketEngine ) )]
@@ -150,7 +169,8 @@ namespace HSP.Vanilla.Components
                 .WithMember( "set_throttle", o => o.SetThrottle )
                 .WithMember( "isp", o => o.Isp )
                 .WithMember( "throttle", o => o.Throttle )
-                .WithMember( "thrust_transform", ObjectContext.Ref, o => o.ThrustTransform );
+                .WithMember( "thrust_transform", ObjectContext.Ref, o => o.ThrustTransform )
+                .WithMember( "inlets", o => o.Inlets );
         }
     }
 }
