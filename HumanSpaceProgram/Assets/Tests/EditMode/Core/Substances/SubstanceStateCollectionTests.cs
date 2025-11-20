@@ -31,7 +31,7 @@ namespace HSP_Tests_EditMode
             collection1.Add( collection2, 1 );
 
             // Assert
-            Assert.IsTrue( collection1.SubstanceCount == 1 && collection1[0].MassAmount == 100f );
+            Assert.IsTrue( collection1.Count == 1 && collection1[0].MassAmount == 100f );
         }
 
         [Test]
@@ -46,7 +46,7 @@ namespace HSP_Tests_EditMode
             collection1.Add( collection2, 1 );
 
             // Assert
-            Assert.IsTrue( collection1.SubstanceCount == 1 && collection1[0].MassAmount == 0f );
+            Assert.IsTrue( collection1.Count == 1 && collection1[0].MassAmount == 0f );
         }
 
         [Test]
@@ -61,7 +61,7 @@ namespace HSP_Tests_EditMode
             collection1.Add( collection2, -1 );
 
             // Assert
-            Assert.IsTrue( collection1.SubstanceCount == 1 && collection1[0].MassAmount == 50f );
+            Assert.IsTrue( collection1.Count == 1 && collection1[0].MassAmount == 50f );
         }
 
         [Test]
@@ -89,7 +89,7 @@ namespace HSP_Tests_EditMode
             collection1.Add( collection2, 1 );
 
             // Assert
-            Assert.IsTrue( collection1.SubstanceCount == 4 && 
+            Assert.IsTrue( collection1.Count == 4 && 
                 collection1[0].MassAmount == 100f
              && collection1[1].MassAmount == 60f
              && collection1[2].MassAmount == 40f
@@ -108,7 +108,7 @@ namespace HSP_Tests_EditMode
             collection1.Add( collection2, 1 );
 
             // Assert
-            Assert.IsTrue( collection1.SubstanceCount == 1 && collection1[0].MassAmount == 50f );
+            Assert.IsTrue( collection1.Count == 1 && collection1[0].MassAmount == 50f );
         }
 
         [Test]
@@ -123,7 +123,7 @@ namespace HSP_Tests_EditMode
             collection1.Add( collection2, -1 );
 
             // Assert
-            Assert.IsTrue( collection1.SubstanceCount == 1 && collection1[0].MassAmount == -50f );
+            Assert.IsTrue( collection1.Count == 1 && collection1[0].MassAmount == -50f );
         }
     }
 }

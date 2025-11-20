@@ -15,7 +15,7 @@ namespace HSP.Vanilla.UI.Components
 #warning TODO - Inefficient as fuck.
             _bar.ClearSegments();
 
-            for( int i = 0; i < this.ReferenceComponent.Contents.SubstanceCount; i++ )
+            for( int i = 0; i < this.ReferenceComponent.Contents.Count; i++ )
             {
                 var sbs = this.ReferenceComponent.Contents[i];
                 float perc = (sbs.MassAmount / sbs.Substance.Density) / ReferenceComponent.MaxVolume;

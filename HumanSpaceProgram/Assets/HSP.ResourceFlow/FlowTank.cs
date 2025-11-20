@@ -10,7 +10,7 @@ namespace HSP.ResourceFlow
         // TODO...
         public Vector3 FluidAcceleration { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
         public Vector3 FluidAngularVelocity { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public SubstanceStateCollection Inflow { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public ISubstanceStateCollection Inflow { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         public FluidState Sample( Vector3 localPosition, float holeArea )
         {
@@ -23,7 +23,7 @@ namespace HSP.ResourceFlow
         // TODO...
         public Vector3 FluidAcceleration { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
         public Vector3 FluidAngularVelocity { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public SubstanceStateCollection Outflow { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public ISubstanceStateCollection Outflow { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         public FluidState Sample( Vector3 localPosition, float holeArea )
         {
@@ -42,13 +42,13 @@ namespace HSP.ResourceFlow
         private FlowTetrahedron[] _tetrahedra;
         private FlowNode[] _nodes;
         private FlowEdge[] _edges;
-        private SubstanceStateCollection[] _contentsInEdges;
+        private ISubstanceStateCollection[] _contentsInEdges;
 
         private Dictionary<FlowNode, float> _inletNodes; // inlets and outlets (ports/holes in the tank). If nothing is attached, the inlet is treated as a hole.
 
-        public SubstanceStateCollection Contents { get; set; } // should always equal the sum of what is in the edges.
-        public SubstanceStateCollection Inflow { get; set; }
-        public SubstanceStateCollection Outflow { get; set; }
+        public ISubstanceStateCollection Contents { get; set; } // should always equal the sum of what is in the edges.
+        public ISubstanceStateCollection Inflow { get; set; }
+        public ISubstanceStateCollection Outflow { get; set; }
 
         public bool IsEmpty => Contents == null || Contents.IsEmpty();
 
@@ -233,7 +233,7 @@ namespace HSP.ResourceFlow
                 throw new ArgumentNullException( nameof( inlets ) );
 
             // Save old contents so we can re-distribute after re-tetrahedralizing.
-            SubstanceStateCollection oldContents = Contents?.Clone();
+            ISubstanceStateCollection oldContents = Contents?.Clone();
 
             // Make sure internal arrays exist so other code won't null-ref.
             if( _nodes == null )
@@ -450,17 +450,16 @@ namespace HSP.ResourceFlow
                     return;
 
                 // Gather fluids from Contents
-                var fluids = Contents.ToArray();
-                float pressure2 = SubstanceState.GetMixturePressure( fluids, Volume, Temperature );
+                float pressure2 = ISubstance_Ex.ComputeFlash( Contents, Temperature, Volume );
 
                 // clear per-edge contents
                 _contentsInEdges = new SubstanceStateCollection[edgeCount];
                 for( int i = 0; i < edgeCount; i++ )
                     _contentsInEdges[i] = new SubstanceStateCollection();
 
-                for( int f = 0; f < fluids.Length; f++ )
+                for( int f = 0; f < Contents.Count; f++ )
                 {
-                    var fs = fluids[f];
+                    var fs = Contents[f];
                     float remaining2 = fs.GetVolumeAtPressure( pressure2, Temperature );
                     // distribute proportionally
                     for( int ei = 0; ei < edgeCount; ei++ )
@@ -543,8 +542,7 @@ namespace HSP.ResourceFlow
             }
 
             // --- 3) Gather fluids (from Contents) and sort by density descending
-            SubstanceState[] fluidsList = Contents.ToArray(); // returns list of FluidSummary {Substance, Volume, Density}
-            float pressure = SubstanceState.GetMixturePressure( fluidsList, Volume, Temperature );
+            float pressure = SubstanceState.ComputeFlash( Contents, Temperature, Volume );
             // sort by density descending (heaviest first)
             Array.Sort( fluidsList, ( a, b ) => b.Substance.Density.CompareTo( a.Substance.Density ) );
 

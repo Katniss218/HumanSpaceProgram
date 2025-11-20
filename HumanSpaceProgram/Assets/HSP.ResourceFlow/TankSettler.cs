@@ -122,7 +122,7 @@ namespace HSP.ResourceFlow
                     // Add all substances proportionally? The spec requests equal-volume mixing.
                     // We will clone the full contents but set mass proportionally to perEdgeVol.
                     // Build per-edge SubstanceStateCollection from _contents with scaled mass.
-                    for( int s = 0; s < _contents.SubstanceCount; ++s )
+                    for( int s = 0; s < _contents.Count; ++s )
                     {
                         var st = _contents[s];
                         float ratio = perEdgeVol / totalVolume;
@@ -300,7 +300,7 @@ namespace HSP.ResourceFlow
 
             // 4) Prepare fluids sorted by density (heaviest first)
             _fluidsTemp.Clear();
-            for( int s = 0; s < _contents.SubstanceCount; ++s )
+            for( int s = 0; s < _contents.Count; ++s )
             {
                 _fluidsTemp.Add( _contents[s] );
             }
@@ -347,7 +347,7 @@ namespace HSP.ResourceFlow
                         {
                             // find existing entry for same substance (small loops expected)
                             int found = -1;
-                            for( int si = 0; si < edgeContents.SubstanceCount; ++si )
+                            for( int si = 0; si < edgeContents.Count; ++si )
                             {
                                 if( edgeContents[si].Substance == fluid.Substance )
                                 {

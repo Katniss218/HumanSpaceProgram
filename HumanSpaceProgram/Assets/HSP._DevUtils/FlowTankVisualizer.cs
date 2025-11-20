@@ -190,7 +190,7 @@ public class FlowTankVisualizer : MonoBehaviour
                     {
                         if( subArr != null && subArr.Length > 0 )
                         {
-                            pressure = HSP.ResourceFlow.SubstanceState.GetMixturePressure( subArr, tankVolume, tankTemp );
+                            pressure = HSP.ResourceFlow.SubstanceState.ComputeFlash( subArr, tankVolume, tankTemp );
                         }
                         else
                         {
@@ -314,7 +314,7 @@ public class FlowTankVisualizer : MonoBehaviour
             float pressure = 0f;
             try
             {
-                pressure = HSP.ResourceFlow.SubstanceState.GetMixturePressure( arr, TargetTank.Volume, TargetTank.Temperature );
+                pressure = HSP.ResourceFlow.SubstanceState.ComputeFlash( arr, TargetTank.Volume, TargetTank.Temperature );
             }
             catch { pressure = 0f; }
 

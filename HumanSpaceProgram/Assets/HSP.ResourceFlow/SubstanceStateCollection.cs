@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityPlus.Serialization;
 
@@ -9,128 +10,65 @@ namespace HSP.ResourceFlow
     /// State information about multiple resources.
     /// </summary>
     [Serializable]
-    public class SubstanceStateCollection : IReadonlySubstanceStateCollection, IEnumerable<SubstanceState>
+    public sealed class SubstanceStateCollection : ISubstanceStateCollection, IEnumerable<ISubstance>, IEnumerable<(ISubstance, double)>
     {
         const float EPSILON = 1e-3f;
 
-        [field: SerializeField]
-        List<SubstanceState> _substances;
+        ISubstance[] _species;
+        double[] _masses;
+        double _totalMass;
+        int _count;
 
-        public int SubstanceCount => _substances?.Count ?? 0;
+        public int Count => _count;
 
-        public SubstanceState this[int i]
+        public (ISubstance, double) this[int i]
         {
-            get => _substances[i];
-            set => _substances[i] = value;
+            get => (_species[i], _masses[i]);
+        }
+
+        public double this[ISubstance substance]
+        {
+            get
+            {
+                for( int i = 0; i < _count; i++ )
+                {
+                    if( ReferenceEquals( _species[i], substance ) )
+                        return _masses[i];
+                }
+                return 0.0;
+            }
         }
 
         public static SubstanceStateCollection Empty => new SubstanceStateCollection();
 
         public SubstanceStateCollection()
         {
-            _substances = new List<SubstanceState>();
+            // Possible optimization: most mixtures will have only a few components, store a few inline fields (maybe 2), and the array on top of that.
+            _species = new ISubstance[4];
+            _masses = new double[4];
+            _count = 0;
+            _totalMass = 0;
         }
 
-        public SubstanceStateCollection( IEnumerable<SubstanceState> substances )
-        {
-            if( substances is ICollection<SubstanceState> collection )
-            {
-                _substances = new List<SubstanceState>( collection.Count );
-                foreach( var s in collection )
-                {
-                    _substances.Add( s );
-                }
-            }
-            else
-            {
-                _substances = new List<SubstanceState>();
-                if( substances != null )
-                {
-                    foreach( var s in substances )
-                    {
-                        _substances.Add( s );
-                    }
-                }
-            }
-        }
+        public bool IsEmpty() => _count == 0;
 
-        public SubstanceStateCollection( params SubstanceState[] substances )
-        {
-            _substances = substances == null ? new List<SubstanceState>() : new List<SubstanceState>( substances );
-        }
-
-        public bool IsEmpty() => _substances == null || _substances.Count == 0;
-
-        public float GetVolume()
+        public double GetVolume()
         {
             if( IsEmpty() )
-                return 0f;
+                return 0;
 
-            float volumeAcc = 0f;
-            for( int i = 0; i < _substances.Count; i++ )
+            double volumeAcc = 0;
+            for( int i = 0; i < _count; i++ )
             {
-                SubstanceState s = _substances[i];
-                volumeAcc += s.MassAmount / s.Substance.Density;
+                volumeAcc += _masses[i] / _species[i].GetDensity(,);
             }
 
             return volumeAcc;
         }
 
-        public float GetMass()
+        public double GetMass()
         {
-            if( IsEmpty() )
-                return 0f;
-
-            float massAcc = 0f;
-            for( int i = 0; i < _substances.Count; i++ )
-                massAcc += _substances[i].MassAmount;
-
-            return massAcc;
-        }
-
-        public float GetAverageDensity()
-        {
-            if( IsEmpty() )
-                throw new InvalidOperationException( $"Can't compute average density for empty {nameof( SubstanceStateCollection )}" );
-
-            float totalMass = 0f;
-            float totalVolume = 0f;
-            for( int i = 0; i < _substances.Count; i++ )
-            {
-                SubstanceState s = _substances[i];
-                float mass = s.MassAmount;
-                float density = s.Substance.Density;
-                totalMass += mass;
-                totalVolume += (mass / density);
-            }
-
-            if( totalVolume <= 0f )
-                throw new InvalidOperationException( "Total volume is zero or negative." );
-
-            return totalMass / totalVolume;
-        }
-
-        public void SetVolume( float volume )
-        {
-            if( IsEmpty() )
-                throw new InvalidOperationException( $"Can't set volume for empty {nameof( SubstanceStateCollection )}" );
-
-            float currentVolume = GetVolume();
-
-            if( Mathf.Approximately( currentVolume, 0f ) )
-                throw new InvalidOperationException( "Current volume is zero; cannot scale." );
-
-            float scaleFactor = volume / currentVolume;
-            for( int i = _substances.Count - 1; i >= 0; i-- )
-            {
-                SubstanceState s = _substances[i];
-                float newMass = scaleFactor * s.MassAmount; // density unchanged -> mass scaled same as volumetric scaling
-
-                if( Mathf.Abs( newMass ) <= EPSILON )
-                    _substances.RemoveAt( i );
-                else
-                    _substances[i] = new SubstanceState( newMass, s.Substance );
-            }
+            return _totalMass;
         }
 
         public void SetMass( float mass )
@@ -138,31 +76,46 @@ namespace HSP.ResourceFlow
             if( IsEmpty() )
                 throw new InvalidOperationException( $"Can't set mass for empty {nameof( SubstanceStateCollection )}" );
 
-            float currentMass = GetMass();
-            if( Mathf.Approximately( currentMass, 0f ) )
+            if( _totalMass == 0 )
                 throw new InvalidOperationException( "Current mass is zero; cannot scale." );
 
-            float scaleFactor = mass / currentMass;
-            for( int i = _substances.Count - 1; i >= 0; i-- )
-            {
-                SubstanceState s = _substances[i];
-                float newMass = scaleFactor * s.MassAmount;
+            double scaleFactor = mass / _totalMass;
 
-                if( Mathf.Abs( newMass ) <= EPSILON )
-                    _substances.RemoveAt( i );
+            for( int i = 0; i < _count; /* increment inside */)
+            {
+                _masses[i] *= scaleFactor;
+
+                if( Math.Abs( _masses[i] ) <= EPSILON )
+                {
+                    // Remove entry i by replacing with last entry.
+                    int last = _count - 1;
+                    if( i != last )
+                    {
+                        _species[i] = _species[last];
+                        _masses[i] = _masses[last];
+                    }
+                    _species[last] = null;
+                    _masses[last] = 0.0;
+                    _count--;
+                    // Do not increment i, because we've just copied new element into i.
+                }
                 else
-                    _substances[i] = new SubstanceState( newMass, s.Substance );
+                {
+                    i++;
+                }
             }
+            _totalMass = mass;
         }
 
-        public int IndexOf( Substance substance )
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        private int IndexOf( ISubstance substance )
         {
             if( substance == null )
                 return -1;
 
-            for( int i = 0; i < _substances.Count; i++ )
+            for( int i = 0; i < _count; i++ )
             {
-                if( ReferenceEquals( _substances[i].Substance, substance ) )
+                if( ReferenceEquals( _species[i], substance ) )
                 {
                     return i;
                 }
@@ -170,102 +123,175 @@ namespace HSP.ResourceFlow
 
             return -1;
         }
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        private int IndexOfEmpty()
+        {
+            for( int i = 0; i < _count; i++ )
+            {
+                if( _species[i] == null )
+                {
+                    return i;
+                }
+            }
+
+            return _count;
+        }
+
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        public void EnsureCapacity( int capacity )
+        {
+            if( _species.Length >= capacity )
+                return;
+
+            int newCapacity = Math.Max( capacity, _species.Length * 2 );
+            Array.Resize( ref _species, newCapacity );
+            Array.Resize( ref _masses, newCapacity );
+        }
+
+        public void TrimExcess()
+        {
+            int newCapacity = Math.Max( 4, _count );
+            Array.Resize( ref _species, newCapacity );
+            Array.Resize( ref _masses, newCapacity );
+        }
+
+        public bool Contains( ISubstance substance ) => IndexOf( substance ) != -1;
+
+        public bool TryGet( ISubstance substance, out double mass )
+        {
+            int i = IndexOf( substance );
+            if( i >= 0 )
+            {
+                mass = _masses[i];
+                return true;
+            }
+
+            mass = 0.0;
+            return false;
+        }
 
         /// <summary>
         /// Add/remove a single SubstanceState (dt scales the incoming mass).
         /// </summary>
-        public void Add( SubstanceState s, float dt = 1.0f )
+        public void Add( ISubstance substance, double mass, double dt = 1.0 )
         {
-            float delta = s.MassAmount * dt;
-            if( Mathf.Abs( delta ) <= EPSILON )
+            if( substance == null )
                 return;
 
-            int idx = IndexOf( s.Substance );
-            if( idx >= 0 )
+            double delta = mass * dt;
+            if( Math.Abs( delta ) <= EPSILON )
+                return;
+
+            int i = IndexOf( substance );
+            if( i >= 0 )
             {
-                float newAmount = _substances[idx].MassAmount + delta;
-                if( Mathf.Abs( newAmount ) <= EPSILON )
-                    _substances.RemoveAt( idx );
-                else
-                    _substances[idx] = new SubstanceState( newAmount, _substances[idx].Substance );
+                _totalMass += delta;
+                double newMass = _masses[i] + delta;
+                // Remove element i, compact by moving last into i.
+                if( Math.Abs( newMass ) <= EPSILON )
+                {
+                    int last = _count - 1;
+                    if( i != last )
+                    {
+                        _species[i] = _species[last];
+                        _masses[i] = _masses[last];
+                    }
+                    _species[last] = null;
+                    _masses[last] = 0.0;
+                    _count--;
+                    return;
+                }
+
+                _masses[i] = newMass;
             }
             else
             {
-                _substances.Add( new SubstanceState( delta, s.Substance ) );
+                // Add new substance
+                i = IndexOfEmpty();
+                EnsureCapacity( i );
+                _species[i] = substance;
+                _masses[i] = delta;
+                _count++;
+                _totalMass += delta;
             }
         }
 
         /// <summary>
         /// Add/remove all substances from other (dt scales the incoming mass).
         /// </summary>
-        public void Add( IReadonlySubstanceStateCollection other, float dt = 1.0f )
+        public void Add( IReadonlySubstanceStateCollection other, double dt = 1.0f )
         {
-            if( other == null )
-                return;
-            if( other.IsEmpty() )
+            if( other == null || other.IsEmpty() )
                 return;
 
-            for( int i = 0; i < other.SubstanceCount; i++ )
+            for( int i = 0; i < other.Count; i++ )
             {
-                SubstanceState s = other[i];
-                float delta = s.MassAmount * dt;
-                if( Mathf.Abs( delta ) <= EPSILON )
-                    continue;
-
-                int idx = IndexOf( s.Substance );
-                if( idx >= 0 )
-                {
-                    float newAmount = _substances[idx].MassAmount + delta;
-                    if( Mathf.Abs( newAmount ) <= EPSILON )
-                        _substances.RemoveAt( idx );
-                    else
-                        _substances[idx] = new SubstanceState( newAmount, _substances[idx].Substance );
-                }
-                else
-                {
-                    _substances.Add( new SubstanceState( delta, s.Substance ) );
-                }
+                (ISubstance s, double mass) = other[i];
+                Add( s, mass, dt );
             }
         }
 
-        public bool Contains( Substance substance ) => IndexOf( substance ) != -1;
-
-        public bool TryGet( Substance substance, out SubstanceState result )
+        public void Clear()
         {
-            int idx = IndexOf( substance );
-            if( idx >= 0 )
+            Array.Clear( _species, 0, _species.Length );
+            Array.Clear( _masses, 0, _masses.Length );
+            _count = 0;
+            _totalMass = 0.0;
+        }
+
+        public ISubstanceStateCollection Clone()
+        {
+            SubstanceStateCollection copy = new SubstanceStateCollection();
+            copy.EnsureCapacity( _count );
+
+            Array.Copy( _species, copy._species, _count );
+            Array.Copy( _masses, copy._masses, _count );
+            copy._count = _count;
+            copy._totalMass = _totalMass;
+
+            return copy;
+        }
+
+        public IEnumerator<ISubstance> GetEnumerator()
+        {
+            for( int i = 0; i < _count; i++ )
             {
-                result = _substances[idx];
-                return true;
+                var s = _species[i];
+                if( s != null )
+                    yield return s;
             }
-            result = default;
-            return false;
         }
 
-        public void Clear() => _substances.Clear();
-
-        public void TrimExcess() => _substances.TrimExcess();
-
-        public SubstanceStateCollection Clone()
-        {
-            List<SubstanceState> copy = new( _substances.Count );
-            copy.AddRange( _substances );
-            return new SubstanceStateCollection( copy );
-        }
-        
-        public SubstanceState[] ToArray()
-        {
-            return _substances.ToArray();
-        }
-
-        public IEnumerator<SubstanceState> GetEnumerator() => _substances.GetEnumerator();
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => GetEnumerator();
+
+        IEnumerator<(ISubstance, double)> IEnumerable<(ISubstance, double)>.GetEnumerator()
+        {
+            for( int i = 0; i < _count; i++ )
+            {
+                ISubstance s = _species[i];
+                if( s != null ) 
+                    yield return (s, _masses[i]);
+            }
+        }
+
+
+        // setialization stuff:
+
+        private (Substance, double)[] GetSubstances()
+        {
+            throw new NotImplementedException();
+        }
+
+        private void SetSubstances( (Substance, double)[] substances )
+        {
+            throw new NotImplementedException();
+        }
 
         [MapsInheritingFrom( typeof( SubstanceStateCollection ) )]
         public static SerializationMapping SubstanceStateCollectionMapping()
         {
             return new MemberwiseSerializationMapping<SubstanceStateCollection>()
-                .WithMember( "substances", o => o._substances );
+                .WithMember( "substances", o => o.GetSubstances(), ( o, value ) => o.SetSubstances( value ) );
         }
     }
 }

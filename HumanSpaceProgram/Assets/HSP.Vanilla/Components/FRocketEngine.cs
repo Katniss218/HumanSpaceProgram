@@ -98,7 +98,7 @@ namespace HSP.Vanilla.Components
         public Transform ThrustTransform { get; set; }
 
         [field: SerializeField]
-        public SubstanceStateCollection Inflow { get; private set; } = SubstanceStateCollection.Empty;
+        public ISubstanceStateCollection Inflow { get; private set; } = SubstanceStateCollection.Empty;
 
         public ResourceInlet[] Inlets { get; set; }
 
@@ -119,7 +119,7 @@ namespace HSP.Vanilla.Components
 
         void FixedUpdate()
         {
-            this.Thrust = GetThrust( Inflow.GetMass() );
+            this.Thrust = GetThrust( (float)Inflow.GetMass() );
 
             if( this.Throttle <= 0.0f )
             {
@@ -133,15 +133,6 @@ namespace HSP.Vanilla.Components
             }
         }
 
-        public void ClampIn( SubstanceStateCollection inflow, float dt )
-        {
-            FlowUtils.ClampMaxMassFlow( inflow, Inflow.GetMass(), MaxMassFlow * Throttle );
-        }
-
-        public FluidState Sample( Vector3 localPosition, Vector3 localAcceleration, float holeArea )
-        {
-            return FluidState.Vacuum; // temp, inlet condition (possible backflow, etc).
-        }
         public BuildFlowResult BuildFlowNetwork( FlowNetworkBuilder c )
         {
             GenericConsumer consumer = new GenericConsumer();

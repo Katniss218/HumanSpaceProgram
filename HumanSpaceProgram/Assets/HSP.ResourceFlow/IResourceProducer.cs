@@ -21,7 +21,7 @@ namespace HSP.ResourceFlow
         /// <summary>
         /// Get or set the total outflow per 1 [s].
         /// </summary>
-        SubstanceStateCollection Outflow { get; set; }
+        ISubstanceStateCollection Outflow { get; set; }
 
         /// <summary>
         /// Calculates the pressure acting at any given point inside the container.

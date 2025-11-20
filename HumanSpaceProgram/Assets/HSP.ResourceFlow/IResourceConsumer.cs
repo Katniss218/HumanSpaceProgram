@@ -20,7 +20,7 @@ namespace HSP.ResourceFlow
         /// <summary>
         /// Get or set the total inflow per 1 [s].
         /// </summary>
-        SubstanceStateCollection Inflow { get; set; }
+        ISubstanceStateCollection Inflow { get; set; }
 
         /// <summary>
         /// Calculates the pressure acting at any given point inside the container.

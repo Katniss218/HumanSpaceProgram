@@ -72,18 +72,10 @@ HSP.Vanilla.UI.Vessels.Construction
 
 ## Likely Future Namespaces:
 
-HSP.Audio
-HSP.Audio.<category>
-HSP.Audio.Music
+HSP.Music
 
-HSP.Settings
 HSP.Vanilla.UI.Settings
 > in-game settings ui
-
-HSP.Vanilla.Scenes
-- SettingsScene
-HSP.Vanilla.UI.Scenes
-- SettingsScene
 
 HSP.Vanilla.UI.Trajectories
 > orbit drawers, etc.
@@ -91,32 +83,11 @@ HSP.Vanilla.UI.Trajectories
 HSP.Voxelization
 HSP.Voxelization.Vessels
 
-HSP.Aerodynamics
-> atmo and water drag
-
 HSP.Buoyancy
 > separate from drag, but will need to use the same voxel data
 
-HSP.VisualEffects
-> core function for plumes and shit, no specific implementations
-
-HSP.VisualEffects.ResourceFlow
-> integration with resflow
-
-
-HSP.DataFixer
-> upgrading old save files
-HSP.Vanilla.DataFixer
-> actual implementations of things to fix between versions.
-
-HSP.MapView
-
-HSP.Scenarios
-> tutorial goes here
-
 HSP.Terraforming
 > editing the heightmaps of planets, building spaceports, etc.
-
 
 UnityPlus.Localization
 

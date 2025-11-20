@@ -4,7 +4,7 @@ using UnityEngine;
 namespace HSP.ResourceFlow
 {
     /// <summary>
-    /// State information about an unspecified fluid.
+    /// Bulk state information about an unspecified fluid or a mixture of fluids.
     /// </summary>
     [Serializable]
     public struct FluidState
@@ -26,11 +26,6 @@ namespace HSP.ResourceFlow
         /// </summary>
         [field: SerializeField]
         public float Velocity { get; set; }
-
-        /// <summary>
-        /// Checks whether or not this fluid state describes a perfect vacuum.
-        /// </summary>
-        public bool IsVacuum => (this.Pressure == 0.0f && this.Temperature == 0.0f && this.Velocity == 0.0f);
 
         /// <summary>
         /// Returns the fluid state for a perfect vacuum.

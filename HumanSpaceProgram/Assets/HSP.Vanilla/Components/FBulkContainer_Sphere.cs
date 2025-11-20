@@ -43,8 +43,8 @@ namespace HSP.Vanilla.Components
         public void ClampIn( SubstanceStateCollection inflow, float dt )
         {
             float currentVol = this.Contents.GetVolume();
-
-            FlowUtils.ClampMaxVolume( inflow, currentVol, MaxVolume, dt );
+            throw new NotImplementedException();
+           // FlowUtils.ClampMaxVolume( inflow, currentVol, MaxVolume, dt );
         }
 
         public FluidState Sample( Vector3 localPosition, Vector3 localAcceleration, float holeArea )
@@ -69,7 +69,7 @@ namespace HSP.Vanilla.Components
 
         public (SubstanceStateCollection, FluidState) SampleFlow( Vector3 localPosition, Vector3 localAcceleration, float holeArea, float dt, FluidState opposingFluid )
         {
-            if( this.Contents.SubstanceCount == 0 )
+            if( this.Contents.Count == 0 )
             {
                 return (SubstanceStateCollection.Empty, FluidState.Vacuum);
             }
