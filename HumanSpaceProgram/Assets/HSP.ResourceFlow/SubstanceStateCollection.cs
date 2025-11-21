@@ -10,7 +10,7 @@ namespace HSP.ResourceFlow
     /// State information about multiple resources.
     /// </summary>
     [Serializable]
-    public sealed class SubstanceStateCollection : ISubstanceStateCollection, IEnumerable<ISubstance>, IEnumerable<(ISubstance, double)>
+    public sealed class SubstanceStateCollection : ISubstanceStateCollection
     {
         const float EPSILON = 1e-3f;
 
@@ -52,18 +52,16 @@ namespace HSP.ResourceFlow
 
         public bool IsEmpty() => _count == 0;
 
-        public double GetVolume()
+        public bool IsPure( out ISubstance dominantSubstance )
         {
-            if( IsEmpty() )
-                return 0;
-
-            double volumeAcc = 0;
-            for( int i = 0; i < _count; i++ )
+            if( _count == 1 )
             {
-                volumeAcc += _masses[i] / _species[i].GetDensity(,);
+                dominantSubstance = _species[0];
+                return true;
             }
 
-            return volumeAcc;
+            dominantSubstance = null;
+            return false;
         }
 
         public double GetMass()
@@ -77,7 +75,7 @@ namespace HSP.ResourceFlow
                 throw new InvalidOperationException( $"Can't set mass for empty {nameof( SubstanceStateCollection )}" );
 
             if( _totalMass == 0 )
-                throw new InvalidOperationException( "Current mass is zero; cannot scale." );
+                throw new InvalidOperationException( "Current mass is zero, cannot scale." );
 
             double scaleFactor = mass / _totalMass;
 
@@ -123,6 +121,7 @@ namespace HSP.ResourceFlow
 
             return -1;
         }
+
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
         private int IndexOfEmpty()
         {
@@ -219,7 +218,7 @@ namespace HSP.ResourceFlow
         /// <summary>
         /// Add/remove all substances from other (dt scales the incoming mass).
         /// </summary>
-        public void Add( IReadonlySubstanceStateCollection other, double dt = 1.0f )
+        public void Add( IReadonlySubstanceStateCollection other, double dt = 1.0 )
         {
             if( other == null || other.IsEmpty() )
                 return;

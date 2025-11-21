@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Rendering;
 
 namespace HSP.ResourceFlow
 {
@@ -122,11 +121,11 @@ namespace HSP.ResourceFlow
         private readonly IReadOnlyDictionary<object, object> _owner;
 
 
-        private float[] currentFlowRates;
-        private (float, float)[] currentPressures;
+        private double[] currentFlowRates;
+        private (double, double)[] currentPressures;
 
-        private float[] nextFlowRates;
-        private (float, float)[] nextPressures; // pressure at FromInlet and ToInlet
+        private double[] nextFlowRates;
+        private (double, double)[] nextPressures; // pressure at FromInlet and ToInlet
 
         public FlowNetworkSnapshot( GameObject rootObject, IReadOnlyDictionary<object, object> owner, IBuildsFlowNetwork[] applyTo, IResourceProducer[] producers, int[][] producersAndPipes, IResourceConsumer[] consumers, int[][] consumersAndPipes, FlowPipe[] pipes )
         {
@@ -138,10 +137,10 @@ namespace HSP.ResourceFlow
             Consumers = consumers;
             ConsumersAndPipes = consumersAndPipes;
             Pipes = pipes;
-            currentFlowRates = new float[Pipes.Length];
-            currentPressures = new (float, float)[Pipes.Length];
-            nextFlowRates = new float[Pipes.Length];
-            nextPressures = new (float, float)[Pipes.Length];
+            currentFlowRates = new double[Pipes.Length];
+            currentPressures = new (double, double)[Pipes.Length];
+            nextFlowRates = new double[Pipes.Length];
+            nextPressures = new (double, double)[Pipes.Length];
         }
 
         public bool TryGetFlowObj<T>( object obj, out T flowObj )
@@ -175,208 +174,180 @@ namespace HSP.ResourceFlow
         /// Solves the flow network iteratively until convergence or max iterations.
         /// </summary>
         /// <param name="dt">Time step, in [s].</param>
-        /// <param name="fluidAccelerationSceneSpace">Acceleration of fluid in scene space, in [m/s^2].</param>
         public void Step( float dt )
         {
             const int MAX_ITERATIONS = 50;
-            const float CONVERGENCE_THRESHOLD = 0.01f; // m^3/s
+            const double CONVERGENCE_THRESHOLD = 0.0001; // Tuned for precision
 
-            // The fluids should come pre-settled when the snapshot is created.
+            // 1. Initial State: Sample pressures based on the tanks' current state (static head).
+            UpdatePressures();
 
-            // Initialize temp pressures.
-            for( int pIndex = 0; pIndex < ProducersAndPipes.Length; pIndex++ )
-            {
-                var producer = Producers[pIndex];
-                var pipeList = ProducersAndPipes[pIndex]; // array of pipe indices connected to this producer
-                for( int k = 0; k < pipeList.Length; k++ )
-                {
-                    int pipeIdx = pipeList[k];
-                    FlowPipe pipe = Pipes[pipeIdx];
-                    if( ReferenceEquals( pipe.FromInlet.Producer, producer ) )
-                    {
-                        float sampleP = producer.Sample( pipe.FromInlet.pos, pipe.CrossSectionArea ).Pressure;
-                        var (from, to) = nextPressures[pipeIdx];
-                        from = sampleP;
-                        nextPressures[pipeIdx] = (from, to);
-                    }
-                    else if( ReferenceEquals( pipe.ToInlet.Producer, producer ) )
-                    {
-                        float sampleP = producer.Sample( pipe.ToInlet.pos, pipe.CrossSectionArea ).Pressure;
-                        var (from, to) = nextPressures[pipeIdx];
-                        to = sampleP;
-                        nextPressures[pipeIdx] = (from, to);
-                    }
-                    else
-                    {
-                        // somethng really bad happened.
-                        throw new Exception( "FlowNetworkSnapshot.Step: Producer not found on its connected pipe." );
-                    }
-                }
-            }
-            for( int cIndex = 0; cIndex < ConsumersAndPipes.Length; cIndex++ )
-            {
-                var consumer = Consumers[cIndex];
-                var pipeList = ConsumersAndPipes[cIndex];
-                for( int k = 0; k < pipeList.Length; k++ )
-                {
-                    int pipeIdx = pipeList[k];
-                    FlowPipe pipe = Pipes[pipeIdx];
-                    if( ReferenceEquals( pipe.FromInlet.Consumer, consumer ) )
-                    {
-                        float sampleP = consumer.Sample( pipe.FromInlet.pos, pipe.CrossSectionArea ).Pressure;
-                        var (from, to) = nextPressures[pipeIdx];
-                        from = sampleP;
-                        nextPressures[pipeIdx] = (from, to);
-                    }
-                    else if( ReferenceEquals( pipe.ToInlet.Consumer, consumer ) )
-                    {
-                        float sampleP = consumer.Sample( pipe.ToInlet.pos, pipe.CrossSectionArea ).Pressure;
-                        var (from, to) = nextPressures[pipeIdx];
-                        to = sampleP;
-                        nextPressures[pipeIdx] = (from, to);
-                    }
-                    else
-                    {
-                        // somethng really bad happened.
-                        throw new Exception( "FlowNetworkSnapshot.Step: Producer not found on its connected pipe." );
-                    }
-                }
-            }
+            bool converged = false;
 
+            // 2. Solver Loop: Find equilibrium Flow Rates and Pressures.
+            // Note: We do NOT move mass (SubstanceStateCollection) here. 
+            // We only solve for the hydrodynamic scalar values (FlowRate).
             for( int iteration = 0; iteration < MAX_ITERATIONS; iteration++ )
             {
-                // Calculate flow rates for each pipe.
+                // A. Calculate Flow Rates based on current Pressures
                 for( int i = 0; i < Pipes.Length; i++ )
                 {
                     FlowPipe pipe = Pipes[i];
-                    (float from, float to) = currentPressures[i]; // from/to refer to the orientation of the pipe, not flow direction.
-                    float flowRate = pipe.ComputeFlowRate( from, to );
-                    nextFlowRates[i] = flowRate;
+                    (double pFrom, double pTo) = currentPressures[i];
+
+                    // ComputeFlowRate typically uses Bernoulli/Pipe friction logic.
+                    // Result > 0 implies Flow From->To. Result < 0 implies To->From.
+                    nextFlowRates[i] = pipe.ComputeFlowRate( pFrom, pTo );
                 }
 
-                // Apply flows and clamp.
+                // B. Check Convergence
+                converged = true;
                 for( int i = 0; i < Pipes.Length; i++ )
                 {
-                    FlowPipe pipe = Pipes[i];
-                    float signedFlowRate = nextFlowRates[i];
-
-                    // This 'view' needs to be cheap.
-                    IReadonlySubstanceStateCollection flowResources = pipe.SampleFlowResources( signedFlowRate, dt );
-
-                    if( flowResources.IsEmpty() )
-                        continue;
-
-                    // Apply flow for each pipe.
-                    // These are 'temporary' objects created for this snapshot (may be reused over multiple solves, if the 'real' objects haven't been changed/desynced).
-                    // flowResources are always positive, regardless of flowrate sign.
-                    if( pipe.FromInlet.Producer != null && pipe.FromInlet.Producer.Outflow != null )
-                        pipe.FromInlet.Producer.Outflow.Add( flowResources, -dt );
-
-                    if( pipe.ToInlet.Consumer != null && pipe.ToInlet.Consumer.Inflow != null )
-                        pipe.ToInlet.Consumer.Inflow.Add( flowResources, dt );
-                }
-
-                // update temporary pressures based on the predicted flows (avoid a full update of the tank contents).
-                for( int pIndex = 0; pIndex < ProducersAndPipes.Length; pIndex++ )
-                {
-                    var producer = Producers[pIndex];
-                    var pipeList = ProducersAndPipes[pIndex]; // array of pipe indices connected to this producer
-                    for( int k = 0; k < pipeList.Length; k++ )
-                    {
-                        int pipeIdx = pipeList[k];
-                        FlowPipe pipe = Pipes[pipeIdx];
-                        if( ReferenceEquals( pipe.FromInlet.Producer, producer ) )
-                        {
-                            float sampleP = producer.Sample( pipe.FromInlet.pos, pipe.CrossSectionArea ).Pressure;
-                            var (from, to) = nextPressures[pipeIdx];
-                            from = sampleP;
-                            nextPressures[pipeIdx] = (from, to);
-                        }
-                        else if( ReferenceEquals( pipe.ToInlet.Producer, producer ) )
-                        {
-                            float sampleP = producer.Sample( pipe.ToInlet.pos, pipe.CrossSectionArea ).Pressure;
-                            var (from, to) = nextPressures[pipeIdx];
-                            to = sampleP;
-                            nextPressures[pipeIdx] = (from, to);
-                        }
-                        else
-                        {
-                            // somethng really bad happened.
-                            throw new Exception( "FlowNetworkSnapshot.Step: Producer not found on its connected pipe." );
-                        }
-                    }
-                }
-                for( int cIndex = 0; cIndex < ConsumersAndPipes.Length; cIndex++ )
-                {
-                    var consumer = Consumers[cIndex];
-                    var pipeList = ConsumersAndPipes[cIndex];
-                    for( int k = 0; k < pipeList.Length; k++ )
-                    {
-                        int pipeIdx = pipeList[k];
-                        FlowPipe pipe = Pipes[pipeIdx];
-                        if( ReferenceEquals( pipe.FromInlet.Consumer, consumer ) )
-                        {
-                            float sampleP = consumer.Sample( pipe.FromInlet.pos, pipe.CrossSectionArea ).Pressure;
-                            var (from, to) = nextPressures[pipeIdx];
-                            from = sampleP;
-                            nextPressures[pipeIdx] = (from, to);
-                        }
-                        else if( ReferenceEquals( pipe.ToInlet.Consumer, consumer ) )
-                        {
-                            float sampleP = consumer.Sample( pipe.ToInlet.pos, pipe.CrossSectionArea ).Pressure;
-                            var (from, to) = nextPressures[pipeIdx];
-                            to = sampleP;
-                            nextPressures[pipeIdx] = (from, to);
-                        }
-                        else
-                        {
-                            // somethng really bad happened.
-                            throw new Exception( "FlowNetworkSnapshot.Step: Producer not found on its connected pipe." );
-                        }
-                    }
-                }
-
-                // Check for convergence
-                bool converged = true;
-                for( int i = 0; i < Pipes.Length; i++ )
-                {
-                    float change = Mathf.Abs( nextFlowRates[i] - currentFlowRates[i] );
-                    if( change > CONVERGENCE_THRESHOLD )
+                    // Check absolute delta
+                    if( Math.Abs( nextFlowRates[i] - currentFlowRates[i] ) > CONVERGENCE_THRESHOLD )
                     {
                         converged = false;
                         break;
                     }
                 }
 
-                if( converged )
-                {
-                    // Apply the result to the 'real' monobehaviours.
-                    foreach( var a in _applyTo )
-                    {
-                        try
-                        {
-                            a.ApplySnapshot( this );
-                        }
-                        catch( Exception ex )
-                        {
-                            Debug.LogError( $"Exception occurred while applying flow snapshot to {a}." );
-                            Debug.LogException( ex );
-                        }
-                    }
-
-                    return;
-                }
-
-                // Update previous flow rates for next iteration
+                // Swap buffers
                 var temp = currentFlowRates;
                 currentFlowRates = nextFlowRates;
                 nextFlowRates = temp;
-                var tempP = currentPressures;
-                currentPressures = nextPressures;
-                nextPressures = tempP;
+
+                if( converged )
+                    break;
+
+                // C. Update Pressures based on new Flow Rates
+                // Note: If the Tank.Sample() method relies purely on Static Head (Volume), 
+                // pressures won't change much during iteration unless we update volume (which we shouldn't in a snapshot).
+                // However, if Sample() includes Dynamic Pressure (Bernoulli term from Inflow velocity), 
+                // we technically need to tell the tank its current inflow/outflow rate here.
+                // Assuming simpler static-head model for stability:
+                UpdatePressures();
             }
 
-            throw new Exception( "FlowNetworkSnapshot.Step: Failed to converge within max iterations." );
+            if( !converged )
+            {
+                // In a realtime game, throwing exceptions crashes the thread/game. 
+                // Better to log a warning and apply the best-effort result.
+                Debug.LogWarning( "FlowNetworkSnapshot.Step: Failed to converge within max iterations. Using best-effort results." );
+            }
+
+            // 3. Transport Phase: Move the actual substances based on the solved flow rates.
+            ApplyTransport( dt );
+
+            // 4. Notify objects
+            foreach( var a in _applyTo )
+            {
+                try
+                {
+                    a.ApplySnapshot( this );
+                }
+                catch( Exception ex )
+                {
+                    Debug.LogError( $"Exception occurred while applying flow snapshot to {a}." );
+                    Debug.LogException( ex );
+                }
+            }
+        }
+
+        private void UpdatePressures()
+        {
+            // Sample pressures from Producers
+            for( int i = 0; i < Producers.Length; i++ )
+            {
+                IResourceProducer producer = Producers[i];
+                int[] pipeIndices = ProducersAndPipes[i];
+
+                for( int k = 0; k < pipeIndices.Length; k++ )
+                {
+                    int pipeIdx = pipeIndices[k];
+                    FlowPipe pipe = Pipes[pipeIdx];
+
+                    // Sample pressure at the connection point
+                    // Note: Sample() might be expensive, optimize if needed.
+                    if( ReferenceEquals( pipe.FromInlet.Producer, producer ) )
+                    {
+                        double p = producer.Sample( pipe.FromInlet.pos, pipe.CrossSectionArea ).Pressure;
+                        currentPressures[pipeIdx].Item1 = p;
+                    }
+                    else if( ReferenceEquals( pipe.ToInlet.Producer, producer ) )
+                    {
+                        double p = producer.Sample( pipe.ToInlet.pos, pipe.CrossSectionArea ).Pressure;
+                        currentPressures[pipeIdx].Item2 = p;
+                    }
+                }
+            }
+
+            // Sample pressures from Consumers
+            for( int i = 0; i < Consumers.Length; i++ )
+            {
+                IResourceConsumer consumer = Consumers[i];
+                int[] pipeIndices = ConsumersAndPipes[i];
+
+                for( int k = 0; k < pipeIndices.Length; k++ )
+                {
+                    int pipeIdx = pipeIndices[k];
+                    FlowPipe pipe = Pipes[pipeIdx];
+
+                    if( ReferenceEquals( pipe.FromInlet.Consumer, consumer ) )
+                    {
+                        double p = consumer.Sample( pipe.FromInlet.pos, pipe.CrossSectionArea ).Pressure;
+                        currentPressures[pipeIdx].Item1 = p;
+                    }
+                    else if( ReferenceEquals( pipe.ToInlet.Consumer, consumer ) )
+                    {
+                        double p = consumer.Sample( pipe.ToInlet.pos, pipe.CrossSectionArea ).Pressure;
+                        currentPressures[pipeIdx].Item2 = p;
+                    }
+                }
+            }
+        }
+
+        private void ApplyTransport( float dt )
+        {
+            for( int i = 0; i < Pipes.Length; i++ )
+            {
+                double signedFlowRate = currentFlowRates[i];
+                if( Math.Abs( signedFlowRate ) <= 1e-9 )
+                    continue;
+
+                FlowPipe pipe = Pipes[i];
+
+                // Determine Direction
+                bool flowForward = signedFlowRate > 0;
+
+                // Identify Source and Sink interfaces dynamically based on flow direction
+                // Pipe: From -> To
+                // Forward: Source(From) -> Sink(To)
+                // Backward: Source(To) -> Sink(From)
+
+                IResourceProducer source = flowForward ? pipe.FromInlet.Producer : pipe.ToInlet.Producer;
+                IResourceConsumer sink = flowForward ? pipe.ToInlet.Consumer : pipe.FromInlet.Consumer;
+
+                // Ensure the connection is valid for the direction of flow.
+                // (e.g. Trying to backflow into a Pump might fail if the Pump doesn't implement IResourceConsumer)
+                if( source == null || sink == null )
+                    continue;
+
+                // Sample substances. 
+                // Pipe needs to know direction to know which density to use (upstream density).
+                IReadonlySubstanceStateCollection flowResources = pipe.SampleFlowResources( signedFlowRate, dt );
+
+                if( flowResources.IsEmpty() )
+                    continue;
+
+                // Apply transfer
+                // Outflow.Add with negative time usually implies removal (if implemented that way in your tank).
+                if( source.Outflow != null )
+                    source.Outflow.Add( flowResources, -dt );
+
+                if( sink.Inflow != null )
+                    sink.Inflow.Add( flowResources, dt );
+            }
         }
     }
 }

@@ -5,38 +5,6 @@ using UnityEngine;
 
 namespace HSP.ResourceFlow
 {
-    public sealed class GenericConsumer : IResourceConsumer
-    {
-        // TODO...
-        public Vector3 FluidAcceleration { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public Vector3 FluidAngularVelocity { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public ISubstanceStateCollection Inflow { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-
-        public FluidState Sample( Vector3 localPosition, float holeArea )
-        {
-            throw new NotImplementedException();
-        }
-    }
-
-    public sealed class GenericProducer : IResourceProducer
-    {
-        // TODO...
-        public Vector3 FluidAcceleration { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public Vector3 FluidAngularVelocity { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public ISubstanceStateCollection Outflow { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-
-        public FluidState Sample( Vector3 localPosition, float holeArea )
-        {
-            throw new NotImplementedException();
-        }
-
-        public IReadonlySubstanceStateCollection SampleSubstances( Vector3 localPosition, float flowRate, float dt )
-        {
-            throw new NotImplementedException();
-        }
-    }
-
-
     public sealed class FlowTank : IResourceConsumer, IResourceProducer
     {
         private FlowTetrahedron[] _tetrahedra;
@@ -44,20 +12,20 @@ namespace HSP.ResourceFlow
         private FlowEdge[] _edges;
         private ISubstanceStateCollection[] _contentsInEdges;
 
-        private Dictionary<FlowNode, float> _inletNodes; // inlets and outlets (ports/holes in the tank). If nothing is attached, the inlet is treated as a hole.
+        private Dictionary<FlowNode, double> _inletNodes; // inlets and outlets (ports/holes in the tank). If nothing is attached, the inlet is treated as a hole.
 
         public ISubstanceStateCollection Contents { get; set; } // should always equal the sum of what is in the edges.
         public ISubstanceStateCollection Inflow { get; set; }
         public ISubstanceStateCollection Outflow { get; set; }
+        public FluidState FluidState { get; set; }
 
         public bool IsEmpty => Contents == null || Contents.IsEmpty();
 
         /// <summary>
         /// Gets the volume calculated from the tetrahedralization. Used for scaling.
         /// </summary>
-        public float CalculatedVolume { get; private set; }
-        public float Volume { get; private set; }
-        public float Temperature { get; set; }
+        public double CalculatedVolume { get; private set; }
+        public double Volume { get; private set; }
 
         public Vector3 FluidAcceleration { get; set; } = Vector3.zero;
         public Vector3 FluidAngularVelocity { get; set; } = Vector3.zero;
@@ -81,30 +49,18 @@ namespace HSP.ResourceFlow
             return FluidAcceleration + angularAccel;
         }
 
-        public FluidState Sample( Vector3 localPosition, float holeArea )
+        public FluidState Sample( Vector3 localPosition, double holeArea )
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
-        public IReadonlySubstanceStateCollection SampleSubstances( Vector3 localPosition, float flowRate, float dt )
+        public IReadonlySubstanceStateCollection SampleSubstances( Vector3 localPosition, double flowRate, double dt )
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         private void SetTetrahedralization( List<FlowNode> nodes, List<FlowEdge> edges, List<FlowTetrahedron> tets )
         {
-            // figure out how many and which tetrahedra each edge is part of, then
-
-            // distribute tetrahedra volumes to edges.
-
-            /*
-            To get the 'proper' volume of each edge, we start with the user-defined 'desired' total tank volume. This can be anything, from 0 to infinity.
-            We then calculate the 'desired' volumes for each tetrahedron (and their total 'desired' volume, i.e. the sum), which will be used for proportional scaling.
-            The 'actual' volume of a *tetrahedron* is then: `actual = (desired / desired_total) * actual_total`.
-            That is then split up between the edges that are part of this tetrahedron, according to the edge length (similar proportionality as above).
-            Then we can get the 'proper' volume of the *edge*, which is just the sum of the contributions from each tetrahedron that this edge is a part of.
-            */
-
             _nodes = nodes.ToArray();
             _edges = edges.ToArray();
             _tetrahedra = tets.ToArray();
@@ -129,12 +85,22 @@ namespace HSP.ResourceFlow
 
         private void RecalculateEdgeVolumes()
         {
+            /*
+            
+            To get the 'proper' volume of each edge, we start with the user-defined 'desired' total tank volume. This can be anything, from 0 to infinity.
+            We then calculate the 'desired' volumes for each tetrahedron (and their total 'desired' volume, i.e. the sum), which will be used for proportional scaling.
+            The 'actual' volume of a *tetrahedron* is then: `actual = (desired / desired_total) * actual_total`.
+            That is then split up between the edges that are part of this tetrahedron, according to the edge length (similar proportionality as above).
+            Then we can get the 'proper' volume of the *edge*, which is just the sum of the contributions from each tetrahedron that this edge is a part of.
+
+            */
+
             if( _tetrahedra == null || _edges == null )
                 return;
 
             // Calculate desired volumes for each tetrahedron
-            float totalDesiredVolume = 0.0f;
-            float[] desiredVolumes = new float[_tetrahedra.Length];
+            double totalDesiredVolume = 0.0f;
+            double[] desiredVolumes = new double[_tetrahedra.Length];
 
             for( int i = 0; i < _tetrahedra.Length; i++ )
             {
@@ -143,7 +109,7 @@ namespace HSP.ResourceFlow
             }
 
             // Calculate actual volumes for each tetrahedron
-            float[] actualVolumes = new float[_tetrahedra.Length];
+            double[] actualVolumes = new double[_tetrahedra.Length];
             if( totalDesiredVolume > 0 )
             {
                 for( int i = 0; i < _tetrahedra.Length; i++ )
@@ -153,17 +119,17 @@ namespace HSP.ResourceFlow
             }
 
             // Calculate edge volumes by distributing tetrahedron volumes to edges
-            Dictionary<(FlowNode, FlowNode), float> edgeVolumes = new();
+            Dictionary<(FlowNode, FlowNode), double> edgeVolumes = new();
 
             for( int i = 0; i < _tetrahedra.Length; i++ )
             {
                 FlowTetrahedron tet = _tetrahedra[i];
                 FlowNode[] tetNodes = new[] { tet.v0, tet.v1, tet.v2, tet.v3 };
-                float tetVolume = actualVolumes[i];
+                double tetVolume = actualVolumes[i];
 
                 // Calculate total edge length for this tetrahedron
-                float totalEdgeLength = 0.0f;
-                List<(FlowNode, FlowNode, float)> tetEdges = new();
+                double totalEdgeLength = 0.0f;
+                List<(FlowNode, FlowNode, double)> tetEdges = new();
 
                 for( int j = 0; j < 4; j++ )
                 {
@@ -171,7 +137,7 @@ namespace HSP.ResourceFlow
                     {
                         FlowNode node1 = tetNodes[j];
                         FlowNode node2 = tetNodes[k];
-                        float length = Vector3.Distance( node1.pos, node2.pos );
+                        double length = Vector3.Distance( node1.pos, node2.pos );
                         totalEdgeLength += length;
 
                         (FlowNode, FlowNode) edgeKey = GetCanonicalEdgeKey( node1, node2 );
@@ -182,10 +148,10 @@ namespace HSP.ResourceFlow
                 // Distribute tetrahedron volume to edges proportionally to edge length
                 if( totalEdgeLength > 0 )
                 {
-                    foreach( (FlowNode node1, FlowNode node2, float length) in tetEdges )
+                    foreach( (FlowNode node1, FlowNode node2, double length) in tetEdges )
                     {
                         (FlowNode, FlowNode) edgeKey = (node1, node2);
-                        float contribution = (length / totalEdgeLength) * tetVolume;
+                        double contribution = (length / totalEdgeLength) * tetVolume;
 
                         if( !edgeVolumes.ContainsKey( edgeKey ) )
                         {
@@ -315,7 +281,7 @@ namespace HSP.ResourceFlow
                 DelaunayTetrahedralizer.ComputeDelaunayTetrahedralization( allPositions );
 
             // 4) Populate inlet-node mapping (_inletNodes) by matching inlet positions to produced FlowNode positions.
-            _inletNodes = new Dictionary<FlowNode, float>();
+            _inletNodes = new Dictionary<FlowNode, double>();
 
             // Use a matching threshold slightly larger than dedupe (so matching succeeds)
             const float MATCH_NODE_TO_INLET_DISTANCE = 0.02f;
@@ -360,290 +326,346 @@ namespace HSP.ResourceFlow
             if( oldContents != null && !oldContents.IsEmpty() )
             {
                 Contents = oldContents;
-                DistributeFluids();
+                DistributeContents();
             }
         }
-        public void DistributeFluids()
-        {
-            // Single-step settlement under linear acceleration (no angular/centrifugal part yet).
-            // Steps:
-            // 1) Gather total Contents (if null -> nothing to distribute)
-            // 2) Build breakpoints from edge endpoint heights (project onto -accel direction)
-            // 3) For each interval compute per-edge capacity contributions
-            // 4) Sort fluids by density desc and pour bottom-up
-            // 5) Write back per-edge SubstanceStateCollection and global Contents
-#warning TODO - ensure that 'overfilled' tank still correctly proportionally distributes fluids (at extreme pressure).
 
-            // quick sanity
-            if( _edges == null || _edges.Length == 0 )
+        /// <summary>
+        /// Calculates the scalar potential energy at a point. <br/>
+        /// Fluids effectively "fall" from high to low potential.
+        /// </summary>
+        /// <remarks>
+        /// Note: Standard physics defines Force = -Gradient(Potential). <br/>
+        /// If FluidAcceleration is "Gravity" (pointing down), Potential = -g.y (increases going up).
+        /// </remarks>
+        public double GetPotential( Vector3 localPoint )
+        {
+            double linearContrib = 0.0;
+            double rotationalContrib = 0.0;
+
+            if( FluidAcceleration.sqrMagnitude > 0.001 )
+            {
+                linearContrib = -Vector3.Dot( FluidAcceleration, localPoint );
+            }
+            if( FluidAngularVelocity.sqrMagnitude > 0.001 )
+            {
+                Vector3 tang = Vector3.Cross( FluidAngularVelocity, localPoint );
+                rotationalContrib = -0.5 * tang.sqrMagnitude;
+            }
+
+            return linearContrib + rotationalContrib;
+        }
+
+        public struct FluidEntry
+        {
+            public ISubstance Substance;
+            public double Mass;
+            public double VolumeAtReferencePressure;
+            public double Density;
+        }
+
+        // Cached buffers (reused to minimize allocations on a semi-hot path)
+        private double[] _nodePotential;
+        private double[] _edgePotentialMin;
+        private double[] _edgePotentialMax;
+
+        private readonly List<double> _breakpointBuffer = new();
+        private FluidEntry[] _sortedFluids;
+
+        private List<(int edgeIndex, double contribution)>[] _intervalContributions;
+
+        private const double Tolerance = 1e-9;
+
+        public void DistributeContents()
+        {
+            if( _edges is not { Length: > 0 } ) 
+                return;
+            if( Contents is null || Contents.IsEmpty() ) 
                 return;
 
-            // Ensure contents exist
-            if( Contents == null || Contents.IsEmpty() )
+            int nodeCount = _nodes.Length;
+            int edgeCount = _edges.Length;
+
+            InitializeBuffers( nodeCount, edgeCount );
+            ClearEdgeContents();
+
+            // 1. Compute gravitational/pressure potential for every node
+            for( int i = 0; i < nodeCount; i++ )
+                _nodePotential[i] = GetPotential( _nodes[i].pos );
+
+            // 2. Determine potential range for each edge and collect breakpoints
+            _breakpointBuffer.Clear();
+            double totalSystemVolume = 0;
+
+            for( int i = 0; i < edgeCount; i++ )
             {
-                // Clear per-edge contents
+                var edge = _edges[i];
+                double potentialA = GetPotential( edge.end1.pos );
+                double potentialB = GetPotential( edge.end2.pos );
+
+                double min = Math.Min( potentialA, potentialB );
+                double max = Math.Max( potentialA, potentialB );
+
+                _edgePotentialMin[i] = min;
+                _edgePotentialMax[i] = max;
+
+                totalSystemVolume += edge.Volume;
+
+                _breakpointBuffer.Add( min );
+                _breakpointBuffer.Add( max );
+            }
+
+            _breakpointBuffer.Sort();
+            double[] distinctPotentials = GetDistinctSortedValues( _breakpointBuffer );
+            int intervalCount = distinctPotentials.Length - 1;
+
+            // Special case: no potential gradient → uniform distribution
+            if( intervalCount == 0 )
+            {
+                DistributeUniformly( totalSystemVolume );
+                return;
+            }
+
+            // 3. Map edges to potential intervals (bucket per interval)
+            EnsureIntervalBuckets( intervalCount );
+            double[] intervalAvailableVolume = new double[intervalCount];
+
+            for( int edgeIdx = 0; edgeIdx < edgeCount; edgeIdx++ )
+            {
+                double low = _edgePotentialMin[edgeIdx];
+                double high = _edgePotentialMax[edgeIdx];
+                double edgeVolume = _edges[edgeIdx].Volume;
+
+                if( high - low > Tolerance ) // Gradient edge
+                {
+                    double volumePerPotential = edgeVolume / (high - low);
+
+                    int startIdx = FindFirstIntervalIndex( distinctPotentials, low );
+
+                    for( int intervalIdx = startIdx; intervalIdx < intervalCount; intervalIdx++ )
+                    {
+                        double intervalLow = distinctPotentials[intervalIdx];
+                        double intervalHigh = distinctPotentials[intervalIdx + 1];
+
+                        if( intervalLow >= high - Tolerance )
+                            break;
+
+                        double overlapLow = Math.Max( low, intervalLow );
+                        double overlapHigh = Math.Min( high, intervalHigh );
+                        double overlap = overlapHigh - overlapLow;
+
+                        if( overlap > Tolerance )
+                        {
+                            double contribution = overlap * volumePerPotential;
+                            _intervalContributions[intervalIdx].Add( (edgeIdx, contribution) );
+                            intervalAvailableVolume[intervalIdx] += contribution;
+                        }
+                    }
+                }
+                else // Equipotential edge
+                {
+                    int intervalIdx = FindIntervalIndexForValue( distinctPotentials, low );
+                    _intervalContributions[intervalIdx].Add( (edgeIdx, edgeVolume) );
+                    intervalAvailableVolume[intervalIdx] += edgeVolume;
+                }
+            }
+
+            // 4. Sort fluids by density (heaviest first)
+            BuildSortedFluidList();
+
+            // 5. Fill intervals from bottom to top
+            FillIntervals( intervalCount, intervalAvailableVolume );
+
+            // 6. Any leftover fluid is distributed uniformly (overflow / incompressible case)
+#warning TODO - this is wrong, needs to be distributed from the start, not after, because then it is no longer stratified correctly.
+            DistributeRemainingFluidUniformly( totalSystemVolume );
+        }
+
+        private void FillIntervals( int intervalCount, double[] intervalCapacity )
+        {
+            int fluidCount = _sortedFluids.Length;
+            double[] remainingVolume = new double[fluidCount];
+            for( int i = 0; i < fluidCount; i++ )
+                remainingVolume[i] = _sortedFluids[i].VolumeAtReferencePressure;
+
+            for( int intervalIdx = 0; intervalIdx < intervalCount; intervalIdx++ )
+            {
+                double capacity = intervalCapacity[intervalIdx];
+                if( capacity <= Tolerance )
+                    continue;
+
+                double initialCapacity = capacity;
+
+                foreach( int fluidIdx in Enumerable.Range( 0, fluidCount ) )
+                {
+                    if( remainingVolume[fluidIdx] <= Tolerance ) 
+                        continue;
+
+                    double pourVolume = Math.Min( remainingVolume[fluidIdx], capacity );
+
+                    double fillRatio = pourVolume / initialCapacity;
+
+                    var contributions = _intervalContributions[intervalIdx];
+                    foreach( (int edgeIdx, double contribVolume) in contributions )
+                    {
+                        double volumeToAdd = contribVolume * fillRatio;
+                        double massToAdd = volumeToAdd * _sortedFluids[fluidIdx].Density;
+
+                        _contentsInEdges[edgeIdx].Add( _sortedFluids[fluidIdx].Substance, massToAdd );
+                    }
+
+                    remainingVolume[fluidIdx] -= pourVolume;
+                    capacity -= pourVolume;
+
+                    if( capacity <= Tolerance )
+                        break; // interval is full
+                }
+            }
+
+            // Update buffer with leftover volumes for overflow handling
+            for( int i = 0; i < fluidCount; i++ )
+            {
+                _sortedFluids[i].VolumeAtReferencePressure = remainingVolume[i];
+            }
+        }
+
+        private void BuildSortedFluidList()
+        {
+            if( _sortedFluids == null || _sortedFluids.Length != Contents.Count )
+            {
+                Array.Resize( ref _sortedFluids, Contents.Count );
+            }
+            Array.Clear( _sortedFluids, 0, _sortedFluids.Length );
+            double temperature = FluidState.Temperature;
+            double pressure = FluidState.Pressure;
+
+            int i = 0;
+            foreach( (ISubstance substance, double mass) in Contents )
+            {
+                double density = substance.GetDensity( temperature, pressure );
+                double volume = mass / density;
+
+                _sortedFluids[i] = new FluidEntry()
+                {
+                    Substance = substance,
+                    Mass = mass,
+                    VolumeAtReferencePressure = volume,
+                    Density = density
+                };
+                i++;
+            }
+
+            Array.Sort( _sortedFluids, ( a, b ) => b.Density.CompareTo( a.Density ) ); // heaviest first
+        }
+
+        private void DistributeRemainingFluidUniformly( double totalVolume )
+        {
+            if( totalVolume <= Tolerance ) 
+                return;
+
+            foreach( var fluid in _sortedFluids )
+            {
+                if( fluid.VolumeAtReferencePressure <= Tolerance )
+                    continue;
+
+                double remainingMass = fluid.VolumeAtReferencePressure * fluid.Density;
+                double massPerVolumeUnit = remainingMass / totalVolume;
+
+                foreach( (int edgeIdx, var edge) in _edges.Select( ( e, i ) => (i, e) ) )
+                {
+                    double massToAdd = edge.Volume * massPerVolumeUnit;
+                    _contentsInEdges[edgeIdx].Add( fluid.Substance, massToAdd );
+                }
+            }
+        }
+
+        private void InitializeBuffers( int nodeCount, int edgeCount )
+        {
+            _nodePotential ??= new double[nodeCount];
+            if( _nodePotential.Length != nodeCount ) _nodePotential = new double[nodeCount];
+
+            _edgePotentialMin ??= new double[edgeCount];
+            _edgePotentialMax ??= new double[edgeCount];
+            if( _edgePotentialMin.Length != edgeCount )
+            {
+                _edgePotentialMin = new double[edgeCount];
+                _edgePotentialMax = new double[edgeCount];
+            }
+
+            _intervalContributions ??= Array.Empty<List<(int, double)>>();
+        }
+
+        private void ClearEdgeContents()
+        {
+            if( _contentsInEdges is null || _contentsInEdges.Length != _edges.Length )
+            {
                 _contentsInEdges = new SubstanceStateCollection[_edges.Length];
                 for( int i = 0; i < _contentsInEdges.Length; i++ )
                     _contentsInEdges[i] = new SubstanceStateCollection();
-                return;
             }
-
-            // --- 1) compute projection axis (u = -accelNormalized). If accel is zero, nothing to do (no "down" direction).
-            Vector3 accel = FluidAcceleration;
-            float accelMag = accel.magnitude;
-            if( accelMag <= 1e-8f )
+            else
             {
-                // No preferred direction: leave distribution as-is or choose arbitrary axis. We'll leave as-is.
-                // Option: you could default to world -Y or similar. For now do nothing.
-                return;
+                foreach( var collection in _contentsInEdges )
+                    collection.Clear();
             }
-            Vector3 upDir = -accel / accelMag; // points "up" opposite acceleration, so lower potential = smaller dot
+        }
 
-            int edgeCount = _edges.Length;
+        private double[] GetDistinctSortedValues( List<double> sortedList )
+        {
+            if( sortedList.Count == 0 ) 
+                return Array.Empty<double>();
 
-            // --- 2) collect all endpoint projected heights
-            List<float> breakpoints = new List<float>( edgeCount * 2 );
-            // We'll store per-edge projected endpoints and lengths
-            float[] h0 = new float[edgeCount];
-            float[] h1 = new float[edgeCount];
-            float[] edgeProjLength = new float[edgeCount];
-            float[] edgeVolume = new float[edgeCount];
+            var result = new List<double> { sortedList[0] };
+            foreach( double value in sortedList )
+                if( value - result[^1] > Tolerance )
+                    result.Add( value );
 
-            for( int i = 0; i < edgeCount; i++ )
+            return result.ToArray();
+        }
+
+        private void EnsureIntervalBuckets( int requiredCount )
+        {
+            if( _intervalContributions.Length < requiredCount )
+                Array.Resize( ref _intervalContributions, requiredCount );
+
+            for( int i = 0; i < requiredCount; i++ )
             {
-                FlowEdge edge = _edges[i];
-                // assumed accessors:
-                Vector3 pA = edge.end1.pos;
-                Vector3 pB = edge.end2.pos;
-                float ha = Vector3.Dot( pA, upDir );
-                float hb = Vector3.Dot( pB, upDir );
-                h0[i] = ha;
-                h1[i] = hb;
-                float hmin = Math.Min( ha, hb );
-                float hmax = Math.Max( ha, hb );
-                edgeProjLength[i] = hmax - hmin; // may be zero
-                edgeVolume[i] = Mathf.Max( 0.0f, edge.Volume ); // assume edge.Volume exists and valid
-
-                // add endpoints
-                breakpoints.Add( ha );
-                breakpoints.Add( hb );
-            }
-
-            // unique-sort breakpoints with small epsilon dedupe
-            const float EPS = 1e-6f;
-            breakpoints.Sort();
-            List<float> uniq = new List<float>();
-            for( int i = 0; i < breakpoints.Count; i++ )
-            {
-                if( i == 0 || Math.Abs( breakpoints[i] - breakpoints[i - 1] ) > EPS )
-                    uniq.Add( breakpoints[i] );
-            }
-
-            if( uniq.Count < 2 )
-            {
-                // All endpoints at same potential -> everything is a point. Put fluids into edges proportionally to edge volume.
-                // Compute total volume and distribute substances proportional to edgeVolume[i]
-                float totalCap = 0.0f;
-                for( int i = 0; i < edgeCount; i++ )
-                    totalCap += edgeVolume[i];
-                if( totalCap <= 0.0f )
-                    return;
-
-                // Gather fluids from Contents
-                float pressure2 = ISubstance_Ex.ComputeFlash( Contents, Temperature, Volume );
-
-                // clear per-edge contents
-                _contentsInEdges = new SubstanceStateCollection[edgeCount];
-                for( int i = 0; i < edgeCount; i++ )
-                    _contentsInEdges[i] = new SubstanceStateCollection();
-
-                for( int f = 0; f < Contents.Count; f++ )
-                {
-                    var fs = Contents[f];
-                    float remaining2 = fs.GetVolumeAtPressure( pressure2, Temperature );
-                    // distribute proportionally
-                    for( int ei = 0; ei < edgeCount; ei++ )
-                    {
-                        float share = edgeVolume[ei] / totalCap;
-                        float assignVol = remaining2 * share;
-                        if( assignVol <= 0 )
-                            continue;
-                        _contentsInEdges[ei].Add( fs );
-                    }
-                }
-                return;
-            }
-
-            // Build intervals [U_j, U_{j+1})
-            int B = uniq.Count - 1;
-            float[] U = uniq.ToArray();
-
-            // Precompute per-edge, per-interval contributions. We'll store for each interval a list of (edgeIndex, contribution)
-            // To avoid heavy NxM arrays, use sparse lists.
-            List<(int edgeIndex, float contribution)>[] intervalContribs = new List<(int, float)>[B];
-            float[] intervalTotalCap = new float[B];
-            for( int j = 0; j < B; j++ )
-            {
-                intervalContribs[j] = new List<(int, float)>();
-                intervalTotalCap[j] = 0.0f;
-            }
-
-            for( int i = 0; i < edgeCount; i++ )
-            {
-                float hi0 = h0[i];
-                float hi1 = h1[i];
-                float hmin = Math.Min( hi0, hi1 );
-                float hmax = Math.Max( hi0, hi1 );
-                float Vi = edgeVolume[i];
-                float ell = edgeProjLength[i];
-
-                if( ell > EPS )
-                {
-                    // uniform per-projected-length -> density nu = Vi / ell
-                    float nu = Vi / ell;
-
-                    // find intervals that intersect [hmin, hmax]
-                    // naive loop over intervals (B usually small relative to E)
-                    for( int j = 0; j < B; j++ )
-                    {
-                        float low = U[j];
-                        float high = U[j + 1];
-                        float overlap = Math.Max( 0.0f, Math.Min( hmax, high ) - Math.Max( hmin, low ) );
-                        if( overlap <= 0.0f )
-                            continue;
-                        float contribution = nu * overlap; // volume portion in this interval
-                        intervalContribs[j].Add( (i, contribution) );
-                        intervalTotalCap[j] += contribution;
-                    }
-                }
+                if( _intervalContributions[i] is null )
+                    _intervalContributions[i] = new List<(int, double)>();
                 else
-                {
-                    // point-capacity: assign full volume to the interval that contains the point (or nearest).
-                    float pt = hi0; // hi0 == hi1
-                    // find j such that U[j] <= pt < U[j+1], with edge-case pt == U[B] -> put into last interval
-                    int jfound = -1;
-                    for( int j = 0; j < B; j++ )
-                    {
-                        if( (pt >= U[j] && pt < U[j + 1]) || (j == B - 1 && Math.Abs( pt - U[j + 1] ) <= EPS) )
-                        {
-                            jfound = j;
-                            break;
-                        }
-                    }
-                    if( jfound == -1 )
-                    {
-                        // rare numeric issue: clamp to nearest interval
-                        if( pt < U[0] ) jfound = 0;
-                        else jfound = B - 1;
-                    }
-                    intervalContribs[jfound].Add( (i, Vi) );
-                    intervalTotalCap[jfound] += Vi;
-                }
+                    _intervalContributions[i].Clear();
             }
+        }
 
-            // --- 3) Gather fluids (from Contents) and sort by density descending
-            float pressure = SubstanceState.ComputeFlash( Contents, Temperature, Volume );
-            // sort by density descending (heaviest first)
-            Array.Sort( fluidsList, ( a, b ) => b.Substance.Density.CompareTo( a.Substance.Density ) );
+        private static int FindFirstIntervalIndex( double[] sortedPotentials, double value )
+        {
+            int idx = Array.BinarySearch( sortedPotentials, value );
+            if( idx < 0 )
+                idx = ~idx - 1;
+            return Math.Clamp( idx, 0, sortedPotentials.Length - 2 );
+        }
 
-            int F = fluidsList.Length;
-            if( F == 0 )
-            {
-                // nothing to distribute
+        private static int FindIntervalIndexForValue( double[] sortedPotentials, double value )
+        {
+            int idx = Array.BinarySearch( sortedPotentials, value );
+            if( idx < 0 )
+                idx = ~idx - 1;
+            return Math.Clamp( idx, 0, sortedPotentials.Length - 2 );
+        }
+
+        private void DistributeUniformly( double totalVolume )
+        {
+            if( totalVolume <= Tolerance ) 
                 return;
-            }
 
-            float[] remaining = new float[F];
-            for( int f = 0; f < F; f++ )
-                remaining[f] = fluidsList[f].GetVolumeAtPressure( pressure, Temperature );
-
-            // result allocation per-edge per-fluid: we will accumulate into per-edge SubstanceStateCollections directly
-            SubstanceStateCollection[] newEdgeContents = new SubstanceStateCollection[edgeCount];
-            for( int i = 0; i < edgeCount; i++ )
-                newEdgeContents[i] = new SubstanceStateCollection();
-
-            // --- 4) pour fluids bottom-up (intervals from lowest U to highest U)
-            for( int j = 0; j < B; j++ )
+            foreach( (ISubstance substance, double totalMass) in Contents )
             {
-                float cap = intervalTotalCap[j];
-                if( cap <= 0.0f )
-                    continue;
-
-                // iterate fluids heaviest -> lightest
-                for( int f = 0; f < F; f++ )
+                foreach( (int edgeIdx, var edge) in _edges.Select( ( e, i ) => (i, e) ) )
                 {
-                    if( remaining[f] <= 0.0f )
-                        continue;
-
-                    if( remaining[f] >= cap - 1e-9f )
-                    {
-                        // fill entire interval with this fluid
-                        float assign = cap;
-                        // distribute to each edge proportional to its contribution
-                        foreach( var (edgeIdx, contrib) in intervalContribs[j] )
-                        {
-                            if( contrib <= 0 )
-                                continue;
-                            float share = contrib / cap;
-                            float vol = assign * share;
-                            if( vol <= 0 )
-                                continue;
-                            var fs = fluidsList[f];
-                            newEdgeContents[edgeIdx].Add( fs );
-                        }
-                        remaining[f] -= assign;
-                        cap = 0.0f;
-                        intervalTotalCap[j] = 0.0f;
-                        break; // interval fully consumed, go to next interval
-                    }
-                    else
-                    {
-                        // partial fill by this fluid: fraction ffrac = remaining[f] / cap
-                        float assign = remaining[f];
-                        float frac = assign / cap;
-                        foreach( var (edgeIdx, contrib) in intervalContribs[j] )
-                        {
-                            if( contrib <= 0 )
-                                continue;
-                            float vol = contrib * frac;
-                            if( vol <= 0 )
-                                continue;
-                            var fs = fluidsList[f];
-                            newEdgeContents[edgeIdx].Add( fs );
-                        }
-                        // reduce remaining capacity and zero out this fluid
-                        cap -= assign;
-                        intervalTotalCap[j] = cap;
-                        remaining[f] = 0.0f;
-                        // continue with next (lighter) fluid to fill leftover cap in this interval
-                    }
-                } // fluids
-            } // intervals
-
-            // If any remaining fluid beyond all intervals (overflow), distribute proportionally to edge total volumes (rare)
-            for( int f = 0; f < F; f++ )
-            {
-                if( remaining[f] <= 1e-9f )
-                    continue;
-                float overflow = remaining[f];
-                // compute total capacity across edges
-                float totalEdgeVol = 0.0f;
-                for( int i = 0; i < edgeCount; i++ )
-                    totalEdgeVol += edgeVolume[i];
-                if( totalEdgeVol <= 0.0f )
-                    continue;
-                for( int ei = 0; ei < edgeCount; ei++ )
-                {
-                    float share = edgeVolume[ei] / totalEdgeVol;
-                    float vol = overflow * share;
-                    var fs = fluidsList[f];
-                    newEdgeContents[ei].Add( fs );
+                    double fraction = edge.Volume / totalVolume;
+                    _contentsInEdges[edgeIdx].Add( substance, totalMass * fraction );
                 }
-                remaining[f] = 0.0f;
             }
-
-            // write results back
-            _contentsInEdges = newEdgeContents;
         }
     }
 }

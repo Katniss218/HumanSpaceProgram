@@ -31,7 +31,7 @@ namespace HSP.ResourceFlow
         /// </remarks>
         /// <param name="localPosition">The local position of the point to sample, in [m].</param>
         /// <param name="holeArea">The area of the hole, in [m^2].</param>
-        FluidState Sample( Vector3 localPosition, float holeArea );
+        FluidState Sample( Vector3 localPosition, double holeArea );
 
         /// <summary>
         /// Calculates the amount of resources that would flow out if a portal of a given flowrate was created at the specified position, and held open for the specified amount of time.
@@ -40,6 +40,6 @@ namespace HSP.ResourceFlow
         /// It should take into account the amount of resources available (not including Inflow/Outflow) in the tank.
         /// </remarks>
         /// <param name="flowRate">Volumetric flow rate, in [m^3/s].</param>
-        IReadonlySubstanceStateCollection SampleSubstances( Vector3 localPosition, float flowRate, float dt );
+        IReadonlySubstanceStateCollection SampleSubstances( Vector3 localPosition, double flowRate, double dt );
     }
 }

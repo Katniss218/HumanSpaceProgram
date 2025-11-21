@@ -38,22 +38,23 @@ namespace HSP.ResourceFlow
         public Port FromInlet { get; }
 
         public Port ToInlet { get; }
+
         /// <summary>
         /// The minimum cross-sectional area of the pipe, in [m^2].
         /// </summary>
-        public float CrossSectionArea { get; }
+        public double CrossSectionArea { get; }
 
         /// <summary>
         /// Volumetric conductance, in [m^3/(s*Pa)]
         /// </summary>
-        public float Conductance { get; }
+        public double Conductance { get; }
 
         /// <summary>
         /// Pump added head pressure, positive when pushing from <see cref="FromInlet"/> to <see cref="ToInlet"/>, in [Pa]
         /// </summary>
-        public float HeadAdded { get; }
+        public double HeadAdded { get; }
 
-        public FlowPipe( Port fromInlet, Port toInlet, float crossSectionArea, float conductance = 1e-6f, float headAdded = 0f )
+        public FlowPipe( Port fromInlet, Port toInlet, double crossSectionArea, double conductance = 1e-6f, double headAdded = 0f )
         {
             FromInlet = fromInlet;
             ToInlet = toInlet;
@@ -62,10 +63,10 @@ namespace HSP.ResourceFlow
             HeadAdded = headAdded;
         }
 
-        public float ComputeFlowRate( float pFrom, float pTo )
+        public double ComputeFlowRate( double pFrom, double pTo )
         {
-            float flowrate = Conductance * (pFrom - pTo + HeadAdded);
-            if( !float.IsFinite( flowrate ) )
+            double flowrate = Conductance * (pFrom - pTo + HeadAdded);
+            if( !double.IsFinite( flowrate ) )
                 flowrate = 0f;
 
             return flowrate;
@@ -76,7 +77,7 @@ namespace HSP.ResourceFlow
         /// </summary>
         /// <param name="signedFlowRate">Volumetric flow rate (positive is flow from FromInlet to ToInlet), in [m^3/s].</param>
         /// <param name="dt"">Timestep used for scaling the flowing resources, in [s].</param>
-        public IReadonlySubstanceStateCollection SampleFlowResources( float signedFlowRate, float dt )
+        public IReadonlySubstanceStateCollection SampleFlowResources( double signedFlowRate, double dt )
         {
             if( signedFlowRate == 0f )
                 return SubstanceStateCollection.Empty;

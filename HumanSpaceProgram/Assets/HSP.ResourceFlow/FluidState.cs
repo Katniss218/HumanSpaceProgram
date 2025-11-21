@@ -13,19 +13,19 @@ namespace HSP.ResourceFlow
         /// Gets or sets the pressure.
         /// </summary>
         [field: SerializeField]
-        public float Pressure { get; set; }
+        public double Pressure { get; set; }
 
         /// <summary>
         /// Gets or sets the temperature.
         /// </summary>
         [field: SerializeField]
-        public float Temperature { get; set; }
+        public double Temperature { get; set; }
 
         /// <summary>
         /// Gets or sets the magnitude of the velocity.
         /// </summary>
         [field: SerializeField]
-        public float Velocity { get; set; }
+        public double Velocity { get; set; }
 
         /// <summary>
         /// Returns the fluid state for a perfect vacuum.
@@ -37,7 +37,7 @@ namespace HSP.ResourceFlow
                 Velocity = 0.0f
             };
 
-        public FluidState( float pressure, float temperature, float velocity )
+        public FluidState( double pressure, double temperature, double velocity )
         {
             this.Pressure = pressure;
             this.Temperature = temperature;

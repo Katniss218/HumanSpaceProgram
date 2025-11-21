@@ -15,12 +15,21 @@ namespace HSP.Vanilla.Components
         public Vector3[] TriangulationPositions { get; set; }
 
         public ResourceInlet[] Inlets { get; set; }
-        public SubstanceStateCollection Contents { get; set; }
+        public ISubstanceStateCollection Contents { get; set; }
+        public FluidState State { get; set; }
 
         public float MaxVolume { get; set; }
 
 
         FlowTank _cachedTank;
+
+        void FixedUpdate()
+        {
+            // Optimize - only compute if needed / if not in equilibrium.
+            // The inflows and contents and stuff are all known so this can be done
+            // Limit flash to tanks whose composition/pressure change significantly.
+            (ISubstanceStateCollection s, FluidState f) = ISubstance_Ex.ComputeFlash( Contents, State, MaxVolume );
+        }
 
 
         public virtual BuildFlowResult BuildFlowNetwork( FlowNetworkBuilder c )
@@ -53,7 +62,7 @@ namespace HSP.Vanilla.Components
             }
 
             // TODO - validate that something is connected to it. We can use a similar 'connection' structure to control inputs.
-            _cachedTank.DistributeFluids(); // settle the fluids so the values at each inlet are correct.
+            _cachedTank.DistributeContents(); // settle the fluids so the values at each inlet are correct.
             c.TryAddFlowObj( this, _cachedTank );
             foreach( var inlet in Inlets )
             {

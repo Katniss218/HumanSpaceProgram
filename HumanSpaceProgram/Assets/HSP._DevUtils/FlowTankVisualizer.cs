@@ -73,13 +73,13 @@ public class FlowTankVisualizer : MonoBehaviour
                 SpecificGasConstant = 0f,
                 Phase = SubstancePhase.Liquid,
                 DisplayName = "TestLiquid",
-                UIColor = Color.cyan
+                DisplayColor = Color.cyan
             };
 
             var contents = new SubstanceStateCollection( new SubstanceState( 25000, sub ) );
             TargetTank.Contents = contents;
             TargetTank.FluidAcceleration = Vector3.down * 10;
-            TargetTank.DistributeFluids();
+            TargetTank.DistributeContents();
         }
 
         // ensure a root object exists

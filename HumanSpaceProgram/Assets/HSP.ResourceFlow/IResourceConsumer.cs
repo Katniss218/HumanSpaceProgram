@@ -30,6 +30,6 @@ namespace HSP.ResourceFlow
         /// </remarks>
         /// <param name="localPosition">The local position of the point to sample, in [m].</param>
         /// <param name="holeArea">The area of the hole, in [m^2].</param>
-        FluidState Sample( Vector3 localPosition, float holeArea );
+        FluidState Sample( Vector3 localPosition, double holeArea );
     }
 }

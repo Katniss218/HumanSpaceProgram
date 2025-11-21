@@ -2,9 +2,11 @@
 
 namespace HSP.ResourceFlow
 {
-    public interface IReadonlySubstanceStateCollection : IEnumerable<ISubstance>, IEnumerable<(ISubstance, double)>
+    public interface IReadonlySubstanceStateCollection : IEnumerable<(ISubstance, double)>
     {
-        bool IsEmpty();
+        bool IsEmpty(); 
+        bool IsPure( out ISubstance dominantSubstance );
+
         int Count { get; }
         (ISubstance, double) this[int i] { get; }
         double this[ISubstance i] { get; }
@@ -15,12 +17,5 @@ namespace HSP.ResourceFlow
 
         bool Contains( ISubstance substance );
         bool TryGet( ISubstance substance, out double mass );
-    }
-
-    public interface ISubstanceStateCollection : IReadonlySubstanceStateCollection
-    {
-        void Add( ISubstance s, double mass, double dt );
-        void Add( IReadonlySubstanceStateCollection s, double dt );
-        void Clear();
     }
 }
