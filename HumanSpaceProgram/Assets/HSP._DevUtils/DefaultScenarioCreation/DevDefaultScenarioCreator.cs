@@ -147,10 +147,11 @@ namespace HSP._DevUtils
             Substance sbsOX = AssetRegistry.Get<Substance>( "Vanilla::Assets/substances/oxidizer" );
 
             var tankSmallTank = tankP.GetComponent<FResourceContainer_FlowTank>();
-            tankSmallTank.Contents = new SubstanceStateCollection(
-                new SubstanceState[] {
-                    new SubstanceState( tankSmallTank.MaxVolume * ((sbsF.Density + sbsOX.Density) / 2f) / 2f, sbsF ),
-                    new SubstanceState( tankSmallTank.MaxVolume * ((sbsF.Density + sbsOX.Density) / 2f) / 2f, sbsOX )} );
+            tankSmallTank.Contents = new SubstanceStateCollection() 
+            {
+                { sbsF, tankSmallTank.MaxVolume * ((sbsF.GetDensityAtSTP() + sbsOX.GetDensityAtSTP()) / 2f) / 2f },
+                { sbsOX, tankSmallTank.MaxVolume * ((sbsF.GetDensityAtSTP() + sbsOX.GetDensityAtSTP()) / 2f) / 2f }
+            };
 
             FResourceConnection_FlowPipe conn21 = engineP1.gameObject.AddComponent<FResourceConnection_FlowPipe>();
             conn21.FromInlet = tankP.GetComponent<FResourceContainer_FlowTank>().Inlets[1];

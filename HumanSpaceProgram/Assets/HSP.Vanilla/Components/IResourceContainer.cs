@@ -1,4 +1,6 @@
-﻿namespace HSP.ResourceFlow
+﻿using HSP.ResourceFlow;
+
+namespace HSP.Vanilla.Components
 {
     /// <summary>
     /// Represents an object that can hold resources (substances).
@@ -14,6 +16,6 @@
         /// <summary>
         /// The current contents of this container.
         /// </summary>
-        SubstanceStateCollection Contents { get; }
+        ISubstanceStateCollection Contents { get; }
     }
 }

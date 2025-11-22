@@ -12,6 +12,9 @@ namespace HSP.ResourceFlow
         private FlowEdge[] _edges;
         private ISubstanceStateCollection[] _contentsInEdges;
 
+        private Vector3 _fluidAcceleration = Vector3.zero;
+        private Vector3 _fluidAngularVelocity = Vector3.zero;
+
         private Dictionary<FlowNode, double> _inletNodes; // inlets and outlets (ports/holes in the tank). If nothing is attached, the inlet is treated as a hole.
 
         public ISubstanceStateCollection Contents { get; set; } // should always equal the sum of what is in the edges.
@@ -25,16 +28,43 @@ namespace HSP.ResourceFlow
         /// Gets the volume calculated from the tetrahedralization. Used for scaling.
         /// </summary>
         public double CalculatedVolume { get; private set; }
+        /// <summary>
+        /// The volume, in [m^3].
+        /// </summary>
         public double Volume { get; private set; }
 
-        public Vector3 FluidAcceleration { get; set; } = Vector3.zero;
-        public Vector3 FluidAngularVelocity { get; set; } = Vector3.zero;
+        public Vector3 FluidAcceleration
+        {
+            get => _fluidAcceleration;
+            set
+            {
+                if( _fluidAcceleration != value )
+                {
+                    _fluidAcceleration = value;
+                    _nodePotentials = null; // invalidate
+                }
+            }
+        }
+
+        public Vector3 FluidAngularVelocity
+        {
+            get => _fluidAngularVelocity;
+            set
+            {
+                if( _fluidAngularVelocity != value )
+                {
+                    _fluidAngularVelocity = value;
+                    _nodePotentials = null; // invalidate
+                }
+            }
+        }
 
         public IReadOnlyList<FlowNode> Nodes => _nodes;
         public IReadOnlyList<FlowEdge> Edges => _edges;
         public IReadonlySubstanceStateCollection[] ContentsInEdges => _contentsInEdges;
+        public IReadOnlyDictionary<FlowNode, double> InletNodes => _inletNodes;
 
-        public FlowTank( float volume )
+        public FlowTank( double volume )
         {
             this.Volume = volume;
         }
@@ -205,6 +235,9 @@ namespace HSP.ResourceFlow
             if( _nodes == null )
                 _nodes = new FlowNode[0];
 
+            _edgeEnd1Indices = null;
+            _edgeEnd2Indices = null;
+
             const float SNAP_DISTANCE = 0.05f;   // if a provided node is within this distance to exactly one inlet, we will skip adding it (it will be represented by the inlet)
             const float DEDUPE_DISTANCE = 0.01f; // positions closer than this to an already-added position will be treated as duplicates
 
@@ -322,7 +355,7 @@ namespace HSP.ResourceFlow
             // 5) Apply tetrahedralization and re-distribute any previously existing fluid.
             SetTetrahedralization( nodes, edges, tets );
 
-            // Restore old contents and redistribute (the caller may prefer different behavior; this preserves fluid as-is).
+            // Restore old contents and redistribute (this preserves fluid as-is).
             if( oldContents != null && !oldContents.IsEmpty() )
             {
                 Contents = oldContents;
@@ -338,206 +371,302 @@ namespace HSP.ResourceFlow
         /// Note: Standard physics defines Force = -Gradient(Potential). <br/>
         /// If FluidAcceleration is "Gravity" (pointing down), Potential = -g.y (increases going up).
         /// </remarks>
-        public double GetPotential( Vector3 localPoint )
+        /// <param name="localPosition">The position, in tank-space.</param>
+        public double GetPotential( Vector3 localPosition )
         {
             double linearContrib = 0.0;
             double rotationalContrib = 0.0;
 
             if( FluidAcceleration.sqrMagnitude > 0.001 )
             {
-                linearContrib = -Vector3.Dot( FluidAcceleration, localPoint );
+                linearContrib = -Vector3.Dot( FluidAcceleration, localPosition );
             }
             if( FluidAngularVelocity.sqrMagnitude > 0.001 )
             {
-                Vector3 tang = Vector3.Cross( FluidAngularVelocity, localPoint );
+                Vector3 tang = Vector3.Cross( FluidAngularVelocity, localPosition );
                 rotationalContrib = -0.5 * tang.sqrMagnitude;
             }
 
             return linearContrib + rotationalContrib;
         }
 
+        //
+        //  Stratification Algorithm.
+        //
+
+        private struct FluidEntryDensityComparer : IComparer<FluidEntry>
+        {
+            public int Compare( FluidEntry lhs, FluidEntry rhs ) => rhs.Density.CompareTo( lhs.Density );
+        }
+
         public struct FluidEntry
         {
             public ISubstance Substance;
             public double Mass;
-            public double VolumeAtReferencePressure;
+            public double Volume;
             public double Density;
         }
 
-        // Cached buffers (reused to minimize allocations on a semi-hot path)
-        private double[] _nodePotential;
-        private double[] _edgePotentialMin;
-        private double[] _edgePotentialMax;
+        // Reusable buffers to limit allocations.
+        private double[] _nodePotentials;
+        private double[] _edgePotentialsMin; // min and max for edges (2 ends)
+        private double[] _edgePotentialsMax;
+        private int[] _edgeEnd1Indices;
+        private int[] _edgeEnd2Indices;
 
-        private readonly List<double> _breakpointBuffer = new();
+        private readonly List<double> _sortedNodePotentials = new();
+        private readonly List<double> _distinctPotentials = new();
+
         private FluidEntry[] _sortedFluids;
+        private double[] _sortedFluidVolumesRemaining;
+        private double[] _intervalVolumes; // Intervals are the spaces between distinct potentials. And potentials are sampled at each node.
 
-        private List<(int edgeIndex, double contribution)>[] _intervalContributions;
+        private List<(int edgeIndex, double contribution)>[] _intervalContributions; // how much each edge contributes to an interval (used for scaling during fill).
 
-        private const double Tolerance = 1e-9;
+        private const double TOLERANCE = 1e-4;
+        private readonly FluidEntryDensityComparer _fluidComparer = new();
 
         public void DistributeContents()
         {
-            if( _edges is not { Length: > 0 } ) 
+            // The idea is to calculate the potential for each node/edge, and then figure out where they fall.
+            // Then pour heaviest-first, scaling the volumes to account for overflow.
+
+            if( _edges == null || _edges.Length == 0 )
                 return;
-            if( Contents is null || Contents.IsEmpty() ) 
+            if( Contents == null || Contents.IsEmpty() )
                 return;
 
             int nodeCount = _nodes.Length;
             int edgeCount = _edges.Length;
 
-            InitializeBuffers( nodeCount, edgeCount );
+            // 1. Ensure Caches (Topology and Memory)
+            EnsureTopologyCache();
+
             ClearEdgeContents();
 
-            // 1. Compute gravitational/pressure potential for every node
-            for( int i = 0; i < nodeCount; i++ )
-                _nodePotential[i] = GetPotential( _nodes[i].pos );
-
-            // 2. Determine potential range for each edge and collect breakpoints
-            _breakpointBuffer.Clear();
-            double totalSystemVolume = 0;
-
+            // 3. Collect sorted potential breakpoints from node potentials.
+            _sortedNodePotentials.Clear();
+            double totalTankVolume = 0;
             for( int i = 0; i < edgeCount; i++ )
             {
-                var edge = _edges[i];
-                double potentialA = GetPotential( edge.end1.pos );
-                double potentialB = GetPotential( edge.end2.pos );
+                // HOT PATH OPTIMIZATION: 
+                // Direct array access via pre-computed indices. No Dictionary, no Search.
+                double potEnd1 = _nodePotentials[_edgeEnd1Indices[i]];
+                double potEnd2 = _nodePotentials[_edgeEnd2Indices[i]];
 
-                double min = Math.Min( potentialA, potentialB );
-                double max = Math.Max( potentialA, potentialB );
+                double min, max;
+                if( potEnd1 < potEnd2 )
+                {
+                    min = potEnd1;
+                    max = potEnd2;
+                }
+                else
+                {
+                    min = potEnd2;
+                    max = potEnd1;
+                }
 
-                _edgePotentialMin[i] = min;
-                _edgePotentialMax[i] = max;
+                _edgePotentialsMin[i] = min;
+                _edgePotentialsMax[i] = max;
 
-                totalSystemVolume += edge.Volume;
+                totalTankVolume += _edges[i].Volume;
 
-                _breakpointBuffer.Add( min );
-                _breakpointBuffer.Add( max );
+                _sortedNodePotentials.Add( min );
+                _sortedNodePotentials.Add( max );
             }
+            _sortedNodePotentials.Sort();
+            PopulateDistinctPotentials( _sortedNodePotentials, _distinctPotentials );
 
-            _breakpointBuffer.Sort();
-            double[] distinctPotentials = GetDistinctSortedValues( _breakpointBuffer );
-            int intervalCount = distinctPotentials.Length - 1;
-
-            // Special case: no potential gradient → uniform distribution
-            if( intervalCount == 0 )
+            int intervalCount = _distinctPotentials.Count - 1;
+            if( intervalCount <= 0 )
             {
-                DistributeUniformly( totalSystemVolume );
+                DistributeUniformly( totalTankVolume );
                 return;
             }
 
-            // 3. Map edges to potential intervals (bucket per interval)
+            // 4. Map edges to intervals
             EnsureIntervalBuckets( intervalCount );
-            double[] intervalAvailableVolume = new double[intervalCount];
 
-            for( int edgeIdx = 0; edgeIdx < edgeCount; edgeIdx++ )
+            if( _intervalVolumes == null || _intervalVolumes.Length < intervalCount )
             {
-                double low = _edgePotentialMin[edgeIdx];
-                double high = _edgePotentialMax[edgeIdx];
-                double edgeVolume = _edges[edgeIdx].Volume;
+                Array.Resize( ref _intervalVolumes, intervalCount );
+            }
+            Array.Clear( _intervalVolumes, 0, intervalCount );
 
-                if( high - low > Tolerance ) // Gradient edge
+            for( int i = 0; i < edgeCount; i++ )
+            {
+                double edgePotentialLow = _edgePotentialsMin[i];
+                double edgePotentialHigh = _edgePotentialsMax[i];
+                double edgeVolume = _edges[i].Volume;
+                double potentialDifference = edgePotentialHigh - edgePotentialLow;
+
+                // Gradient potential
+                if( potentialDifference > TOLERANCE )
                 {
-                    double volumePerPotential = edgeVolume / (high - low);
+                    double invSpan = edgeVolume / potentialDifference;
+                    int startIndex = FindFirstIntervalIndex( _distinctPotentials, edgePotentialLow );
 
-                    int startIdx = FindFirstIntervalIndex( distinctPotentials, low );
-
-                    for( int intervalIdx = startIdx; intervalIdx < intervalCount; intervalIdx++ )
+                    for( int intervalIndex = startIndex; intervalIndex < intervalCount; intervalIndex++ )
                     {
-                        double intervalLow = distinctPotentials[intervalIdx];
-                        double intervalHigh = distinctPotentials[intervalIdx + 1];
+                        double intervalLowPotential = _distinctPotentials[intervalIndex];
+                        double intervalHighPotential = _distinctPotentials[intervalIndex + 1];
 
-                        if( intervalLow >= high - Tolerance )
+                        if( intervalLowPotential >= edgePotentialHigh - TOLERANCE )
                             break;
 
-                        double overlapLow = Math.Max( low, intervalLow );
-                        double overlapHigh = Math.Min( high, intervalHigh );
+                        double overlapLow = (edgePotentialLow > intervalLowPotential) 
+                            ? edgePotentialLow 
+                            : intervalLowPotential;
+                        double overlapHigh = (edgePotentialHigh < intervalHighPotential)
+                            ? edgePotentialHigh 
+                            : intervalHighPotential;
                         double overlap = overlapHigh - overlapLow;
 
-                        if( overlap > Tolerance )
+                        if( overlap > TOLERANCE )
                         {
-                            double contribution = overlap * volumePerPotential;
-                            _intervalContributions[intervalIdx].Add( (edgeIdx, contribution) );
-                            intervalAvailableVolume[intervalIdx] += contribution;
+                            double contribution = overlap * invSpan;
+                            _intervalContributions[intervalIndex].Add( (i, contribution) );
+                            _intervalVolumes[intervalIndex] += contribution;
                         }
                     }
                 }
-                else // Equipotential edge
+                // Flat potential
+                else
                 {
-                    int intervalIdx = FindIntervalIndexForValue( distinctPotentials, low );
-                    _intervalContributions[intervalIdx].Add( (edgeIdx, edgeVolume) );
-                    intervalAvailableVolume[intervalIdx] += edgeVolume;
+                    int intervalIndex = FindFirstIntervalIndex( _distinctPotentials, edgePotentialLow );
+                    if( intervalIndex >= 0 && intervalIndex < intervalCount )
+                    {
+                        _intervalContributions[intervalIndex].Add( (i, edgeVolume) );
+                        _intervalVolumes[intervalIndex] += edgeVolume;
+                    }
                 }
             }
 
-            // 4. Sort fluids by density (heaviest first)
-            BuildSortedFluidList();
+            // 5. Prepare fluids
+            RebuildSortedFluidsArray( out double totalFluidReferenceVolume );
 
-            // 5. Fill intervals from bottom to top
-            FillIntervals( intervalCount, intervalAvailableVolume );
+            // 6. Calculate scale (stratified overflow)
+            double volumeScale = 1.0;
+            if( totalFluidReferenceVolume > totalTankVolume && totalTankVolume > TOLERANCE )
+            {
+                volumeScale = totalTankVolume / totalFluidReferenceVolume;
+            }
 
-            // 6. Any leftover fluid is distributed uniformly (overflow / incompressible case)
-#warning TODO - this is wrong, needs to be distributed from the start, not after, because then it is no longer stratified correctly.
-            DistributeRemainingFluidUniformly( totalSystemVolume );
+            // 7. Fill
+            FillIntervals( intervalCount, volumeScale );
         }
 
-        private void FillIntervals( int intervalCount, double[] intervalCapacity )
+        private void EnsureTopologyCache()
         {
-            int fluidCount = _sortedFluids.Length;
-            double[] remainingVolume = new double[fluidCount];
-            for( int i = 0; i < fluidCount; i++ )
-                remainingVolume[i] = _sortedFluids[i].VolumeAtReferencePressure;
+            int edgeCount = _edges.Length;
+            int nodeCount = _nodes.Length;
 
-            for( int intervalIdx = 0; intervalIdx < intervalCount; intervalIdx++ )
+            if( _edgePotentialsMin == null || _edgePotentialsMin.Length != edgeCount )
             {
-                double capacity = intervalCapacity[intervalIdx];
-                if( capacity <= Tolerance )
+                _edgePotentialsMin = new double[edgeCount];
+                _edgePotentialsMax = new double[edgeCount];
+            }
+
+            if( _edgeEnd1Indices == null || _edgeEnd1Indices.Length != edgeCount )
+            {
+                _edgeEnd1Indices = new int[edgeCount];
+                _edgeEnd2Indices = new int[edgeCount];
+
+                // Temporarily map FlowNode -> Index for O(N) setup instead of O(N^2)
+                Dictionary<FlowNode, int> nodeMap = new ( nodeCount );
+                for( int i = 0; i < nodeCount; i++ )
+                {
+                    nodeMap[_nodes[i]] = i;
+                }
+
+                for( int i = 0; i < edgeCount; i++ )
+                {
+                    FlowEdge edge = _edges[i];
+                    // Assuming edge nodes exist in the node array. 
+                    // If not found, default to 0 to prevent crash, though data will be wrong.
+                    if( nodeMap.TryGetValue( edge.end1, out int end1 ) )
+                        _edgeEnd1Indices[i] = end1;
+                    if( nodeMap.TryGetValue( edge.end2, out int end2 ) )
+                        _edgeEnd2Indices[i] = end2;
+                }
+            }
+
+            if( _nodePotentials == null || _nodePotentials.Length != nodeCount )
+            {
+                _nodePotentials = new double[nodeCount];
+                for( int i = 0; i < nodeCount; i++ )
+                {
+                    _nodePotentials[i] = GetPotential( _nodes[i].pos );
+                }
+            }
+        }
+
+        private void FillIntervals( int intervalCount, double volumeScale )
+        {
+            // Fills, using the calculated volumes and densities *at tank pressure* to match the calculated scaling factor exactly.
+            int fluidCount = _sortedFluids.Length;
+
+#warning TODO - needs to use tank pressure instead, for accurate compression and distribution of mixed fluid-gas contents.
+            if( _sortedFluidVolumesRemaining == null || _sortedFluidVolumesRemaining.Length < fluidCount )
+                _sortedFluidVolumesRemaining = new double[fluidCount];
+
+            for( int i = 0; i < fluidCount; i++ )
+                _sortedFluidVolumesRemaining[i] = _sortedFluids[i].Volume * volumeScale;
+
+            double inverseVolumeScale = 1.0 / volumeScale;
+
+            for( int i = 0; i < intervalCount; i++ )
+            {
+                double capacity = _intervalVolumes[i];
+                if( capacity <= TOLERANCE )
                     continue;
 
                 double initialCapacity = capacity;
+                var contributions = _intervalContributions[i];
+                int contributionCount = contributions.Count;
 
-                foreach( int fluidIdx in Enumerable.Range( 0, fluidCount ) )
+                for( int j = 0; j < fluidCount; j++ )
                 {
-                    if( remainingVolume[fluidIdx] <= Tolerance ) 
+                    double remaining = _sortedFluidVolumesRemaining[j];
+                    if( remaining <= TOLERANCE )
                         continue;
 
-                    double pourVolume = Math.Min( remainingVolume[fluidIdx], capacity );
-
+                    double pourVolume = (remaining < capacity) ? remaining : capacity;
                     double fillRatio = pourVolume / initialCapacity;
+                    double massFactor = fillRatio * _sortedFluids[j].Density * inverseVolumeScale;
+                    ISubstance substance = _sortedFluids[j].Substance;
 
-                    var contributions = _intervalContributions[intervalIdx];
-                    foreach( (int edgeIdx, double contribVolume) in contributions )
+                    for( int k = 0; k < contributionCount; k++ )
                     {
-                        double volumeToAdd = contribVolume * fillRatio;
-                        double massToAdd = volumeToAdd * _sortedFluids[fluidIdx].Density;
-
-                        _contentsInEdges[edgeIdx].Add( _sortedFluids[fluidIdx].Substance, massToAdd );
+                        (int edgeIdx, double geoVolume) = contributions[k];
+                        _contentsInEdges[edgeIdx].Add( substance, geoVolume * massFactor );
                     }
 
-                    remainingVolume[fluidIdx] -= pourVolume;
+                    _sortedFluidVolumesRemaining[j] -= pourVolume;
                     capacity -= pourVolume;
 
-                    if( capacity <= Tolerance )
-                        break; // interval is full
+                    if( capacity <= TOLERANCE )
+                        break;
                 }
             }
 
-            // Update buffer with leftover volumes for overflow handling
+            // Sync remaining volume back for correctness (unscaled)
             for( int i = 0; i < fluidCount; i++ )
             {
-                _sortedFluids[i].VolumeAtReferencePressure = remainingVolume[i];
+                _sortedFluids[i].Volume = _sortedFluidVolumesRemaining[i] * inverseVolumeScale;
             }
         }
 
-        private void BuildSortedFluidList()
+        private void RebuildSortedFluidsArray( out double totalVolume )
         {
+            // Calculates the volumes and densities *at tank pressure* to match the pouring algorithm and overfill volume scaling.
+
             if( _sortedFluids == null || _sortedFluids.Length != Contents.Count )
-            {
                 Array.Resize( ref _sortedFluids, Contents.Count );
-            }
-            Array.Clear( _sortedFluids, 0, _sortedFluids.Length );
+
             double temperature = FluidState.Temperature;
             double pressure = FluidState.Pressure;
+            totalVolume = 0;
 
             int i = 0;
             foreach( (ISubstance substance, double mass) in Contents )
@@ -545,59 +674,85 @@ namespace HSP.ResourceFlow
                 double density = substance.GetDensity( temperature, pressure );
                 double volume = mass / density;
 
-                _sortedFluids[i] = new FluidEntry()
-                {
-                    Substance = substance,
-                    Mass = mass,
-                    VolumeAtReferencePressure = volume,
-                    Density = density
-                };
+                _sortedFluids[i].Substance = substance;
+                _sortedFluids[i].Mass = mass;
+                _sortedFluids[i].Volume = volume;
+                _sortedFluids[i].Density = density;
+
+                totalVolume += volume;
                 i++;
             }
 
-            Array.Sort( _sortedFluids, ( a, b ) => b.Density.CompareTo( a.Density ) ); // heaviest first
+            Array.Sort( _sortedFluids, 0, i, _fluidComparer );
         }
 
-        private void DistributeRemainingFluidUniformly( double totalVolume )
+        private void PopulateDistinctPotentials( List<double> sortedSource, List<double> destination )
         {
-            if( totalVolume <= Tolerance ) 
+            destination.Clear();
+            if( sortedSource.Count == 0 )
                 return;
 
-            foreach( var fluid in _sortedFluids )
+            double last = sortedSource[0];
+            destination.Add( last );
+
+            int count = sortedSource.Count;
+            for( int i = 1; i < count; i++ )
             {
-                if( fluid.VolumeAtReferencePressure <= Tolerance )
-                    continue;
-
-                double remainingMass = fluid.VolumeAtReferencePressure * fluid.Density;
-                double massPerVolumeUnit = remainingMass / totalVolume;
-
-                foreach( (int edgeIdx, var edge) in _edges.Select( ( e, i ) => (i, e) ) )
+                double val = sortedSource[i];
+                if( val - last > TOLERANCE )
                 {
-                    double massToAdd = edge.Volume * massPerVolumeUnit;
-                    _contentsInEdges[edgeIdx].Add( fluid.Substance, massToAdd );
+                    destination.Add( val );
+                    last = val;
                 }
             }
         }
 
-        private void InitializeBuffers( int nodeCount, int edgeCount )
+        private void EnsureIntervalBuckets( int requiredCount )
         {
-            _nodePotential ??= new double[nodeCount];
-            if( _nodePotential.Length != nodeCount ) _nodePotential = new double[nodeCount];
-
-            _edgePotentialMin ??= new double[edgeCount];
-            _edgePotentialMax ??= new double[edgeCount];
-            if( _edgePotentialMin.Length != edgeCount )
+            if( _intervalContributions == null || _intervalContributions.Length < requiredCount )
             {
-                _edgePotentialMin = new double[edgeCount];
-                _edgePotentialMax = new double[edgeCount];
+                int oldLen = _intervalContributions?.Length ?? 0;
+                Array.Resize( ref _intervalContributions, requiredCount );
+                for( int i = oldLen; i < requiredCount; i++ )
+                    _intervalContributions[i] = new List<(int, double)>();
             }
+            for( int i = 0; i < requiredCount; i++ )
+                _intervalContributions[i].Clear();
+        }
 
-            _intervalContributions ??= Array.Empty<List<(int, double)>>();
+        private static int FindFirstIntervalIndex( List<double> distinctPotentials, double value )
+        {
+            int low = 0;
+            int high = distinctPotentials.Count - 1;
+            int result = ~0;
+
+            while( low <= high )
+            {
+                int mid = low + ((high - low) >> 1);
+                double midVal = distinctPotentials[mid];
+
+                if( midVal == value )
+                {
+                    result = mid;
+                    break;
+                }
+                if( midVal < value )
+                    low = mid + 1;
+                else
+                    high = mid - 1;
+            }
+            if( low > high )
+                result = ~low;
+
+            if( result < 0 )
+                result = ~result - 1;
+
+            return Math.Clamp( result, 0, distinctPotentials.Count - 2 );
         }
 
         private void ClearEdgeContents()
         {
-            if( _contentsInEdges is null || _contentsInEdges.Length != _edges.Length )
+            if( _contentsInEdges == null || _contentsInEdges.Length != _edges.Length )
             {
                 _contentsInEdges = new SubstanceStateCollection[_edges.Length];
                 for( int i = 0; i < _contentsInEdges.Length; i++ )
@@ -605,65 +760,23 @@ namespace HSP.ResourceFlow
             }
             else
             {
-                foreach( var collection in _contentsInEdges )
-                    collection.Clear();
+                for( int i = 0; i < _contentsInEdges.Length; i++ )
+                    _contentsInEdges[i].Clear();
             }
-        }
-
-        private double[] GetDistinctSortedValues( List<double> sortedList )
-        {
-            if( sortedList.Count == 0 ) 
-                return Array.Empty<double>();
-
-            var result = new List<double> { sortedList[0] };
-            foreach( double value in sortedList )
-                if( value - result[^1] > Tolerance )
-                    result.Add( value );
-
-            return result.ToArray();
-        }
-
-        private void EnsureIntervalBuckets( int requiredCount )
-        {
-            if( _intervalContributions.Length < requiredCount )
-                Array.Resize( ref _intervalContributions, requiredCount );
-
-            for( int i = 0; i < requiredCount; i++ )
-            {
-                if( _intervalContributions[i] is null )
-                    _intervalContributions[i] = new List<(int, double)>();
-                else
-                    _intervalContributions[i].Clear();
-            }
-        }
-
-        private static int FindFirstIntervalIndex( double[] sortedPotentials, double value )
-        {
-            int idx = Array.BinarySearch( sortedPotentials, value );
-            if( idx < 0 )
-                idx = ~idx - 1;
-            return Math.Clamp( idx, 0, sortedPotentials.Length - 2 );
-        }
-
-        private static int FindIntervalIndexForValue( double[] sortedPotentials, double value )
-        {
-            int idx = Array.BinarySearch( sortedPotentials, value );
-            if( idx < 0 )
-                idx = ~idx - 1;
-            return Math.Clamp( idx, 0, sortedPotentials.Length - 2 );
         }
 
         private void DistributeUniformly( double totalVolume )
         {
-            if( totalVolume <= Tolerance ) 
+            if( totalVolume <= TOLERANCE )
                 return;
+            double invTotal = 1.0 / totalVolume;
 
             foreach( (ISubstance substance, double totalMass) in Contents )
             {
-                foreach( (int edgeIdx, var edge) in _edges.Select( ( e, i ) => (i, e) ) )
+                for( int i = 0; i < _edges.Length; i++ )
                 {
-                    double fraction = edge.Volume / totalVolume;
-                    _contentsInEdges[edgeIdx].Add( substance, totalMass * fraction );
+                    double fraction = _edges[i].Volume * invTotal;
+                    _contentsInEdges[i].Add( substance, totalMass * fraction );
                 }
             }
         }

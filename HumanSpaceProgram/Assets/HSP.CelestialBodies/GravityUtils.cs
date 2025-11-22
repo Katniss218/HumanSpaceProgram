@@ -6,6 +6,7 @@ namespace HSP.CelestialBodies
 {
     public static class GravityUtils
     {
+#warning TODO - replace with the provider system.
         public static IEnumerable<(CelestialBody, Vector3Dbl)> GetNBodyGravityAccelerations( Vector3Dbl absolutePosition )
         {
             // method to get the gravitational contribution of every CB individually, mostly for analysis and for auxiliary functionality.

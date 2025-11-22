@@ -42,6 +42,14 @@ namespace HSP.ResourceFlow
             return self.GetPressure( temperature, density );
         }
 
+        public static double GetDensityAtSTP( this ISubstance self )
+        {
+            const double temperature = 273.15; // K
+            const double pressure = 101325.0; // Pa
+            return self.GetDensity( temperature, pressure );
+        }
+
+
 
         /// <summary>
         /// Calculates the dynamic pressure of a flowing liquid (per unit volume).
@@ -71,8 +79,8 @@ namespace HSP.ResourceFlow
             double pSat = substance.GetVaporPressure( temperature );
             if( double.IsNaN( pSat ) )
             {
-                // No meaningful vapor pressure known - assume condensed (liquid/solid).
-                return SubstancePhase.Liquid;
+                // No meaningful vapor pressure known - assume solid.
+                return SubstancePhase.Solid;
             }
 
             if( pressure <= pSat )

@@ -1,4 +1,5 @@
 using HSP.ResourceFlow;
+using HSP.Vanilla.Components;
 using UnityEngine;
 using UnityPlus.AssetManagement;
 using UnityPlus.UILib;
@@ -18,11 +19,11 @@ namespace HSP.Vanilla.UI.Components
             for( int i = 0; i < this.ReferenceComponent.Contents.Count; i++ )
             {
                 var sbs = this.ReferenceComponent.Contents[i];
-                float perc = (sbs.MassAmount / sbs.Substance.Density) / ReferenceComponent.MaxVolume;
+                float perc = (float)(sbs.mass / sbs.s.GetDensityAtSTP()) / ReferenceComponent.MaxVolume;
 
                 var seg = _bar.AddSegment( perc );
                 seg.Sprite = AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/bar" );
-                seg.Color = sbs.Substance.UIColor;
+                seg.Color = sbs.s.DisplayColor;
             }
         }
 

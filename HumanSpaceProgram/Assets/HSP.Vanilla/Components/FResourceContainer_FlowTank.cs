@@ -1,13 +1,14 @@
 ﻿using HSP.CelestialBodies;
 using HSP.ReferenceFrames;
 using HSP.ResourceFlow;
+using HSP.Time;
 using HSP.Vessels;
 using UnityEngine;
 using UnityPlus.Serialization;
 
 namespace HSP.Vanilla.Components
 {
-    public class FResourceContainer_FlowTank : MonoBehaviour, IBuildsFlowNetwork
+    public class FResourceContainer_FlowTank : MonoBehaviour, IBuildsFlowNetwork, IResourceContainer
     {
         /// <summary>
         /// Gets or sets the initial triangulation positions for the tank.
@@ -20,15 +21,18 @@ namespace HSP.Vanilla.Components
 
         public float MaxVolume { get; set; }
 
+        public float Mass => throw new System.NotImplementedException();
 
         FlowTank _cachedTank;
+
+        public event IHasMass.MassChange OnAfterMassChanged;
 
         void FixedUpdate()
         {
             // Optimize - only compute if needed / if not in equilibrium.
             // The inflows and contents and stuff are all known so this can be done
             // Limit flash to tanks whose composition/pressure change significantly.
-            (ISubstanceStateCollection s, FluidState f) = ISubstance_Ex.ComputeFlash( Contents, State, MaxVolume );
+            (ISubstanceStateCollection s, FluidState f) = VaporLiquidEquilibrium.ComputeFlash( Contents, State, MaxVolume, TimeManager.FixedDeltaTime );
         }
 
 

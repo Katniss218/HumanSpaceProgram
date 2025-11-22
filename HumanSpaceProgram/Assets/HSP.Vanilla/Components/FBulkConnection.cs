@@ -151,7 +151,7 @@ namespace HSP.Vanilla.Components
             }
         }
 
-        public static (int inlet, int outlet) GetInletAndOutletIndices( float sign )
+        public static (int inlet, int outlet) GetInletAndOutletIndices( double sign )
         {
             int inlet = sign < 0 ? 1 : 0;
             int outlet = sign < 0 ? 0 : 1;
@@ -214,9 +214,9 @@ namespace HSP.Vanilla.Components
            //     endSamples[1] = endP[1].Sample( End2.Position, endP[1].transform.InverseTransformVector( fluidAccelerationSceneSpace ), CrossSectionArea );
             }
 
-            float signedRelativePressure_Pa = endSamples[0].Pressure - endSamples[1].Pressure;
+            double signedRelativePressure_Pa = endSamples[0].Pressure - endSamples[1].Pressure;
 
-            if( Mathf.Abs( signedRelativePressure_Pa ) < MIN_PRESSURE_DIFFERENCE )
+            if( Math.Abs( signedRelativePressure_Pa ) < MIN_PRESSURE_DIFFERENCE )
             {
                 return;
             }
