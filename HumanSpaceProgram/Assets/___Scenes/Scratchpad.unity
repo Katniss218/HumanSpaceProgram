@@ -205,15 +205,15 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 270790817}
-  m_LocalRotation: {x: 0, y: 0.17373411, z: 0, w: 0.9847926}
-  m_LocalPosition: {x: -10.34, y: 5.97, z: 5.06}
+  m_LocalRotation: {x: 0.07726595, y: 0.17319854, z: -0.013631024, w: 0.9817568}
+  m_LocalPosition: {x: 0, y: 0.2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1231186022}
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 20.01, z: 0}
+  m_LocalEulerAnglesHint: {x: 9, y: 20.01, z: 0}
 --- !u!1 &304444761
 GameObject:
   m_ObjectHideFlags: 0
@@ -270,7 +270,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 334964977}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -12.74, y: 7.806551, z: -0.70525265}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -481,6 +481,7 @@ GameObject:
   - component: {fileID: 1231186025}
   - component: {fileID: 1231186027}
   - component: {fileID: 1231186026}
+  - component: {fileID: 1231186028}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -496,7 +497,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1231186021}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -15}
+  m_LocalPosition: {x: 0, y: 0, z: -9}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -559,7 +560,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   targetTransform: {fileID: 334964979}
-  PipeThickness: 0.05
+  ParticleSize: 0.15
+  TotalSampleCount: 8
   NodeRadius: 0.1
   NodeColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   InletColor: {r: 1, g: 0.6, b: 0, a: 1}
@@ -579,6 +581,23 @@ MonoBehaviour:
   useWorldSpaceWidth: 1
   globalColor: {r: 1, g: 1, b: 1, a: 1}
   depthBias: 0.0005
+--- !u!114 &1231186028
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1231186021}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e2d481c2ee5cf34a934de31b3d1acbf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targetTransform: {fileID: 334964979}
+  PipeThickness: 0.05
+  NodeRadius: 0.1
+  NodeColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  InletColor: {r: 1, g: 0.6, b: 0, a: 1}
 --- !u!1 &1495969645
 GameObject:
   m_ObjectHideFlags: 0

@@ -7,19 +7,22 @@ using HSP.UI;
 namespace HSP._DevUtils
 {
     /// <summary>
-    /// Visualizes a FlowTank's topology and contents using the new Potential-Interval architecture.
+    /// Visualizes a FlowTank by performing purely random sampling (Monte Carlo style) 
+    /// within the valid geometry of the tank.
     /// </summary>
-    [RequireComponent( typeof( PolyLineRenderer ) )]
-    public class FlowTankRenderer : MonoBehaviour
+    public class FlowTankRenderer2 : MonoBehaviour
     {
         public Transform targetTransform;
 
         [Header( "Data Source" )]
         public FlowTank TargetTank;
 
-        [Header( "Line Settings" )]
-        [Tooltip( "Thickness of the pipes in Meters." )]
-        public float PipeThickness = 0.05f;
+        [Header( "Sampling Settings" )]
+        [Tooltip( "World space size of the sample particles." )]
+        public float ParticleSize = 0.1f;
+
+        [Tooltip( "Total number of random samples to attempt to place within the tank." )]
+        public int TotalSampleCount = 2000;
 
         [Header( "Node Settings" )]
         [Tooltip( "Radius of the nodes in Meters." )]
@@ -30,10 +33,14 @@ namespace HSP._DevUtils
         public Color InletColor = new Color( 1f, 0.6f, 0.0f, 1f );
 
         // --- Internal ---
-        private PolyLineRenderer _lineRenderer;
-        private List<Color> _edgeColorBuffer = new List<Color>();
 
-        // Instancing Data
+        // Random Sampling Data
+        private Vector3[] _samplePositions;
+        private Matrix4x4[] _particleMatrices;
+        private Vector4[] _particleColors;
+        private MaterialPropertyBlock _particleProps;
+
+        // Node Instancing Data
         private Mesh _quadMesh;
         private Material _billboardMat;
         private Matrix4x4[] _nodeMatrices;
@@ -64,7 +71,7 @@ namespace HSP._DevUtils
                         if( y % 2 == 0 )
                         {
                             //cellCenter.x += 0.5f; // Offset every other layer in X for staggered effect
-                           // cellCenter.z += 0.5f; // Offset every other layer in Z for staggered effect
+                            // cellCenter.z += 0.5f; // Offset every other layer in Z for staggered effect
                         }
 
                         // Add all 12 local positions, shifted by the cell's center
@@ -131,9 +138,6 @@ namespace HSP._DevUtils
             Debug.Log( TargetTank.FluidState );
 
             // --- Renderer Setup ---
-            _lineRenderer = GetComponent<PolyLineRenderer>();
-            _lineRenderer.useWorldSpaceWidth = true;
-            _lineRenderer.lineMaterial = new Material( Shader.Find( "Hidden/HSP/PolyLine" ) );
 
             _quadMesh = CreateQuadMesh();
             _billboardMat = new Material( Shader.Find( "Hidden/HSP/NodeBillboard" ) );
@@ -141,6 +145,7 @@ namespace HSP._DevUtils
 
             _nodeProps = new MaterialPropertyBlock();
             _inletProps = new MaterialPropertyBlock();
+            _particleProps = new MaterialPropertyBlock();
 
             if( TargetTank != null )
             {
@@ -150,118 +155,209 @@ namespace HSP._DevUtils
 
         public void FixedUpdate()
         {
-            /*for( int i = 0; i < 500; i++ )
-            {
-                TargetTank.ForceRecalculateCache();
-            }*/
+            // Simulation updates if needed
         }
 
         private void LateUpdate()
         {
             if( TargetTank == null || !_initialized ) return;
 
-            // 1. Update Line Colors (Query the stateless tank)
-            UpdateFlowColors();
+            // 1. Update Volume Particles (Position & Color)
+            UpdateVolumeParticles();
 
             // 2. Draw Nodes
             DrawBatchedInstanced( _quadMesh, _billboardMat, _nodeMatrices, _nodeProps, ( props ) =>
             {
-                props.SetColor( "_Color", NodeColor );
+                props.SetColor( "_Colorasd", NodeColor );
                 props.SetFloat( "_InnerRadius", 0.0f );
             } );
 
             // 3. Draw Inlets
             DrawBatchedInstanced( _quadMesh, _billboardMat, _inletMatrices, _inletProps, ( props, offset, count ) =>
             {
-                props.SetColor( "_Color", InletColor );
+                props.SetColor( "_Colorasd", InletColor );
                 float[] slice = new float[count];
                 Array.Copy( _inletInnerRadii, offset, slice, 0, count );
                 props.SetFloatArray( "_InnerRadius", slice );
             } );
+
+            // 4. Draw Volume Particles
+            DrawBatchedInstanced( _quadMesh, _billboardMat, _particleMatrices, _particleProps, ( props, offset, count ) =>
+            {
+                Vector4[] slice = new Vector4[count];
+                //Array.Copy( _particleColors, offset, slice, 0, count );
+                for( int i = 0; i < count; i++ )
+                {
+                    slice[i] = Color.red;
+                }
+                slice[0] = Color.green;
+                props.SetVectorArray( "_Colorasd", slice );
+                props.SetFloat( "_InnerRadius", 0.0f );
+            } );
+
+
+
+
+            int count = 8;
+            Matrix4x4[] mats = new Matrix4x4[count];
+            Vector4[] cols = new Vector4[count];
+            for( int i = 0; i < count; ++i )
+            {
+                Vector3 pos = new Vector3( i * 0.5f, 0, 0 );
+                mats[i] = Matrix4x4.TRS( pos, Quaternion.identity, Vector3.one * 0.25f );
+                cols[i] = new Vector4( i / 8.0f, 1 - i / 8.0f, (i % 2 == 0) ? 1 : 0, 1 );
+            }
+            var mpb = new MaterialPropertyBlock();
+            mpb.SetVectorArray( "_Colorasd", cols );
+            Graphics.DrawMeshInstanced( _quadMesh, 0, _billboardMat, mats, count, mpb );
         }
 
         public void InitializeVisuals()
         {
             if( TargetTank == null ) return;
-            RebuildEdges();
+
+            GenerateRandomSamples();
             RebuildNodesAndInlets();
+
             _initialized = true;
         }
 
-        private void RebuildEdges()
+        /// <summary>
+        /// Generates random points within the AABB of the tank, discards those outside the actual tetrahedra geometry.
+        /// </summary>
+        private void GenerateRandomSamples()
         {
-            _lineRenderer.Clear();
-            _edgeColorBuffer.Clear();
-
-            // Access the raw geometry arrays from the Tank
-            // Assuming FlowTank exposes these (based on the previous implementation structure)
-            var edges = TargetTank.Edges;
             var nodes = TargetTank.Nodes;
+            var tets = TargetTank.Tetrahedra;
+            if( nodes == null || nodes.Count == 0 || tets == null ) return;
 
-            if( edges == null || nodes == null ) return;
+            // 1. Calculate AABB
+            Vector3 min = new Vector3( float.MaxValue, float.MaxValue, float.MaxValue );
+            Vector3 max = new Vector3( float.MinValue, float.MinValue, float.MinValue );
 
-            // We need the transform to convert Tank-Space to World-Space
-            Matrix4x4 tankToWorld = targetTransform.localToWorldMatrix;
-
-            for( int i = 0; i < edges.Count; i++ )
+            foreach( var node in nodes )
             {
-                var edge = edges[i];
-                Vector3 p1 = tankToWorld.MultiplyPoint3x4( nodes[edge.end1].pos );
-                Vector3 p2 = tankToWorld.MultiplyPoint3x4( nodes[edge.end2].pos );
-
-                _lineRenderer.AddLine( p1, p2, Color.gray, PipeThickness );
-
-                // Initialize buffer with empty color
-                _edgeColorBuffer.Add( Color.black );
+                min = Vector3.Min( min, node.pos );
+                max = Vector3.Max( max, node.pos );
             }
 
-            _lineRenderer.ForceRebuildMesh();
+            // 2. Rejection Sampling
+            List<Vector3> validPositions = new List<Vector3>();
+            int attempts = 0;
+            int maxAttempts = TotalSampleCount * 5; // Prevent infinite loops if geometry is weird
+            while( validPositions.Count < TotalSampleCount && attempts < maxAttempts )
+            {
+                attempts++;
+
+                // Random point in AABB
+                Vector3 p = new Vector3(
+                    UnityEngine.Random.Range( min.x, max.x ),
+                    UnityEngine.Random.Range( min.y, max.y ),
+                    UnityEngine.Random.Range( min.z, max.z )
+                );
+
+                // Check if inside any tetrahedron
+                if( IsPointInsideTank( p, tets ) )
+                {
+                    validPositions.Add( p );
+                }
+            }
+
+            _samplePositions = validPositions.ToArray();
+            int count = _samplePositions.Length;
+
+            _particleMatrices = new Matrix4x4[count];
+            _particleColors = new Vector4[count];
+
+            // Initialize matrices once, they don't move in this specific visualizer style
+            // unless the tank itself moves (handled in UpdateVolumeParticles via localToWorld).
+            Vector3 scaleVec = Vector3.one * ParticleSize;
+            for( int i = 0; i < count; i++ )
+            {
+                // We set the TRS in Update because the parent Transform might move
+                _particleMatrices[i] = Matrix4x4.identity;
+            }
+
+            Debug.Log( $"Generated {_samplePositions.Length} random samples inside tank bounds." );
         }
 
-        private void UpdateFlowColors()
+        private bool IsPointInsideTank( Vector3 p, IReadOnlyList<FlowTetrahedron> tets )
         {
-            // Logic to determine color based on Potential
-            var edges = TargetTank.Edges;
-            var nodes = TargetTank.Nodes;
-
-            if( edges == null )
-                return;
-
-            int edgeCount = edges.Count;
-            if( _edgeColorBuffer.Count != edgeCount )
+            // Brute force check: is point inside ANY tetrahedron?
+            // Optimization: In a real system, use a spatial hash or BVH. 
+            // Since this is init-time only, brute force is acceptable for reasonable N.
+            for( int i = 0; i < tets.Count; i++ )
             {
-                // Mismatch (topology changed?), rebuild
-                RebuildEdges();
-                return;
+                if( IsPointInsideTetrahedron( p, tets[i] ) )
+                    return true;
             }
+            return false;
+        }
 
-            // To visualize what's in the pipe, we sample the fluid at the CENTER of the pipe.
-            // Since the tank is stateless, we just ask "What substance is at this potential?"
+        private bool IsPointInsideTetrahedron( Vector3 p, FlowTetrahedron tet )
+        {
+            // Get vertices
+            Vector3 a = tet.v0.pos;
+            Vector3 b = tet.v1.pos;
+            Vector3 c = tet.v2.pos;
+            Vector3 d = tet.v3.pos;
 
-            for( int i = 0; i < edgeCount; i++ )
+            // Compute Barycentric weights
+            // Solve P = a*w0 + b*w1 + c*w2 + d*w3
+            // Relative to 'd': P-d = w0(a-d) + w1(b-d) + w2(c-d)
+
+            Vector3 v0 = a - d;
+            Vector3 v1 = b - d;
+            Vector3 v2 = c - d;
+            Vector3 v3 = p - d;
+
+            // Cramer's rule or dot products to solve 3x3 system
+            // Mat3 M = [v0 v1 v2]
+            // M * w = v3
+
+            // Scalar Triple Product for volume (det)
+            float detM = Vector3.Dot( v0, Vector3.Cross( v1, v2 ) );
+
+            // If det is near zero, flat tet, ignore
+            if( Mathf.Abs( detM ) < 1e-6f ) return false;
+
+            float w0 = Vector3.Dot( v3, Vector3.Cross( v1, v2 ) ) / detM;
+            float w1 = Vector3.Dot( v0, Vector3.Cross( v3, v2 ) ) / detM;
+            float w2 = Vector3.Dot( v0, Vector3.Cross( v1, v3 ) ) / detM;
+            float w3 = 1.0f - (w0 + w1 + w2);
+
+            // Point is inside if all weights are between 0 and 1
+            // (Actually just >= 0 is enough since they sum to 1)
+            return (w0 >= -1e-4f && w1 >= -1e-4f && w2 >= -1e-4f && w3 >= -1e-4f);
+        }
+
+        private void UpdateVolumeParticles()
+        {
+            if( _samplePositions == null || _samplePositions.Length == 0 ) return;
+
+            Matrix4x4 tankToWorld = targetTransform.localToWorldMatrix;
+            Vector3 scaleVec = Vector3.one * ParticleSize;
+            Quaternion rotation = Quaternion.identity;
+
+            for( int i = 0; i < _samplePositions.Length; i++ )
             {
-                var edge = edges[i];
-                Vector3 p1 = nodes[edge.end1].pos;
-                Vector3 p2 = nodes[edge.end2].pos;
-                IReadonlySubstanceStateCollection[] average = new IReadonlySubstanceStateCollection[10];
-                for( int j = 0; j < 10; j++ )
-                {
-                    Vector3 samplePoint = Vector3.Lerp( p1, p2, ( j + 0.5f ) / 10f );
-                    average[j] = TargetTank.SampleSubstances( samplePoint, 1, 1 );
-                }
+                Vector3 localPos = _samplePositions[i];
 
-                IReadonlySubstanceStateCollection subAvg = IReadonlySubstanceStateCollection.Average( average );
+                // Sample the fluid simulation at this exact coordinate
+                //IReadonlySubstanceStateCollection contents = TargetTank.SampleSubstances( localPos, 1, 1 );
+                // var pot = TargetTank.GetPotentialAt( localPos ); // Optional usage
+                //Color col = FlowColorResolver.GetMixedColor( contents );
 
-                _edgeColorBuffer[i] = FlowColorResolver.GetMixedColor( subAvg );
+                // Update Transform
+                Vector3 worldPos = tankToWorld.MultiplyPoint3x4( localPos );
+                _particleMatrices[i] = Matrix4x4.TRS( worldPos, rotation, scaleVec );
+                _particleColors[i] = new Vector4( worldPos.x, worldPos.y, worldPos.z, 1 ); // Visual tests indicate the colors are distributed randomly and without any obvious pattern (white noise-like).
             }
-
-            _lineRenderer.UpdateLineColors( _edgeColorBuffer );
         }
 
         private void RebuildNodesAndInlets()
         {
             var nodes = TargetTank.Nodes;
-            // Assuming InletNodes is exposed as Dictionary<FlowNode, double> or similar
             var inletsDict = TargetTank.InletNodes;
 
             if( nodes == null ) return;
@@ -275,7 +371,7 @@ namespace HSP._DevUtils
             foreach( var node in nodes )
             {
                 Vector3 worldPos = tankToWorld.MultiplyPoint3x4( node.pos );
-                float visualNodeRadius = Mathf.Max( NodeRadius, PipeThickness * 1.2f );
+                float visualNodeRadius = NodeRadius;
                 float nodeScale = visualNodeRadius * 2.0f;
 
                 nodeMats.Add( Matrix4x4.TRS( worldPos, Quaternion.identity, Vector3.one * nodeScale ) );
@@ -298,7 +394,7 @@ namespace HSP._DevUtils
             _inletInnerRadii = inletRadii.ToArray();
         }
 
-        // --- Standard Instancing Helpers (Unchanged) ---
+        // --- Standard Instancing Helpers ---
 
         private void DrawBatchedInstanced( Mesh mesh, Material mat, Matrix4x4[] matrices, MaterialPropertyBlock props, Action<MaterialPropertyBlock> setupProps )
         {
@@ -307,6 +403,9 @@ namespace HSP._DevUtils
 
         private void DrawBatchedInstanced( Mesh mesh, Material mat, Matrix4x4[] matrices, MaterialPropertyBlock props, Action<MaterialPropertyBlock, int, int> setupProps )
         {
+            for( int i = 0; i < Math.Min( 8, _samplePositions.Length ); ++i )
+                Debug.Log( i + " pos=" + _samplePositions[i] + " color=" + _particleColors[i] );
+
             if( matrices == null || matrices.Length == 0 ) return;
             const int BATCH_SIZE = 1023;
             for( int i = 0; i < matrices.Length; i += BATCH_SIZE )
@@ -315,16 +414,9 @@ namespace HSP._DevUtils
                 props.Clear();
                 setupProps( props, i, count );
 
-                if( matrices.Length <= BATCH_SIZE )
-                {
-                    Graphics.DrawMeshInstanced( mesh, 0, mat, matrices, count, props );
-                }
-                else
-                {
-                    Matrix4x4[] batchMats = new Matrix4x4[count];
-                    Array.Copy( matrices, i, batchMats, 0, count );
-                    Graphics.DrawMeshInstanced( mesh, 0, mat, batchMats, count, props );
-                }
+                Matrix4x4[] batchMats = new Matrix4x4[count];
+                Array.Copy( matrices, i, batchMats, 0, count );
+                Graphics.DrawMeshInstanced( mesh, 0, mat, batchMats, count, props );
             }
         }
 

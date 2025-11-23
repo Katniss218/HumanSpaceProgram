@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace HSP.ResourceFlow
 {
@@ -7,7 +9,7 @@ namespace HSP.ResourceFlow
         /// <summary>
         /// Checks if the collection is empty (contains no substances).
         /// </summary>
-        bool IsEmpty(); 
+        bool IsEmpty();
         /// <summary>
         /// Checks if the collection contains only one substance, and outputs that substance.
         /// </summary>
@@ -49,5 +51,78 @@ namespace HSP.ResourceFlow
         /// <param name="mass">The amount of the substance in the collection, in [kg].</param>
         /// <returns>True if the substance exists in the collection.</returns>
         bool TryGet( ISubstance substance, out double mass );
+
+        /// <summary>
+        /// Linearly interpolates between two states.
+        /// Result = From * (1 - t) + To * t.
+        /// </summary>
+        /// <param name="from">The start state.</param>
+        /// <param name="to">The end state.</param>
+        /// <param name="t">The interpolation factor (usually 0.0 to 1.0).</param>
+        public static ISubstanceStateCollection Lerp( IReadonlySubstanceStateCollection from, IReadonlySubstanceStateCollection to, double t )
+        {
+            if( from == null )
+                throw new ArgumentNullException( nameof( from ) );
+            if( to == null )
+                throw new ArgumentNullException( nameof( to ) );
+
+            t = Math.Clamp( t, 0.0, 1.0 ); // Unclamped doesn't make sense, because we can't extrapolate substances that don't exist or have a negative amount of a substance.
+
+            // Clone, scale, and add scaled from the other.
+            ISubstanceStateCollection result = from.Clone();
+            result.Scale( 1.0 - t );
+            result.Add( to, t );
+
+            return result;
+        }
+
+        /// <summary>
+        /// Computes the average state of a collection of states.
+        /// </summary>
+        /// <param name="collections">The list of states to average.</param>
+        /// <returns>A new collection where each substance mass is the average of the inputs.</returns>
+        public static ISubstanceStateCollection Average( IEnumerable<IReadonlySubstanceStateCollection> collections )
+        {
+            if( collections == null )
+                throw new ArgumentNullException( nameof( collections ) );
+
+            using var enumerator = collections.GetEnumerator();
+
+            if( !enumerator.MoveNext() )
+                throw new ArgumentException( "Cannot average an empty sequence of collections.", nameof( collections ) );
+
+            ISubstanceStateCollection result = enumerator.Current.Clone();
+            long totalCount = 1;
+
+            while( enumerator.MoveNext() )
+            {
+                totalCount++;
+                result.Add( enumerator.Current );
+            }
+
+            result.Scale( 1.0 / totalCount );
+
+            return result;
+        }
+    }
+
+    public static class IReadonlySubstanceStateCollection_Ex
+    {
+        /// <summary>
+        /// Gets the mass fraction (0.0 to 1.0) of a specific substance.
+        /// Returns 0 if total mass is effectively zero.
+        /// </summary>
+        public static double GetMassFraction( this IReadonlySubstanceStateCollection collection, ISubstance substance )
+        {
+            double totalMass = collection.GetMass();
+            if( totalMass <= 1e-9 )
+                return 0.0;
+
+            if( collection.TryGet( substance, out double mass ) )
+            {
+                return mass / totalMass;
+            }
+            return 0.0;
+        }
     }
 }

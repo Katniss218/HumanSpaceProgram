@@ -150,7 +150,7 @@ namespace HSP._DevUtils
                 foreach( var e in _edges )
                 {
                     if( e.end1 == null || e.end2 == null ) continue;
-                    Gizmos.DrawLine( transform.TransformPoint( e.end1.pos ), transform.TransformPoint( e.end2.pos ) );
+                    Gizmos.DrawLine( transform.TransformPoint( _nodes[e.end1].pos ), transform.TransformPoint( _nodes[e.end2].pos ) );
                 }
             }
 
@@ -286,8 +286,8 @@ namespace HSP._DevUtils
             var lr = go.AddComponent<LineRenderer>();
             lr.positionCount = 2;
             lr.useWorldSpace = false;
-            Vector3 p0 = e.end1.pos;
-            Vector3 p1 = e.end2.pos;
+            Vector3 p0 = _nodes[e.end1].pos;
+            Vector3 p1 = _nodes[e.end2].pos;
             lr.SetPosition( 0, p0 );
             lr.SetPosition( 1, p1 );
             lr.widthMultiplier = EdgeWidth;
@@ -412,7 +412,7 @@ namespace HSP._DevUtils
         // we declare an external call. Replace or remove this wrapper as needed in your project.
         private static (List<FlowNode> nodes, List<FlowEdge> edges, List<FlowTetrahedron> tets) ComputeDelaunayTetrahedralization( IList<Vector3> inputPoints )
         {
-            return DelaunayTetrahedralizer.ComputeDelaunayTetrahedralization( inputPoints );
+            return DelaunayTetrahedralizer.ComputeTetrahedralization( inputPoints );
         }
 
         #endregion

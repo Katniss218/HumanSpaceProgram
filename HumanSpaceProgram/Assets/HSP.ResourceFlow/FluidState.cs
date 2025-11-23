@@ -43,5 +43,10 @@ namespace HSP.ResourceFlow
             this.Temperature = temperature;
             this.Velocity = velocity;
         }
+
+        public override string ToString()
+        {
+            return $"P={Pressure} Pa, T={Temperature} K, V={Velocity} m/s";
+        }
     }
 }

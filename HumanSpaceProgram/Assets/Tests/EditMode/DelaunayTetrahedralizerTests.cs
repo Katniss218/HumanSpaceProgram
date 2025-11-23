@@ -30,7 +30,7 @@ namespace HSP.ResourceFlow.Tests
             };
 
             // Act
-            var (nodes, edges, tets) = DelaunayTetrahedralizer.ComputeDelaunayTetrahedralization( input );
+            var (nodes, edges, tets) = DelaunayTetrahedralizer.ComputeTetrahedralization( input );
 
             // Assert basic counts
             // Note: current implementation appends 4 super nodes to the nodes list.
@@ -69,7 +69,7 @@ namespace HSP.ResourceFlow.Tests
             };
 
             // Act
-            var (nodes, edges, tets) = DelaunayTetrahedralizer.ComputeDelaunayTetrahedralization( input );
+            var (nodes, edges, tets) = DelaunayTetrahedralizer.ComputeTetrahedralization( input );
 
             // Assert
             Assert.That( nodes, Is.Not.Null );
@@ -93,7 +93,7 @@ namespace HSP.ResourceFlow.Tests
             };
 
             // Act
-            var (nodes, edges, tets) = DelaunayTetrahedralizer.ComputeDelaunayTetrahedralization( input );
+            var (nodes, edges, tets) = DelaunayTetrahedralizer.ComputeTetrahedralization( input );
 
             // Assert: algorithm should treat duplicates as degenerate; expect 0 tets
             Assert.That( nodes, Is.Not.Null );
@@ -118,7 +118,7 @@ namespace HSP.ResourceFlow.Tests
             };
 
             // Act
-            var (nodes, edges, tets) = DelaunayTetrahedralizer.ComputeDelaunayTetrahedralization( input );
+            var (nodes, edges, tets) = DelaunayTetrahedralizer.ComputeTetrahedralization( input );
 
             // Assert: algorithm should treat duplicates as degenerate; expect 0 tets
             Assert.That( nodes, Is.Not.Null );
@@ -148,7 +148,7 @@ namespace HSP.ResourceFlow.Tests
             };
 
             // Act
-            var (nodes, edges, tets) = DelaunayTetrahedralizer.ComputeDelaunayTetrahedralization( input );
+            var (nodes, edges, tets) = DelaunayTetrahedralizer.ComputeTetrahedralization( input );
 
             // Assert: algorithm should treat duplicates as degenerate; expect 0 tets
             Assert.That( nodes, Is.Not.Null );
@@ -173,7 +173,7 @@ namespace HSP.ResourceFlow.Tests
             };
 
             // Act
-            var (nodes, edges, tets) = DelaunayTetrahedralizer.ComputeDelaunayTetrahedralization( input );
+            var (nodes, edges, tets) = DelaunayTetrahedralizer.ComputeTetrahedralization( input );
 
             // Assert
             Assert.That( edges.Count, Is.GreaterThanOrEqualTo( 0 ) );

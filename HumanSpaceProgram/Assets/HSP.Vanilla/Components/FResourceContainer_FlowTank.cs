@@ -66,7 +66,7 @@ namespace HSP.Vanilla.Components
             }
 
             // TODO - validate that something is connected to it. We can use a similar 'connection' structure to control inputs.
-            _cachedTank.DistributeContents(); // settle the fluids so the values at each inlet are correct.
+          //  _cachedTank.DistributeContents(); // settle the fluids so the values at each inlet are correct.
             c.TryAddFlowObj( this, _cachedTank );
             foreach( var inlet in Inlets )
             {

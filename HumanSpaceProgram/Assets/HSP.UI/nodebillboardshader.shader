@@ -37,7 +37,7 @@ Shader "Hidden/HSP/NodeBillboard"
             };
 
             UNITY_INSTANCING_BUFFER_START(Props)
-                UNITY_DEFINE_INSTANCED_PROP(float4, _Color)
+                UNITY_DEFINE_INSTANCED_PROP(float4, _Colorasd)
                 UNITY_DEFINE_INSTANCED_PROP(float, _InnerRadius)
             UNITY_INSTANCING_BUFFER_END(Props)
 
@@ -70,7 +70,7 @@ Shader "Hidden/HSP/NodeBillboard"
             fixed4 frag (v2f i) : SV_Target
             {
                 UNITY_SETUP_INSTANCE_ID(i);
-                float4 col = UNITY_ACCESS_INSTANCED_PROP(Props, _Color);
+                float4 col = UNITY_ACCESS_INSTANCED_PROP(Props, _Colorasd);
                 float innerRad = UNITY_ACCESS_INSTANCED_PROP(Props, _InnerRadius);
 
                 // Circular SDF

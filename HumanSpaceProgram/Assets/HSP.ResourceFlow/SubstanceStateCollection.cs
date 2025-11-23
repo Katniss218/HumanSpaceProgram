@@ -37,6 +37,45 @@ namespace HSP.ResourceFlow
                 }
                 return 0.0;
             }
+            set
+            {
+                int i;
+                double delta = value;
+                for( i = 0; i < _count; i++ )
+                {
+                    if( ReferenceEquals( _species[i], substance ) )
+                    {
+                        delta -= _masses[i];
+                        _totalMass += delta;
+                        double newMass = value;
+                        // Remove element i, compact by moving last into i.
+                        if( Math.Abs( newMass ) <= EPSILON )
+                        {
+                            int last = _count - 1;
+                            if( i != last )
+                            {
+                                _species[i] = _species[last];
+                                _masses[i] = _masses[last];
+                            }
+                            _species[last] = null;
+                            _masses[last] = 0.0;
+                            _count--;
+                            return;
+                        }
+
+                        _masses[i] = newMass;
+                        return;
+                    }
+                }
+
+                // Add new substance
+                i = IndexOfEmpty();
+                EnsureCapacity( i );
+                _species[i] = substance;
+                _masses[i] = value;
+                _count++;
+                _totalMass += delta;
+            }
         }
 
         public static SubstanceStateCollection Empty => new SubstanceStateCollection();
@@ -46,6 +85,16 @@ namespace HSP.ResourceFlow
             // Possible optimization: most mixtures will have only a few components, store a few inline fields (maybe 2), and the array on top of that.
             _species = new ISubstance[4];
             _masses = new double[4];
+            _count = 0;
+            _totalMass = 0;
+        }
+        public SubstanceStateCollection( int capacity )
+        {
+            if( capacity <= 0 )
+                throw new ArgumentOutOfRangeException( nameof( capacity ), "Capacity must be greater than zero." );
+
+            _species = new ISubstance[capacity];
+            _masses = new double[capacity];
             _count = 0;
             _totalMass = 0;
         }
@@ -172,12 +221,12 @@ namespace HSP.ResourceFlow
         /// <summary>
         /// Add/remove a single SubstanceState (dt scales the incoming mass).
         /// </summary>
-        public void Add( ISubstance substance, double mass, double dt = 1.0 )
+        public void Add( ISubstance substance, double mass, double scale = 1.0 )
         {
             if( substance == null )
                 return;
 
-            double delta = mass * dt;
+            double delta = mass * scale;
             if( Math.Abs( delta ) <= EPSILON )
                 return;
 
@@ -218,7 +267,7 @@ namespace HSP.ResourceFlow
         /// <summary>
         /// Add/remove all substances from other (dt scales the incoming mass).
         /// </summary>
-        public void Add( IReadonlySubstanceStateCollection other, double dt = 1.0 )
+        public void Add( IReadonlySubstanceStateCollection other, double scale = 1.0 )
         {
             if( other == null || other.IsEmpty() )
                 return;
@@ -226,8 +275,23 @@ namespace HSP.ResourceFlow
             for( int i = 0; i < other.Count; i++ )
             {
                 (ISubstance s, double mass) = other[i];
-                Add( s, mass, dt );
+                Add( s, mass, scale );
             }
+        }
+
+        public void Scale( double scale )
+        {
+            if( Math.Abs( scale ) <= EPSILON )
+            {
+                Clear();
+                return;
+            }
+
+            for( int i = 0; i < _count; i++ )
+            {
+                _masses[i] *= scale;
+            }
+            _totalMass *= scale;
         }
 
         public void Clear()
@@ -240,9 +304,7 @@ namespace HSP.ResourceFlow
 
         public ISubstanceStateCollection Clone()
         {
-            SubstanceStateCollection copy = new SubstanceStateCollection();
-            copy.EnsureCapacity( _count );
-
+            SubstanceStateCollection copy = new SubstanceStateCollection( _masses.Length );
             Array.Copy( _species, copy._species, _count );
             Array.Copy( _masses, copy._masses, _count );
             copy._count = _count;
