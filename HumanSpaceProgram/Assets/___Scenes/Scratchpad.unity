@@ -560,8 +560,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   targetTransform: {fileID: 334964979}
-  ParticleSize: 0.05
-  TotalSampleCount: 2000
+  ParticleSize: 0.1
+  TotalSampleCount: 3000
   NodeRadius: 0.1
   NodeColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   InletColor: {r: 1, g: 0.6, b: 0, a: 1}

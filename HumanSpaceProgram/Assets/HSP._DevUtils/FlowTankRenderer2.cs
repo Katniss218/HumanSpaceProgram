@@ -125,8 +125,8 @@ namespace HSP._DevUtils
             TargetTank.SetNodes( triangulationPositions, inlets );
             //TargetTank.FluidAcceleration = new Vector3( 2, 6, 0 );
             //TargetTank.FluidAngularVelocity = new Vector3( 0, 0, 0 );
-            TargetTank.FluidAcceleration = new Vector3( 0, -6, 0 );
-            TargetTank.FluidAngularVelocity = new Vector3( 1, 3, 0 );
+            TargetTank.FluidAcceleration = new Vector3( 0, -0.5f, 0 );
+            TargetTank.FluidAngularVelocity = new Vector3( 0, 2, 0 );
             TargetTank.Contents = new SubstanceStateCollection()
             {
                 { sub2, 0.3 * 1 },
@@ -324,9 +324,24 @@ namespace HSP._DevUtils
                 Vector3 localPos = _samplePositions[i];
 
                 // Sample the fluid simulation at this exact coordinate
-                IReadonlySubstanceStateCollection contents = TargetTank.SampleSubstances( localPos, 1, 1 );
-                // var pot = TargetTank.GetPotentialAt( localPos ); // Optional usage
-                Color col = FlowColorResolver.GetMixedColor( contents );
+                const float sampleOffset = 0.0125f; 
+                IReadonlySubstanceStateCollection contentsMid = TargetTank.SampleSubstances( localPos, 1, 1 );
+
+                // Sample the 8 surrounding corners of the cube centered at localPos
+                IReadonlySubstanceStateCollection contents001 = TargetTank.SampleSubstances( localPos + new Vector3( -sampleOffset, -sampleOffset, sampleOffset ), 1, 1 );
+                IReadonlySubstanceStateCollection contents011 = TargetTank.SampleSubstances( localPos + new Vector3( -sampleOffset, sampleOffset, sampleOffset ), 1, 1 );
+                //IReadonlySubstanceStateCollection contents101 = TargetTank.SampleSubstances( localPos + new Vector3( sampleOffset, -sampleOffset, sampleOffset ), 1, 1 );
+                //IReadonlySubstanceStateCollection contents111 = TargetTank.SampleSubstances( localPos + new Vector3( sampleOffset, sampleOffset, sampleOffset ), 1, 1 );
+
+                //IReadonlySubstanceStateCollection contents000 = TargetTank.SampleSubstances( localPos + new Vector3( -sampleOffset, -sampleOffset, -sampleOffset ), 1, 1 );
+                //IReadonlySubstanceStateCollection contents010 = TargetTank.SampleSubstances( localPos + new Vector3( -sampleOffset, sampleOffset, -sampleOffset ), 1, 1 );
+                IReadonlySubstanceStateCollection contents100 = TargetTank.SampleSubstances( localPos + new Vector3( sampleOffset, -sampleOffset, -sampleOffset ), 1, 1 );
+                IReadonlySubstanceStateCollection contents110 = TargetTank.SampleSubstances( localPos + new Vector3( sampleOffset, sampleOffset, -sampleOffset ), 1, 1 );
+
+                IReadonlySubstanceStateCollection avg = IReadonlySubstanceStateCollection.Average( new[] {
+                                       contentsMid, contents001, contents011,
+                                        contents100, contents110 } );
+                Color col = FlowColorResolver.GetMixedColor( avg );
 
                 // Update Transform
                 Vector3 worldPos = tankToWorld.MultiplyPoint3x4( localPos );

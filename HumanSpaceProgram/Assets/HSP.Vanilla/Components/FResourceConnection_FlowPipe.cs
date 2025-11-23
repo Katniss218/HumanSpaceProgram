@@ -6,7 +6,7 @@ namespace HSP.Vanilla.Components
 {
     public class FResourceConnection_FlowPipe : MonoBehaviour, IBuildsFlowNetwork
     {
-        public float CrossSectionArea = 0.1f;
+        public float CrossSectionArea { get; set; } = 0.1f;
         public ResourceInlet FromInlet { get; set; }
         public ResourceInlet ToInlet { get; set; }
 
@@ -30,7 +30,7 @@ namespace HSP.Vanilla.Components
             return BuildFlowResult.Finished;
         }
 
-        public bool IsValid( FlowNetworkSnapshot snapshot )
+        public virtual bool IsValid( FlowNetworkSnapshot snapshot )
         {
 #warning TODO - implement.
             return false;
@@ -47,18 +47,12 @@ namespace HSP.Vanilla.Components
         {
             return new MemberwiseSerializationMapping<FResourceConnection_FlowPipe>()
                 .WithMember( "from_inlet", ObjectContext.Ref, o => o.FromInlet )
-                .WithMember( "to_inlet", ObjectContext.Ref, o => o.ToInlet );
+                .WithMember( "to_inlet", ObjectContext.Ref, o => o.ToInlet )
+                .WithMember( "cross_section_area", o => o.CrossSectionArea );
         }
     }
 
-    /*public class FResourceConnector_FlowPipePump : FResourceConnector_FlowPipe
-    {
-
-    }
-    public class FResourceConnector_FlowPipeValve : FResourceConnector_FlowPipe
-    {
-
-    }
+    /*
     public class FResourceConnector_FlowPipeCheckValve : FResourceConnector_FlowPipe
     {
 

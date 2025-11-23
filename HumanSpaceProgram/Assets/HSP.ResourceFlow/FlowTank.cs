@@ -1,12 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace HSP.ResourceFlow
 {
     public sealed class FlowTank : IResourceConsumer, IResourceProducer
     {
+        /*
+        
+        Uses the edges of a tetrahedralization to figure out the volume distribution of an arbitrary shape
+        Then, for some specific acceleration+angular velocity, group the volume into buckets (slices) by potential
+        Then pour the fluids into the sorted and deduplicated potential buckets (slices)
+        This allows easy and very fast lookup of the fluid surface at any point, and checking which fluids can drain from an inlet with some potential.
+
+        */
+
         private FlowTetrahedron[] _tetrahedra;
         private FlowNode[] _nodes;
         private FlowEdge[] _edges;
@@ -33,8 +41,7 @@ namespace HSP.ResourceFlow
             get => _fluidAcceleration;
             set
             {
-                // Simple equality check to prevent trashing the cache on identical vectors
-                if( _fluidAcceleration != value )
+                if( (_fluidAcceleration - value).sqrMagnitude > 0.05f )
                 {
                     _fluidAcceleration = value;
                     InvalidateGeometryAndFluids();
@@ -47,7 +54,7 @@ namespace HSP.ResourceFlow
             get => _fluidAngularVelocity;
             set
             {
-                if( _fluidAngularVelocity != value )
+                if( (_fluidAngularVelocity - value).sqrMagnitude > 0.05f )
                 {
                     _fluidAngularVelocity = value;
                     InvalidateGeometryAndFluids();
@@ -122,14 +129,14 @@ namespace HSP.ResourceFlow
 
             // Build boundary list: [layer0.Start, layer1.Start, ..., layerN.Start, layerN.End]
             int n = _fluidInSlices.Length;
-            var bounds = new List<double>( n + 1 );
+            List<double> bounds = new ( n + 1 );
             for( int i = 0; i < n; i++ ) bounds.Add( _fluidInSlices[i].PotentialStart );
             bounds.Add( _fluidInSlices[n - 1].PotentialEnd );
 
             int idx = FindIntervalIndex( bounds, p );
             if( idx >= 0 && idx < n )
             {
-                ref var layer = ref _fluidInSlices[idx];
+                ref FluidInSlice layer = ref _fluidInSlices[idx];
                 double massExtracted = flowRate * dt * layer.Density;
                 result.Add( layer.Substance, massExtracted );
             }
@@ -150,7 +157,7 @@ namespace HSP.ResourceFlow
             int sliceIdx = 0;
             for( int f = 0; f < _fluidInSlices.Length; f++ )
             {
-                ref var layer = ref _fluidInSlices[f];
+                ref FluidInSlice layer = ref _fluidInSlices[f];
                 double fStart = layer.PotentialStart;
                 double fEnd = layer.PotentialEnd;
                 double density = layer.Density;
@@ -160,18 +167,18 @@ namespace HSP.ResourceFlow
 
                 for( int s = sliceIdx; s < _slices.Length; s++ )
                 {
-                    ref var slice = ref _slices[s];
+                    ref PotentialSlice slice = ref _slices[s];
                     if( slice.PotentialBottom >= fEnd )
                         break;
 
                     double intersectStart = Math.Max( fStart, slice.PotentialBottom );
                     double intersectEnd = Math.Min( fEnd, slice.PotentialTop );
                     double span = intersectEnd - intersectStart;
-                    if( span <= EPS_POT )
+                    if( span <= EPSILON_OVERLAP )
                         continue;
 
                     double sliceSpan = slice.PotentialTop - slice.PotentialBottom;
-                    double fillRatio = (sliceSpan > EPS_POT) ? (span / sliceSpan) : 1.0;
+                    double fillRatio = (sliceSpan > EPSILON_OVERLAP) ? (span / sliceSpan) : 1.0;
                     double volInOverlap = slice.VolumeCapacity * fillRatio;
                     double mass = volInOverlap * density;
 
@@ -192,19 +199,19 @@ namespace HSP.ResourceFlow
             RecalculateEdgeVolumes();
         }
 
-        private static (int, int) GetCanonicalEdgeKey( FlowNode node1, int i1, FlowNode node2, int i2 )
+        private static (int, int) GetCanonicalEdgeKeyByIndex( int i1, int i2 )
         {
-            // Create a canonical ordering for edges (smaller position first)
-            Vector3 pos1 = node1.pos;
-            Vector3 pos2 = node2.pos;
-
-            if( pos1.x < pos2.x ||
-               (pos1.x == pos2.x && pos1.y < pos2.y) ||
-               (pos1.x == pos2.x && pos1.y == pos2.y && pos1.z < pos2.z) )
-            {
+            if( i1 <= i2 ) 
                 return (i1, i2);
-            }
             return (i2, i1);
+        }
+
+        private static long PackCanonicalEdgeKey( (int a, int b) keyTuple ) => ((long)keyTuple.a << 32) | (uint)keyTuple.b;
+        private static (int a, int b) UnpackCanonicalEdgeKey( long packed )
+        {
+            int a = (int)(packed >> 32);
+            int b = (int)(packed & 0xFFFFFFFF);
+            return (a, b);
         }
 
         private void RecalculateEdgeVolumes()
@@ -249,47 +256,44 @@ namespace HSP.ResourceFlow
             }
 
             // Calculate edge volumes by distributing tetrahedron volumes to edges
-            Dictionary<(int, int), double> edgeVolumes = new();
+            Dictionary<long, double> edgeVolumes = new();
 
             for( int i = 0; i < _tetrahedra.Length; i++ )
             {
-                FlowTetrahedron tet = _tetrahedra[i];
-                FlowNode[] tetNodes = new[] { tet.v0, tet.v1, tet.v2, tet.v3 };
+                var tet = _tetrahedra[i];
+                int[] idx = new int[4]
+                {
+        nodeToIndex[tet.v0],
+        nodeToIndex[tet.v1],
+        nodeToIndex[tet.v2],
+        nodeToIndex[tet.v3]
+                };
+
                 double tetVolume = actualVolumes[i];
 
-                // Calculate total edge length for this tetrahedron
-                double totalEdgeLength = 0.0f;
-                List<(int, int, double)> tetEdges = new();
-
-                for( int j = 0; j < 4; j++ )
-                {
-                    for( int k = j + 1; k < 4; k++ )
+                // compute edge lengths & total
+                double totalEdgeLength = 0.0;
+                double[] lengths = new double[6];
+                int li = 0;
+                for( int a = 0; a < 4; a++ )
+                    for( int b = a + 1; b < 4; b++ )
                     {
-                        FlowNode node1 = tetNodes[j];
-                        FlowNode node2 = tetNodes[k];
-                        double length = Vector3.Distance( node1.pos, node2.pos );
-                        totalEdgeLength += length;
-
-                        (int, int) edgeKey = GetCanonicalEdgeKey( node1, nodeToIndex[node1], node2, nodeToIndex[node2] );
-                        tetEdges.Add( (edgeKey.Item1, edgeKey.Item2, length) );
+                        lengths[li++] = Vector3.Distance( _nodes[idx[a]].pos, _nodes[idx[b]].pos );
+                        totalEdgeLength += lengths[li - 1];
                     }
-                }
 
-                // Distribute tetrahedron volume to edges proportionally to edge length
-                if( totalEdgeLength > 0 )
-                {
-                    foreach( (int node1, int node2, double length) in tetEdges )
+                if( totalEdgeLength <= 0 ) continue;
+
+                li = 0;
+                for( int a = 0; a < 4; a++ )
+                    for( int b = a + 1; b < 4; b++ )
                     {
-                        (int, int) edgeKey = (node1, node2);
-                        double contribution = (length / totalEdgeLength) * tetVolume;
-
-                        if( !edgeVolumes.ContainsKey( edgeKey ) )
-                        {
-                            edgeVolumes[edgeKey] = 0.0f;
-                        }
-                        edgeVolumes[edgeKey] += contribution;
+                        var key = PackCanonicalEdgeKey( GetCanonicalEdgeKeyByIndex( idx[a], idx[b] ));
+                        double contribution = (lengths[li++] / totalEdgeLength) * tetVolume;
+                        if( !edgeVolumes.TryGetValue( key, out double cur ) )
+                            cur = 0.0;
+                        edgeVolumes[key] = cur + contribution;
                     }
-                }
             }
 
             // Create new edges with calculated volumes
@@ -297,14 +301,18 @@ namespace HSP.ResourceFlow
 
             foreach( var kvp in edgeVolumes )
             {
-                FlowEdge edge = new FlowEdge( kvp.Key.Item1, kvp.Key.Item2, kvp.Value );
+                (int a, int b) = UnpackCanonicalEdgeKey(kvp.Key);
+                FlowEdge edge = new FlowEdge( a, b, kvp.Value );
                 edgeGeometries.Add( edge );
             }
 
             _edges = edgeGeometries.ToArray();
 
             // Calculate total calculated volume
-            CalculatedVolume = edgeVolumes.Values.Sum();
+            double sum = 0.0;
+            foreach( var kv in edgeVolumes )
+                sum += kv.Value;
+            CalculatedVolume = sum;
         }
 
         /// <summary>
@@ -493,8 +501,8 @@ namespace HSP.ResourceFlow
             public double PotentialEnd;
         }
 
-        const double EPS_POT = 1e-9;
-        const double EPS_DUP = 1e-2;
+        const double EPSILON_OVERLAP = 1e-9;
+        const double EPSILON_DEDUPE_POTENTIALS = 0.1;
 
         private double[] _nodePotentials; // Cached potentials per node.
         private PotentialSlice[] _slices; // The baked geometry (Null = Dirty)
@@ -547,11 +555,11 @@ namespace HSP.ResourceFlow
 
         private void RecalculateCache( bool force = false )
         {
-            // Lazy evaluation pipeline
+            // "cache" refers to the data that will change without changing the tank geometry.
             if( _slices == null || force )
             {
                 BakePotentialSlices();
-                _fluidInSlices = null; // Geometry changed, so fluids definitely need restacking
+                _fluidInSlices = null; // Geometry changed, so fluid distribution doesn't match the volume distribution by potential.
             }
 
             if( _fluidInSlices == null || force )
@@ -565,6 +573,9 @@ namespace HSP.ResourceFlow
         /// </summary>
         private void BakePotentialSlices()
         {
+            // This operation finds the volume distribution of the tank for the given potential field.
+            // Needs to be recalculated every time fluid acceleration/angular velocity changes.
+
             if( _nodes == null || _edges == null )
                 return;
 
@@ -584,7 +595,7 @@ namespace HSP.ResourceFlow
             int write = 1;
             for( int i = 1; i < distinct.Count; i++ )
             {
-                if( distinct[i] - distinct[write - 1] > EPS_DUP )
+                if( distinct[i] - distinct[write - 1] > EPSILON_DEDUPE_POTENTIALS )
                     distinct[write++] = distinct[i];
             }
             if( write < distinct.Count )
@@ -609,11 +620,11 @@ namespace HSP.ResourceFlow
             // integrate edges
             for( int ei = 0; ei < _edges.Length; ei++ )
             {
-                ref var edge = ref _edges[ei];
+                ref FlowEdge edge = ref _edges[ei];
                 double p1 = _nodePotentials[edge.end1];
                 double p2 = _nodePotentials[edge.end2];
-                var pos1 = _nodes[edge.end1].pos;
-                var pos2 = _nodes[edge.end2].pos;
+                Vector3 pos1 = _nodes[edge.end1].pos;
+                Vector3 pos2 = _nodes[edge.end2].pos;
 
                 if( p1 > p2 )
                 {
@@ -624,12 +635,12 @@ namespace HSP.ResourceFlow
                 double potDiff = p2 - p1;
                 double edgeVol = edge.Volume;
 
-                if( potDiff <= EPS_POT )
+                if( potDiff <= EPSILON_OVERLAP )
                 {
                     int idx = FindIntervalIndex( distinct, p1 );
                     if( idx >= 0 && idx < sliceCount )
                     {
-                        var center = (pos1 + pos2) * 0.5f;
+                        Vector3 center = (pos1 + pos2) * 0.5f;
                         _slices[idx].VolumeCapacity += edgeVol;
                         _slices[idx].GeometricMoment += center * (float)edgeVol;
                     }
@@ -653,7 +664,7 @@ namespace HSP.ResourceFlow
                     double overlapMin = Math.Max( p1, sb );
                     double overlapMax = Math.Min( p2, st );
                     double overlap = overlapMax - overlapMin;
-                    if( overlap <= EPS_POT )
+                    if( overlap <= EPSILON_OVERLAP )
                         continue;
 
                     double frac = overlap * invPotDiff;
@@ -661,9 +672,9 @@ namespace HSP.ResourceFlow
 
                     float tmin = (float)((overlapMin - p1) * invPotDiff);
                     float tmax = (float)((overlapMax - p1) * invPotDiff);
-                    var segStart = Vector3.Lerp( pos1, pos2, tmin );
-                    var segEnd = Vector3.Lerp( pos1, pos2, tmax );
-                    var segCenter = (segStart + segEnd) * 0.5f;
+                    Vector3 segStart = Vector3.Lerp( pos1, pos2, tmin );
+                    Vector3 segEnd = Vector3.Lerp( pos1, pos2, tmax );
+                    Vector3 segCenter = (segStart + segEnd) * 0.5f;
 
                     _slices[s].VolumeCapacity += segVol;
                     _slices[s].GeometricMoment += segCenter * (float)segVol;
@@ -672,7 +683,7 @@ namespace HSP.ResourceFlow
 
             for( int i = 0; i < sliceCount; i++ )
             {
-                if( _slices[i].VolumeCapacity > EPS_POT )
+                if( _slices[i].VolumeCapacity > EPSILON_OVERLAP )
                     _slices[i].Centroid = _slices[i].GeometricMoment / (float)_slices[i].VolumeCapacity;
             }
         }
@@ -682,6 +693,8 @@ namespace HSP.ResourceFlow
         /// </summary>
         private void DistributeFluidsToPotentials()
         {
+            // This operation fills the precalculated sliced potential column with fluids according to their volumes and densities.
+
 #warning TODO - overfill/hydraulic lock should distribute according to volumes.
             // Prepare Fluids
             int fluidCount = Contents.Count;
@@ -791,9 +804,9 @@ namespace HSP.ResourceFlow
             {
                 int mid = lo + (hi - lo) / 2;
                 double a = sortedDistinct[mid], b = sortedDistinct[mid + 1];
-                if( val + EPS_POT < a )
+                if( val + EPSILON_OVERLAP < a )
                     hi = mid - 1;
-                else if( val - EPS_POT > b )
+                else if( val - EPSILON_OVERLAP > b )
                     lo = mid + 1;
                 else return mid;
             }

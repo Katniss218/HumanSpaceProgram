@@ -133,11 +133,23 @@ namespace HSP.Vanilla.Components
             }
         }
 
+        IResourceConsumer _cachedConsumer;
+
         public BuildFlowResult BuildFlowNetwork( FlowNetworkBuilder c )
         {
-            GenericConsumer consumer = new GenericConsumer();
-            consumer.FluidAcceleration = Vector3.zero; // handled in FixedUpdate.
-            consumer.FluidAngularVelocity = Vector3.zero;
+            Vessel vessel = this.transform.GetVessel();
+            Transform reference = vessel.ReferenceTransform;
+
+            foreach( var inlet in Inlets )
+            {
+                Vector3 inletPosInReferenceSpace = reference.InverseTransformPoint( this.transform.TransformPoint( inlet.LocalPosition ) );
+                FlowPipe.Port flowInlet = new FlowPipe.Port( _cachedConsumer, inletPosInReferenceSpace );
+                c.TryAddFlowObj( inlet, flowInlet );
+            }
+
+            _cachedConsumer = new GenericConsumer();
+            _cachedConsumer.FluidAcceleration = Vector3.zero;
+            _cachedConsumer.FluidAngularVelocity = Vector3.zero;
             throw new NotImplementedException();
         }
 

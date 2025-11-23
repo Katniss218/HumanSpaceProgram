@@ -7,7 +7,7 @@ using HSP.UI;
 namespace HSP._DevUtils
 {
     /// <summary>
-    /// Visualizes a FlowTank's topology and contents using the new Potential-Interval architecture.
+    /// Visualizes a FlowTank's topology and contents.
     /// </summary>
     [RequireComponent( typeof( PolyLineRenderer ) )]
     public class FlowTankRenderer : MonoBehaviour
@@ -118,8 +118,8 @@ namespace HSP._DevUtils
             TargetTank.SetNodes( triangulationPositions, inlets );
             //TargetTank.FluidAcceleration = new Vector3( 2, 6, 0 );
             //TargetTank.FluidAngularVelocity = new Vector3( 0, 0, 0 );
-            TargetTank.FluidAcceleration = new Vector3( 0, -6, 0 );
-            TargetTank.FluidAngularVelocity = new Vector3( 1, 3, 0 );
+            TargetTank.FluidAcceleration = new Vector3( 0, -0.5f, 0 );
+            TargetTank.FluidAngularVelocity = new Vector3( 0, 2, 0 );
             TargetTank.Contents = new SubstanceStateCollection()
             {
                 { sub2, 0.3 * 1 },
@@ -151,7 +151,7 @@ namespace HSP._DevUtils
 
         public void FixedUpdate()
         {
-            for( int i = 0; i < 500; i++ )
+            for( int i = 0; i < 50; i++ )
             {
                 TargetTank.ForceRecalculateCache();
             }
