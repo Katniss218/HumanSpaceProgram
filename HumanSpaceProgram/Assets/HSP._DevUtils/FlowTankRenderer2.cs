@@ -123,13 +123,14 @@ namespace HSP._DevUtils
             };
             TargetTank = new FlowTank( 0.5 );
             TargetTank.SetNodes( triangulationPositions, inlets );
-            TargetTank.FluidAcceleration = new Vector3( 2, 6, 0 );
-            //TargetTank.FluidAcceleration = new Vector3( 0, -6, 0 );
-            TargetTank.FluidAngularVelocity = new Vector3( 0, 0, 0 );
+            //TargetTank.FluidAcceleration = new Vector3( 2, 6, 0 );
+            //TargetTank.FluidAngularVelocity = new Vector3( 0, 0, 0 );
+            TargetTank.FluidAcceleration = new Vector3( 0, -6, 0 );
+            TargetTank.FluidAngularVelocity = new Vector3( 1, 3, 0 );
             TargetTank.Contents = new SubstanceStateCollection()
             {
                 { sub2, 0.3 * 1 },
-                { sub3, 100 },
+                { sub3, 50 },
                 { sub, 250 }
             };
             TargetTank.FluidState = new FluidState( pressure: 101325, temperature: 293, velocity: 0 );
@@ -168,14 +169,14 @@ namespace HSP._DevUtils
             // 2. Draw Nodes
             DrawBatchedInstanced( _quadMesh, _billboardMat, _nodeMatrices, _nodeProps, ( props ) =>
             {
-                props.SetColor( "_Colorasd", NodeColor );
+                props.SetColor( "_Color", NodeColor );
                 props.SetFloat( "_InnerRadius", 0.0f );
             } );
 
             // 3. Draw Inlets
             DrawBatchedInstanced( _quadMesh, _billboardMat, _inletMatrices, _inletProps, ( props, offset, count ) =>
             {
-                props.SetColor( "_Colorasd", InletColor );
+                props.SetColor( "_Color", InletColor );
                 float[] slice = new float[count];
                 Array.Copy( _inletInnerRadii, offset, slice, 0, count );
                 props.SetFloatArray( "_InnerRadius", slice );
@@ -185,31 +186,10 @@ namespace HSP._DevUtils
             DrawBatchedInstanced( _quadMesh, _billboardMat, _particleMatrices, _particleProps, ( props, offset, count ) =>
             {
                 Vector4[] slice = new Vector4[count];
-                //Array.Copy( _particleColors, offset, slice, 0, count );
-                for( int i = 0; i < count; i++ )
-                {
-                    slice[i] = Color.red;
-                }
-                slice[0] = Color.green;
-                props.SetVectorArray( "_Colorasd", slice );
+                Array.Copy( _particleColors, offset, slice, 0, count );
+                props.SetVectorArray( "_Color", slice );
                 props.SetFloat( "_InnerRadius", 0.0f );
             } );
-
-
-
-
-            int count = 8;
-            Matrix4x4[] mats = new Matrix4x4[count];
-            Vector4[] cols = new Vector4[count];
-            for( int i = 0; i < count; ++i )
-            {
-                Vector3 pos = new Vector3( i * 0.5f, 0, 0 );
-                mats[i] = Matrix4x4.TRS( pos, Quaternion.identity, Vector3.one * 0.25f );
-                cols[i] = new Vector4( i / 8.0f, 1 - i / 8.0f, (i % 2 == 0) ? 1 : 0, 1 );
-            }
-            var mpb = new MaterialPropertyBlock();
-            mpb.SetVectorArray( "_Colorasd", cols );
-            Graphics.DrawMeshInstanced( _quadMesh, 0, _billboardMat, mats, count, mpb );
         }
 
         public void InitializeVisuals()
@@ -344,14 +324,14 @@ namespace HSP._DevUtils
                 Vector3 localPos = _samplePositions[i];
 
                 // Sample the fluid simulation at this exact coordinate
-                //IReadonlySubstanceStateCollection contents = TargetTank.SampleSubstances( localPos, 1, 1 );
+                IReadonlySubstanceStateCollection contents = TargetTank.SampleSubstances( localPos, 1, 1 );
                 // var pot = TargetTank.GetPotentialAt( localPos ); // Optional usage
-                //Color col = FlowColorResolver.GetMixedColor( contents );
+                Color col = FlowColorResolver.GetMixedColor( contents );
 
                 // Update Transform
                 Vector3 worldPos = tankToWorld.MultiplyPoint3x4( localPos );
                 _particleMatrices[i] = Matrix4x4.TRS( worldPos, rotation, scaleVec );
-                _particleColors[i] = new Vector4( worldPos.x, worldPos.y, worldPos.z, 1 ); // Visual tests indicate the colors are distributed randomly and without any obvious pattern (white noise-like).
+                _particleColors[i] = col;
             }
         }
 
@@ -403,9 +383,6 @@ namespace HSP._DevUtils
 
         private void DrawBatchedInstanced( Mesh mesh, Material mat, Matrix4x4[] matrices, MaterialPropertyBlock props, Action<MaterialPropertyBlock, int, int> setupProps )
         {
-            for( int i = 0; i < Math.Min( 8, _samplePositions.Length ); ++i )
-                Debug.Log( i + " pos=" + _samplePositions[i] + " color=" + _particleColors[i] );
-
             if( matrices == null || matrices.Length == 0 ) return;
             const int BATCH_SIZE = 1023;
             for( int i = 0; i < matrices.Length; i += BATCH_SIZE )

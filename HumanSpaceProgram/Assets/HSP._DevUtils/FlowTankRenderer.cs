@@ -116,13 +116,14 @@ namespace HSP._DevUtils
             };
             TargetTank = new FlowTank( 0.5 );
             TargetTank.SetNodes( triangulationPositions, inlets );
-            TargetTank.FluidAcceleration = new Vector3( 2, 6, 0 );
-            //TargetTank.FluidAcceleration = new Vector3( 0, -6, 0 );
-            TargetTank.FluidAngularVelocity = new Vector3( 0, 0, 0 );
+            //TargetTank.FluidAcceleration = new Vector3( 2, 6, 0 );
+            //TargetTank.FluidAngularVelocity = new Vector3( 0, 0, 0 );
+            TargetTank.FluidAcceleration = new Vector3( 0, -6, 0 );
+            TargetTank.FluidAngularVelocity = new Vector3( 1, 3, 0 );
             TargetTank.Contents = new SubstanceStateCollection()
             {
                 { sub2, 0.3 * 1 },
-                { sub3, 100 },
+                { sub3, 50 },
                 { sub, 250 }
             };
             TargetTank.FluidState = new FluidState( pressure: 101325, temperature: 293, velocity: 0 );
@@ -150,10 +151,10 @@ namespace HSP._DevUtils
 
         public void FixedUpdate()
         {
-            /*for( int i = 0; i < 500; i++ )
+            for( int i = 0; i < 500; i++ )
             {
                 TargetTank.ForceRecalculateCache();
-            }*/
+            }
         }
 
         private void LateUpdate()
