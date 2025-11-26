@@ -71,7 +71,7 @@ namespace HSP.ResourceFlow
 
 
         /// <summary>
-        /// Samples the fluid state (Pressure, Temperature) at a specific local position.
+        /// Samples the fluid state (Pressure, Temperature, FluidSurfacePotential) at a specific local position.
         /// Calculates hydrostatic pressure based on the potential depth.
         /// </summary>
         public FluidState Sample( Vector3 localPosition, double holeArea )
@@ -82,8 +82,20 @@ namespace HSP.ResourceFlow
             double pressure = result.Pressure;
             double pointPotential = GetPotentialAt( localPosition );
 
+            // Calculate Fluid Surface Potential
+            if( Contents.Count > 0 && _fluidInSlices.Length > 0 )
+            {
+                result.FluidSurfacePotential = _fluidInSlices[^1].PotentialEnd;
+            }
+            else
+            {
+                // If the tank is empty, the "surface" that fluid would flow against is the inlet port itself.
+                // This makes the empty tank a sink relative to any tank with a higher fluid surface.
+                result.FluidSurfacePotential = pointPotential;
+            }
+
             // Optimization: If point is above the highest fluid, we are in gas.
-            if( Contents.Count == 0 || pointPotential >= _fluidInSlices[Contents.Count - 1].PotentialEnd )
+            if( Contents.Count == 0 || pointPotential >= result.FluidSurfacePotential )
             {
                 return result;
             }
@@ -99,11 +111,10 @@ namespace HSP.ResourceFlow
                     // We are strictly below this layer. Add its full weight.
                     pressure += layer.Density * (layer.PotentialEnd - layer.PotentialStart);
                 }
-                else
+                else if( pointPotential < layer.PotentialEnd )
                 {
                     // We are inside this layer. Add weight from top of layer to point.
-                    double effectiveTop = Math.Max( layer.PotentialEnd, pointPotential );
-                    pressure += layer.Density * (effectiveTop - pointPotential);
+                    pressure += layer.Density * (layer.PotentialEnd - pointPotential);
                     break; // We reached the fluid containing the point
                 }
             }
@@ -129,7 +140,7 @@ namespace HSP.ResourceFlow
 
             // Build boundary list: [layer0.Start, layer1.Start, ..., layerN.Start, layerN.End]
             int n = _fluidInSlices.Length;
-            List<double> bounds = new ( n + 1 );
+            List<double> bounds = new( n + 1 );
             for( int i = 0; i < n; i++ ) bounds.Add( _fluidInSlices[i].PotentialStart );
             bounds.Add( _fluidInSlices[n - 1].PotentialEnd );
 
@@ -201,7 +212,7 @@ namespace HSP.ResourceFlow
 
         private static (int, int) GetCanonicalEdgeKeyByIndex( int i1, int i2 )
         {
-            if( i1 <= i2 ) 
+            if( i1 <= i2 )
                 return (i1, i2);
             return (i2, i1);
         }
@@ -216,103 +227,70 @@ namespace HSP.ResourceFlow
 
         private void RecalculateEdgeVolumes()
         {
-            /*
-            
-            To get the 'proper' volume of each edge, we start with the user-defined 'desired' total tank volume. This can be anything, from 0 to infinity.
-            We then calculate the 'desired' volumes for each tetrahedron (and their total 'desired' volume, i.e. the sum), which will be used for proportional scaling.
-            The 'actual' volume of a *tetrahedron* is then: `actual = (desired / desired_total) * actual_total`.
-            That is then split up between the edges that are part of this tetrahedron, according to the edge length (similar proportionality as above).
-            Then we can get the 'proper' volume of the *edge*, which is just the sum of the contributions from each tetrahedron that this edge is a part of.
-
-            */
-
             if( _tetrahedra == null || _edges == null )
                 return;
 
-            Dictionary<FlowNode, int> nodeToIndex = new Dictionary<FlowNode, int>( _nodes.Length );
-            for( int i = 0; i < _nodes.Length; i++ )
+            // 1. Calculate Tetrahedra Volumes
+            double totalDes = 0;
+            double[] tetVolumes = new double[_tetrahedra.Length];
+            for( int i = 0; i < _tetrahedra.Length; i++ )
             {
-                nodeToIndex[_nodes[i]] = i;
+                tetVolumes[i] = _tetrahedra[i].GetVolume();
+                totalDes += tetVolumes[i];
             }
 
-            // Calculate desired volumes for each tetrahedron
-            double totalDesiredVolume = 0.0f;
-            double[] desiredVolumes = new double[_tetrahedra.Length];
+            // Scale to match Tank Actual Volume
+            double scale = (totalDes > 0) ? Volume / totalDes : 0;
+            for( int i = 0; i < tetVolumes.Length; i++ )
+                tetVolumes[i] *= scale;
+
+            // 2. Distribute to Edges using ValueTuple Dictionary
+            var edgeVols = new Dictionary<(int, int), double>();
 
             for( int i = 0; i < _tetrahedra.Length; i++ )
             {
-                desiredVolumes[i] = _tetrahedra[i].GetVolume();
-                totalDesiredVolume += desiredVolumes[i];
-            }
-
-            // Calculate actual volumes for each tetrahedron
-            double[] actualVolumes = new double[_tetrahedra.Length];
-            if( totalDesiredVolume > 0 )
-            {
-                for( int i = 0; i < _tetrahedra.Length; i++ )
-                {
-                    actualVolumes[i] = (desiredVolumes[i] / totalDesiredVolume) * Volume;
-                }
-            }
-
-            // Calculate edge volumes by distributing tetrahedron volumes to edges
-            Dictionary<long, double> edgeVolumes = new();
-
-            for( int i = 0; i < _tetrahedra.Length; i++ )
-            {
-                var tet = _tetrahedra[i];
-                int[] idx = new int[4]
-                {
-        nodeToIndex[tet.v0],
-        nodeToIndex[tet.v1],
-        nodeToIndex[tet.v2],
-        nodeToIndex[tet.v3]
+                var t = _tetrahedra[i];
+                int[] ni = {
+                    Array.IndexOf(_nodes, t.v0), Array.IndexOf(_nodes, t.v1),
+                    Array.IndexOf(_nodes, t.v2), Array.IndexOf(_nodes, t.v3)
                 };
 
-                double tetVolume = actualVolumes[i];
-
-                // compute edge lengths & total
-                double totalEdgeLength = 0.0;
-                double[] lengths = new double[6];
-                int li = 0;
+                // Calc lengths
+                double totalLen = 0;
+                double[] lens = new double[6];
+                int k = 0;
                 for( int a = 0; a < 4; a++ )
                     for( int b = a + 1; b < 4; b++ )
                     {
-                        lengths[li++] = Vector3.Distance( _nodes[idx[a]].pos, _nodes[idx[b]].pos );
-                        totalEdgeLength += lengths[li - 1];
+                        lens[k] = Vector3.Distance( _nodes[ni[a]].pos, _nodes[ni[b]].pos );
+                        totalLen += lens[k++];
                     }
 
-                if( totalEdgeLength <= 0 ) continue;
+                if( totalLen <= EPSILON_OVERLAP )
+                    continue;
 
-                li = 0;
+                // Distribute
+                k = 0;
                 for( int a = 0; a < 4; a++ )
                     for( int b = a + 1; b < 4; b++ )
                     {
-                        var key = PackCanonicalEdgeKey( GetCanonicalEdgeKeyByIndex( idx[a], idx[b] ));
-                        double contribution = (lengths[li++] / totalEdgeLength) * tetVolume;
-                        if( !edgeVolumes.TryGetValue( key, out double cur ) )
-                            cur = 0.0;
-                        edgeVolumes[key] = cur + contribution;
+                        (int, int) key = GetCanonicalEdgeKeyByIndex( ni[a], ni[b] );
+                        double vol = (lens[k++] / totalLen) * tetVolumes[i];
+
+                        edgeVols.TryGetValue( key, out double existing );
+                        edgeVols[key] = existing + vol;
                     }
             }
 
-            // Create new edges with calculated volumes
-            List<FlowEdge> edgeGeometries = new();
-
-            foreach( var kvp in edgeVolumes )
+            // 3. Rebuild Array
+            List<FlowEdge> newEdges = new( edgeVols.Count );
+            CalculatedVolume = 0;
+            foreach( var kvp in edgeVols )
             {
-                (int a, int b) = UnpackCanonicalEdgeKey(kvp.Key);
-                FlowEdge edge = new FlowEdge( a, b, kvp.Value );
-                edgeGeometries.Add( edge );
+                newEdges.Add( new FlowEdge( kvp.Key.Item1, kvp.Key.Item2, kvp.Value ) );
+                CalculatedVolume += kvp.Value;
             }
-
-            _edges = edgeGeometries.ToArray();
-
-            // Calculate total calculated volume
-            double sum = 0.0;
-            foreach( var kv in edgeVolumes )
-                sum += kv.Value;
-            CalculatedVolume = sum;
+            _edges = newEdges.ToArray();
         }
 
         /// <summary>
@@ -410,7 +388,7 @@ namespace HSP.ResourceFlow
             // 3) Compute tetrahedralization from the position list.
             (List<FlowNode> nodes, List<FlowEdge> edges, List<FlowTetrahedron> tets) = DelaunayTetrahedralizer.ComputeTetrahedralization( allPositions );
 
-            Debug.Log( nodes.Count + " : " + edges.Count + " : " + tets.Count );
+            //Debug.Log( nodes.Count + " : " + edges.Count + " : " + tets.Count );
             // 4) Populate inlet-node mapping (_inletNodes) by matching inlet positions to produced FlowNode positions.
             _inletNodes = new Dictionary<FlowNode, double>();
 
@@ -483,7 +461,17 @@ namespace HSP.ResourceFlow
             /// </summary>
             public Vector3 Centroid;
 
-            public bool IsEmpty => VolumeCapacity <= 1e-9;
+            public void AddVolume( double volume, Vector3 center )
+            {
+                VolumeCapacity += volume;
+                GeometricMoment += center * (float)volume;
+            }
+
+            public void FinalizeCentroid()
+            {
+                if( VolumeCapacity > EPSILON_OVERLAP )
+                    Centroid = GeometricMoment / (float)VolumeCapacity;
+            }
         }
 
         /// <summary>
@@ -573,51 +561,44 @@ namespace HSP.ResourceFlow
         /// </summary>
         private void BakePotentialSlices()
         {
-            // This operation finds the volume distribution of the tank for the given potential field.
-            // Needs to be recalculated every time fluid acceleration/angular velocity changes.
-
             if( _nodes == null || _edges == null )
                 return;
 
+            // 1. Calculate and Sort Potentials
             int n = _nodes.Length;
             _nodePotentials = new double[n];
             List<double> distinct = new( n );
 
             for( int i = 0; i < n; i++ )
             {
-                double p = GetPotentialAt( _nodes[i].pos );
-                _nodePotentials[i] = p;
-                distinct.Add( p );
+                _nodePotentials[i] = GetPotentialAt( _nodes[i].pos );
+                distinct.Add( _nodePotentials[i] );
             }
 
             distinct.Sort();
-            // dedupe with tolerance
-            int write = 1;
-            for( int i = 1; i < distinct.Count; i++ )
+
+            // Dedupe
+            int write = 0;
+            for( int i = 0; i < distinct.Count; i++ )
             {
-                if( distinct[i] - distinct[write - 1] > EPSILON_DEDUPE_POTENTIALS )
+                if( write == 0 || (distinct[i] - distinct[write - 1] > EPSILON_DEDUPE_POTENTIALS) )
                     distinct[write++] = distinct[i];
             }
-            if( write < distinct.Count )
-                distinct.RemoveRange( write, distinct.Count - write );
+            distinct.RemoveRange( write, distinct.Count - write );
 
+            // 2. Init Slices
             int sliceCount = Math.Max( 0, distinct.Count - 1 );
-            if( sliceCount == 0 )
-            {
-                _slices = Array.Empty<PotentialSlice>();
-                return;
-            }
-
             _slices = new PotentialSlice[sliceCount];
             for( int i = 0; i < sliceCount; i++ )
             {
                 _slices[i].PotentialBottom = distinct[i];
                 _slices[i].PotentialTop = distinct[i + 1];
-                _slices[i].VolumeCapacity = 0.0;
-                _slices[i].GeometricMoment = Vector3.zero;
             }
 
-            // integrate edges
+            if( sliceCount == 0 )
+                return;
+
+            // 3. Integrate Edges
             for( int ei = 0; ei < _edges.Length; ei++ )
             {
                 ref FlowEdge edge = ref _edges[ei];
@@ -626,6 +607,7 @@ namespace HSP.ResourceFlow
                 Vector3 pos1 = _nodes[edge.end1].pos;
                 Vector3 pos2 = _nodes[edge.end2].pos;
 
+                // Ensure p1 < p2
                 if( p1 > p2 )
                 {
                     (p1, p2) = (p2, p1);
@@ -633,59 +615,72 @@ namespace HSP.ResourceFlow
                 }
 
                 double potDiff = p2 - p1;
-                double edgeVol = edge.Volume;
 
+                // --- PERPENDICULAR EDGE ---
                 if( potDiff <= EPSILON_OVERLAP )
                 {
-                    int idx = FindIntervalIndex( distinct, p1 );
-                    if( idx >= 0 && idx < sliceCount )
+                    // Find the exact potential boundary this edge sits on
+                    int k = FindClosestIndex( distinct, p1, EPSILON_DEDUPE_POTENTIALS * 1.5 );
+
+                    // If found, split volume between slice below (k-1) and slice above (k)
+                    if( k >= 0 )
                     {
                         Vector3 center = (pos1 + pos2) * 0.5f;
-                        _slices[idx].VolumeCapacity += edgeVol;
-                        _slices[idx].GeometricMoment += center * (float)edgeVol;
+                        double halfVol = edge.Volume * 0.5;
+
+                        bool hasBottom = (k - 1 >= 0 && k - 1 < sliceCount);
+                        bool hasTop = (k < sliceCount);
+
+                        // If we are at the very floor, put all volume above. If at ceiling, all below.
+                        if( !hasBottom )
+                            halfVol *= 2;
+                        else if( !hasTop )
+                            halfVol *= 2;
+
+                        if( hasBottom )
+                            _slices[k - 1].AddVolume( halfVol, center );
+                        if( hasTop )
+                            _slices[k].AddVolume( halfVol, center );
                     }
                     continue;
                 }
 
-                double invPotDiff = 1.0 / potDiff;
-                int startIdx = FindIntervalIndex( distinct, p1 );
-                if( startIdx < 0 )
-                    startIdx = 0;
+                // --- STANDARD SLOPED EDGE ---
+                double invDiff = 1.0 / potDiff;
+                int startIdx = FindIntervalIndex( distinct, p1 ); // Use helper
+                if( startIdx < 0 ) startIdx = 0;
 
                 for( int s = startIdx; s < sliceCount; s++ )
                 {
-                    double sb = _slices[s].PotentialBottom;
-                    double st = _slices[s].PotentialTop;
-                    if( sb >= p2 )
+                    ref PotentialSlice slice = ref _slices[s];
+                    if( slice.PotentialBottom >= p2 )
                         break;
-                    if( st <= p1 )
+                    if( slice.PotentialTop <= p1 )
                         continue;
 
-                    double overlapMin = Math.Max( p1, sb );
-                    double overlapMax = Math.Min( p2, st );
-                    double overlap = overlapMax - overlapMin;
-                    if( overlap <= EPSILON_OVERLAP )
-                        continue;
+                    // Calc Overlap
+                    double oMin = Math.Max( p1, slice.PotentialBottom );
+                    double oMax = Math.Min( p2, slice.PotentialTop );
+                    double overlap = oMax - oMin;
 
-                    double frac = overlap * invPotDiff;
-                    double segVol = edgeVol * frac;
+                    if( overlap > EPSILON_OVERLAP )
+                    {
+                        double frac = overlap * invDiff;
+                        double segVol = edge.Volume * frac;
 
-                    float tmin = (float)((overlapMin - p1) * invPotDiff);
-                    float tmax = (float)((overlapMax - p1) * invPotDiff);
-                    Vector3 segStart = Vector3.Lerp( pos1, pos2, tmin );
-                    Vector3 segEnd = Vector3.Lerp( pos1, pos2, tmax );
-                    Vector3 segCenter = (segStart + segEnd) * 0.5f;
+                        // Centroid of the segment
+                        float t1 = (float)((oMin - p1) * invDiff);
+                        float t2 = (float)((oMax - p1) * invDiff);
+                        Vector3 segCenter = Vector3.Lerp( pos1, pos2, (t1 + t2) * 0.5f );
 
-                    _slices[s].VolumeCapacity += segVol;
-                    _slices[s].GeometricMoment += segCenter * (float)segVol;
+                        slice.AddVolume( segVol, segCenter );
+                    }
                 }
             }
 
+            // 4. Finalize
             for( int i = 0; i < sliceCount; i++ )
-            {
-                if( _slices[i].VolumeCapacity > EPSILON_OVERLAP )
-                    _slices[i].Centroid = _slices[i].GeometricMoment / (float)_slices[i].VolumeCapacity;
-            }
+                _slices[i].FinalizeCentroid();
         }
 
         /// <summary>
@@ -793,20 +788,59 @@ namespace HSP.ResourceFlow
             }
         }
 
-        // Find index i such that arr[i] <= val <= arr[i+1], returns -1 if out of range.
-        public static int FindIntervalIndex( IList<double> sortedDistinct, double val )
+        /// <summary>
+        /// Finds the index i such that sortedList[i] is within tolerance of value. 
+        /// Returns -1 if no match found.
+        /// </summary>
+        public static int FindClosestIndex( IList<double> sortedList, double value, double tolerance )
         {
-            int n = sortedDistinct.Count;
+            // Use standard BinarySearch. 
+            // If found, returns index. If not, returns bitwise complement of next largest element.
+            int idx = (sortedList is List<double> list)
+                ? list.BinarySearch( value )
+                : -1; // Fallback if not List<T>, strictly not needed if we only use List
+
+            if( idx >= 0 )
+                return idx;
+
+            int nextIdx = ~idx;
+
+            // Check neighbors (nextIdx and nextIdx - 1) for tolerance match
+            double diffNext = (nextIdx < sortedList.Count)
+                ? Math.Abs( sortedList[nextIdx] - value )
+                : double.MaxValue;
+            double diffPrev = (nextIdx > 0)
+                ? Math.Abs( sortedList[nextIdx - 1] - value )
+                : double.MaxValue;
+
+            if( diffNext < diffPrev && diffNext <= tolerance )
+                return nextIdx;
+            if( diffPrev <= diffNext && diffPrev <= tolerance )
+                return nextIdx - 1;
+
+            return -1;
+        }
+
+        /// <summary>
+        /// Finds index i such that list[i] <= val <= list[i+1].
+        /// </summary>
+        public static int FindIntervalIndex( IList<double> sortedList, double val, double epsilon = EPSILON_OVERLAP )
+        {
+            int n = sortedList.Count;
             if( n < 2 )
                 return -1;
+
+            // Bounds check
+            if( val < sortedList[0] - epsilon || val > sortedList[n - 1] + epsilon )
+                return -1;
+
             int lo = 0, hi = n - 2;
             while( lo <= hi )
             {
                 int mid = lo + (hi - lo) / 2;
-                double a = sortedDistinct[mid], b = sortedDistinct[mid + 1];
-                if( val + EPSILON_OVERLAP < a )
+                if( val < sortedList[mid] - epsilon )
                     hi = mid - 1;
-                else if( val - EPSILON_OVERLAP > b )
+                else if( val > sortedList[mid + 1] + epsilon )
                     lo = mid + 1;
                 else return mid;
             }

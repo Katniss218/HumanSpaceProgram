@@ -122,10 +122,9 @@ namespace HSP.ResourceFlow
 
 
         private double[] currentFlowRates;
-        private (double, double)[] currentPressures;
+        private (double, double)[] currentPotentials;
 
         private double[] nextFlowRates;
-        private (double, double)[] nextPressures; // pressure at FromInlet and ToInlet
 
         public FlowNetworkSnapshot( GameObject rootObject, IReadOnlyDictionary<object, object> owner, IBuildsFlowNetwork[] applyTo, IResourceProducer[] producers, int[][] producersAndPipes, IResourceConsumer[] consumers, int[][] consumersAndPipes, FlowPipe[] pipes )
         {
@@ -138,9 +137,8 @@ namespace HSP.ResourceFlow
             ConsumersAndPipes = consumersAndPipes;
             Pipes = pipes;
             currentFlowRates = new double[Pipes.Length];
-            currentPressures = new (double, double)[Pipes.Length];
+            currentPotentials = new (double, double)[Pipes.Length];
             nextFlowRates = new double[Pipes.Length];
-            nextPressures = new (double, double)[Pipes.Length];
         }
 
         public bool TryGetFlowObj<T>( object obj, out T flowObj )
@@ -179,25 +177,25 @@ namespace HSP.ResourceFlow
             const int MAX_ITERATIONS = 50;
             const double CONVERGENCE_THRESHOLD = 0.0001; // Tuned for precision
 
-            // 1. Initial State: Sample pressures based on the tanks' current state (static head).
-            UpdatePressures();
+            // 1. Initial State: Sample potentials based on the tanks' current state (fluid surface potential).
+            UpdatePotentials();
 
             bool converged = false;
 
-            // 2. Solver Loop: Find equilibrium Flow Rates and Pressures.
+            // 2. Solver Loop: Find equilibrium Flow Rates and Potentials.
             // Note: We do NOT move mass (SubstanceStateCollection) here. 
             // We only solve for the hydrodynamic scalar values (FlowRate).
             for( int iteration = 0; iteration < MAX_ITERATIONS; iteration++ )
             {
-                // A. Calculate Flow Rates based on current Pressures
+                // A. Calculate Flow Rates based on current Potentials
                 for( int i = 0; i < Pipes.Length; i++ )
                 {
                     FlowPipe pipe = Pipes[i];
-                    (double pFrom, double pTo) = currentPressures[i];
+                    (double potFrom, double potTo) = currentPotentials[i];
 
-                    // ComputeFlowRate typically uses Bernoulli/Pipe friction logic.
+                    // ComputeFlowRate typically uses potential difference logic.
                     // Result > 0 implies Flow From->To. Result < 0 implies To->From.
-                    nextFlowRates[i] = pipe.ComputeFlowRate( pFrom, pTo );
+                    nextFlowRates[i] = pipe.ComputeFlowRate( potFrom, potTo );
                 }
 
                 // B. Check Convergence
@@ -220,20 +218,13 @@ namespace HSP.ResourceFlow
                 if( converged )
                     break;
 
-                // C. Update Pressures based on new Flow Rates
-                // Note: If the Tank.Sample() method relies purely on Static Head (Volume), 
-                // pressures won't change much during iteration unless we update volume (which we shouldn't in a snapshot).
-                // However, if Sample() includes Dynamic Pressure (Bernoulli term from Inflow velocity), 
-                // we technically need to tell the tank its current inflow/outflow rate here.
-                // Assuming simpler static-head model for stability:
-                UpdatePressures();
+                // C. Update Potentials based on new Flow Rates
+                UpdatePotentials();
             }
 
             if( !converged )
             {
-                // In a realtime game, throwing exceptions crashes the thread/game. 
-                // Better to log a warning and apply the best-effort result.
-                Debug.LogWarning( "FlowNetworkSnapshot.Step: Failed to converge within max iterations. Using best-effort results." );
+                throw new Exception( "FlowNetworkSnapshot.Step: Failed to converge within max iterations." );
             }
 
             // 3. Transport Phase: Move the actual substances based on the solved flow rates.
@@ -254,9 +245,9 @@ namespace HSP.ResourceFlow
             }
         }
 
-        private void UpdatePressures()
+        private void UpdatePotentials()
         {
-            // Sample pressures from Producers
+            // Sample potentials from Producers
             for( int i = 0; i < Producers.Length; i++ )
             {
                 IResourceProducer producer = Producers[i];
@@ -267,22 +258,22 @@ namespace HSP.ResourceFlow
                     int pipeIdx = pipeIndices[k];
                     FlowPipe pipe = Pipes[pipeIdx];
 
-                    // Sample pressure at the connection point
-                    // Note: Sample() might be expensive, optimize if needed.
+#warning TODO - include gas pressure in the overall potential?
+                    // Sample potential at the connection point
                     if( ReferenceEquals( pipe.FromInlet.Producer, producer ) )
                     {
-                        double p = producer.Sample( pipe.FromInlet.pos, pipe.CrossSectionArea ).Pressure;
-                        currentPressures[pipeIdx].Item1 = p;
+                        double p = producer.Sample( pipe.FromInlet.pos, pipe.CrossSectionArea ).FluidSurfacePotential;
+                        currentPotentials[pipeIdx].Item1 = p;
                     }
                     else if( ReferenceEquals( pipe.ToInlet.Producer, producer ) )
                     {
-                        double p = producer.Sample( pipe.ToInlet.pos, pipe.CrossSectionArea ).Pressure;
-                        currentPressures[pipeIdx].Item2 = p;
+                        double p = producer.Sample( pipe.ToInlet.pos, pipe.CrossSectionArea ).FluidSurfacePotential;
+                        currentPotentials[pipeIdx].Item2 = p;
                     }
                 }
             }
 
-            // Sample pressures from Consumers
+            // Sample potentials from Consumers
             for( int i = 0; i < Consumers.Length; i++ )
             {
                 IResourceConsumer consumer = Consumers[i];
@@ -295,13 +286,13 @@ namespace HSP.ResourceFlow
 
                     if( ReferenceEquals( pipe.FromInlet.Consumer, consumer ) )
                     {
-                        double p = consumer.Sample( pipe.FromInlet.pos, pipe.CrossSectionArea ).Pressure;
-                        currentPressures[pipeIdx].Item1 = p;
+                        double p = consumer.Sample( pipe.FromInlet.pos, pipe.CrossSectionArea ).FluidSurfacePotential;
+                        currentPotentials[pipeIdx].Item1 = p;
                     }
                     else if( ReferenceEquals( pipe.ToInlet.Consumer, consumer ) )
                     {
-                        double p = consumer.Sample( pipe.ToInlet.pos, pipe.CrossSectionArea ).Pressure;
-                        currentPressures[pipeIdx].Item2 = p;
+                        double p = consumer.Sample( pipe.ToInlet.pos, pipe.CrossSectionArea ).FluidSurfacePotential;
+                        currentPotentials[pipeIdx].Item2 = p;
                     }
                 }
             }
@@ -312,41 +303,25 @@ namespace HSP.ResourceFlow
             for( int i = 0; i < Pipes.Length; i++ )
             {
                 double signedFlowRate = currentFlowRates[i];
-                if( Math.Abs( signedFlowRate ) <= 1e-9 )
-                    continue;
 
                 FlowPipe pipe = Pipes[i];
 
-                // Determine Direction
                 bool flowForward = signedFlowRate > 0;
-
-                // Identify Source and Sink interfaces dynamically based on flow direction
-                // Pipe: From -> To
-                // Forward: Source(From) -> Sink(To)
-                // Backward: Source(To) -> Sink(From)
 
                 IResourceProducer source = flowForward ? pipe.FromInlet.Producer : pipe.ToInlet.Producer;
                 IResourceConsumer sink = flowForward ? pipe.ToInlet.Consumer : pipe.FromInlet.Consumer;
 
                 // Ensure the connection is valid for the direction of flow.
-                // (e.g. Trying to backflow into a Pump might fail if the Pump doesn't implement IResourceConsumer)
                 if( source == null || sink == null )
                     continue;
 
-                // Sample substances. 
-                // Pipe needs to know direction to know which density to use (upstream density).
                 IReadonlySubstanceStateCollection flowResources = pipe.SampleFlowResources( signedFlowRate, dt );
 
                 if( flowResources.IsEmpty() )
                     continue;
 
-                // Apply transfer
-                // Outflow.Add with negative time usually implies removal (if implemented that way in your tank).
-                if( source.Outflow != null )
-                    source.Outflow.Add( flowResources, -dt );
-
-                if( sink.Inflow != null )
-                    sink.Inflow.Add( flowResources, dt );
+                source.Outflow?.Add( flowResources, -dt );
+                sink.Inflow?.Add( flowResources, dt );
             }
         }
     }

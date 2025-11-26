@@ -28,20 +28,27 @@ namespace HSP.ResourceFlow
         public double Velocity { get; set; }
 
         /// <summary>
+        /// Gets or sets the potential energy of the fluid surface.
+        /// </summary>
+        public double FluidSurfacePotential { get; set; }
+
+        /// <summary>
         /// Returns the fluid state for a perfect vacuum.
         /// </summary>
         public static FluidState Vacuum => new FluidState()
-            {
-                Pressure = 0.0f,
-                Temperature = 0.0f,
-                Velocity = 0.0f
-            };
+        {
+            Pressure = 0.0f,
+            Temperature = 0.0f,
+            Velocity = 0.0f,
+            FluidSurfacePotential = double.NegativeInfinity
+        };
 
         public FluidState( double pressure, double temperature, double velocity )
         {
             this.Pressure = pressure;
             this.Temperature = temperature;
             this.Velocity = velocity;
+            this.FluidSurfacePotential = 0.0;
         }
 
         public override string ToString()
