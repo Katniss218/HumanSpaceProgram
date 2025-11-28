@@ -10,6 +10,8 @@ namespace HSP.ResourceFlow
     /// </summary>
     public sealed class FlowNetworkSnapshot
     {
+        public double deltaTime { get; private set; }
+
         public static FlowNetworkSnapshot GetNetworkSnapshot( GameObject obj )
         {
             // return the flow network for this object and its children.
@@ -174,6 +176,7 @@ namespace HSP.ResourceFlow
         /// <param name="dt">Time step, in [s].</param>
         public void Step( float dt )
         {
+            deltaTime = dt;
             const int MAX_ITERATIONS = 50;
             const double CONVERGENCE_THRESHOLD = 0.0001; // Tuned for precision
 
@@ -300,18 +303,28 @@ namespace HSP.ResourceFlow
 
         private void ApplyTransport( float dt )
         {
+            for( int i = 0; i < Producers.Length; i++ )
+            {
+                Producers[i].Outflow?.Clear();
+            }
+
+            for( int i = 0; i < Consumers.Length; i++ )
+            {
+                Consumers[i].Inflow?.Clear();
+            }
+
             for( int i = 0; i < Pipes.Length; i++ )
             {
                 double signedFlowRate = currentFlowRates[i];
+                if( Math.Abs( signedFlowRate ) < 1e-4 )
+                    continue;
 
                 FlowPipe pipe = Pipes[i];
-
                 bool flowForward = signedFlowRate > 0;
 
                 IResourceProducer source = flowForward ? pipe.FromInlet.Producer : pipe.ToInlet.Producer;
                 IResourceConsumer sink = flowForward ? pipe.ToInlet.Consumer : pipe.FromInlet.Consumer;
 
-                // Ensure the connection is valid for the direction of flow.
                 if( source == null || sink == null )
                     continue;
 
@@ -320,8 +333,8 @@ namespace HSP.ResourceFlow
                 if( flowResources.IsEmpty() )
                     continue;
 
-                source.Outflow?.Add( flowResources, -dt );
-                sink.Inflow?.Add( flowResources, dt );
+                source.Outflow?.Add( flowResources, 1.0 );
+                sink.Inflow?.Add( flowResources, 1.0 );
             }
         }
     }

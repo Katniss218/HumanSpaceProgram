@@ -54,7 +54,7 @@ namespace HSP.ResourceFlow
         /// </summary>
         public double HeadAdded { get; }
 
-        public FlowPipe( Port fromInlet, Port toInlet, double crossSectionArea, double conductance = 1e-6f, double headAdded = 0f )
+        public FlowPipe( Port fromInlet, Port toInlet, double crossSectionArea, double conductance = 1.0, double headAdded = 0.0 )
         {
             FromInlet = fromInlet;
             ToInlet = toInlet;
@@ -65,6 +65,7 @@ namespace HSP.ResourceFlow
 
         public double ComputeFlowRate( double potentialFrom, double potentialTo )
         {
+            Debug.Log( potentialFrom - potentialTo );
             double flowrate = Conductance * (potentialFrom - potentialTo + HeadAdded);
             if( !double.IsFinite( flowrate ) )
                 flowrate = 0f;

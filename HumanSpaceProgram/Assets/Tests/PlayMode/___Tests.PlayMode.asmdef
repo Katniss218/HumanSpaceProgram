@@ -15,6 +15,7 @@
         "HSP",
         "HSP.CelestialBodies",
         "HSP.ReferenceFrames",
+        "HSP.ResourceFlow",
         "HSP.Trajectories",
         "HSP.UI",
         "HSP.Vanilla",

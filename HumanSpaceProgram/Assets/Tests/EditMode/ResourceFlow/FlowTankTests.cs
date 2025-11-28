@@ -277,7 +277,6 @@ namespace HSP_Tests_EditMode.ResourceFlow
         public void SetUp()
         {
             _tank = new FlowTank( 1.0 ); // 1 m^3
-            // A simple vertical line of nodes for predictable potential slices.
             var nodes = new[]
             {
                 new Vector3( 0, 1, 0 ),  // Node 0: Top
