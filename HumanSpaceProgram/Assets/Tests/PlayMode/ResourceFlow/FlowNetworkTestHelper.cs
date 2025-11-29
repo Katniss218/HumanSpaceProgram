@@ -1,14 +1,6 @@
-using HSP.CelestialBodies;
-using HSP.ReferenceFrames;
-using HSP;
 using HSP.ResourceFlow;
 using HSP.Time;
-using HSP.Vanilla.Components;
-using HSP.Vessels;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
-using UnityPlus.Serialization;
 
 namespace HSP_Tests_PlayMode.ResourceFlow
 {
@@ -25,37 +17,6 @@ namespace HSP_Tests_PlayMode.ResourceFlow
         }
     }
 
-    public class MockSubstance : ISubstance
-    {
-        public string ID { get; set; }
-        public string DisplayName { get; set; }
-        public Color DisplayColor { get; set; }
-        public string[] Tags { get; set; }
-        public SubstancePhase Phase { get; set; }
-        public double MolarMass { get; set; }
-        public double SpecificGasConstant { get; set; }
-        public double? FlashPoint { get; set; }
-
-        private double _density;
-
-        public MockSubstance( string id, double density )
-        {
-            ID = id;
-            _density = density;
-        }
-
-        public double GetDensity( double temperature, double pressure ) => _density;
-        public double GetBoilingPoint( double pressure ) => throw new System.NotImplementedException();
-        public double GetLatentHeatOfFusion( double temperature ) => throw new System.NotImplementedException();
-        public double GetLatentHeatOfVaporization( double temperature ) => throw new System.NotImplementedException();
-        public double GetPressure( double temperature, double density ) => throw new System.NotImplementedException();
-        public double GetSpecificHeatCapacity( double temperature, double pressure ) => throw new System.NotImplementedException();
-        public double GetSpeedOfSound( double temperature, double pressure ) => throw new System.NotImplementedException();
-        public double GetThermalConductivity( double temperature, double pressure ) => throw new System.NotImplementedException();
-        public double GetVaporPressure( double temperature ) => throw new System.NotImplementedException();
-        public double GetViscosity( double temperature, double pressure ) => throw new System.NotImplementedException();
-    }
-
     public sealed class MockFlowTankWrapper : MonoBehaviour, IBuildsFlowNetwork
     {
         public FlowTank Tank { get; set; }
@@ -63,13 +24,10 @@ namespace HSP_Tests_PlayMode.ResourceFlow
 
         public BuildFlowResult BuildFlowNetwork( FlowNetworkBuilder c )
         {
-            Transform reference = this.transform.root;
-
             c.TryAddFlowObj( this, Tank );
             foreach( var inlet in Inlets )
             {
-                Vector3 inletPosInReferenceSpace = reference.InverseTransformPoint( this.transform.TransformPoint( inlet.LocalPosition ) );
-                FlowPipe.Port flowInlet = new FlowPipe.Port( (IResourceConsumer)Tank, inletPosInReferenceSpace );
+                FlowPipe.Port flowInlet = new FlowPipe.Port( (IResourceConsumer)Tank, inlet.LocalPosition );
                 c.TryAddFlowObj( inlet, flowInlet );
             }
 

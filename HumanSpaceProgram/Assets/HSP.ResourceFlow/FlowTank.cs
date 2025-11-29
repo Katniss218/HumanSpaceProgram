@@ -74,88 +74,154 @@ namespace HSP.ResourceFlow
 
 
         /// <summary>
-        /// Samples the fluid state (Pressure, Temperature, FluidSurfacePotential) at a specific local position.
-        /// Calculates hydrostatic pressure based on the potential depth.
+        /// Samples the fluid state. Returns potential in [J/kg].
+        /// Potential = Geometric_Potential + (Pressure / Density).
         /// </summary>
         public FluidState Sample( Vector3 localPosition, double holeArea )
         {
             RecalculateCache();
 
-            FluidState result = FluidState; // Copy structural defaults (Temp, etc.)
-            double pressure = result.Pressure;
-            double pointPotential = GetPotentialAt( localPosition );
+            FluidState result = FluidState;
 
-            // Calculate Fluid Surface Potential
-            if( Contents.Count > 0 && _fluidInSlices.Length > 0 )
+            // 1. Geometric Potential (Gravity) in J/kg
+            double geoPotential = GetPotentialAt( localPosition );
+
+            // 2. Identify Local Properties
+            double localPressure = _internalGasPressure;
+            double localDensity = 0.0;
+
+            // Top of liquid stack
+            double liquidSurfacePot = (_fluidInSlices != null && _fluidInSlices.Length > 0)
+                ? _fluidInSlices[^1].PotentialEnd
+                : double.MinValue;
+
+            bool isSampleInLiquid = geoPotential < liquidSurfacePot;
+
+            if( isSampleInLiquid )
             {
-                result.FluidSurfacePotential = _fluidInSlices[^1].PotentialEnd;
+                // --- LIQUID PHASE ---
+                // Calculate Hydrostatic Pressure
+                double hydrostaticPressure = 0;
+
+                // Iterate backwards (Top/Lightest -> Bottom/Heaviest)
+                for( int i = _fluidInSlices.Length - 1; i >= 0; i-- )
+                {
+                    ref FluidInSlice layer = ref _fluidInSlices[i];
+
+                    // If we are strictly below this layer, add its full weight
+                    if( geoPotential < layer.PotentialStart )
+                    {
+                        hydrostaticPressure += layer.Density * (layer.PotentialEnd - layer.PotentialStart);
+                    }
+                    // If we are inside this layer
+                    else if( geoPotential < layer.PotentialEnd )
+                    {
+                        localDensity = layer.Density;
+                        hydrostaticPressure += layer.Density * (layer.PotentialEnd - geoPotential);
+                        break;
+                    }
+                }
+
+                localPressure += hydrostaticPressure;
             }
             else
             {
-                // If the tank is empty, the "surface" that fluid would flow against is the inlet port itself.
-                // This makes the empty tank a sink relative to any tank with a higher fluid surface.
-                result.FluidSurfacePotential = pointPotential;
-            }
-
-            // Optimization: If point is above the highest fluid, we are in gas.
-            if( Contents.Count == 0 || pointPotential >= result.FluidSurfacePotential )
-            {
-                return result;
-            }
-
-            // Iterate backwards (Lightest -> Heaviest) to accumulate pressure
-            // Pressure at point = Sum(Density_i * Height_i)
-            for( int i = Contents.Count - 1; i >= 0; i-- )
-            {
-                ref FluidInSlice layer = ref _fluidInSlices[i];
-
-                if( pointPotential < layer.PotentialStart )
+                // --- GAS PHASE ---
+                // Calculate average gas density for the potential conversion
+                double totalR = 0;
+                double totalMass = 0;
+                foreach( var (sub, mass) in _gasBuffer )
                 {
-                    // We are strictly below this layer. Add its full weight.
-                    pressure += layer.Density * (layer.PotentialEnd - layer.PotentialStart);
+                    totalR += sub.SpecificGasConstant * mass;
+                    totalMass += mass;
                 }
-                else if( pointPotential < layer.PotentialEnd )
-                {
-                    // We are inside this layer. Add weight from top of layer to point.
-                    pressure += layer.Density * (layer.PotentialEnd - pointPotential);
-                    break; // We reached the fluid containing the point
-                }
+
+#warning TODO - I think we can use the Substance fields here too somehow, but needs more thinking.
+                double specificGasConstant = (totalMass > 0) ? (totalR / totalMass) : 287.0; // get averaged gas constant.
+
+                localDensity = 101325.0 / (specificGasConstant * FluidState.Temperature);
             }
 
-            result.Pressure = pressure;
+            result.Pressure = localPressure;
+
+            // 3. Calculate Bernoulli Potential
+            // Total Potential = Geometric + PressureHead
+            if( localDensity > 1e-9 )
+            {
+                result.FluidSurfacePotential = geoPotential + (localPressure / localDensity);
+            }
+            else
+            {
+                // Fallback for vacuum or empty tank
+                result.FluidSurfacePotential = geoPotential;
+            }
+
             return result;
         }
 
-        /// <summary>
-        /// Determines what substances flow out at a specific position over a specific time.
-        /// Returns a read-only collection representing the mass extracted.
-        /// </summary>
         public IReadonlySubstanceStateCollection SampleSubstances( Vector3 localPosition, double flowRate, double dt )
         {
             RecalculateCache();
 
             var result = new SubstanceStateCollection();
 
-            if( Contents == null || Contents.Count == 0 )
+            if( Contents == null || Contents.IsEmpty() )
                 return result;
 
             double p = GetPotentialAt( localPosition );
 
-            // Build boundary list: [layer0.Start, layer1.Start, ..., layerN.Start, layerN.End]
-            int n = _fluidInSlices.Length;
-            List<double> bounds = new( n + 1 );
-            for( int i = 0; i < n; i++ ) bounds.Add( _fluidInSlices[i].PotentialStart );
-            bounds.Add( _fluidInSlices[n - 1].PotentialEnd );
+            // Determine if we are hitting liquid or gas
+            // Liquids are stored in _fluidInSlices.
+            double liquidSurfacePot = (_fluidInSlices != null && _fluidInSlices.Length > 0)
+                ? _fluidInSlices[^1].PotentialEnd
+                : double.MinValue;
 
-#warning TODO - min max > error.
-            double pClamped = Math.Clamp( p, bounds[0], bounds[^1] );
+            bool isSubmerged = p < liquidSurfacePot;
 
-            int idx = FindIntervalIndex( bounds, pClamped );
-            if( idx >= 0 && idx < n )
+            if( isSubmerged )
             {
-                ref FluidInSlice layer = ref _fluidInSlices[idx];
-                double massExtracted = flowRate * dt * layer.Density;
-                result.Add( layer.Substance, massExtracted );
+                // --- LIQUID EXTRACTION ---
+                double pClamped = Math.Clamp( p, _slices[0].PotentialBottom, _slices[^1].PotentialTop );
+                int idx = FindSliceIndexForPotential( _fluidInSlices, pClamped );
+
+                if( idx >= 0 )
+                {
+                    ref FluidInSlice layer = ref _fluidInSlices[idx];
+                    double requestedMass = flowRate * dt * layer.Density;
+
+                    // Simple availability check (without the transient fix for now)
+                    double availableMass = layer.Volume * layer.Density;
+                    availableMass += Inflow[layer.Substance];
+
+                    result.Add( layer.Substance, Math.Min( requestedMass, availableMass ) );
+                }
+            }
+            else
+            {
+                // --- GAS EXTRACTION ---
+                // If we are in the gas, we extract a mixture of all gases proportional to their mass
+                if( _gasBuffer.Count == 0 )
+                    return result;
+
+                double totalGasMass = 0;
+                foreach( var pair in _gasBuffer ) totalGasMass += pair.mass;
+
+                if( totalGasMass > 1e-9 )
+                {
+                    double avgGasDensity = totalGasMass / _ullageVolume;
+                    double requestedTotalMass = flowRate * dt * avgGasDensity;
+
+                    // Scale down if requesting more than available
+                    double scale = 1.0;
+                    if( requestedTotalMass > totalGasMass )
+                        scale = totalGasMass / requestedTotalMass;
+
+                    foreach( var (sub, mass) in _gasBuffer )
+                    {
+                        double extractMass = (mass / totalGasMass) * requestedTotalMass * scale;
+                        result.Add( sub, extractMass );
+                    }
+                }
             }
 
             return result;
@@ -247,7 +313,7 @@ namespace HSP.ResourceFlow
 
             // Scale to match actual volume.
             double scale = (totalDes > 0)
-                ? Volume / totalDes 
+                ? Volume / totalDes
                 : 0;
             for( int i = 0; i < tetVolumes.Length; i++ )
                 tetVolumes[i] *= scale;
@@ -322,9 +388,6 @@ namespace HSP.ResourceFlow
                 throw new ArgumentNullException( nameof( localPositions ) );
             if( inlets == null )
                 throw new ArgumentNullException( nameof( inlets ) );
-
-            // Save old contents so we can re-distribute after re-tetrahedralizing.
-            ISubstanceStateCollection oldContents = Contents?.Clone();
 
             // Make sure internal arrays exist so other code won't null-ref.
             if( _nodes == null )
@@ -512,6 +575,12 @@ namespace HSP.ResourceFlow
         private PotentialSlice[] _slices; // The baked geometry (Null = Dirty)
 
         private FluidInSlice[] _fluidInSlices; // The calculated fluid stack (Null = Dirty)
+        private readonly List<(ISubstance sub, double mass, double density)> _sortBuffer = new();
+
+        private double _internalGasPressure;
+        private double _ullageVolume;
+#warning TODO - split contents into gas and liquid contents? I think it would be better to just filter over the main contents array, the length is small (mostly 2-3 subs)
+        private readonly List<(ISubstance sub, double mass)> _gasBuffer = new(); // Temp buffer for gas calc
 
         public void InvalidateGeometryAndFluids()
         {
@@ -573,7 +642,7 @@ namespace HSP.ResourceFlow
         }
 
         /// <summary>
-        /// Rebuilds the cached potential slices. This is the O(Edges) operation.
+        /// Rebuilds the cache of volume per each interval between sorted potential values.
         /// </summary>
         private void BakePotentialSlices()
         {
@@ -604,16 +673,24 @@ namespace HSP.ResourceFlow
             // 2. Init Slices
             int sliceCount = Math.Max( 1, distinct.Count - 1 ); // max 1 => no distinct breakpoints (no potential gradient), single slice.
             _slices = new PotentialSlice[sliceCount];
-            for( int i = 0; i < sliceCount; i++ )
+            if( sliceCount == 1 )
             {
-                _slices[i].PotentialBottom = distinct[i];
-                _slices[i].PotentialTop = distinct[i + 1];
+                _slices[0].PotentialBottom = double.NegativeInfinity;
+                _slices[0].PotentialTop = double.PositiveInfinity;
+            }
+            else
+            {
+                for( int i = 0; i < sliceCount; i++ )
+                {
+                    _slices[i].PotentialBottom = distinct[i];
+                    _slices[i].PotentialTop = distinct[i + 1];
+                }
             }
 
             if( sliceCount == 0 )
                 return;
 
-            // 3. Integrate Edges
+            // 3. Add Edge volumes to corresponding potential slices via overlap.
             for( int ei = 0; ei < _edges.Length; ei++ )
             {
                 ref FlowEdge edge = ref _edges[ei];
@@ -635,27 +712,31 @@ namespace HSP.ResourceFlow
                 if( potDiff <= EPSILON_OVERLAP )
                 {
                     // Find the exact potential boundary this edge sits on
-                    int k = FindClosestIndex( distinct, p1, EPSILON_DEDUPE_POTENTIALS * 1.5 );
+                    int k = FindClosestIndex( distinct, p1 );
 
                     // If found, split volume between slice below (k-1) and slice above (k)
                     if( k >= 0 )
                     {
                         Vector3 center = (pos1 + pos2) * 0.5f;
-                        double halfVol = edge.Volume * 0.5;
 
                         bool hasBottom = (k - 1 >= 0 && k - 1 < sliceCount);
                         bool hasTop = (k < sliceCount);
 
-                        // If we are at the very floor, put all volume above. If at ceiling, all below.
-                        if( !hasBottom )
-                            halfVol *= 2;
-                        else if( !hasTop )
-                            halfVol *= 2;
-
-                        if( hasBottom )
+                        if( hasBottom && hasTop )
+                        {
+                            // Split 50/50
+                            double halfVol = edge.Volume * 0.5;
                             _slices[k - 1].AddVolume( halfVol, center );
-                        if( hasTop )
                             _slices[k].AddVolume( halfVol, center );
+                        }
+                        else if( hasBottom )
+                        {
+                            _slices[k - 1].AddVolume( edge.Volume, center );
+                        }
+                        else if( hasTop )
+                        {
+                            _slices[k].AddVolume( edge.Volume, center );
+                        }
                     }
                     continue;
                 }
@@ -695,80 +776,105 @@ namespace HSP.ResourceFlow
 
             // 4. Finalize
             for( int i = 0; i < sliceCount; i++ )
+            {
                 _slices[i].FinalizeCentroid();
+            }
         }
 
         /// <summary>
-        /// Maps the fluids to the potential slices. The "Pouring" step.
+        /// Separates liquids into potential slices and calculates total gas pressure for the ullage.
         /// </summary>
         private void DistributeFluidsToPotentials()
         {
-            // This operation fills the precalculated sliced potential column with fluids according to their volumes and densities.
-
-#warning TODO - overfill/hydraulic lock should distribute according to volumes.
-            // Prepare Fluids
             int fluidCount = Contents.Count;
-            if( _fluidInSlices == null || _fluidInSlices.Length != fluidCount )
-                _fluidInSlices = new FluidInSlice[fluidCount];
 
-            if( fluidCount == 0 )
-                return;
+            // 1. Separate Liquids and Gases
+            _sortBuffer.Clear();
+            _gasBuffer.Clear();
 
-            // Sort Fluids by Density (Heaviest First)
-            List<(ISubstance sub, double mass, double density)> fluidList = new();
             foreach( (ISubstance substance, double mass) in Contents )
             {
-                double density = substance.GetDensity( FluidState.Temperature, FluidState.Pressure );
-                fluidList.Add( (substance, mass, density) );
+                if( substance.Phase == SubstancePhase.Gas )
+                {
+                    _gasBuffer.Add( (substance, mass) );
+                }
+                else
+                {
+                    double density = substance.GetDensity( FluidState.Temperature, FluidState.Pressure );
+                    _sortBuffer.Add( (substance, mass, density) );
+                }
             }
-            // Sort Descending Density
-            fluidList.Sort( ( a, b ) => b.density.CompareTo( a.density ) );
 
-            // Total Tank Volume Calculation for scaling (Overflow handling)
+            // 2. Process Liquids (Standard logic)
+            // Sort descending by density.
+            _sortBuffer.Sort( ( a, b ) => b.density.CompareTo( a.density ) );
+
+            int liquidCount = _sortBuffer.Count;
+            if( _fluidInSlices == null || _fluidInSlices.Length != liquidCount )
+                _fluidInSlices = new FluidInSlice[liquidCount];
+
+            // Total Tank Volume
             double totalTankVolume = 0;
             for( int i = 0; i < _slices.Length; i++ )
                 totalTankVolume += _slices[i].VolumeCapacity;
 
-            // Calculate Fluid Volumes
-            double totalFluidVolume = 0;
-            for( int i = 0; i < fluidCount; i++ )
+            // Calculate Liquid Volumes
+            double totalLiquidVolume = 0;
+            for( int i = 0; i < liquidCount; i++ )
             {
-                double vol = fluidList[i].mass / fluidList[i].density;
-                totalFluidVolume += vol;
+                double vol = _sortBuffer[i].mass / _sortBuffer[i].density;
+                totalLiquidVolume += vol;
                 _fluidInSlices[i] = new FluidInSlice()
                 {
-                    Substance = fluidList[i].sub,
-                    Density = fluidList[i].density,
+                    Substance = _sortBuffer[i].sub,
+                    Density = _sortBuffer[i].density,
                     Volume = vol
                 };
             }
 
-            // Scale if overflowing
+            // 3. Process Gases (New Logic)
+            // Ullage is the empty space. Clamp to small epsilon to avoid divide-by-zero if tank is full.
+            _ullageVolume = Math.Max( 1e-6, totalTankVolume - totalLiquidVolume );
+
+            _internalGasPressure = 0.0;
+            if( _gasBuffer.Count > 0 )
+            {
+                // Dalton's Law: Sum of partial pressures
+                foreach( var (sub, mass) in _gasBuffer )
+                {
+                    double gasDensity = mass / _ullageVolume;
+                    _internalGasPressure += sub.GetPressure( FluidState.Temperature, gasDensity );
+                }
+            }
+
+            // 4. Handle Hydraulic Lock (Liquid > Tank Volume)
+            // If liquids overflow, pressure spikes massively. 
+            // We apply a scaling factor to the liquid slices for geometry, but logically the pressure is immense.
             double scale = 1.0;
-            if( totalFluidVolume > totalTankVolume && totalTankVolume > 0 )
-                scale = totalTankVolume / totalFluidVolume;
+            if( totalLiquidVolume > totalTankVolume && totalTankVolume > 0 )
+            {
+                scale = totalTankVolume / totalLiquidVolume;
+#warning TODO - handle with substance's actual bulk modulus.
+                double overflowRatio = totalLiquidVolume / totalTankVolume;
+                _internalGasPressure += (overflowRatio - 1.0) * 100_000_000; // 100MPa per 100% overfill
+            }
 
-            // Map Layers to Potentials
+            // 5. Map Liquid Layers to Potentials (Existing logic, but using liquidCount)
             double currentVolumeConsumed = 0;
-
-            // Helper to find Potential for a specific volume accumulation
-            // We keep state between calls to optimize (slices are visited sequentially)
             int sliceWalkerIdx = 0;
             double volumeInPreviousSlices = 0;
 
-            for( int i = 0; i < fluidCount; i++ )
+            for( int i = 0; i < liquidCount; i++ )
             {
                 ref FluidInSlice layer = ref _fluidInSlices[i];
-                layer.Volume *= scale; // Apply compression/overflow scale
+                layer.Volume *= scale;
 
-                // Start Potential is where the previous fluid ended
                 layer.PotentialStart = (i == 0)
                     ? _slices[0].PotentialBottom
                     : _fluidInSlices[i - 1].PotentialEnd;
 
                 double volumeTarget = currentVolumeConsumed + layer.Volume;
 
-                // Find the potential corresponding to volumeTarget
                 while( sliceWalkerIdx < _slices.Length )
                 {
                     double sliceCap = _slices[sliceWalkerIdx].VolumeCapacity;
@@ -776,28 +882,20 @@ namespace HSP.ResourceFlow
 
                     if( volumeTarget <= totalAtSliceTop )
                     {
-                        // The end is inside this slice
-                        // Linear Interpolation within the slice
                         double volInSlice = volumeTarget - volumeInPreviousSlices;
                         double fraction = (sliceCap > 1e-9) ? (volInSlice / sliceCap) : 1.0;
-
-                        // Linear assumption: Potential scales linearly with volume in the slice
                         layer.PotentialEnd = Lerp( _slices[sliceWalkerIdx].PotentialBottom, _slices[sliceWalkerIdx].PotentialTop, fraction );
                         break;
                     }
                     else
                     {
-                        // Move to next slice
                         volumeInPreviousSlices += sliceCap;
                         sliceWalkerIdx++;
                     }
                 }
 
-                // Clamp if we ran out of tank
                 if( sliceWalkerIdx >= _slices.Length )
-                {
                     layer.PotentialEnd = _slices[^1].PotentialTop;
-                }
 
                 currentVolumeConsumed += layer.Volume;
             }
@@ -807,9 +905,10 @@ namespace HSP.ResourceFlow
         /// Finds the index i such that sortedList[i] is within tolerance of value. 
         /// Returns -1 if no match found.
         /// </summary>
-        public static int FindClosestIndex( IList<double> sortedList, double value, double tolerance )
+        public static int FindClosestIndex( IList<double> sortedList, double value )
         {
-            // Use standard BinarySearch. 
+            const double TOLERANCE = EPSILON_DEDUPE_POTENTIALS * 1.5;
+
             // If found, returns index. If not, returns bitwise complement of next largest element.
             int idx = (sortedList is List<double> list)
                 ? list.BinarySearch( value )
@@ -828,9 +927,9 @@ namespace HSP.ResourceFlow
                 ? Math.Abs( sortedList[nextIdx - 1] - value )
                 : double.MaxValue;
 
-            if( diffNext < diffPrev && diffNext <= tolerance )
+            if( diffNext < diffPrev && diffNext <= TOLERANCE )
                 return nextIdx;
-            if( diffPrev <= diffNext && diffPrev <= tolerance )
+            if( diffPrev <= diffNext && diffPrev <= TOLERANCE )
                 return nextIdx - 1;
 
             return -1;
@@ -839,26 +938,49 @@ namespace HSP.ResourceFlow
         /// <summary>
         /// Finds index i such that list[i] <= val <= list[i+1].
         /// </summary>
-        public static int FindIntervalIndex( IList<double> sortedList, double val, double epsilon = EPSILON_OVERLAP )
+        public static int FindIntervalIndex( IList<double> sortedList, double val )
         {
             int n = sortedList.Count;
             if( n < 2 )
                 return -1;
 
             // Bounds check
-            if( val < sortedList[0] - epsilon || val > sortedList[n - 1] + epsilon )
+            if( val < sortedList[0] - EPSILON_OVERLAP || val > sortedList[n - 1] + EPSILON_OVERLAP )
                 return -1;
 
             int lo = 0, hi = n - 2;
             while( lo <= hi )
             {
                 int mid = lo + (hi - lo) / 2;
-                if( val < sortedList[mid] - epsilon )
+                if( val < sortedList[mid] - EPSILON_OVERLAP )
                     hi = mid - 1;
-                else if( val > sortedList[mid + 1] + epsilon )
+                else if( val > sortedList[mid + 1] + EPSILON_OVERLAP )
                     lo = mid + 1;
                 else return mid;
             }
+            return -1;
+        }
+
+        /// <summary>
+        /// optimized binary search directly on the struct array to avoid allocations.
+        /// </summary>
+        private static int FindSliceIndexForPotential( FluidInSlice[] slices, double potential )
+        {
+            int low = 0;
+            int high = slices.Length - 1;
+
+            while( low <= high )
+            {
+                int mid = low + (high - low) / 2;
+                ref FluidInSlice slice = ref slices[mid];
+
+                if( potential < slice.PotentialStart - EPSILON_OVERLAP )
+                    high = mid - 1;
+                else if( potential > slice.PotentialEnd + EPSILON_OVERLAP )
+                    low = mid + 1;
+                else return mid;
+            }
+
             return -1;
         }
 

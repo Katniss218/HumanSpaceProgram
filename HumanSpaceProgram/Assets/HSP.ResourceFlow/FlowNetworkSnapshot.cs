@@ -178,7 +178,7 @@ namespace HSP.ResourceFlow
         {
             deltaTime = dt;
             const int MAX_ITERATIONS = 50;
-            const double CONVERGENCE_THRESHOLD = 0.0001; // Tuned for precision
+            const double CONVERGENCE_THRESHOLD = 0.0001;
 
             // 1. Initial State: Sample potentials based on the tanks' current state (fluid surface potential).
             UpdatePotentials();
@@ -261,7 +261,6 @@ namespace HSP.ResourceFlow
                     int pipeIdx = pipeIndices[k];
                     FlowPipe pipe = Pipes[pipeIdx];
 
-#warning TODO - include gas pressure in the overall potential?
                     // Sample potential at the connection point
                     if( ReferenceEquals( pipe.FromInlet.Producer, producer ) )
                     {
@@ -303,35 +302,97 @@ namespace HSP.ResourceFlow
 
         private void ApplyTransport( float dt )
         {
-            for( int i = 0; i < Producers.Length; i++ )
-            {
-                Producers[i].Outflow?.Clear();
-            }
+            // Clear previous IO states
+            foreach( var producer in Producers ) producer.Outflow?.Clear();
+            foreach( var consumer in Consumers ) consumer.Inflow?.Clear();
 
-            for( int i = 0; i < Consumers.Length; i++ )
-            {
-                Consumers[i].Inflow?.Clear();
-            }
+            // --- Step 1: Calculate Demand (Ideal Flow) ---
+            // We store the signed flow rate for every pipe.
+            // Positive = From -> To, Negative = To -> From
+            double[] proposedFlows = new double[Pipes.Length];
+
+            // We need to track total requested mass OUT of each tank.
+            // Dictionary maps Tank Object -> Total Volume Requested to leave
+            Dictionary<object, double> totalVolumeDemand = new Dictionary<object, double>();
 
             for( int i = 0; i < Pipes.Length; i++ )
             {
-                double signedFlowRate = currentFlowRates[i];
-                if( Math.Abs( signedFlowRate ) < 1e-4 )
-                    continue;
+                double rate = currentFlowRates[i];
+                if( Math.Abs( rate ) < 1e-9 ) continue;
+
+                proposedFlows[i] = rate;
+                double volRequested = Math.Abs( rate ) * dt;
+
+                // Identify Source
+                object sourceObj = (rate > 0) ? Pipes[i].FromInlet.Producer : Pipes[i].ToInlet.Producer;
+
+                if( sourceObj != null )
+                {
+                    if( !totalVolumeDemand.ContainsKey( sourceObj ) )
+                        totalVolumeDemand[sourceObj] = 0;
+
+                    totalVolumeDemand[sourceObj] += volRequested;
+                }
+            }
+
+            // --- Step 2 & 3: Limit & Scale ---
+            // We compute a scaling factor (0.0 to 1.0) for every pipe.
+            double[] flowScalars = new double[Pipes.Length];
+            Array.Fill( flowScalars, 1.0 );
+
+            for( int i = 0; i < Pipes.Length; i++ )
+            {
+                double rate = proposedFlows[i];
+                if( Math.Abs( rate ) < 1e-9 ) continue;
+
+                object sourceObj = (rate > 0) ? Pipes[i].FromInlet.Producer : Pipes[i].ToInlet.Producer;
+
+                if( sourceObj is FlowTank tank )
+                {
+                    // Retrieve the total demand calculated in Step 1
+                    if( totalVolumeDemand.TryGetValue( tank, out double totalDemand ) )
+                    {
+                        // Check tank contents (Volume is usually easier to check than specific mass at this stage)
+                        // If your tank mixes fluids, use total volume. 
+                        double availableVolume = tank.Volume; // Or tank.Contents.TotalVolume();
+
+                        if( totalDemand > availableVolume && totalDemand > 0 )
+                        {
+                            // The tank is over-subscribed. Scale down.
+                            // Example: 10L available, 20L demanded. Scale = 0.5.
+                            double scale = availableVolume / totalDemand;
+
+                            // We apply the most restrictive limit found. 
+                            // (Usually a pipe has 1 source, so we just set it, but min protects against edge cases).
+                            flowScalars[i] = Math.Min( flowScalars[i], scale );
+                        }
+                    }
+                }
+            }
+
+            // --- Step 4: Execution ---
+            for( int i = 0; i < Pipes.Length; i++ )
+            {
+                double rawRate = proposedFlows[i];
+                if( Math.Abs( rawRate ) < 1e-9 ) continue;
+
+                // Apply the scaling factor we calculated
+                double finalRate = rawRate * flowScalars[i];
 
                 FlowPipe pipe = Pipes[i];
-                bool flowForward = signedFlowRate > 0;
+                bool flowForward = finalRate > 0;
 
                 IResourceProducer source = flowForward ? pipe.FromInlet.Producer : pipe.ToInlet.Producer;
                 IResourceConsumer sink = flowForward ? pipe.ToInlet.Consumer : pipe.FromInlet.Consumer;
 
-                if( source == null || sink == null )
-                    continue;
+                if( source == null || sink == null ) continue;
 
-                IReadonlySubstanceStateCollection flowResources = pipe.SampleFlowResources( signedFlowRate, dt );
+                // Now we can safely sample. 
+                // The tank might still do internal clamping, but we know physically we aren't asking for more 
+                // than the TOTAL tank contains across all pipes.
+                IReadonlySubstanceStateCollection flowResources = pipe.SampleFlowResources( finalRate, dt );
 
-                if( flowResources.IsEmpty() )
-                    continue;
+                if( flowResources.IsEmpty() ) continue;
 
                 source.Outflow?.Add( flowResources, 1.0 );
                 sink.Inflow?.Add( flowResources, 1.0 );

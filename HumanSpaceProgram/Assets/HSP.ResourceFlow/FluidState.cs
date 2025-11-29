@@ -10,25 +10,25 @@ namespace HSP.ResourceFlow
     public struct FluidState
     {
         /// <summary>
-        /// Gets or sets the pressure.
+        /// Gets or sets the pressure, in [Pa].
         /// </summary>
         [field: SerializeField]
         public double Pressure { get; set; }
 
         /// <summary>
-        /// Gets or sets the temperature.
+        /// Gets or sets the temperature, in [K].
         /// </summary>
         [field: SerializeField]
         public double Temperature { get; set; }
 
         /// <summary>
-        /// Gets or sets the magnitude of the velocity.
+        /// Gets or sets the magnitude of the velocity, in [m/s].
         /// </summary>
         [field: SerializeField]
         public double Velocity { get; set; }
 
         /// <summary>
-        /// Gets or sets the potential energy of the fluid surface.
+        /// Gets or sets the potential energy of the fluid surface, in [J/kg].
         /// </summary>
         public double FluidSurfacePotential { get; set; }
 

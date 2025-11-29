@@ -46,11 +46,11 @@ namespace HSP.ResourceFlow
                     if( ReferenceEquals( _species[i], substance ) )
                     {
                         delta -= _masses[i];
-                        _totalMass += delta;
                         double newMass = value;
                         // Remove element i, compact by moving last into i.
-                        if( Math.Abs( newMass ) <= EPSILON )
+                        if( newMass <= EPSILON )
                         {
+                            _totalMass -= _masses[i];
                             int last = _count - 1;
                             if( i != last )
                             {
@@ -63,11 +63,14 @@ namespace HSP.ResourceFlow
                             return;
                         }
 
+                        _totalMass += delta;
                         _masses[i] = newMass;
                         return;
                     }
                 }
 
+                if( delta <= EPSILON )
+                    return;
                 // Add new substance
                 i = IndexOfEmpty();
                 EnsureCapacity( i );
@@ -120,6 +123,11 @@ namespace HSP.ResourceFlow
 
         public void SetMass( float mass )
         {
+            if( mass < 0 )
+            {
+                throw new ArgumentOutOfRangeException( nameof( mass ), "Mass cannot be negative." );
+            }
+
             if( IsEmpty() )
                 throw new InvalidOperationException( $"Can't set mass for empty {nameof( SubstanceStateCollection )}" );
 
@@ -132,7 +140,7 @@ namespace HSP.ResourceFlow
             {
                 _masses[i] *= scaleFactor;
 
-                if( Math.Abs( _masses[i] ) <= EPSILON )
+                if( _masses[i] <= EPSILON )
                 {
                     // Remove entry i by replacing with last entry.
                     int last = _count - 1;
@@ -233,11 +241,11 @@ namespace HSP.ResourceFlow
             int i = IndexOf( substance );
             if( i >= 0 )
             {
-                _totalMass += delta;
                 double newMass = _masses[i] + delta;
                 // Remove element i, compact by moving last into i.
-                if( Math.Abs( newMass ) <= EPSILON )
+                if( newMass <= EPSILON )
                 {
+                    _totalMass -= _masses[i];
                     int last = _count - 1;
                     if( i != last )
                     {
@@ -250,10 +258,13 @@ namespace HSP.ResourceFlow
                     return;
                 }
 
+                _totalMass += delta;
                 _masses[i] = newMass;
             }
             else
             {
+                if( delta <= EPSILON )
+                    return;
                 // Add new substance
                 i = IndexOfEmpty();
                 EnsureCapacity( i );

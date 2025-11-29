@@ -45,12 +45,12 @@ namespace HSP.ResourceFlow
         public double CrossSectionArea { get; }
 
         /// <summary>
-        /// Volumetric conductance, in [m^3/(s*PotentialUnit)]
+        /// Volumetric conductance, in [m^3/(s*(J/kg))]
         /// </summary>
         public double Conductance { get; }
 
         /// <summary>
-        /// Pump added head potential, positive when pushing from <see cref="FromInlet"/> to <see cref="ToInlet"/>, in [PotentialUnit]
+        /// Pump added head potential, positive when pushing from <see cref="FromInlet"/> to <see cref="ToInlet"/>, in [J/kg]
         /// </summary>
         public double HeadAdded { get; }
 
@@ -65,7 +65,6 @@ namespace HSP.ResourceFlow
 
         public double ComputeFlowRate( double potentialFrom, double potentialTo )
         {
-            Debug.Log( potentialFrom - potentialTo );
             double flowrate = Conductance * (potentialFrom - potentialTo + HeadAdded);
             if( !double.IsFinite( flowrate ) )
                 flowrate = 0f;
