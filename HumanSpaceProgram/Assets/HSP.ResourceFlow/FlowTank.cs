@@ -363,16 +363,21 @@ namespace HSP.ResourceFlow
                 }
             }
 
-            // 3. Rebuild Array
-            List<FlowEdge> newEdges = new( edgeToVolume.Count );
+            // 3. Rebuild Array with calculated volumes
+            FlowEdge[] newEdges = new FlowEdge[_edges.Length];
             CalculatedVolume = 0;
-            foreach( var kvp in edgeToVolume )
+
+            for( int i = 0; i < _edges.Length; i++ )
             {
-                var (a, b) = UnpackCanonicalEdgeKey( kvp.Key );
-                newEdges.Add( new FlowEdge( a, b, kvp.Value ) );
-                CalculatedVolume += kvp.Value;
+                FlowEdge oldEdge = _edges[i];
+                long key = PackCanonicalEdgeKey( GetCanonicalEdgeKeyByIndex( oldEdge.end1, oldEdge.end2 ) );
+
+                edgeToVolume.TryGetValue( key, out double volume );
+
+                newEdges[i] = new FlowEdge( oldEdge.end1, oldEdge.end2, volume );
+                CalculatedVolume += volume;
             }
-            _edges = newEdges.ToArray();
+            _edges = newEdges;
         }
 
         /// <summary>

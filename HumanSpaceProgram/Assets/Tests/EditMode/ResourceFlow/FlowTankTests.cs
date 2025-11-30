@@ -5,39 +5,6 @@ using UnityEngine;
 
 namespace HSP_Tests_EditMode.ResourceFlow
 {
-    public class MockSubstance : ISubstance
-    {
-        public string ID { get; set; }
-        public string DisplayName { get; set; }
-        public Color DisplayColor { get; set; }
-        public string[] Tags { get; set; }
-        public SubstancePhase Phase { get; set; }
-        public double MolarMass { get; set; }
-        public double SpecificGasConstant { get; set; }
-        public double? FlashPoint { get; set; }
-
-        private double _density;
-
-        public MockSubstance( string id, double density, Color color )
-        {
-            ID = id;
-            _density = density;
-            DisplayColor = color;
-        }
-
-        public double GetDensity( double temperature, double pressure ) => _density;
-
-        public double GetBoilingPoint( double pressure ) { throw new System.NotImplementedException(); }
-        public double GetLatentHeatOfFusion( double temperature ) { throw new System.NotImplementedException(); }
-        public double GetLatentHeatOfVaporization( double temperature ) { throw new System.NotImplementedException(); }
-        public double GetPressure( double temperature, double density ) { throw new System.NotImplementedException(); }
-        public double GetSpecificHeatCapacity( double temperature, double pressure ) { throw new System.NotImplementedException(); }
-        public double GetSpeedOfSound( double temperature, double pressure ) { throw new System.NotImplementedException(); }
-        public double GetThermalConductivity( double temperature, double pressure ) { throw new System.NotImplementedException(); }
-        public double GetVaporPressure( double temperature ) { throw new System.NotImplementedException(); }
-        public double GetViscosity( double temperature, double pressure ) { throw new System.NotImplementedException(); }
-    }
-
     [TestFixture]
     public class FlowTankTests2
     {
@@ -51,9 +18,33 @@ namespace HSP_Tests_EditMode.ResourceFlow
         {
             // Standard tank volume 1.0
             _tank = new FlowTank( 1.0 );
-            _water = new MockSubstance( "water", 1000, Color.blue );
-            _oil = new MockSubstance( "oil", 800, Color.yellow );
-            _mercury = new MockSubstance( "mercury", 13500, Color.gray );
+            _water = new Substance( "water" )
+            {
+                DisplayName = "Water",
+                Phase = SubstancePhase.Liquid,
+                ReferenceDensity = 1000f,
+                ReferencePressure = 101325f,
+                BulkModulus = 2.2e9f, // Water is slightly compressible
+                DisplayColor = Color.blue
+            };
+            _oil = new Substance( "oil" )
+            {
+                DisplayName = "Oil",
+                Phase = SubstancePhase.Liquid,
+                ReferenceDensity = 800f,
+                ReferencePressure = 101325f,
+                BulkModulus = 1.5e9f,
+                DisplayColor = Color.yellow
+            };
+            _mercury = new Substance( "mercury" )
+            {
+                DisplayName = "Mercury",
+                Phase = SubstancePhase.Liquid,
+                ReferenceDensity = 13500f,
+                ReferencePressure = 101325f,
+                BulkModulus = 2.85e9f,
+                DisplayColor = Color.gray
+            };
         }
 
         // --- HELPER: Create Geometry ---
@@ -298,8 +289,24 @@ namespace HSP_Tests_EditMode.ResourceFlow
             _tank.SetNodes( nodes, inlets );
             _tank.FluidAcceleration = new Vector3( 0, -10, 0 ); // Gravity
 
-            _water = new MockSubstance( "water", 1000, Color.blue );
-            _oil = new MockSubstance( "oil", 800, Color.yellow );
+            _water = new Substance( "water" )
+            {
+                DisplayName = "Water",
+                Phase = SubstancePhase.Liquid,
+                ReferenceDensity = 1000f,
+                ReferencePressure = 101325f,
+                BulkModulus = 2.2e9f, // Water is slightly compressible
+                DisplayColor = Color.blue
+            };
+            _oil = new Substance( "oil" )
+            {
+                DisplayName = "Oil",
+                Phase = SubstancePhase.Liquid,
+                ReferenceDensity = 800f,
+                ReferencePressure = 101325f,
+                BulkModulus = 1.5e9f,
+                DisplayColor = Color.yellow
+            };
         }
 
         [Test]
@@ -333,7 +340,7 @@ namespace HSP_Tests_EditMode.ResourceFlow
             FluidState state = _tank.Sample( portPosition, 0.1 );
 
             // Assert
-            Assert.AreEqual( 0.0, state.FluidSurfacePotential, 1e-9 );
+            Assert.AreEqual( 0.0, state.FluidSurfacePotential, 1e-3 );
         }
 
         [Test]

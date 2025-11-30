@@ -634,6 +634,7 @@ namespace HSP_Tests_PlayMode.ResourceFlow
             // Assert
             Assert.Less( tankA.Contents.GetMass(), initialMass, "Gas should have escaped through the top pipe." );
             Assert.Greater( tankB.Contents.GetMass(), 0.0, "Gas should have entered the second tank." );
+            Assert.AreEqual( 0.5, tankB.Contents.GetMass() + tankA.Contents.GetMass(), 0.01, "Total mass conservation failed." );
         }
 
         [UnityTest]
@@ -687,6 +688,7 @@ namespace HSP_Tests_PlayMode.ResourceFlow
             // Assert
             Assert.Greater( tankB.Contents.GetMass(), 1.0, "Gas failed to flow upwards against gravity." );
             Assert.Less( tankA.Contents.GetMass(), 9.0, "Gas failed to leave the bottom tank." );
+            Assert.AreEqual( 10.0, tankB.Contents.GetMass() + tankA.Contents.GetMass(), 0.01, "Total mass conservation failed." );
         }
 
         [UnityTest]
@@ -751,6 +753,7 @@ namespace HSP_Tests_PlayMode.ResourceFlow
             Assert.AreEqual( 2.0, massA, 0.2, "Small tank did not settle at correct proportional mass." );
             Assert.AreEqual( 4.0, massB, 0.2, "Large tank did not settle at correct proportional mass." );
             Assert.Greater( massB, massA, "Mass should not be equal; it should be proportional to volume for gasses." );
+            Assert.AreEqual( 6.0, tankB.Contents.GetMass() + tankA.Contents.GetMass(), 0.01, "Total mass conservation failed." );
         }
 
         [UnityTest]

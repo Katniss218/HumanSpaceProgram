@@ -165,7 +165,7 @@ namespace HSP.ResourceFlow
             // Note - floating point Bowyer-Watson fails on aligned grids/near-coplanar inputs.
 
             TetrahedronVertex[] vertices = new TetrahedronVertex[inputPoints.Count];
-            List<FlowNode> nodes = new List<FlowNode>(inputPoints.Count);
+            List<FlowNode> nodes = new List<FlowNode>( inputPoints.Count );
 
             Vector3 min = inputPoints[0];
             Vector3 max = inputPoints[0];
@@ -311,7 +311,7 @@ namespace HSP.ResourceFlow
                     long key = ((long)Math.Min( u, v ) << 32) | (uint)Math.Max( u, v );
                     if( edgeSet.Add( key ) )
                     {
-                        finalEdges.Add( new FlowEdge( i, j, -1.0 ) );
+                        finalEdges.Add( new FlowEdge( u, v, -1.0 ) );
                     }
                 }
 
