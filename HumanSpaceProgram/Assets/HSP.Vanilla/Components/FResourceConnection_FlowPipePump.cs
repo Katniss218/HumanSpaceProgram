@@ -11,10 +11,19 @@ namespace HSP.Vanilla.Components
         /// </summary>
         public float PressureHead { get; set; } = 10000f;
 
+        private FlowPipe _cachedPumpPipe;
+
         public override BuildFlowResult BuildFlowNetwork( FlowNetworkBuilder c )
         {
             if( FromInlet == null || ToInlet == null )
+            {
+                if( _cachedPumpPipe != null )
+                {
+                    c.TryRemoveFlowObj( _cachedPumpPipe );
+                    _cachedPumpPipe = null;
+                }
                 return BuildFlowResult.Finished;
+            }
 
             // Try to get the simulation ports for the inlets
             if( !c.TryGetFlowObj( FromInlet, out FlowPipe.Port flowEnd1 ) || !c.TryGetFlowObj( ToInlet, out FlowPipe.Port flowEnd2 ) )
@@ -23,9 +32,18 @@ namespace HSP.Vanilla.Components
             }
 
             // Create pipe with added Head Pressure
-            FlowPipe pipe = new FlowPipe( flowEnd1, flowEnd2, CrossSectionArea, headAdded: PressureHead );
-            c.TryAddFlowObj( this, pipe );
+            _cachedPumpPipe = new FlowPipe( flowEnd1, flowEnd2, CrossSectionArea, headAdded: PressureHead );
+            c.TryAddFlowObj( this, _cachedPumpPipe );
             return BuildFlowResult.Finished;
+        }
+
+        public override void SynchronizeState( FlowNetworkSnapshot snapshot )
+        {
+            // If our pipe exists in the simulation, update its head pressure.
+            if( _cachedPumpPipe != null )
+            {
+                _cachedPumpPipe.HeadAdded = this.PressureHead;
+            }
         }
 
         [MapsInheritingFrom( typeof( FResourceConnection_FlowPipePump ) )]
@@ -35,14 +53,4 @@ namespace HSP.Vanilla.Components
                 .WithMember( "pressure_head", o => o.PressureHead );
         }
     }
-
-    /*
-    public class FResourceConnector_FlowPipeCheckValve : FResourceConnector_FlowPipe
-    {
-
-    }
-    public class FResourceConnector_FlowPipeReliefValve : FResourceConnector_FlowPipe
-    {
-
-    }*/
 }

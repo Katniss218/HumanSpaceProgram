@@ -143,8 +143,8 @@ namespace HSP._DevUtils
             //conn.End2.Position = new Vector3( 0.0f, 1.5f, 0.0f );
             conn.CrossSectionArea = 0.1f;
 
-            Substance sbsF = AssetRegistry.Get<Substance>( "Vanilla::Assets/substances/fuel" );
-            Substance sbsOX = AssetRegistry.Get<Substance>( "Vanilla::Assets/substances/oxidizer" );
+            Substance sbsF = AssetRegistry.Get<Substance>( "Vanilla::Assets/substances/rp_1" );
+            Substance sbsOX = AssetRegistry.Get<Substance>( "Vanilla::Assets/substances/lox" );
 
             var tankSmallTank = tankP.GetComponent<FResourceContainer_FlowTank>();
             tankSmallTank.Contents = new SubstanceStateCollection() 
@@ -161,7 +161,7 @@ namespace HSP._DevUtils
             conn21.CrossSectionArea = 60f;
 
             FResourceConnection_FlowPipe conn22 = engineP2.gameObject.AddComponent<FResourceConnection_FlowPipe>();
-            conn22.FromInlet = tankP.GetComponent<FResourceContainer_FlowTank>().Inlets[2];
+            conn22.FromInlet = tankP.GetComponent<FResourceContainer_FlowTank>().Inlets[1];
             //conn22.End1.Position = new Vector3( 0.0f, -1.5f, 0.0f );
             conn22.ToInlet = engineP2.GetComponent<FRocketEngine>().Inlets[0];
             //conn22.End2.Position = new Vector3( 0.0f, 0.0f, 0.0f );

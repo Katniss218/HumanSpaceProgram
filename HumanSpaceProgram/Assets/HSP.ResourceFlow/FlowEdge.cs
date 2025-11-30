@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-
-namespace HSP.ResourceFlow
+﻿namespace HSP.ResourceFlow
 {
     /// <summary>
     /// Holds fluid inside a <see cref="FlowTank2"/>.

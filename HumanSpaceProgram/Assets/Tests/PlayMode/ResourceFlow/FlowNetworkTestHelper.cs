@@ -51,6 +51,11 @@ namespace HSP_Tests_PlayMode.ResourceFlow
             }
             Tank.InvalidateFluids();
         }
+
+        public void SynchronizeState( FlowNetworkSnapshot snapshot )
+        {
+            throw new System.NotImplementedException();
+        }
     }
 
     public sealed class MockFlowPipeWrapper : MonoBehaviour, IBuildsFlowNetwork
@@ -87,5 +92,42 @@ namespace HSP_Tests_PlayMode.ResourceFlow
         public void ApplySnapshot( FlowNetworkSnapshot snapshot )
         {
         }
+
+        public void SynchronizeState( FlowNetworkSnapshot snapshot )
+        {
+            //  throw new System.NotImplementedException();
+        }
+    }
+
+    /// <summary>
+    /// A custom pipe wrapper for the oscillation test that allows setting a high conductance value.
+    /// It follows the same (apparently flawed) builder pattern as existing components to ensure compatibility.
+    /// </summary>
+    public sealed class HighConductancePipeWrapper : MonoBehaviour, IBuildsFlowNetwork
+    {
+        public float CrossSectionArea { get; set; } = 1.0f;
+        public ResourceInlet FromInlet { get; set; }
+        public ResourceInlet ToInlet { get; set; }
+        public double Conductance { get; set; } = 5000.0; // ridiculously huge conductance for testing.
+
+        public BuildFlowResult BuildFlowNetwork( FlowNetworkBuilder c )
+        {
+            if( FromInlet == null || ToInlet == null )
+                return BuildFlowResult.Finished;
+
+            // This call pattern is suspect but consistent with other components.
+            if( !c.TryGetFlowObj( FromInlet, out FlowPipe.Port flowEnd1 ) || !c.TryGetFlowObj( ToInlet, out FlowPipe.Port flowEnd2 ) )
+            {
+                return BuildFlowResult.Retry;
+            }
+
+            FlowPipe pipe = new FlowPipe( flowEnd1, flowEnd2, CrossSectionArea, conductance: this.Conductance );
+            c.TryAddFlowObj( this, pipe );
+            return BuildFlowResult.Finished;
+        }
+
+        public bool IsValid( FlowNetworkSnapshot snapshot ) => true;
+        public void ApplySnapshot( FlowNetworkSnapshot snapshot ) { }
+        public void SynchronizeState( FlowNetworkSnapshot snapshot ) { }
     }
 }

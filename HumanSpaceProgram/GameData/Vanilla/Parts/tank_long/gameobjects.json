@@ -255,22 +255,44 @@
                 "on_after_mass_changed": null
             },
             {
-                "$type": "HSP.Vanilla.Components.FBulkContainer_Sphere, HSP.Vanilla, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                "$type": "HSP.Vanilla.Components.FResourceContainer_FlowTank, HSP.Vanilla, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
                 "$id": "03bba123-a6f1-4525-b929-1a2a6e5050c2",
                 "is_enabled": true,
                 "volume_transform": {
                     "$ref": "305c0ff1-30a1-4a83-8765-e43485576613"
                 },
                 "max_volume": 14,
-                "radius": 2.5,
-                "contents": {
-                    "$type": "HSP.ResourceFlow.SubstanceStateCollection, HSP.ResourceFlow, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
-                    "$id": "e97b93ba-dc7a-41fa-8a33-1b797148c082",
-                    "substances": {
-                        "$type": "System.Collections.Generic.List`1[[HSP.ResourceFlow.SubstanceState, HSP.ResourceFlow, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089",
-                        "$id": "f06bfc0c-66dc-4da0-bdbd-d034f937751f",
-                        "value": []
-                    }
+                "triangulation_positions": {
+                    "value": [
+                        [0, 1, 0],
+                        [0, -1, 0],
+
+                        [1, 0, 0],
+                        [-1, 0, 0],
+                        [0, 0, 1],
+                        [0, 0, -1]
+                    ]
+                },
+                "inlets": {
+                    "value": [
+                        {
+                            "$id": "e6e42fe4-a75b-49e8-a224-696c30033654",
+                            "nominal_area": 1,
+                            "local_position": [0, 2, 0]
+                        },
+                        {
+                            "$id": "e42e4f19-6196-45ac-9edf-7695771d1e0e",
+                            "nominal_area": 1,
+                            "local_position": [0, -2, 0]
+                        }
+                    ]
+                },
+                "contents": null,
+                "fluid_state": {
+                    "pressure": 101325.0,
+                    "temperature": 273.15,
+                    "velocity": 0.0,
+                    "fluid_surface_potential": 0.0
                 }
             },
             {

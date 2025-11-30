@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using UnityPlus.Serialization;
 
 namespace HSP.ResourceFlow
 {
@@ -43,6 +44,14 @@ namespace HSP.ResourceFlow
             FluidSurfacePotential = double.NegativeInfinity
         };
 
+        public static FluidState STP => new FluidState()
+        {
+            Pressure = 101325.0,
+            Temperature = 273.15,
+            Velocity = 0.0,
+            FluidSurfacePotential = 0.0
+        };
+
         public FluidState( double pressure, double temperature, double velocity )
         {
             this.Pressure = pressure;
@@ -54,6 +63,17 @@ namespace HSP.ResourceFlow
         public override string ToString()
         {
             return $"P={Pressure} Pa, T={Temperature} K, V={Velocity} m/s";
+        }
+
+
+        [MapsInheritingFrom( typeof( FluidState ) )]
+        public static SerializationMapping FluidStateMapping()
+        {
+            return new MemberwiseSerializationMapping<FluidState>()
+                .WithMember( "pressure", o => o.Pressure )
+                .WithMember( "temperature", o => o.Temperature )
+                .WithMember( "velocity", o => o.Velocity )
+                .WithMember( "fluid_surface_potential", o => o.FluidSurfacePotential );
         }
     }
 }

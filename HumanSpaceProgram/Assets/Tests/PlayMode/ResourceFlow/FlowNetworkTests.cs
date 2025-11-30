@@ -834,5 +834,134 @@ namespace HSP_Tests_PlayMode.ResourceFlow
             // but usually bottom drains are pure liquid until empty.
             Assert.Less( airInC, 0.1, "Bottom pipe should generally exclude gas while liquid exists." );
         }
+
+
+        [UnityTest]
+        public IEnumerator Solver_HandlesOscillationProneSystem_WithoutException()
+        {
+            // Arrange
+            var (manager, _, _) = FlowNetworkTestHelper.CreateTestScene();
+            _manager = manager;
+
+            _root = new GameObject( "TestRoot" );
+
+            var goA = new GameObject( "TankA" );
+            goA.transform.SetParent( _root.transform );
+            var tankA = CreateTestTank( 100.0, new Vector3( 0, -10, 0 ), Vector3.zero );
+            tankA.Contents.Add( _water, 90000 ); // 90% full
+            var wrapperA = goA.AddComponent<MockFlowTankWrapper>();
+            wrapperA.Tank = tankA;
+            wrapperA.Inlets = new[] {
+                new ResourceInlet(1, new Vector3(0, 2.32f, 0)),
+                new ResourceInlet(1, new Vector3(0, -2.32f, 0))
+            };
+
+            var goB = new GameObject( "TankB" );
+            goB.transform.SetParent( _root.transform );
+            var tankB = CreateTestTank( 100.0, new Vector3( 0, -10, 0 ), new Vector3( 10, 0, 0 ) );
+            tankB.Contents.Add( _water, 10000 ); // 10% full
+            var wrapperB = goB.AddComponent<MockFlowTankWrapper>();
+            wrapperB.Tank = tankB;
+            wrapperB.Inlets = new[] {
+                new ResourceInlet(1, new Vector3(10, 2.32f, 0)),
+                new ResourceInlet(1, new Vector3(10, -2.32f, 0))
+            };
+
+            var pipeGO = new GameObject( "Pipe" );
+            pipeGO.transform.SetParent( _root.transform );
+            var pipe = pipeGO.AddComponent<HighConductancePipeWrapper>();
+            pipe.FromInlet = wrapperA.Inlets[1];
+            pipe.ToInlet = wrapperB.Inlets[1];
+
+            yield return new WaitForFixedUpdate();
+
+            var snapshot = FlowNetworkSnapshot.GetNetworkSnapshot( _root );
+
+            var s = snapshot;
+
+            // Act & Assert
+            float simulationTime = 5f;
+            int steps = (int)(simulationTime / Time.fixedDeltaTime);
+
+            for( int i = 0; i < steps; i++ )
+            {
+                Assert.DoesNotThrow( () => snapshot.Step( Time.fixedDeltaTime ), $"Solver threw a convergence exception at step {i}." );
+                yield return new WaitForFixedUpdate();
+            }
+
+            double massA = tankA.Contents.GetMass();
+            double massB = tankB.Contents.GetMass();
+
+            Assert.AreEqual( 50000.0, massA, 15.0, "Tank A should have equalized." );
+            Assert.AreEqual( 50000.0, massB, 15.0, "Tank B should have equalized." );
+        }
+
+        [UnityTest]
+        public IEnumerator Solver_HandlesClosedLoop_WithoutException()
+        {
+            // Arrange
+            var (manager, _, _) = FlowNetworkTestHelper.CreateTestScene();
+            _manager = manager;
+            _root = new GameObject( "TestRoot" );
+
+            // Create three tanks at the same height (y=0) in a triangle on the XZ plane.
+            // All tanks are identical and half-full, creating a perfect equilibrium state.
+            var goA = new GameObject( "TankA" ); goA.transform.SetParent( _root.transform );
+            var tankA = CreateTestTank( 1.0, new Vector3( 0, -10, 0 ), new Vector3( -5, 0, 0 ) );
+            tankA.Contents.Add( _water, 600 ); // Half full
+            var wrapperA = goA.AddComponent<MockFlowTankWrapper>();
+            wrapperA.Tank = tankA;
+            wrapperA.Inlets = new[] { new ResourceInlet( 1, new Vector3( -5, 1.07f, 0 ) ), new ResourceInlet( 1, new Vector3( -5, -1.07f, 0 ) ) };
+
+            var goB = new GameObject( "TankB" ); goB.transform.SetParent( _root.transform );
+            var tankB = CreateTestTank( 1.0, new Vector3( 0, -10, 0 ), new Vector3( 5, 0, 0 ) );
+            tankB.Contents.Add( _water, 500 ); // Half full
+            var wrapperB = goB.AddComponent<MockFlowTankWrapper>();
+            wrapperB.Tank = tankB;
+            wrapperB.Inlets = new[] { new ResourceInlet( 1, new Vector3( 5, 1.07f, 0 ) ), new ResourceInlet( 1, new Vector3( 5, -1.07f, 0 ) ) };
+
+            var goC = new GameObject( "TankC" ); goC.transform.SetParent( _root.transform );
+            var tankC = CreateTestTank( 1.0, new Vector3( 0, -10, 0 ), new Vector3( 0, 0, 5 ) );
+            tankC.Contents.Add( _water, 400 ); // Half full
+            var wrapperC = goC.AddComponent<MockFlowTankWrapper>();
+            wrapperC.Tank = tankC;
+            wrapperC.Inlets = new[] { new ResourceInlet( 1, new Vector3( 0, 1.07f, 5 ) ), new ResourceInlet( 1, new Vector3( 0, -1.07f, 5 ) ) };
+
+            // Connect the bottom inlets in a ring: A -> B -> C -> A
+            var pipeAB_GO = new GameObject( "Pipe_AB" ); pipeAB_GO.transform.SetParent( _root.transform );
+            var pipeAB = pipeAB_GO.AddComponent<MockFlowPipeWrapper>();
+            pipeAB.FromInlet = wrapperA.Inlets[1];
+            pipeAB.ToInlet = wrapperB.Inlets[1];
+
+            var pipeBC_GO = new GameObject( "Pipe_BC" ); pipeBC_GO.transform.SetParent( _root.transform );
+            var pipeBC = pipeBC_GO.AddComponent<MockFlowPipeWrapper>();
+            pipeBC.FromInlet = wrapperB.Inlets[1];
+            pipeBC.ToInlet = wrapperC.Inlets[1];
+
+            var pipeCA_GO = new GameObject( "Pipe_CA" ); pipeCA_GO.transform.SetParent( _root.transform );
+            var pipeCA = pipeCA_GO.AddComponent<MockFlowPipeWrapper>();
+            pipeCA.FromInlet = wrapperC.Inlets[1];
+            pipeCA.ToInlet = wrapperA.Inlets[1];
+
+            yield return new WaitForFixedUpdate();
+
+            var snapshot = FlowNetworkSnapshot.GetNetworkSnapshot( _root );
+
+            // Act & Assert
+            // Run for a few steps and verify that the solver doesn't throw an exception
+            // and that no flow occurs, as the system is in perfect equilibrium.
+            float simulationTime = 10f;
+            int steps = (int)(simulationTime / Time.fixedDeltaTime);
+
+            for( int i = 0; i < steps; i++ )
+            {
+                Assert.DoesNotThrow( () => snapshot.Step( Time.fixedDeltaTime ), $"Solver threw an exception on step {i} with a closed loop." );
+                yield return new WaitForFixedUpdate();
+            }
+
+            Assert.AreEqual( 500.0, tankA.Contents.GetMass(), 0.1, "Tank A mass should not change in equilibrium." );
+            Assert.AreEqual( 500.0, tankB.Contents.GetMass(), 0.1, "Tank B mass should not change in equilibrium." );
+            Assert.AreEqual( 500.0, tankC.Contents.GetMass(), 0.1, "Tank C mass should not change in equilibrium." );
+        }
     }
 }

@@ -68,61 +68,30 @@ namespace HSP.ResourceFlow
                 }
             }
 
-            IResourceConsumer[] consumers = builder.Consumers.ToArray();
-            IResourceProducer[] producers = builder.Producers.ToArray();
-            FlowPipe[] pipes = builder.Pipes.ToArray();
-            // pipes are already added.
-
-            // figure out which tanks are connected to which pipes.
-            // FlowPipe already contains the connectivity info.
-            int[][] consumersAndPipes = new int[consumers.Length][];
-            int[][] producersAndPipes = new int[producers.Length][];
-            List<int> tempPipeArray = new();
-            for( int i = 0; i < consumers.Length; i++ )
-            {
-                IResourceConsumer consumer = consumers[i];
-                for( int j = 0; j < pipes.Length; j++ )
-                {
-                    FlowPipe pipe = pipes[j];
-                    if( pipe.FromInlet.Consumer == consumer || pipe.ToInlet.Consumer == consumer )
-                    {
-                        tempPipeArray.Add( j );
-                    }
-                }
-                consumersAndPipes[i] = tempPipeArray.ToArray();
-                tempPipeArray.Clear();
-            }
-            for( int i = 0; i < producers.Length; i++ )
-            {
-                IResourceProducer producer = producers[i];
-                for( int j = 0; j < pipes.Length; j++ )
-                {
-                    FlowPipe pipe = pipes[j];
-                    if( pipe.FromInlet.Producer == producer || pipe.ToInlet.Producer == producer )
-                    {
-                        tempPipeArray.Add( j );
-                    }
-                }
-                producersAndPipes[i] = tempPipeArray.ToArray();
-                tempPipeArray.Clear();
-            }
-
-            return new FlowNetworkSnapshot( obj, builder.Owner, applyTo, producers, producersAndPipes, consumers, consumersAndPipes, pipes );
+            return new FlowNetworkSnapshot( obj, builder.Owner, applyTo, builder.Producers.ToList(), builder.Consumers.ToList(), builder.Pipes.ToList() );
         }
 
         public readonly GameObject RootObject;
 
-        // In general, only parts of the 'real' full network that need solving/evaluating will/should be included here.
-        // E.g. tanks that actually are connected to something through an open pipe.
         private readonly IBuildsFlowNetwork[] _applyTo;
-        private readonly FlowPipe[] _pipes;
+        private readonly List<FlowPipe> _pipes;
+        private readonly List<IResourceProducer> _producers;
+        private readonly List<IResourceConsumer> _consumers;
 
-        private readonly IResourceProducer[] _producers;
-        private readonly int[][] _producersAndPipes; // Lists indices to the Pipes array for each producer (which producer is connected to which pipes).
-        private readonly IResourceConsumer[] _consumers;
-        private readonly int[][] _consumersAndPipes;
+        private int[][] _producersAndPipes;
+        private int[][] _consumersAndPipes;
         private readonly IReadOnlyDictionary<object, object> _owner;
 
+        // --- Partial Rebuild Data ---
+        private readonly Dictionary<FlowPipe, int> _pipeToIndex = new();
+        private readonly Dictionary<IResourceProducer, int> _producerToIndex = new();
+        private readonly Dictionary<IResourceConsumer, int> _consumerToIndex = new();
+
+        private readonly Queue<int> _freePipeSlots = new();
+        private readonly Queue<int> _freeProducerSlots = new();
+        private readonly Queue<int> _freeConsumerSlots = new();
+
+        // --- Solver Buffers ---
         private (double, double)[] _currentPotentials;
         private double[] _previousFlowRates; // For oscillation detection
         private double[] _currentFlowRates;
@@ -130,20 +99,37 @@ namespace HSP.ResourceFlow
 
         private double _relaxationFactor;
 
-        public FlowNetworkSnapshot( GameObject rootObject, IReadOnlyDictionary<object, object> owner, IBuildsFlowNetwork[] applyTo, IResourceProducer[] producers, int[][] producersAndPipes, IResourceConsumer[] consumers, int[][] consumersAndPipes, FlowPipe[] pipes )
+        public FlowNetworkSnapshot( GameObject rootObject, IReadOnlyDictionary<object, object> owner, IBuildsFlowNetwork[] applyTo, List<IResourceProducer> producers, List<IResourceConsumer> consumers, List<FlowPipe> pipes )
         {
             RootObject = rootObject;
             _owner = owner;
             _applyTo = applyTo;
             _producers = producers;
-            _producersAndPipes = producersAndPipes;
             _consumers = consumers;
-            _consumersAndPipes = consumersAndPipes;
             _pipes = pipes;
-            _currentFlowRates = new double[_pipes.Length];
-            _currentPotentials = new (double, double)[_pipes.Length];
-            _nextFlowRates = new double[_pipes.Length];
-            _previousFlowRates = new double[_pipes.Length];
+
+            // Initialize solver buffers to the correct capacity.
+            ResizeSolverBuffers( _pipes.Count, true );
+
+            // Populate reverse lookup maps for the initial state.
+            for( int i = 0; i < _producers.Count; i++ ) _producerToIndex[_producers[i]] = i;
+            for( int i = 0; i < _consumers.Count; i++ ) _consumerToIndex[_consumers[i]] = i;
+            for( int i = 0; i < _pipes.Count; i++ ) _pipeToIndex[_pipes[i]] = i;
+
+            // Build initial connectivity maps.
+            RebuildConnectivityMaps();
+        }
+
+        private void ResizeSolverBuffers( int capacity, bool exact )
+        {
+            if( _currentFlowRates == null || _currentFlowRates.Length < capacity )
+            {
+                int newSize = exact ? capacity : Math.Max( capacity, (_currentFlowRates?.Length ?? 0) * 2 );
+                Array.Resize( ref _currentFlowRates, newSize );
+                Array.Resize( ref _previousFlowRates, newSize );
+                Array.Resize( ref _nextFlowRates, newSize );
+                Array.Resize( ref _currentPotentials, newSize );
+            }
         }
 
         public bool TryGetFlowObj<T>( object obj, out T flowObj )
@@ -157,21 +143,176 @@ namespace HSP.ResourceFlow
             return false;
         }
 
-
-        public bool IsValid()
+        public void GetInvalidComponents( List<IBuildsFlowNetwork> invalidComponents )
         {
-            // TODO - optimization: partial rebuild - rebuild only those parts/objects that have changed.
-
-            // invalid if the 'real' objects moved/connections have been made, fluid was changed, etc.
-            // each 'real' object needs to validate whether the simulation snapshot is still valid for itself.
             foreach( var a in _applyTo )
             {
                 if( !a.IsValid( this ) )
-                    return false;
+                {
+                    invalidComponents.Add( a );
+                }
+            }
+        }
+
+        public void SynchronizeStateWithComponents()
+        {
+            foreach( var a in _applyTo )
+            {
+                a.SynchronizeState( this );
+            }
+        }
+
+        public void ApplyTransaction( FlowNetworkBuilder transaction )
+        {
+            bool structureChanged = false;
+
+            // Process Removals
+            foreach( var pipe in transaction.PipeRemovals )
+            {
+                if( _pipeToIndex.TryGetValue( pipe, out int index ) )
+                {
+                    _pipes[index] = null;
+                    _pipeToIndex.Remove( pipe );
+                    _freePipeSlots.Enqueue( index );
+                    structureChanged = true;
+                }
+            }
+            foreach( var producer in transaction.ProducerRemovals )
+            {
+                if( _producerToIndex.TryGetValue( producer, out int index ) )
+                {
+                    _producers[index] = null;
+                    _producerToIndex.Remove( producer );
+                    _freeProducerSlots.Enqueue( index );
+                    structureChanged = true;
+                }
+            }
+            foreach( var consumer in transaction.ConsumerRemovals )
+            {
+                if( _consumerToIndex.TryGetValue( consumer, out int index ) )
+                {
+                    _consumers[index] = null;
+                    _consumerToIndex.Remove( consumer );
+                    _freeConsumerSlots.Enqueue( index );
+                    structureChanged = true;
+                }
             }
 
-            return true;
+            // Process Additions
+            if( transaction.Pipes.Any() )
+            {
+                structureChanged = true;
+                foreach( var pipe in transaction.Pipes )
+                {
+                    if( _pipeToIndex.ContainsKey( pipe ) ) continue;
+
+                    if( _freePipeSlots.TryDequeue( out int index ) )
+                    {
+                        _pipes[index] = pipe;
+                        _pipeToIndex[pipe] = index;
+                    }
+                    else
+                    {
+                        int newIndex = _pipes.Count;
+                        _pipes.Add( pipe );
+                        _pipeToIndex[pipe] = newIndex;
+                    }
+                }
+            }
+            if( transaction.Producers.Any() )
+            {
+                structureChanged = true;
+                foreach( var producer in transaction.Producers )
+                {
+                    if( _producerToIndex.ContainsKey( producer ) ) continue;
+
+                    if( _freeProducerSlots.TryDequeue( out int index ) )
+                    {
+                        _producers[index] = producer;
+                        _producerToIndex[producer] = index;
+                    }
+                    else
+                    {
+                        int newIndex = _producers.Count;
+                        _producers.Add( producer );
+                        _producerToIndex[producer] = newIndex;
+                    }
+                }
+            }
+            if( transaction.Consumers.Any() )
+            {
+                structureChanged = true;
+                foreach( var consumer in transaction.Consumers )
+                {
+                    if( _consumerToIndex.ContainsKey( consumer ) ) continue;
+
+                    if( _freeConsumerSlots.TryDequeue( out int index ) )
+                    {
+                        _consumers[index] = consumer;
+                        _consumerToIndex[consumer] = index;
+                    }
+                    else
+                    {
+                        int newIndex = _consumers.Count;
+                        _consumers.Add( consumer );
+                        _consumerToIndex[consumer] = newIndex;
+                    }
+                }
+            }
+
+            if( structureChanged )
+            {
+                // Rebuild connectivity maps since pipes were added/removed.
+                // This is simpler than trying to patch the maps.
+                RebuildConnectivityMaps();
+
+                // Ensure solver buffers are large enough.
+                ResizeSolverBuffers( _pipes.Count, false );
+            }
         }
+
+        private void RebuildConnectivityMaps()
+        {
+            _producersAndPipes = BuildConnectivityMap( _producers, _pipes );
+            _consumersAndPipes = BuildConnectivityMap( _consumers, _pipes );
+        }
+
+        private int[][] BuildConnectivityMap<T>( List<T> nodes, List<FlowPipe> pipes )
+        {
+            int[][] map = new int[nodes.Count][];
+            List<int> tempPipeArray = new();
+
+            for( int i = 0; i < nodes.Count; i++ )
+            {
+                object node = nodes[i];
+                if( node == null )
+                {
+                    map[i] = Array.Empty<int>();
+                    continue;
+                }
+
+                for( int j = 0; j < pipes.Count; j++ )
+                {
+                    FlowPipe pipe = pipes[j];
+                    if( pipe == null ) continue;
+
+                    bool connected = false;
+                    if( node is IResourceConsumer consumer && (ReferenceEquals( pipe.FromInlet.Consumer, consumer ) || ReferenceEquals( pipe.ToInlet.Consumer, consumer )) )
+                        connected = true;
+                    if( node is IResourceProducer producer && (ReferenceEquals( pipe.FromInlet.Producer, producer ) || ReferenceEquals( pipe.ToInlet.Producer, producer )) )
+                        connected = true;
+
+                    if( connected )
+                    {
+                        tempPipeArray.Add( j );
+                    }
+                }
+                map[i] = tempPipeArray.ToArray();
+                tempPipeArray.Clear();
+            }
+            return map;
+        }
+
 
         /// <summary>
         /// Solves the flow network iteratively until convergence or max iterations.
@@ -194,9 +335,11 @@ namespace HSP.ResourceFlow
             for( int iteration = 0; iteration < MAX_ITERATIONS; iteration++ )
             {
                 // A. Calculate Flow Rates based on current Potentials
-                for( int i = 0; i < _pipes.Length; i++ )
+                for( int i = 0; i < _pipes.Count; i++ )
                 {
                     FlowPipe pipe = _pipes[i];
+                    if( pipe == null ) continue;
+
                     (double potFrom, double potTo) = _currentPotentials[i];
 
                     // ComputeFlowRate typically uses potential difference logic.
@@ -207,8 +350,10 @@ namespace HSP.ResourceFlow
                 // B. Check Convergence, Detect Oscillation, and Apply Relaxation
                 converged = true;
                 bool hasOscillations = false;
-                for( int i = 0; i < _pipes.Length; i++ )
+                for( int i = 0; i < _pipes.Count; i++ )
                 {
+                    if( _pipes[i] == null ) continue;
+
                     double prevFlow = _currentFlowRates[i];
                     double prevPrevFlow = _previousFlowRates[i];
                     double newFlowUnrelaxed = _nextFlowRates[i];
@@ -280,15 +425,18 @@ namespace HSP.ResourceFlow
         private void UpdatePotentials()
         {
             // Sample potentials from Producers
-            for( int i = 0; i < _producers.Length; i++ )
+            for( int i = 0; i < _producers.Count; i++ )
             {
                 IResourceProducer producer = _producers[i];
+                if( producer == null ) continue;
+
                 int[] pipeIndices = _producersAndPipes[i];
 
                 for( int k = 0; k < pipeIndices.Length; k++ )
                 {
                     int pipeIdx = pipeIndices[k];
                     FlowPipe pipe = _pipes[pipeIdx];
+                    if( pipe == null ) continue;
 
                     // Sample potential at the connection point
                     if( ReferenceEquals( pipe.FromInlet.Producer, producer ) )
@@ -305,15 +453,18 @@ namespace HSP.ResourceFlow
             }
 
             // Sample potentials from Consumers
-            for( int i = 0; i < _consumers.Length; i++ )
+            for( int i = 0; i < _consumers.Count; i++ )
             {
                 IResourceConsumer consumer = _consumers[i];
+                if( consumer == null ) continue;
+
                 int[] pipeIndices = _consumersAndPipes[i];
 
                 for( int k = 0; k < pipeIndices.Length; k++ )
                 {
                     int pipeIdx = pipeIndices[k];
                     FlowPipe pipe = _pipes[pipeIdx];
+                    if( pipe == null ) continue;
 
                     if( ReferenceEquals( pipe.FromInlet.Consumer, consumer ) )
                     {
@@ -332,27 +483,34 @@ namespace HSP.ResourceFlow
         private void ApplyTransport( float dt )
         {
             // Clear previous IO states
-            foreach( var producer in _producers ) 
+            foreach( var producer in _producers )
+            {
+                if( producer == null ) continue;
                 producer.Outflow?.Clear();
+            }
             foreach( var consumer in _consumers )
+            {
+                if( consumer == null ) continue;
                 consumer.Inflow?.Clear();
+            }
 
             // --- Step 1: Calculate Demand (Ideal Flow) ---
             // We store the signed flow rate for every pipe.
             // Positive = From -> To, Negative = To -> From
-            double[] proposedFlows = new double[_pipes.Length];
+            double[] proposedFlows = _currentFlowRates; // Use the already calculated rates
 
             // We need to track total requested mass OUT of each tank.
             // Dictionary maps Tank Object -> Total Volume Requested to leave
             Dictionary<object, double> totalVolumeDemand = new Dictionary<object, double>();
 
-            for( int i = 0; i < _pipes.Length; i++ )
+            for( int i = 0; i < _pipes.Count; i++ )
             {
-                double rate = _currentFlowRates[i];
+                if( _pipes[i] == null ) continue;
+
+                double rate = proposedFlows[i];
                 if( Math.Abs( rate ) < 1e-9 )
                     continue;
 
-                proposedFlows[i] = rate;
                 double volRequested = Math.Abs( rate ) * dt;
 
                 // Identify Source
@@ -369,13 +527,15 @@ namespace HSP.ResourceFlow
 
             // --- Step 2 & 3: Limit & Scale ---
             // We compute a scaling factor (0.0 to 1.0) for every pipe.
-            double[] flowScalars = new double[_pipes.Length];
+            double[] flowScalars = new double[_pipes.Count];
             Array.Fill( flowScalars, 1.0 );
 
-            for( int i = 0; i < _pipes.Length; i++ )
+            for( int i = 0; i < _pipes.Count; i++ )
             {
+                if( _pipes[i] == null ) continue;
+
                 double rate = proposedFlows[i];
-                if( Math.Abs( rate ) < 1e-9 ) 
+                if( Math.Abs( rate ) < 1e-9 )
                     continue;
 
                 object sourceObj = (rate > 0) ? _pipes[i].FromInlet.Producer : _pipes[i].ToInlet.Producer;
@@ -404,10 +564,12 @@ namespace HSP.ResourceFlow
             }
 
             // --- Step 4: Execution ---
-            for( int i = 0; i < _pipes.Length; i++ )
+            for( int i = 0; i < _pipes.Count; i++ )
             {
+                if( _pipes[i] == null ) continue;
+
                 double rawRate = proposedFlows[i];
-                if( Math.Abs( rawRate ) < 1e-9 ) 
+                if( Math.Abs( rawRate ) < 1e-9 )
                     continue;
 
                 // Apply the scaling factor we calculated
@@ -419,7 +581,7 @@ namespace HSP.ResourceFlow
                 IResourceProducer source = flowForward ? pipe.FromInlet.Producer : pipe.ToInlet.Producer;
                 IResourceConsumer sink = flowForward ? pipe.ToInlet.Consumer : pipe.FromInlet.Consumer;
 
-                if( source == null || sink == null ) 
+                if( source == null || sink == null )
                     continue;
 
                 // Now we can safely sample. 
@@ -427,7 +589,7 @@ namespace HSP.ResourceFlow
                 // than the TOTAL tank contains across all pipes.
                 IReadonlySubstanceStateCollection flowResources = pipe.SampleFlowResources( finalRate, dt );
 
-                if( flowResources.IsEmpty() ) 
+                if( flowResources.IsEmpty() )
                     continue;
 
                 source.Outflow?.Add( flowResources, 1.0 );

@@ -79,12 +79,12 @@ namespace HSP.ResourceFlow
         /// <summary>
         /// Computes the latent heat of vaporization, in [J/kg].
         /// </summary>
-        double GetLatentHeatOfVaporization( double temperature );
+        double GetLatentHeatOfVaporization();
 
         /// <summary>
         /// Computes the latent heat of fusion, in [J/kg].
         /// </summary>
-        double GetLatentHeatOfFusion( double temperature );
+        double GetLatentHeatOfFusion();
 
 
         // Thermochemistry.

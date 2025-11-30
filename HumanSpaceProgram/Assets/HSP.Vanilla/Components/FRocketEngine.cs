@@ -20,7 +20,7 @@ namespace HSP.Vanilla.Components
     }
 
     [Serializable]
-    public class FRocketEngine : MonoBehaviour, IPropulsion, IBuildsFlowNetwork
+    public class FRocketEngine : MonoBehaviour, IPropulsion//, IBuildsFlowNetwork
     {
         const float g = 9.80665f;
 
@@ -144,7 +144,7 @@ namespace HSP.Vanilla.Components
             {
                 Vector3 inletPosInReferenceSpace = reference.InverseTransformPoint( this.transform.TransformPoint( inlet.LocalPosition ) );
                 FlowPipe.Port flowInlet = new FlowPipe.Port( _cachedConsumer, inletPosInReferenceSpace );
-                c.TryAddFlowObj( inlet, flowInlet );
+               // c.TryAddFlowObj( inlet, flowInlet );
             }
 
             _cachedConsumer = new GenericConsumer();

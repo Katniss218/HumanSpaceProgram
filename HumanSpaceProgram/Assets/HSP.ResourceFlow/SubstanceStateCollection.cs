@@ -196,10 +196,10 @@ namespace HSP.ResourceFlow
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
         public void EnsureCapacity( int capacity )
         {
-            if( _species.Length >= capacity )
+            if( _species.Length > capacity )
                 return;
 
-            int newCapacity = Math.Max( capacity, _species.Length * 2 );
+            int newCapacity = Math.Max( capacity + 1, _species.Length * 2 );
             Array.Resize( ref _species, newCapacity );
             Array.Resize( ref _masses, newCapacity );
         }
@@ -290,6 +290,40 @@ namespace HSP.ResourceFlow
             }
         }
 
+        /// <summary>
+        /// Overwrites the state of this collection with the state of the other collection.
+        /// Optimized to minimize allocations.
+        /// </summary>
+        public void Set( IReadonlySubstanceStateCollection other, double scale )
+        {
+            if( other == null || other.IsEmpty() )
+            {
+                Clear();
+                return;
+            }
+
+            int otherCount = other.Count;
+            EnsureCapacity( otherCount );
+
+            // Overwrite existing slots
+            for( int i = 0; i < otherCount; i++ )
+            {
+                (ISubstance s, double m) = other[i];
+                _species[i] = s;
+                _masses[i] = m * scale;
+            }
+
+            // Clear any remaining slots if we had more items previously
+            if( _count > otherCount )
+            {
+                Array.Clear( _species, otherCount, _count - otherCount );
+                Array.Clear( _masses, otherCount, _count - otherCount );
+            }
+
+            _count = otherCount;
+            _totalMass = other.GetMass();
+        }
+
         public void Scale( double scale )
         {
             if( Math.Abs( scale ) <= EPSILON )
@@ -341,22 +375,54 @@ namespace HSP.ResourceFlow
             for( int i = 0; i < _count; i++ )
             {
                 ISubstance s = _species[i];
-                if( s != null ) 
+                if( s != null )
                     yield return (s, _masses[i]);
             }
         }
 
-
-        // setialization stuff:
+        // Serialization stuff:
 
         private (Substance, double)[] GetSubstances()
         {
-            throw new NotImplementedException();
+            if( _count == 0 )
+                return Array.Empty<(Substance, double)>();
+
+            var result = new (Substance, double)[_count];
+            for( int i = 0; i < _count; i++ )
+            {
+                // Note: We cast ISubstance to Substance here. 
+                // This assumes that only concrete 'Substance' types are used in this collection.
+                result[i] = ((Substance)_species[i], _masses[i]);
+            }
+            return result;
         }
 
         private void SetSubstances( (Substance, double)[] substances )
         {
-            throw new NotImplementedException();
+            Clear();
+
+            if( substances == null || substances.Length == 0 )
+                return;
+
+            EnsureCapacity( substances.Length );
+
+            double calculatedTotalMass = 0;
+            int validCount = 0;
+
+            for( int i = 0; i < substances.Length; i++ )
+            {
+                var (s, m) = substances[i];
+                if( s != null && m > EPSILON )
+                {
+                    _species[validCount] = s;
+                    _masses[validCount] = m;
+                    calculatedTotalMass += m;
+                    validCount++;
+                }
+            }
+
+            _count = validCount;
+            _totalMass = calculatedTotalMass;
         }
 
         [MapsInheritingFrom( typeof( SubstanceStateCollection ) )]

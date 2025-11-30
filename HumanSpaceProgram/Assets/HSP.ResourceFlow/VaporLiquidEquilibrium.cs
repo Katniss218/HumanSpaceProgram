@@ -21,10 +21,12 @@ namespace HSP.ResourceFlow
             double totalGasMoles = 0.0;
 
             // Sum up gas moles and liquid occupied volume
-            foreach( (ISubstance substance, double mass) in contents )
+            Action<(ISubstance, double)> processSubstance = ( item ) =>
             {
-                if( mass <= 0.0 ) 
-                    continue;
+                (ISubstance substance, double mass) = item;
+
+                if( mass <= 0.0 )
+                    return;
 
                 // convert mass -> moles
                 double moles = mass / substance.MolarMass;
@@ -43,7 +45,24 @@ namespace HSP.ResourceFlow
                 {
                     totalGasMoles += moles;
                 }
+            };
+
+            // OPTIMIZATION: Use for loop to avoid enumerator allocation on SubstanceStateCollection
+            if( contents is SubstanceStateCollection ssc )
+            {
+                for( int i = 0; i < ssc.Count; i++ )
+                {
+                    processSubstance( ssc[i] );
+                }
             }
+            else
+            {
+                foreach( (ISubstance substance, double mass) in contents )
+                {
+                    processSubstance( (substance, mass) );
+                }
+            }
+
 
             // Compute available gas volume
             double gasVolume = tankVolume - liquidVolume;
@@ -70,194 +89,6 @@ namespace HSP.ResourceFlow
             }
         }
 
-        [Obsolete( "untested" )]
-        public static (ISubstanceStateCollection, FluidState) ComputeFlash( IReadonlySubstanceStateCollection currentContents, FluidState currentState, double tankVolume, double deltaTime )
-        {
-            const double MinVolume = 1e-6;
-            const double R = 8.314462618;
-            const double BulkModulus = 2.2e9;
-            const double RelaxationFactor = 0.3;
-
-            double initialTemperature = currentState.Temperature;
-
-            // 1. Pre-pass: Aggregate system properties (Moles, Volume, Heat Capacity)
-            // We need to map Substances to their current Moles for quick lookup during the flash calculation
-            var moleMap = new Dictionary<ISubstance, double>();
-
-            double totalInitialLiquidMoles = 0.0;
-            double totalInitialGasMoles = 0.0;
-            double initialLiquidVolume = 0.0;
-            double totalHeatCapacity = 0.0;
-
-            // Sanity check temperature
-            if( initialTemperature <= 0.1 || initialTemperature > 100_000 )
-                initialTemperature = 293.15;
-
-            // Iterate the generic collection (ISubstance, Mass)
-            foreach( (ISubstance substance, double mass) in currentContents )
-            {
-                if( mass <= 1e-9 )
-                    continue;
-
-                double moles = mass / substance.MolarMass;
-                moleMap[substance] = moles; // Store for later lookup
-
-                // Determine phase behavior based on substance properties
-                // Assumption: ISubstance has a 'Phase' property. 
-                // If not, you might need to check: if (substance == SubstancePhaseMap.GetPartnerPhase(substance, SubstancePhase.Liquid))
-                if( substance.Phase == SubstancePhase.Liquid )
-                {
-                    totalInitialLiquidMoles += moles;
-                    double density = substance.GetDensity( initialTemperature, currentState.Pressure );
-                    initialLiquidVolume += mass / density;
-
-                    double cp = substance.GetSpecificHeatCapacity( initialTemperature, currentState.Pressure );
-                    totalHeatCapacity += mass * cp;
-                }
-                else if( substance.Phase == SubstancePhase.Gas )
-                {
-                    totalInitialGasMoles += moles;
-
-                    double cp = substance.GetSpecificHeatCapacity( initialTemperature, currentState.Pressure );
-                    double cv = cp - substance.SpecificGasConstant; // Ideal gas relation
-                    totalHeatCapacity += mass * cv;
-                }
-            }
-
-            // Prevent division by zero in temp calculation
-            if( totalHeatCapacity < 1e-5 ) 
-                totalHeatCapacity = 1.0;
-
-            // Geometric constraints
-            double gasVolume = tankVolume - initialLiquidVolume;
-            bool isFullOfLiquid = gasVolume <= MinVolume;
-            double effectiveGasVolume = Math.Max( gasVolume, MinVolume );
-
-            double totalLatentHeatAbsorbed = 0.0;
-
-            // Store planned transfers: (SubstanceToChange, MassDelta)
-            List<(ISubstance, double)> massTransfers = new ();
-
-            // 2. Flash Calculation Pass
-            // We drive the equilibrium from the Liquid side. 
-            foreach( (ISubstance liquidSubstance, double liquidMoles) in moleMap )
-            {
-                if( liquidSubstance.Phase != SubstancePhase.Liquid ) 
-                    continue;
-
-                ISubstance gasVariant = SubstancePhaseMap.GetPartnerPhase( liquidSubstance, SubstancePhase.Gas );
-
-                double gasMoles = 0.0;
-                if( gasVariant != null && moleMap.TryGetValue( gasVariant, out double existingGasMoles ) )
-                {
-                    gasMoles = existingGasMoles;
-                }
-
-                // Equilibrium Logic
-
-                double vaporPressure = liquidSubstance.GetVaporPressure( initialTemperature );
-
-                // Raoult's Law
-                double liquidMoleFraction = totalInitialLiquidMoles > 1e-9 ? liquidMoles / totalInitialLiquidMoles : 0.0;
-                double equilibriumPartialPressure = liquidMoleFraction * vaporPressure;
-
-                // Dalton's Law
-                double currentPartialPressure = (gasMoles * R * initialTemperature) / effectiveGasVolume;
-
-                double pressureDifference = equilibriumPartialPressure - currentPartialPressure;
-
-                // Calculate transfer in moles
-                double unrestrictedTransferMoles = (pressureDifference * effectiveGasVolume) / (R * initialTemperature) * RelaxationFactor;
-                double actualTransferMoles = unrestrictedTransferMoles;
-
-                // Hydraulic Lock - cannot evaporate (volume constrained), but can condense.
-                if( isFullOfLiquid && actualTransferMoles > 0 )
-                    actualTransferMoles = 0.0;
-
-                // Mass Balance Limits
-                if( actualTransferMoles > 0 )
-                { 
-                    // Liquid -> Gas
-                    actualTransferMoles = Math.Min( actualTransferMoles, liquidMoles );
-                }
-                else
-                {
-                    // Gas -> Liquid
-                    actualTransferMoles = Math.Max( actualTransferMoles, -gasMoles ); // negative subtracts.
-                }
-
-                // 3. Queue Updates
-                if( Math.Abs( actualTransferMoles ) > 1e-12 && gasVariant != null )
-                {
-                    double molarMass = liquidSubstance.MolarMass;
-                    double transferredMass = actualTransferMoles * molarMass;
-
-                    // Liquid loses mass, Gas gains mass (sign of transferredMass respects this direction)
-                    massTransfers.Add( (liquidSubstance, -transferredMass) );
-                    massTransfers.Add( (gasVariant, transferredMass) );
-
-                    // Latent Heat (Energy Balance)
-                    // Evaporation (positive transfer) absorbs heat -> system cools
-                    double latentHeatPerKg = liquidSubstance.GetLatentHeatOfVaporization( initialTemperature );
-                    totalLatentHeatAbsorbed += transferredMass * latentHeatPerKg;
-                }
-            }
-
-            // 4. Apply Updates
-            var updatedContents = currentContents.Clone();
-
-            foreach( var (substance, massDelta) in massTransfers )
-            {
-                updatedContents.Add( substance, massDelta, deltaTime );
-            }
-
-            // 5. Final State Calculation
-            double temperatureChange = -totalLatentHeatAbsorbed / totalHeatCapacity;
-            double finalTemperature = initialTemperature + temperatureChange;
-
-            double finalPressure;
-            if( isFullOfLiquid )
-            {
-                // Bulk Modulus approximation for hydraulic pressure
-                double fillRatio = initialLiquidVolume / tankVolume;
-                double compressionStrain = Math.Max( 0.0, fillRatio - 1.0 );
-                finalPressure = compressionStrain * BulkModulus;
-            }
-            else
-            {
-                // Recalculate pressure with new gas totals and new temperature
-                // Note: We need the *new* total gas moles.
-                double finalTotalGasMoles = totalInitialGasMoles + massTransfers
-                    .Where( t => t.Item1.Phase == SubstancePhase.Gas )
-                    .Sum( t => t.Item2 / t.Item1.MolarMass ); // Convert mass delta back to moles
-
-                finalPressure = (finalTotalGasMoles * R * finalTemperature) / effectiveGasVolume;
-            }
-
-            var newState = new FluidState( finalPressure, finalTemperature, currentState.Velocity );
-            return (updatedContents, newState);
-        }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        //
-
         struct LiquidEntry
         {
             public ISubstance Liq;
@@ -267,20 +98,21 @@ namespace HSP.ResourceFlow
             public double Lv; // Latent heat per kg
         }
 
-        [Obsolete( "untested" )]
         public static (ISubstanceStateCollection, FluidState) ComputeFlash2( IReadonlySubstanceStateCollection currentContents, FluidState currentState, double tankVolume, double deltaTime )
         {
             const double MinVolume = 1e-6;
-            const double RelaxationFactor = 0.3;
+            const double RelaxationFactor = 0.21;
             const double R = 8.314462618;
-            const double MinMass = 1e-9;
-            const double MinMoles = 1e-12;
+            const double MinMass = 1e-6;
+            const double MinMoles = 1e-8;
+            const double PressureDeadZone = 1e-2; // Pa. Pressure differences smaller than this are ignored.
 
-            // Clone immediately — only one allocation in entire function
-            var updatedContents = currentContents.Clone();
+            // Clone immediately — this may be the only main allocation in the function.
+            var updatedContents = (SubstanceStateCollection)currentContents.Clone();
 
             double T = currentState.Temperature;
-            if( T <= 0.1 || T > 100_000 ) T = 293.15;
+            if( T <= 0.1 || T > 100_000 )
+                T = 293.15;
 
             double totalLiquidMoles = 0;
             double totalGasMoles = 0;
@@ -295,9 +127,12 @@ namespace HSP.ResourceFlow
 
 
             // First pass
-            foreach( (var s, double mass) in currentContents )
+            Action<(ISubstance, double)> processSubstance = ( item ) =>
             {
-                if( mass <= MinMass ) continue;
+                (var s, double mass) = item;
+
+                if( mass <= MinMass )
+                    return;
                 double moles = mass / s.MolarMass;
 
                 if( s.Phase == SubstancePhase.Liquid )
@@ -315,7 +150,7 @@ namespace HSP.ResourceFlow
                             Gas = gas,
                             Moles = moles,
                             MolarMass = s.MolarMass,
-                            Lv = s.GetLatentHeatOfVaporization( T )
+                            Lv = s.GetLatentHeatOfVaporization()
                         };
                     }
                 }
@@ -325,9 +160,32 @@ namespace HSP.ResourceFlow
                     double cp = s.GetSpecificHeatCapacity( T, currentState.Pressure );
                     totalHeatCap += mass * (cp - s.SpecificGasConstant);
                 }
+            };
+
+            // OPTIMIZATION: Use for loop to avoid enumerator allocation on SubstanceStateCollection
+            if( currentContents is SubstanceStateCollection ssc )
+            {
+                for( int i = 0; i < ssc.Count; i++ )
+                {
+                    processSubstance( ssc[i] );
+                }
+            }
+            else
+            {
+                foreach( (var s, double mass) in currentContents )
+                {
+                    processSubstance( (s, mass) );
+                }
             }
 
-            if( totalHeatCap < 1e-5 ) totalHeatCap = 1.0;
+            // OPTIMIZATION: Pre-allocate capacity to avoid re-allocations when adding new gas species.
+            if( updatedContents != null )
+            {
+                updatedContents.EnsureCapacity( updatedContents.Count + liquidCount );
+            }
+
+            if( totalHeatCap < 1e-5 )
+                totalHeatCap = 1.0;
 
             double gasVol = tankVolume - liquidVolume;
             bool fullOfLiquid = gasVol <= MinVolume;
@@ -336,6 +194,8 @@ namespace HSP.ResourceFlow
             // Flash pass
             if( totalLiquidMoles > 1e-9 && liquidCount > 0 )
             {
+                // Pre-calculate total gas pressure for correct partial pressure calculation.
+                double pTotalGases = (totalGasMoles * R * T) / Vg;
                 double invLiq = 1.0 / totalLiquidMoles;
 
                 for( int i = 0; i < liquidCount; i++ )
@@ -350,8 +210,15 @@ namespace HSP.ResourceFlow
                     if( currentContents.TryGet( e.Gas, out double gasMass ) )
                         gasMolesThis = gasMass / e.Gas.MolarMass;
 
-                    double pNow = (gasMolesThis * R * T) / Vg;
+                    // Correct partial pressure calculation based on mole fraction and total pressure.
+                    // P_partial = (moles_gas / total_moles_gas) * P_total_gas
+                    // Note: This is mathematically equivalent to (moles_gas * R * T) / Vg but makes the physics clearer.
+                    double pNow = (totalGasMoles > MinMoles) ? (gasMolesThis / totalGasMoles) * pTotalGases : 0.0;
                     double dp = pEq - pNow;
+
+                    // If the pressure difference is negligible, the system is in equilibrium. Do nothing.
+                    if( Math.Abs( dp ) < PressureDeadZone )
+                        continue;
 
                     double dMoles = (dp * Vg) / (R * T) * RelaxationFactor;
 
@@ -365,8 +232,9 @@ namespace HSP.ResourceFlow
                         netGasMoleChange += dMoles;
                         latentHeatAbsorbed += dMass * e.Lv;
 
-                        updatedContents.Add( e.Liq, -dMass, deltaTime );
-                        updatedContents.Add( e.Gas, dMass, deltaTime );
+                        // The calculated dMass is the amount to transfer this step, it should not be scaled by time.
+                        updatedContents.Add( e.Liq, -dMass );
+                        updatedContents.Add( e.Gas, dMass );
                     }
                 }
             }

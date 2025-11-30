@@ -64,11 +64,6 @@ namespace HSP.Vanilla
                 comp.DragCoefficient = 0.08;
                 comp.ReferenceArea = 5.0;
             }
-            else if( HSPSceneManager.IsLoaded<DesignSceneM>() )
-            {
-                var comp = v.gameObject.AddComponent<FixedReferenceFrameTransform>();
-                comp.SceneReferenceFrameProvider = new GameplaySceneReferenceFrameProvider();
-            }
         }
 
         [HSPEventListener( HSPEvent_AFTER_VESSEL_HIERARCHY_CHANGED.ID, TRY_PIN_PHYSICS_OBJECT )]

@@ -10,30 +10,58 @@ namespace HSP.Vanilla.Components
         public ResourceInlet FromInlet { get; set; }
         public ResourceInlet ToInlet { get; set; }
 
+        // --- State for Partial Rebuilds ---
+        private FlowPipe _cachedPipe;
+        private bool _isInNetwork;
+
         public virtual BuildFlowResult BuildFlowNetwork( FlowNetworkBuilder c )
         {
-            if( FromInlet == null )
-                return BuildFlowResult.Finished;
-            if( ToInlet == null )
-                return BuildFlowResult.Finished;
-
-            // only add if valve open, etc.
-
-            // inlets are part of the tank which is built by the builder.
-            if( !c.TryGetFlowObj( FromInlet, out FlowPipe.Port flowEnd1 ) || !c.TryGetFlowObj( ToInlet, out FlowPipe.Port flowEnd2 ) )
+            if( FromInlet == null || ToInlet == null )
             {
-                return BuildFlowResult.Retry;
+                // If we were previously in the network, remove ourselves.
+                if( _isInNetwork && _cachedPipe != null )
+                {
+                    c.TryRemoveFlowObj( _cachedPipe );
+                    _cachedPipe = null;
+                    _isInNetwork = false;
+                }
+                return BuildFlowResult.Finished;
             }
 
-            FlowPipe pipe = new FlowPipe( flowEnd1, flowEnd2, CrossSectionArea );
-            c.TryAddFlowObj( this, pipe );
+            // Standard pipe is always "on".
+            // If we were already in the network, no change is needed.
+            // If not, we add ourselves.
+            if( !_isInNetwork )
+            {
+                if( !c.TryGetFlowObj( FromInlet, out FlowPipe.Port flowEnd1 ) || !c.TryGetFlowObj( ToInlet, out FlowPipe.Port flowEnd2 ) )
+                {
+                    return BuildFlowResult.Retry;
+                }
+
+                _cachedPipe = new FlowPipe( flowEnd1, flowEnd2, CrossSectionArea );
+                c.TryAddFlowObj( this, _cachedPipe );
+                _isInNetwork = true;
+            }
+
             return BuildFlowResult.Finished;
         }
 
         public virtual bool IsValid( FlowNetworkSnapshot snapshot )
         {
-#warning TODO - implement.
-            return false;
+            // A basic static pipe is always valid unless its connections are removed.
+            // The builder will handle removing it if FromInlet/ToInlet become null.
+            bool shouldBeInNetwork = FromInlet != null && ToInlet != null;
+            if( _isInNetwork != shouldBeInNetwork )
+            {
+                return false; // Our state (in vs out of network) has changed.
+            }
+            return true;
+        }
+
+        public virtual void SynchronizeState( FlowNetworkSnapshot snapshot )
+        {
+            // Base pipe has no dynamic state to synchronize.
+            // Derived classes (like pumps) will override this.
         }
 
         public virtual void ApplySnapshot( FlowNetworkSnapshot snapshot )
@@ -51,14 +79,4 @@ namespace HSP.Vanilla.Components
                 .WithMember( "cross_section_area", o => o.CrossSectionArea );
         }
     }
-
-    /*
-    public class FResourceConnector_FlowPipeCheckValve : FResourceConnector_FlowPipe
-    {
-
-    }
-    public class FResourceConnector_FlowPipeReliefValve : FResourceConnector_FlowPipe
-    {
-
-    }*/
 }

@@ -322,6 +322,15 @@
                 "throttle": 0,
                 "thrust_transform": {
                     "$ref": "ce4ac1ed-4a56-458a-9622-352cdae0af4c"
+                },
+                "inlets": {
+                    "value": [
+                        {
+                            "$id": "6f3124e3-62cf-43d6-99ef-ca53f2a7d764",
+                            "nominal_area": 1,
+                            "local_position": [0, 1, 0]
+                        }
+                    ]
                 }
             },
             {

@@ -1,0 +1,30 @@
+{
+    "$type": "HSP.ResourceFlow.Substance, HSP.ResourceFlow, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+    "id": "lox",
+    "display_name": "Liquid Oxygen",
+    "display_color": {
+        "r": 0.4,
+        "g": 0.65,
+        "b": 1.0,
+        "a": 1.0
+    },
+    "tags": { "value": [ "oxidizer", "cryogenic" ] },
+    "phase": "Liquid",
+    
+    "molar_mass": 0.031998,
+    "specific_gas_constant": 259.84,
+    "adiabatic_index": 1.4,
+    
+    "reference_density": 1141.0,
+    "reference_pressure": 101325.0,
+    "bulk_modulus": 1.6e+9,
+    
+    "viscosity_coeffs": { "value": [ 0.000195 ] }, 
+    "conductivity_coeffs": { "value": [ 0.15 ] },
+    "specific_heat_coeffs": { "value": [ 1700.0 ] },
+    
+    "latent_heat_vap": 213000.0,
+    "latent_heat_fus": 13900.0,
+    
+    "antoine_coeffs": { "value": [ 9.0, 356.0, -6.0 ] }
+}

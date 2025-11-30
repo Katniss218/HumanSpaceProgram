@@ -17,13 +17,14 @@ namespace HSP.Vanilla.Components
 
         public ResourceInlet[] Inlets { get; set; }
         public ISubstanceStateCollection Contents { get; set; }
-        public FluidState State { get; set; }
+        public FluidState FluidState { get; set; }
 
         public float MaxVolume { get; set; }
 
-        public float Mass => throw new System.NotImplementedException();
+        public float Mass => Contents == null ? 0f : (float)Contents?.GetMass();
 
-        FlowTank _cachedTank;
+        private FlowTank _cachedTank;
+        private bool _isStructurallyDirty = true; // Start dirty to force initial build.
 
         public event IHasMass.MassChange OnAfterMassChanged;
 
@@ -32,48 +33,30 @@ namespace HSP.Vanilla.Components
             // Optimize - only compute if needed / if not in equilibrium.
             // The inflows and contents and stuff are all known so this can be done
             // Limit flash to tanks whose composition/pressure change significantly.
-            (ISubstanceStateCollection s, FluidState f) = VaporLiquidEquilibrium.ComputeFlash( Contents, State, MaxVolume, TimeManager.FixedDeltaTime );
+            //(ISubstanceStateCollection s, FluidState f) = VaporLiquidEquilibrium.ComputeFlash( Contents, FluidState, MaxVolume, TimeManager.FixedDeltaTime );
         }
 
 
         public virtual BuildFlowResult BuildFlowNetwork( FlowNetworkBuilder c )
         {
-            // build the tank?
+            // On a structural rebuild, we create the tank object.
+            if( _cachedTank == null )
+            {
+                _cachedTank = new FlowTank( this.MaxVolume );
+            }
+
+            _cachedTank.SetNodes( TriangulationPositions, Inlets );
+            if( this.Contents != null )
+            {
+                _cachedTank.Contents.Clear();
+                _cachedTank.Contents.Add( this.Contents );
+            }
+
+            c.TryAddFlowObj( this, _cachedTank );
 
             Vessel vessel = this.transform.GetVessel();
             Transform reference = vessel.ReferenceTransform;
 
-
-            // only add if something attaches to the tank that is open.
-            if( _cachedTank == null )
-            {
-                INonInertialReferenceFrame vesselFrame = vessel.ReferenceFrameTransform.NonInertialReferenceFrame();
-
-                Vector3Dbl localPosition = (Vector3Dbl)reference.InverseTransformPoint( this.transform.position );
-
-                Vector3Dbl gravityAbsolute = GravityUtils.GetNBodyGravityAcceleration( vessel.ReferenceFrameTransform.AbsolutePosition );
-
-                Vector3Dbl gravityLocal = vesselFrame.InverseTransformDirection( (Vector3)gravityAbsolute );
-
-                Vector3Dbl fictitiousAccel = vesselFrame.GetFicticiousAcceleration( localPosition, Vector3Dbl.zero );
-
-                Vector3Dbl frameAngularVelocity = -vesselFrame.InverseTransformAngularVelocity( Vector3Dbl.zero );
-
-                Vector3Dbl netAcceleration = gravityLocal + fictitiousAccel;
-
-                _cachedTank = new FlowTank( this.MaxVolume );
-#warning TODO - define simulation space. should be vessel space.
-                _cachedTank.SetNodes( TriangulationPositions, Inlets );
-                _cachedTank.Contents = this.Contents;
-
-                // Apply calculated physics vectors (Converted to Unity Single Precision for the solver)
-                _cachedTank.FluidAcceleration = (Vector3)netAcceleration;
-                _cachedTank.FluidAngularVelocity = (Vector3)frameAngularVelocity;
-            }
-
-            // TODO - validate that something is connected to it. We can use a similar 'connection' structure to control inputs.
-          //  _cachedTank.DistributeContents(); // settle the fluids so the values at each inlet are correct.
-            c.TryAddFlowObj( this, _cachedTank );
             foreach( var inlet in Inlets )
             {
                 Vector3 inletPosInReferenceSpace = reference.InverseTransformPoint( this.transform.TransformPoint( inlet.LocalPosition ) );
@@ -81,21 +64,46 @@ namespace HSP.Vanilla.Components
                 c.TryAddFlowObj( inlet, flowInlet );
             }
 
+            _isStructurallyDirty = false;
             return BuildFlowResult.Finished;
         }
 
         public bool IsValid( FlowNetworkSnapshot snapshot )
         {
-#warning TODO - implement.
-            return false;
+            // A change in physics vectors is NOT a structural change and should not invalidate the network.
+            // A change in geometry (nodes/inlets) or capacity IS a structural change.
+            return !_isStructurallyDirty;
+        }
+
+        public void SynchronizeState( FlowNetworkSnapshot snapshot )
+        {
+            // This is the correct place for frequent state updates like physics.
+            if( _cachedTank != null )
+            {
+                Vessel vessel = this.transform.GetVessel();
+                if( vessel == null ) return;
+
+                Transform reference = vessel.ReferenceTransform;
+                INonInertialReferenceFrame vesselFrame = vessel.ReferenceFrameTransform.NonInertialReferenceFrame();
+                Vector3Dbl localPosition = (Vector3Dbl)reference.InverseTransformPoint( this.transform.position );
+                Vector3Dbl gravityAbsolute = GravityUtils.GetNBodyGravityAcceleration( vessel.ReferenceFrameTransform.AbsolutePosition );
+                Vector3Dbl gravityLocal = vesselFrame.InverseTransformDirection( (Vector3)gravityAbsolute );
+                Vector3Dbl fictitiousAccel = vesselFrame.GetFicticiousAcceleration( localPosition, Vector3Dbl.zero );
+                Vector3Dbl frameAngularVelocity = -vesselFrame.InverseTransformAngularVelocity( Vector3Dbl.zero );
+                Vector3Dbl netAcceleration = gravityLocal + fictitiousAccel;
+
+                _cachedTank.FluidAcceleration = (Vector3)netAcceleration;
+                _cachedTank.FluidAngularVelocity = (Vector3)frameAngularVelocity;
+            }
         }
 
         public virtual void ApplySnapshot( FlowNetworkSnapshot snapshot )
         {
             // apply the snapshot to the tank.
-            if( snapshot.TryGetFlowObj( _cachedTank, out FlowTank tankSnapshot ) )
+            if( snapshot.TryGetFlowObj( this, out FlowTank tankSnapshot ) )
             {
-                this.Contents = tankSnapshot.Contents;
+                this.Contents.Clear();
+                this.Contents.Add( tankSnapshot.Contents );
             }
         }
 
@@ -104,9 +112,11 @@ namespace HSP.Vanilla.Components
         public static SerializationMapping FResourceContainer_FlowTankMapping()
         {
             return new MemberwiseSerializationMapping<FResourceContainer_FlowTank>()
+                .WithMember( "max_volume", o => o.MaxVolume )
                 .WithMember( "triangulation_positions", o => o.TriangulationPositions )
                 .WithMember( "inlets", o => o.Inlets )
-                .WithMember( "contents", o => o.Contents );
+                .WithMember( "contents", o => o.Contents )
+                .WithMember( "fluid_state", o => o.FluidState );
         }
     }
 }

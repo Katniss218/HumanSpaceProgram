@@ -47,12 +47,12 @@ namespace HSP.ResourceFlow
         /// <summary>
         /// Volumetric conductance, in [m^3/(s*(J/kg))]
         /// </summary>
-        public double Conductance { get; }
+        public double Conductance { get; set; }
 
         /// <summary>
         /// Pump added head potential, positive when pushing from <see cref="FromInlet"/> to <see cref="ToInlet"/>, in [J/kg]
         /// </summary>
-        public double HeadAdded { get; }
+        public double HeadAdded { get; set; }
 
         public FlowPipe( Port fromInlet, Port toInlet, double crossSectionArea, double conductance = 1.0, double headAdded = 0.0 )
         {

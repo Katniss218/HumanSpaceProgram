@@ -111,6 +111,7 @@ namespace HSP.ResourceFlow
                     // If we are strictly below this layer, add its full weight
                     if( geoPotential < layer.PotentialStart )
                     {
+                        localDensity = layer.Density;
                         hydrostaticPressure += layer.Density * (layer.PotentialEnd - layer.PotentialStart);
                     }
                     // If we are inside this layer

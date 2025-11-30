@@ -29,8 +29,8 @@ namespace HSP.ResourceFlow
         public static SerializationMapping ResourceInletMapping()
         {
             return new MemberwiseSerializationMapping<ResourceInlet>()
-                .WithMember( "max_thrust", o => o.NominalArea )
-                .WithMember( "set_throttle", o => o.LocalPosition );
+                .WithMember( "nominal_area", o => o.NominalArea )
+                .WithMember( "local_position", o => o.LocalPosition );
         }
     }
 }
