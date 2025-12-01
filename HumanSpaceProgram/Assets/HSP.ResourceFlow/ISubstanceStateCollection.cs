@@ -1,5 +1,8 @@
 ﻿namespace HSP.ResourceFlow
 {
+    /// <summary>
+    /// Represents a mutable state information about multiple resources.
+    /// </summary>
     public interface ISubstanceStateCollection : IReadonlySubstanceStateCollection
     {
         new double this[ISubstance s] { get; set; }

@@ -4,6 +4,9 @@ using System.Linq;
 
 namespace HSP.ResourceFlow
 {
+    /// <summary>
+    /// Represents a state information about multiple resources.
+    /// </summary>
     public interface IReadonlySubstanceStateCollection : IEnumerable<(ISubstance, double)>
     {
         /// <summary>

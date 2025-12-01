@@ -319,34 +319,34 @@ namespace HSP._DevUtils
             Vector3 scaleVec = Vector3.one * ParticleSize;
             Quaternion rotation = Quaternion.identity;
 
-            for( int i = 0; i < _samplePositions.Length; i++ )
+            using( var total = PooledReadonlySubstanceStateCollection.Get() )
             {
-                Vector3 localPos = _samplePositions[i];
+                for( int i = 0; i < _samplePositions.Length; i++ )
+                {
+                    Vector3 localPos = _samplePositions[i];
 
-                // Sample the fluid simulation at this exact coordinate
-                const float sampleOffset = 0.0125f; 
-                IReadonlySubstanceStateCollection contentsMid = TargetTank.SampleSubstances( localPos, 1, 1 );
+                    // Sample the fluid simulation at this exact coordinate and its surroundings
+                    int sampleCount = 0;
+                    const float sampleOffset = 0.0125f;
 
-                // Sample the 8 surrounding corners of the cube centered at localPos
-                IReadonlySubstanceStateCollection contents001 = TargetTank.SampleSubstances( localPos + new Vector3( -sampleOffset, -sampleOffset, sampleOffset ), 1, 1 );
-                IReadonlySubstanceStateCollection contents011 = TargetTank.SampleSubstances( localPos + new Vector3( -sampleOffset, sampleOffset, sampleOffset ), 1, 1 );
-                //IReadonlySubstanceStateCollection contents101 = TargetTank.SampleSubstances( localPos + new Vector3( sampleOffset, -sampleOffset, sampleOffset ), 1, 1 );
-                //IReadonlySubstanceStateCollection contents111 = TargetTank.SampleSubstances( localPos + new Vector3( sampleOffset, sampleOffset, sampleOffset ), 1, 1 );
+                    using( var s = TargetTank.SampleSubstances( localPos, 1, 1 ) ) { total.Add( s ); sampleCount++; }
+                    using( var s = TargetTank.SampleSubstances( localPos + new Vector3( -sampleOffset, -sampleOffset, sampleOffset ), 1, 1 ) ) { total.Add( s ); sampleCount++; }
+                    using( var s = TargetTank.SampleSubstances( localPos + new Vector3( -sampleOffset, sampleOffset, sampleOffset ), 1, 1 ) ) { total.Add( s ); sampleCount++; }
+                    using( var s = TargetTank.SampleSubstances( localPos + new Vector3( sampleOffset, -sampleOffset, -sampleOffset ), 1, 1 ) ) { total.Add( s ); sampleCount++; }
+                    using( var s = TargetTank.SampleSubstances( localPos + new Vector3( sampleOffset, sampleOffset, -sampleOffset ), 1, 1 ) ) { total.Add( s ); sampleCount++; }
 
-                //IReadonlySubstanceStateCollection contents000 = TargetTank.SampleSubstances( localPos + new Vector3( -sampleOffset, -sampleOffset, -sampleOffset ), 1, 1 );
-                //IReadonlySubstanceStateCollection contents010 = TargetTank.SampleSubstances( localPos + new Vector3( -sampleOffset, sampleOffset, -sampleOffset ), 1, 1 );
-                IReadonlySubstanceStateCollection contents100 = TargetTank.SampleSubstances( localPos + new Vector3( sampleOffset, -sampleOffset, -sampleOffset ), 1, 1 );
-                IReadonlySubstanceStateCollection contents110 = TargetTank.SampleSubstances( localPos + new Vector3( sampleOffset, sampleOffset, -sampleOffset ), 1, 1 );
+                    if( sampleCount > 0 )
+                    {
+                        total.Scale( 1.0 / sampleCount );
+                    }
 
-                IReadonlySubstanceStateCollection avg = IReadonlySubstanceStateCollection.Average( new[] {
-                                       contentsMid, contents001, contents011,
-                                        contents100, contents110 } );
-                Color col = FlowColorResolver.GetMixedColor( avg );
+                    Color col = FlowColorResolver.GetMixedColor( total );
 
-                // Update Transform
-                Vector3 worldPos = tankToWorld.MultiplyPoint3x4( localPos );
-                _particleMatrices[i] = Matrix4x4.TRS( worldPos, rotation, scaleVec );
-                _particleColors[i] = col;
+                    // Update Transform
+                    Vector3 worldPos = tankToWorld.MultiplyPoint3x4( localPos );
+                    _particleMatrices[i] = Matrix4x4.TRS( worldPos, rotation, scaleVec );
+                    _particleColors[i] = col;
+                }
             }
         }
 

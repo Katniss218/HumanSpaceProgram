@@ -40,6 +40,6 @@ namespace HSP.ResourceFlow
         /// It should take into account the amount of resources available (not including Inflow/Outflow) in the tank.
         /// </remarks>
         /// <param name="flowRate">Volumetric flow rate, in [m^3/s].</param>
-        IReadonlySubstanceStateCollection SampleSubstances( Vector3 localPosition, double flowRate, double dt );
+        ISampledSubstanceStateCollection SampleSubstances( Vector3 localPosition, double flowRate, double dt );
     }
 }

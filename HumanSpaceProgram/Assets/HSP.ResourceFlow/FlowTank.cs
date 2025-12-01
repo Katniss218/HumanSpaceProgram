@@ -159,12 +159,12 @@ namespace HSP.ResourceFlow
 
             return result;
         }
-
-        public IReadonlySubstanceStateCollection SampleSubstances( Vector3 localPosition, double flowRate, double dt )
+        
+        public ISampledSubstanceStateCollection SampleSubstances( Vector3 localPosition, double flowRate, double dt )
         {
             RecalculateCache();
 
-            var result = new SubstanceStateCollection();
+            var result = PooledReadonlySubstanceStateCollection.Get();
 
             if( Contents == null || Contents.IsEmpty() )
                 return result;

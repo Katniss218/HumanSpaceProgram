@@ -15,7 +15,7 @@ namespace HSP.ResourceFlow
             throw new NotImplementedException();
         }
 
-        public IReadonlySubstanceStateCollection SampleSubstances( Vector3 localPosition, double flowRate, double dt )
+        public ISampledSubstanceStateCollection SampleSubstances( Vector3 localPosition, double flowRate, double dt )
         {
             throw new NotImplementedException();
         }

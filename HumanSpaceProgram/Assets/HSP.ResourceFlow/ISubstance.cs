@@ -2,6 +2,9 @@
 
 namespace HSP.ResourceFlow
 {
+    /// <summary>
+    /// Represents a physical substance/resource.
+    /// </summary>
     public interface ISubstance
     {
         // Basic properties.

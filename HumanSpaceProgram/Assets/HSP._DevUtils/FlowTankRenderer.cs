@@ -64,7 +64,7 @@ namespace HSP._DevUtils
                         if( y % 2 == 0 )
                         {
                             //cellCenter.x += 0.5f; // Offset every other layer in X for staggered effect
-                           // cellCenter.z += 0.5f; // Offset every other layer in Z for staggered effect
+                            // cellCenter.z += 0.5f; // Offset every other layer in Z for staggered effect
                         }
 
                         // Add all 12 local positions, shifted by the cell's center
@@ -238,24 +238,28 @@ namespace HSP._DevUtils
 
             // To visualize what's in the pipe, we sample the fluid at the CENTER of the pipe.
             // Since the tank is stateless, we just ask "What substance is at this potential?"
-
-            for( int i = 0; i < edgeCount; i++ )
+            using( var total = PooledReadonlySubstanceStateCollection.Get() )
             {
-                var edge = edges[i];
-                Vector3 p1 = nodes[edge.end1].pos;
-                Vector3 p2 = nodes[edge.end2].pos;
-                IReadonlySubstanceStateCollection[] average = new IReadonlySubstanceStateCollection[10];
-                for( int j = 0; j < 10; j++ )
+                for( int i = 0; i < edgeCount; i++ )
                 {
-                    Vector3 samplePoint = Vector3.Lerp( p1, p2, ( j + 0.5f ) / 10f );
-                    average[j] = TargetTank.SampleSubstances( samplePoint, 1, 1 );
+                    var edge = edges[i];
+                    Vector3 p1 = nodes[edge.end1].pos;
+                    Vector3 p2 = nodes[edge.end2].pos;
+
+                    const int sampleCount = 10;
+                    for( int j = 0; j < sampleCount; j++ )
+                    {
+                        Vector3 samplePoint = Vector3.Lerp( p1, p2, (j + 0.5f) / sampleCount );
+                        using( var sample = TargetTank.SampleSubstances( samplePoint, 1, 1 ) )
+                        {
+                            total.Add( sample );
+                        }
+                    }
+                    total.Scale( 1.0 / sampleCount );
+
+                    _edgeColorBuffer[i] = FlowColorResolver.GetMixedColor( total );
                 }
-
-                IReadonlySubstanceStateCollection subAvg = IReadonlySubstanceStateCollection.Average( average );
-
-                _edgeColorBuffer[i] = FlowColorResolver.GetMixedColor( subAvg );
             }
-
             _lineRenderer.UpdateLineColors( _edgeColorBuffer );
         }
 

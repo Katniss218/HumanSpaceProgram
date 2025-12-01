@@ -77,10 +77,10 @@ namespace HSP.ResourceFlow
         /// </summary>
         /// <param name="signedFlowRate">Volumetric flow rate (positive is flow from FromInlet to ToInlet), in [m^3/s].</param>
         /// <param name="dt"">Timestep used for scaling the flowing resources, in [s].</param>
-        public IReadonlySubstanceStateCollection SampleFlowResources( double signedFlowRate, double dt )
+        public ISampledSubstanceStateCollection SampleFlowResources( double signedFlowRate, double dt )
         {
             if( signedFlowRate == 0f )
-                return SubstanceStateCollection.Empty;
+                return PooledReadonlySubstanceStateCollection.Get();
 
             IResourceConsumer consumer;
             IResourceProducer producer;
@@ -97,10 +97,7 @@ namespace HSP.ResourceFlow
             // TODO - bidirectional flow later (diffusion)
 
             // Do not clamp. instead we'll use compressibility to determine whether the resources can fit / what flowrate is achievable until equilibrium hits.
-            IReadonlySubstanceStateCollection flow = producer.SampleSubstances( FromInlet.pos, Math.Abs( signedFlowRate ), dt );
-
-
-            return flow;
+            return producer.SampleSubstances( FromInlet.pos, Math.Abs( signedFlowRate ), dt );
         }
     }
 }

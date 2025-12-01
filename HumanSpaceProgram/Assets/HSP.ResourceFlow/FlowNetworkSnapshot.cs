@@ -96,8 +96,13 @@ namespace HSP.ResourceFlow
         private double[] _previousFlowRates; // For oscillation detection
         private double[] _currentFlowRates;
         private double[] _nextFlowRates; // Buffer for unrelaxed flows
+        private double[] _flowScalars;
 
         private double _relaxationFactor;
+
+        // --- Transport Buffers ---
+        private readonly Dictionary<object, double> _totalVolumeDemand = new();
+
 
         public FlowNetworkSnapshot( GameObject rootObject, IReadOnlyDictionary<object, object> owner, IBuildsFlowNetwork[] applyTo, List<IResourceProducer> producers, List<IResourceConsumer> consumers, List<FlowPipe> pipes )
         {
@@ -110,6 +115,7 @@ namespace HSP.ResourceFlow
 
             // Initialize solver buffers to the correct capacity.
             ResizeSolverBuffers( _pipes.Count, true );
+            _flowScalars = new double[_pipes.Count];
 
             // Populate reverse lookup maps for the initial state.
             for( int i = 0; i < _producers.Count; i++ ) _producerToIndex[_producers[i]] = i;
@@ -268,6 +274,10 @@ namespace HSP.ResourceFlow
 
                 // Ensure solver buffers are large enough.
                 ResizeSolverBuffers( _pipes.Count, false );
+                if( _flowScalars.Length < _pipes.Count )
+                {
+                    Array.Resize( ref _flowScalars, _pipes.Count );
+                }
             }
         }
 
@@ -401,7 +411,8 @@ namespace HSP.ResourceFlow
 
             if( !converged )
             {
-                throw new Exception( "FlowNetworkSnapshot.Step: Failed to converge within max iterations." );
+                Debug.LogWarning( "FlowNetworkSnapshot.Step: Failed to converge within max iterations. Using zero flow for this frame." );
+                return; // This effectively uses zero flow for this frame, as ApplyTransport is skipped.
             }
 
             // 3. Transport Phase: Move the actual substances based on the solved flow rates.
@@ -501,7 +512,7 @@ namespace HSP.ResourceFlow
 
             // We need to track total requested mass OUT of each tank.
             // Dictionary maps Tank Object -> Total Volume Requested to leave
-            Dictionary<object, double> totalVolumeDemand = new Dictionary<object, double>();
+            _totalVolumeDemand.Clear();
 
             for( int i = 0; i < _pipes.Count; i++ )
             {
@@ -518,17 +529,20 @@ namespace HSP.ResourceFlow
 
                 if( sourceObj != null )
                 {
-                    if( !totalVolumeDemand.ContainsKey( sourceObj ) )
-                        totalVolumeDemand[sourceObj] = 0;
+                    if( !_totalVolumeDemand.ContainsKey( sourceObj ) )
+                        _totalVolumeDemand[sourceObj] = 0;
 
-                    totalVolumeDemand[sourceObj] += volRequested;
+                    _totalVolumeDemand[sourceObj] += volRequested;
                 }
             }
 
             // --- Step 2 & 3: Limit & Scale ---
             // We compute a scaling factor (0.0 to 1.0) for every pipe.
-            double[] flowScalars = new double[_pipes.Count];
-            Array.Fill( flowScalars, 1.0 );
+            if( _flowScalars.Length < _pipes.Count )
+            {
+                Array.Resize( ref _flowScalars, _pipes.Count );
+            }
+            Array.Fill( _flowScalars, 1.0, 0, _pipes.Count );
 
             for( int i = 0; i < _pipes.Count; i++ )
             {
@@ -543,7 +557,7 @@ namespace HSP.ResourceFlow
                 if( sourceObj is FlowTank tank )
                 {
                     // Retrieve the total demand calculated in Step 1
-                    if( totalVolumeDemand.TryGetValue( tank, out double totalDemand ) )
+                    if( _totalVolumeDemand.TryGetValue( tank, out double totalDemand ) )
                     {
                         // Check tank contents (Volume is usually easier to check than specific mass at this stage)
                         // If your tank mixes fluids, use total volume. 
@@ -557,7 +571,7 @@ namespace HSP.ResourceFlow
 
                             // We apply the most restrictive limit found. 
                             // (Usually a pipe has 1 source, so we just set it, but min protects against edge cases).
-                            flowScalars[i] = Math.Min( flowScalars[i], scale );
+                            _flowScalars[i] = Math.Min( _flowScalars[i], scale );
                         }
                     }
                 }
@@ -573,7 +587,7 @@ namespace HSP.ResourceFlow
                     continue;
 
                 // Apply the scaling factor we calculated
-                double finalRate = rawRate * flowScalars[i];
+                double finalRate = rawRate * _flowScalars[i];
 
                 FlowPipe pipe = _pipes[i];
                 bool flowForward = finalRate > 0;
@@ -587,13 +601,14 @@ namespace HSP.ResourceFlow
                 // Now we can safely sample. 
                 // The tank might still do internal clamping, but we know physically we aren't asking for more 
                 // than the TOTAL tank contains across all pipes.
-                IReadonlySubstanceStateCollection flowResources = pipe.SampleFlowResources( finalRate, dt );
+                using( var flowResources = pipe.SampleFlowResources( finalRate, dt ) )
+                {
+                    if( flowResources.IsEmpty() )
+                        continue;
 
-                if( flowResources.IsEmpty() )
-                    continue;
-
-                source.Outflow?.Add( flowResources, 1.0 );
-                sink.Inflow?.Add( flowResources, 1.0 );
+                    source.Outflow?.Add( flowResources, 1.0 );
+                    sink.Inflow?.Add( flowResources, 1.0 );
+                }
             }
         }
     }
