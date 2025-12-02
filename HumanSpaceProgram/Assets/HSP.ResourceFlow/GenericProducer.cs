@@ -5,19 +5,26 @@ namespace HSP.ResourceFlow
 {
     public sealed class GenericProducer : IResourceProducer
     {
-        // TODO...
-        public Vector3 FluidAcceleration { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public Vector3 FluidAngularVelocity { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public ISubstanceStateCollection Outflow { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public Vector3 FluidAcceleration { get; set; }
+        public Vector3 FluidAngularVelocity { get; set; }
+        public ISubstanceStateCollection Outflow { get; set; } = new SubstanceStateCollection();
+
+        public void ApplyFlows( double deltaTime )
+        {
+            // This is a proxy object. The owning component is responsible for providing Outflow.
+        }
 
         public FluidState Sample( Vector3 localPosition, double holeArea )
         {
-            throw new NotImplementedException();
+            // A generic producer is assumed to be at some defined state, for now STP.
+            return FluidState.STP;
         }
 
         public ISampledSubstanceStateCollection SampleSubstances( Vector3 localPosition, double flowRate, double dt )
         {
-            throw new NotImplementedException();
+            // A generic producer needs to have its contents supplied by the owning component.
+            // By default, it produces nothing.
+            return PooledReadonlySubstanceStateCollection.Get();
         }
     }
 }

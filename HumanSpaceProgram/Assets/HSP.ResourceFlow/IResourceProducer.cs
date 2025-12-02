@@ -24,6 +24,11 @@ namespace HSP.ResourceFlow
         ISubstanceStateCollection Outflow { get; set; }
 
         /// <summary>
+        /// Applies the calculated inflows and outflows to the internal contents of the object.
+        /// </summary>
+        void ApplyFlows( double deltaTime );
+
+        /// <summary>
         /// Calculates the pressure acting at any given point inside the container.
         /// </summary>
         /// <remarks>

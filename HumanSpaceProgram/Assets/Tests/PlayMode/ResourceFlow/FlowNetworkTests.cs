@@ -963,5 +963,172 @@ namespace HSP_Tests_PlayMode.ResourceFlow
             Assert.AreEqual( 500.0, tankB.Contents.GetMass(), 0.1, "Tank B mass should not change in equilibrium." );
             Assert.AreEqual( 500.0, tankC.Contents.GetMass(), 0.1, "Tank C mass should not change in equilibrium." );
         }
+
+        [UnityTest]
+        public IEnumerator GenericConsumer_DrainsTank()
+        {
+            // Arrange
+            var (manager, _, _) = FlowNetworkTestHelper.CreateTestScene();
+            _manager = manager;
+            _root = new GameObject( "TestRoot" );
+
+            var goA = new GameObject( "TankA" );
+            goA.transform.SetParent( _root.transform );
+            var tankA = CreateTestTank( 1.0, new Vector3( 0, -10, 0 ), Vector3.zero );
+            tankA.Contents.Add( _fuel, 820 ); // Full of fuel
+            var wrapperA = goA.AddComponent<MockFlowTankWrapper>();
+            wrapperA.Tank = tankA;
+            wrapperA.Inlets = new[] { new ResourceInlet( 1, new Vector3( 0, -1, 0 ) ) };
+
+            var goEngine = new GameObject( "Engine" );
+            goEngine.transform.SetParent( _root.transform );
+            var wrapperEngine = goEngine.AddComponent<MockEngineWrapper>();
+            wrapperEngine.Inlet = new ResourceInlet( 1, new Vector3( 0, -2, 0 ) );
+
+            var pipe = _root.AddComponent<MockFlowPipeWrapper>();
+            pipe.FromInlet = wrapperA.Inlets[0]; // bottom of tank
+            pipe.ToInlet = wrapperEngine.Inlet;
+
+            yield return new WaitForFixedUpdate();
+
+            // Act
+            var snapshot = FlowNetworkSnapshot.GetNetworkSnapshot( _root );
+            snapshot.Step( Time.fixedDeltaTime * 10 );
+
+            // Assert
+            Assert.Less( tankA.Contents.GetMass(), 820.0, "Tank should have drained some fuel." );
+        }
+
+        [UnityTest]
+        public IEnumerator Pump_MovesFluidUphill()
+        {
+            // Arrange
+            var (manager, _, _) = FlowNetworkTestHelper.CreateTestScene();
+            _manager = manager;
+            _root = new GameObject( "TestRoot" );
+            Vector3 gravity = new Vector3( 0, -10, 0 );
+
+            var goA = new GameObject( "TankA" );
+            goA.transform.SetParent( _root.transform );
+            var tankA = CreateTestTank( 1.0, gravity, Vector3.zero );
+            tankA.Contents.Add( _water, 500 ); // Half full
+            var wrapperA = goA.AddComponent<MockFlowTankWrapper>();
+            wrapperA.Tank = tankA;
+            wrapperA.Inlets = new[] {
+                new ResourceInlet( 1, new Vector3( 0, 1, 0 ) ),
+                new ResourceInlet( 1, new Vector3( 0, -1, 0 ) )
+            };
+
+            var goB = new GameObject( "TankB" );
+            goB.transform.SetParent( _root.transform );
+            var tankB = CreateTestTank( 1.0, gravity, new Vector3( 0, 5, 0 ) );
+            var wrapperB = goB.AddComponent<MockFlowTankWrapper>();
+            wrapperB.Tank = tankB;
+            wrapperB.Inlets = new[] { new ResourceInlet( 1, new Vector3( 0, 4, 0 ) ) };
+
+            var pump = _root.AddComponent<MockPumpWrapper>();
+            pump.FromInlet = wrapperA.Inlets[1];
+            pump.ToInlet = wrapperB.Inlets[0];
+            pump.HeadAdded = 200.0; // J/kg. g*h = 10 * (4-1) = 30. 200 is plenty.
+
+            yield return new WaitForFixedUpdate();
+
+            // Act
+            var snapshot = FlowNetworkSnapshot.GetNetworkSnapshot( _root );
+            snapshot.Step( Time.fixedDeltaTime * 10 );
+
+            // Assert
+            Assert.Less( tankA.Contents.GetMass(), 500.0, "Pump should have moved fluid out of the lower tank." );
+            Assert.Greater( tankB.Contents.GetMass(), 0.0, "Pump should have moved fluid into the upper tank." );
+            Assert.AreEqual( 500.0, tankA.Contents.GetMass() + tankB.Contents.GetMass(), 1.0, "Mass should be conserved." );
+        }
+
+        [UnityTest]
+        public IEnumerator Valve_WhenClosed_StopsFlow()
+        {
+            // Arrange
+            var (manager, _, _) = FlowNetworkTestHelper.CreateTestScene();
+            _manager = manager;
+            _root = new GameObject( "TestRoot" );
+
+            var goA = new GameObject( "TankA" );
+            goA.transform.SetParent( _root.transform );
+            var tankA = CreateTestTank( 1.0, new Vector3( 0, -10, 0 ), Vector3.zero );
+            tankA.Contents.Add( _water, 1000 );
+            var wrapperA = goA.AddComponent<MockFlowTankWrapper>();
+            wrapperA.Tank = tankA;
+            wrapperA.Inlets = new[] { new ResourceInlet( 1, new Vector3( 0, -1, 0 ) ) };
+
+            var goB = new GameObject( "TankB" );
+            goB.transform.SetParent( _root.transform );
+            var tankB = CreateTestTank( 1.0, new Vector3( 0, -10, 0 ), new Vector3( 5, 0, 0 ) );
+            var wrapperB = goB.AddComponent<MockFlowTankWrapper>();
+            wrapperB.Tank = tankB;
+            wrapperB.Inlets = new[] { new ResourceInlet( 1, new Vector3( 5, -1, 0 ) ) };
+
+            var valve = _root.AddComponent<MockValveWrapper>();
+            valve.FromInlet = wrapperA.Inlets[0];
+            valve.ToInlet = wrapperB.Inlets[0];
+            valve.IsOpen = false;
+
+            yield return new WaitForFixedUpdate();
+
+            // Act
+            var snapshot = FlowNetworkSnapshot.GetNetworkSnapshot( _root );
+            snapshot.Step( Time.fixedDeltaTime * 10 );
+
+            // Assert
+            Assert.AreEqual( 1000.0, tankA.Contents.GetMass(), 0.1, "Mass should not leave tank A when valve is closed." );
+            Assert.AreEqual( 0.0, tankB.Contents.GetMass(), 0.1, "Mass should not enter tank B when valve is closed." );
+        }
+
+        [UnityTest]
+        public IEnumerator Valve_WhenOpened_AllowsFlowAndEqualization()
+        {
+            // Arrange
+            var (manager, _, _) = FlowNetworkTestHelper.CreateTestScene();
+            _manager = manager;
+            _root = new GameObject( "TestRoot" );
+
+            var goA = new GameObject( "TankA" );
+            goA.transform.SetParent( _root.transform );
+            var tankA = CreateTestTank( 1.0, new Vector3( 0, -10, 0 ), Vector3.zero );
+            tankA.Contents.Add( _water, 1000 );
+            var wrapperA = goA.AddComponent<MockFlowTankWrapper>();
+            wrapperA.Tank = tankA;
+            wrapperA.Inlets = new[] { new ResourceInlet( 1, new Vector3( 0, -1, 0 ) ) };
+
+            var goB = new GameObject( "TankB" );
+            goB.transform.SetParent( _root.transform );
+            var tankB = CreateTestTank( 1.0, new Vector3( 0, -10, 0 ), new Vector3( 5, 0, 0 ) );
+            var wrapperB = goB.AddComponent<MockFlowTankWrapper>();
+            wrapperB.Tank = tankB;
+            wrapperB.Inlets = new[] { new ResourceInlet( 1, new Vector3( 5, -1, 0 ) ) };
+
+            var valve = _root.AddComponent<MockValveWrapper>();
+            valve.FromInlet = wrapperA.Inlets[0];
+            valve.ToInlet = wrapperB.Inlets[0];
+            valve.IsOpen = false;
+
+            yield return new WaitForFixedUpdate();
+
+            // Act 1: Valve is closed
+            var snapshot = FlowNetworkSnapshot.GetNetworkSnapshot( _root );
+            snapshot.Step( Time.fixedDeltaTime * 10 );
+
+            // Assert 1: No flow
+            Assert.AreEqual( 1000.0, tankA.Contents.GetMass(), 0.1, "No flow should occur before valve is opened." );
+            Assert.AreEqual( 0.0, tankB.Contents.GetMass(), 0.1, "No flow should occur before valve is opened." );
+
+            // Act 2: Open valve and rebuild network
+            valve.IsOpen = true;
+            snapshot = FlowNetworkSnapshot.GetNetworkSnapshot( _root ); // Rebuilds the network with the open valve
+            snapshot.Step( Time.fixedDeltaTime * 10 );
+
+            // Assert 2: Flow has started
+            Assert.Less( tankA.Contents.GetMass(), 1000.0, "Flow should start after valve is opened." );
+            Assert.Greater( tankB.Contents.GetMass(), 0.0, "Flow should start after valve is opened." );
+            Assert.AreEqual( 1000.0, tankA.Contents.GetMass() + tankB.Contents.GetMass(), 1.0, "Mass should be conserved after opening valve." );
+        }
     }
 }

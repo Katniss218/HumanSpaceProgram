@@ -382,22 +382,42 @@ namespace HSP.ResourceFlow
 
         // Serialization stuff:
 
-        private (Substance, double)[] GetSubstances()
+        private struct SubstanceState
+        {
+            public Substance Substance;
+            public double Mass;
+
+            public SubstanceState( Substance substance, double mass )
+            {
+                Substance = substance;
+                Mass = mass;
+            }
+
+            [MapsInheritingFrom( typeof( SubstanceState ) )]
+            public static SerializationMapping SubstanceStateMapping()
+            {
+                return new MemberwiseSerializationMapping<SubstanceState>()
+                    .WithMember( "substance", ObjectContext.Asset, o => o.Substance )
+                    .WithMember( "mass", o => o.Mass );
+            }
+        }
+
+        private SubstanceState[] GetSubstances()
         {
             if( _count == 0 )
-                return Array.Empty<(Substance, double)>();
+                return Array.Empty<SubstanceState>();
 
-            var result = new (Substance, double)[_count];
+            var result = new SubstanceState[_count];
             for( int i = 0; i < _count; i++ )
             {
                 // Note: We cast ISubstance to Substance here. 
                 // This assumes that only concrete 'Substance' types are used in this collection.
-                result[i] = ((Substance)_species[i], _masses[i]);
+                result[i] = new SubstanceState( (Substance)_species[i], _masses[i]);
             }
             return result;
         }
 
-        private void SetSubstances( (Substance, double)[] substances )
+        private void SetSubstances( SubstanceState[] substances )
         {
             Clear();
 
@@ -411,12 +431,12 @@ namespace HSP.ResourceFlow
 
             for( int i = 0; i < substances.Length; i++ )
             {
-                var (s, m) = substances[i];
-                if( s != null && m > EPSILON )
+                SubstanceState s = substances[i];
+                if( s.Substance != null && s.Mass > EPSILON )
                 {
-                    _species[validCount] = s;
-                    _masses[validCount] = m;
-                    calculatedTotalMass += m;
+                    _species[validCount] = s.Substance;
+                    _masses[validCount] = s.Mass;
+                    calculatedTotalMass += s.Mass;
                     validCount++;
                 }
             }

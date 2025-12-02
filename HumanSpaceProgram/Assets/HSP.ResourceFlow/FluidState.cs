@@ -13,19 +13,16 @@ namespace HSP.ResourceFlow
         /// <summary>
         /// Gets or sets the pressure, in [Pa].
         /// </summary>
-        [field: SerializeField]
         public double Pressure { get; set; }
 
         /// <summary>
         /// Gets or sets the temperature, in [K].
         /// </summary>
-        [field: SerializeField]
         public double Temperature { get; set; }
 
         /// <summary>
         /// Gets or sets the magnitude of the velocity, in [m/s].
         /// </summary>
-        [field: SerializeField]
         public double Velocity { get; set; }
 
         /// <summary>
@@ -41,7 +38,7 @@ namespace HSP.ResourceFlow
             Pressure = 0.0f,
             Temperature = 0.0f,
             Velocity = 0.0f,
-            FluidSurfacePotential = double.NegativeInfinity
+            FluidSurfacePotential = -1e12
         };
 
         public static FluidState STP => new FluidState()

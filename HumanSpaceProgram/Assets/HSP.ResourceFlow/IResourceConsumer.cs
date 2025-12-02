@@ -23,6 +23,18 @@ namespace HSP.ResourceFlow
         ISubstanceStateCollection Inflow { get; set; }
 
         /// <summary>
+        /// The desired volumetric flow rate into this consumer, in [m^3/s].
+        /// The solver will attempt to meet this demand.
+        /// A value of PositiveInfinity means demand is unlimited.
+        /// </summary>
+        double Demand { get; set; }
+
+        /// <summary>
+        /// Applies the calculated inflows and outflows to the internal contents of the object.
+        /// </summary>
+        void ApplyFlows( double deltaTime );
+
+        /// <summary>
         /// Calculates the pressure acting at any given point inside the container.
         /// </summary>
         /// <remarks>

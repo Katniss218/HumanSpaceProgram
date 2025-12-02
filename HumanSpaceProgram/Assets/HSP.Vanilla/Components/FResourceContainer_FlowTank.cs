@@ -3,6 +3,7 @@ using HSP.ReferenceFrames;
 using HSP.ResourceFlow;
 using HSP.Time;
 using HSP.Vessels;
+using System;
 using UnityEngine;
 using UnityPlus.Serialization;
 
@@ -60,7 +61,7 @@ namespace HSP.Vanilla.Components
             foreach( var inlet in Inlets )
             {
                 Vector3 inletPosInReferenceSpace = reference.InverseTransformPoint( this.transform.TransformPoint( inlet.LocalPosition ) );
-                FlowPipe.Port flowInlet = new FlowPipe.Port( (IResourceConsumer)_cachedTank, inletPosInReferenceSpace );
+                FlowPipe.Port flowInlet = new FlowPipe.Port( (IResourceConsumer)_cachedTank, inletPosInReferenceSpace, inlet.NominalArea );
                 c.TryAddFlowObj( inlet, flowInlet );
             }
 
@@ -83,6 +84,8 @@ namespace HSP.Vanilla.Components
                 Vessel vessel = this.transform.GetVessel();
                 if( vessel == null ) return;
 
+                _cachedTank.FluidState = this.FluidState;
+
                 Transform reference = vessel.ReferenceTransform;
                 INonInertialReferenceFrame vesselFrame = vessel.ReferenceFrameTransform.NonInertialReferenceFrame();
                 Vector3Dbl localPosition = (Vector3Dbl)reference.InverseTransformPoint( this.transform.position );
@@ -94,6 +97,7 @@ namespace HSP.Vanilla.Components
 
                 _cachedTank.FluidAcceleration = (Vector3)netAcceleration;
                 _cachedTank.FluidAngularVelocity = (Vector3)frameAngularVelocity;
+                _cachedTank.RunInternalSimulationStep( TimeManager.FixedDeltaTime );
             }
         }
 
@@ -102,8 +106,28 @@ namespace HSP.Vanilla.Components
             // apply the snapshot to the tank.
             if( snapshot.TryGetFlowObj( this, out FlowTank tankSnapshot ) )
             {
-                this.Contents.Clear();
-                this.Contents.Add( tankSnapshot.Contents );
+                if( this.Contents == null )
+                {
+                    this.Contents = new SubstanceStateCollection();
+                }
+
+                double oldMass = this.Mass;
+
+                // 1. Copy Final State
+                this.Contents.Set( tankSnapshot.Contents );
+                this.FluidState = tankSnapshot.FluidState;
+
+                double newMass = this.Mass;
+                if( Math.Abs( newMass - oldMass ) > 1e-9 )
+                {
+                    OnAfterMassChanged?.Invoke( (float)(newMass - oldMass) );
+                }
+
+                // 2. Invalidate Cache
+                if( _cachedTank != null )
+                {
+                    _cachedTank.InvalidateFluids();
+                }
             }
         }
 

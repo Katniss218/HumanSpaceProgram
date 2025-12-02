@@ -17,32 +17,30 @@ namespace HSP.ResourceFlow
             /// The position of the inlet, in simulation space.
             /// </summary>
             public readonly Vector3 pos;
+            public readonly float area;
             public readonly IResourceProducer Producer;
             public readonly IResourceConsumer Consumer;
 
-            public Port( IResourceProducer producer, Vector3 pos )
+            public Port( IResourceProducer producer, Vector3 pos, float area )
             {
                 Producer = producer;
                 Consumer = producer as IResourceConsumer;
                 this.pos = pos;
+                this.area = area;
             }
 
-            public Port( IResourceConsumer consumer, Vector3 pos )
+            public Port( IResourceConsumer consumer, Vector3 pos, float area )
             {
                 Producer = consumer as IResourceProducer;
                 Consumer = consumer;
                 this.pos = pos;
+                this.area = area;
             }
         }
 
         public Port FromInlet { get; }
 
         public Port ToInlet { get; }
-
-        /// <summary>
-        /// The minimum cross-sectional area of the pipe, in [m^2].
-        /// </summary>
-        public double CrossSectionArea { get; }
 
         /// <summary>
         /// Volumetric conductance, in [m^3/(s*(J/kg))]
@@ -54,11 +52,10 @@ namespace HSP.ResourceFlow
         /// </summary>
         public double HeadAdded { get; set; }
 
-        public FlowPipe( Port fromInlet, Port toInlet, double crossSectionArea, double conductance = 1.0, double headAdded = 0.0 )
+        public FlowPipe( Port fromInlet, Port toInlet, double conductance = 1.0, double headAdded = 0.0 )
         {
             FromInlet = fromInlet;
             ToInlet = toInlet;
-            CrossSectionArea = crossSectionArea;
             Conductance = conductance;
             HeadAdded = headAdded;
         }

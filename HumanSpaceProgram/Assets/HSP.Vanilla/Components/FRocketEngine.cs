@@ -1,6 +1,7 @@
 ﻿using HSP.ControlSystems;
 using HSP.ControlSystems.Controls;
 using HSP.ResourceFlow;
+using HSP.Time;
 using HSP.Vessels;
 using System;
 using UnityEngine;
@@ -20,7 +21,7 @@ namespace HSP.Vanilla.Components
     }
 
     [Serializable]
-    public class FRocketEngine : MonoBehaviour, IPropulsion//, IBuildsFlowNetwork
+    public class FRocketEngine : MonoBehaviour, IPropulsion, IBuildsFlowNetwork
     {
         const float g = 9.80665f;
 
@@ -84,6 +85,11 @@ namespace HSP.Vanilla.Components
             }
         }
 
+        /// <summary>
+        /// The propellant mixture ratio required by the engine. The mass values represent the ratio.
+        /// </summary>
+        public IReadonlySubstanceStateCollection PropellantMixture { get; set; } = new SubstanceStateCollection();
+
         [NamedControl( "Throttle", "Connect this to the controller's throttle output." )]
         public ControlleeInput<float> SetThrottle;
         private void SetThrottleListener( float value )
@@ -98,7 +104,7 @@ namespace HSP.Vanilla.Components
         public Transform ThrustTransform { get; set; }
 
         [field: SerializeField]
-        public ISubstanceStateCollection Inflow { get; private set; } = SubstanceStateCollection.Empty;
+        public ISubstanceStateCollection Inflow { get; private set; } = new SubstanceStateCollection();
 
         public ResourceInlet[] Inlets { get; set; }
 
@@ -109,7 +115,7 @@ namespace HSP.Vanilla.Components
 
         private float GetThrust( float massFlow )
         {
-            return (this.Isp * g) * massFlow * Throttle;
+            return (this.Isp * g) * massFlow;
         }
 
         void Awake()
@@ -119,48 +125,103 @@ namespace HSP.Vanilla.Components
 
         void FixedUpdate()
         {
-            this.Thrust = GetThrust( (float)Inflow.GetMass() );
-
-            if( this.Throttle <= 0.0f )
+            float massFlowRate = 0f;
+            if( Inflow != null && TimeManager.FixedDeltaTime > 0 )
             {
-                return;
+                massFlowRate = (float)(Inflow.GetMass() / TimeManager.FixedDeltaTime);
             }
 
-            Vessel vessel = this.transform.GetVessel();
-            if( vessel != null )
+            // Throttle is already accounted for in the demand, which limits the inflow.
+            this.Thrust = GetThrust( massFlowRate );
+
+            // Safety check: if for any reason there's flow while throttled down, produce no thrust.
+            if( this.Throttle <= 0.0f )
             {
-                vessel.PhysicsTransform.AddForceAtPosition( this.ThrustTransform.forward * this.Thrust, this.ThrustTransform.position );
+                this.Thrust = 0f;
+            }
+            Debug.Log( Inflow.Count );
+            if( this.Thrust > 0.0f )
+            {
+                Vessel vessel = this.transform.GetVessel();
+                if( vessel != null )
+                {
+                    vessel.PhysicsTransform.AddForceAtPosition( this.ThrustTransform.forward * this.Thrust, this.ThrustTransform.position );
+                }
             }
         }
 
-        IResourceConsumer _cachedConsumer;
+        GenericConsumer _cachedConsumer;
 
         public BuildFlowResult BuildFlowNetwork( FlowNetworkBuilder c )
         {
+            if( Inlets == null || Inlets.Length == 0 )
+            {
+                return BuildFlowResult.Finished;
+            }
+
             Vessel vessel = this.transform.GetVessel();
+            if( vessel == null || vessel.RootPart == null )
+            {
+                return BuildFlowResult.Retry;
+            }
             Transform reference = vessel.ReferenceTransform;
+
+            _cachedConsumer ??= new GenericConsumer();
+            c.TryAddFlowObj( this, _cachedConsumer );
 
             foreach( var inlet in Inlets )
             {
                 Vector3 inletPosInReferenceSpace = reference.InverseTransformPoint( this.transform.TransformPoint( inlet.LocalPosition ) );
-                FlowPipe.Port flowInlet = new FlowPipe.Port( _cachedConsumer, inletPosInReferenceSpace );
-               // c.TryAddFlowObj( inlet, flowInlet );
+                FlowPipe.Port flowInlet = new FlowPipe.Port( _cachedConsumer, inletPosInReferenceSpace, inlet.NominalArea );
+                c.TryAddFlowObj( inlet, flowInlet );
             }
 
-            _cachedConsumer = new GenericConsumer();
-            _cachedConsumer.FluidAcceleration = Vector3.zero;
-            _cachedConsumer.FluidAngularVelocity = Vector3.zero;
-            throw new NotImplementedException();
+            return BuildFlowResult.Finished;
         }
 
         public bool IsValid( FlowNetworkSnapshot snapshot )
         {
-            throw new NotImplementedException();
+            // The engine is always considered valid once built.
+            return true;
+        }
+
+        public void SynchronizeState( FlowNetworkSnapshot snapshot )
+        {
+            if( _cachedConsumer != null )
+            {
+                double massFlowDemand = Throttle * MaxMassFlow;
+                if( massFlowDemand > 0 && PropellantMixture != null && !PropellantMixture.IsEmpty() )
+                {
+                    // Propellant density is approximated at STP for demand calculation.
+                    double averageDensity = PropellantMixture.GetAverageDensity( 293.15, 101325 );
+                    if( averageDensity > 0 )
+                    {
+                        double volumeFlowDemand = massFlowDemand / averageDensity;
+                        _cachedConsumer.Demand = volumeFlowDemand;
+                    }
+                    else
+                    {
+                        _cachedConsumer.Demand = 0;
+                    }
+                }
+                else
+                {
+                    _cachedConsumer.Demand = 0;
+                }
+            }
         }
 
         public void ApplySnapshot( FlowNetworkSnapshot snapshot )
         {
-            throw new NotImplementedException();
+            // After the simulation step, pull the actual resource flow from the consumer proxy.
+            if( _cachedConsumer != null && _cachedConsumer.Inflow != null )
+            {
+                this.Inflow = _cachedConsumer.Inflow.Clone();
+            }
+            else
+            {
+                this.Inflow?.Clear();
+            }
         }
 
 
@@ -173,7 +234,8 @@ namespace HSP.Vanilla.Components
                 .WithMember( "isp", o => o.Isp )
                 .WithMember( "throttle", o => o.Throttle )
                 .WithMember( "thrust_transform", ObjectContext.Ref, o => o.ThrustTransform )
-                .WithMember( "inlets", o => o.Inlets );
+                .WithMember( "inlets", o => o.Inlets )
+                .WithMember( "propellant_mixture", o => o.PropellantMixture );
         }
     }
 }

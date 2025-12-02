@@ -6,7 +6,7 @@ namespace HSP.Vanilla.Components
 {
     public class FResourceConnection_FlowPipe : MonoBehaviour, IBuildsFlowNetwork
     {
-        public float CrossSectionArea { get; set; } = 0.1f;
+        public double Conductance { get; set; } = 1.0;
         public ResourceInlet FromInlet { get; set; }
         public ResourceInlet ToInlet { get; set; }
 
@@ -38,7 +38,7 @@ namespace HSP.Vanilla.Components
                     return BuildFlowResult.Retry;
                 }
 
-                _cachedPipe = new FlowPipe( flowEnd1, flowEnd2, CrossSectionArea );
+                _cachedPipe = new FlowPipe( flowEnd1, flowEnd2, Conductance );
                 c.TryAddFlowObj( this, _cachedPipe );
                 _isInNetwork = true;
             }
@@ -76,7 +76,7 @@ namespace HSP.Vanilla.Components
             return new MemberwiseSerializationMapping<FResourceConnection_FlowPipe>()
                 .WithMember( "from_inlet", ObjectContext.Ref, o => o.FromInlet )
                 .WithMember( "to_inlet", ObjectContext.Ref, o => o.ToInlet )
-                .WithMember( "cross_section_area", o => o.CrossSectionArea );
+                .WithMember( "conductance", o => o.Conductance );
         }
     }
 }

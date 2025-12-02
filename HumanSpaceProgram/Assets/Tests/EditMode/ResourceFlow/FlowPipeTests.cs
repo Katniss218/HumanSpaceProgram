@@ -10,7 +10,7 @@ namespace HSP_Tests_EditMode.ResourceFlow
         public void ComputeFlowRate___PositivePotentialDifference___FlowsForward()
         {
             // Arrange
-            var pipe = new FlowPipe( default, default, 0.1, conductance: 0.5 );
+            var pipe = new FlowPipe( default, default, conductance: 0.5 );
             double potentialFrom = 100.0;
             double potentialTo = 50.0;
 
@@ -26,7 +26,7 @@ namespace HSP_Tests_EditMode.ResourceFlow
         public void ComputeFlowRate___NegativePotentialDifference___FlowsBackward()
         {
             // Arrange
-            var pipe = new FlowPipe( default, default, 0.1, conductance: 0.5 );
+            var pipe = new FlowPipe( default, default, conductance: 0.5 );
             double potentialFrom = 50.0;
             double potentialTo = 100.0;
 
@@ -42,7 +42,7 @@ namespace HSP_Tests_EditMode.ResourceFlow
         public void ComputeFlowRate___ZeroPotentialDifference___NoFlow()
         {
             // Arrange
-            var pipe = new FlowPipe( default, default, 0.1, conductance: 0.5 );
+            var pipe = new FlowPipe( default, default, conductance: 0.5 );
             double potentialFrom = 100.0;
             double potentialTo = 100.0;
 
@@ -57,7 +57,7 @@ namespace HSP_Tests_EditMode.ResourceFlow
         public void ComputeFlowRate___WithPositiveHeadAdded___IncreasesForwardFlow()
         {
             // Arrange
-            var pipe = new FlowPipe( default, default, 0.1, conductance: 0.5, headAdded: 20.0 );
+            var pipe = new FlowPipe( default, default, conductance: 0.5, headAdded: 20.0 );
             double potentialFrom = 100.0;
             double potentialTo = 100.0; // No natural flow
 
@@ -73,7 +73,7 @@ namespace HSP_Tests_EditMode.ResourceFlow
         public void ComputeFlowRate___WithNegativeHeadAdded___InducesBackwardFlow()
         {
             // Arrange
-            var pipe = new FlowPipe( default, default, 0.1, conductance: 0.5, headAdded: -30.0 );
+            var pipe = new FlowPipe( default, default, conductance: 0.5, headAdded: -30.0 );
             double potentialFrom = 100.0;
             double potentialTo = 100.0; // No natural flow
 

@@ -32,7 +32,7 @@ namespace HSP.Vanilla.Components
             }
 
             // Create pipe with added Head Pressure
-            _cachedPumpPipe = new FlowPipe( flowEnd1, flowEnd2, CrossSectionArea, headAdded: PressureHead );
+            _cachedPumpPipe = new FlowPipe( flowEnd1, flowEnd2, conductance: Conductance, headAdded: PressureHead );
             c.TryAddFlowObj( this, _cachedPumpPipe );
             return BuildFlowResult.Finished;
         }

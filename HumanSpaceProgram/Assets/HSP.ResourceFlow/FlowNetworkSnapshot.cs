@@ -77,6 +77,7 @@ namespace HSP.ResourceFlow
         private readonly List<FlowPipe> _pipes;
         private readonly List<IResourceProducer> _producers;
         private readonly List<IResourceConsumer> _consumers;
+        private readonly List<object> _participants = new();
 
         private int[][] _producersAndPipes;
         private int[][] _consumersAndPipes;
@@ -101,7 +102,17 @@ namespace HSP.ResourceFlow
         private double _relaxationFactor;
 
         // --- Transport Buffers ---
-        private readonly Dictionary<object, double> _totalVolumeDemand = new();
+        private readonly Dictionary<IResourceProducer, double> _totalVolumeDemand = new();
+        private readonly Dictionary<IResourceConsumer, double> _consumerVolumeSupply = new();
+        private readonly Dictionary<IResourceProducer, double> _producerScales = new();
+        private readonly Dictionary<IResourceConsumer, double> _consumerScales = new();
+
+
+        // --- Public Read-only access for debug visualizers ---
+        public IReadOnlyList<FlowPipe> Pipes => _pipes;
+        public IReadOnlyList<IResourceProducer> Producers => _producers;
+        public IReadOnlyList<IResourceConsumer> Consumers => _consumers;
+        public double[] CurrentFlowRates => _currentFlowRates;
 
 
         public FlowNetworkSnapshot( GameObject rootObject, IReadOnlyDictionary<object, object> owner, IBuildsFlowNetwork[] applyTo, List<IResourceProducer> producers, List<IResourceConsumer> consumers, List<FlowPipe> pipes )
@@ -124,6 +135,7 @@ namespace HSP.ResourceFlow
 
             // Build initial connectivity maps.
             RebuildConnectivityMaps();
+            RebuildParticipantsList();
         }
 
         private void ResizeSolverBuffers( int capacity, bool exact )
@@ -271,6 +283,7 @@ namespace HSP.ResourceFlow
                 // Rebuild connectivity maps since pipes were added/removed.
                 // This is simpler than trying to patch the maps.
                 RebuildConnectivityMaps();
+                RebuildParticipantsList();
 
                 // Ensure solver buffers are large enough.
                 ResizeSolverBuffers( _pipes.Count, false );
@@ -285,6 +298,15 @@ namespace HSP.ResourceFlow
         {
             _producersAndPipes = BuildConnectivityMap( _producers, _pipes );
             _consumersAndPipes = BuildConnectivityMap( _consumers, _pipes );
+        }
+
+        private void RebuildParticipantsList()
+        {
+            _participants.Clear();
+            var uniqueParticipants = new HashSet<object>();
+            foreach( var p in _producers ) if( p != null ) uniqueParticipants.Add( p );
+            foreach( var c in _consumers ) if( c != null ) uniqueParticipants.Add( c );
+            _participants.AddRange( uniqueParticipants );
         }
 
         private int[][] BuildConnectivityMap<T>( List<T> nodes, List<FlowPipe> pipes )
@@ -331,6 +353,7 @@ namespace HSP.ResourceFlow
         public void Step( float dt )
         {
             deltaTime = dt;
+
             const int MAX_ITERATIONS = 50;
             const double CONVERGENCE_THRESHOLD = 0.0001;
             _relaxationFactor = 0.7; // Start with a reasonable under-relaxation.
@@ -418,6 +441,23 @@ namespace HSP.ResourceFlow
             // 3. Transport Phase: Move the actual substances based on the solved flow rates.
             ApplyTransport( dt );
 
+            // Apply flows to simulation objects
+            foreach( var participant in _participants )
+            {
+                if( participant is IResourceProducer producer )
+                {
+                    producer.ApplyFlows( dt );
+                }
+                else if( participant is IResourceConsumer consumer )
+                {
+                    // This handles cases where an object is only a consumer
+                    consumer.ApplyFlows( dt );
+                }
+            }
+        }
+
+        public void ApplySnapshotToComponents()
+        {
             // 4. Notify objects
             foreach( var a in _applyTo )
             {
@@ -452,12 +492,12 @@ namespace HSP.ResourceFlow
                     // Sample potential at the connection point
                     if( ReferenceEquals( pipe.FromInlet.Producer, producer ) )
                     {
-                        double p = producer.Sample( pipe.FromInlet.pos, pipe.CrossSectionArea ).FluidSurfacePotential;
+                        double p = producer.Sample( pipe.FromInlet.pos, pipe.FromInlet.area ).FluidSurfacePotential;
                         _currentPotentials[pipeIdx].Item1 = p;
                     }
                     else if( ReferenceEquals( pipe.ToInlet.Producer, producer ) )
                     {
-                        double p = producer.Sample( pipe.ToInlet.pos, pipe.CrossSectionArea ).FluidSurfacePotential;
+                        double p = producer.Sample( pipe.ToInlet.pos, pipe.FromInlet.area ).FluidSurfacePotential;
                         _currentPotentials[pipeIdx].Item2 = p;
                     }
                 }
@@ -479,12 +519,12 @@ namespace HSP.ResourceFlow
 
                     if( ReferenceEquals( pipe.FromInlet.Consumer, consumer ) )
                     {
-                        double p = consumer.Sample( pipe.FromInlet.pos, pipe.CrossSectionArea ).FluidSurfacePotential;
+                        double p = consumer.Sample( pipe.FromInlet.pos, pipe.FromInlet.area ).FluidSurfacePotential;
                         _currentPotentials[pipeIdx].Item1 = p;
                     }
                     else if( ReferenceEquals( pipe.ToInlet.Consumer, consumer ) )
                     {
-                        double p = consumer.Sample( pipe.ToInlet.pos, pipe.CrossSectionArea ).FluidSurfacePotential;
+                        double p = consumer.Sample( pipe.ToInlet.pos, pipe.FromInlet.area ).FluidSurfacePotential;
                         _currentPotentials[pipeIdx].Item2 = p;
                     }
                 }
@@ -505,75 +545,80 @@ namespace HSP.ResourceFlow
                 consumer.Inflow?.Clear();
             }
 
-            // --- Step 1: Calculate Demand (Ideal Flow) ---
-            // We store the signed flow rate for every pipe.
-            // Positive = From -> To, Negative = To -> From
-            double[] proposedFlows = _currentFlowRates; // Use the already calculated rates
+            double[] proposedFlows = _currentFlowRates;
 
-            // We need to track total requested mass OUT of each tank.
-            // Dictionary maps Tank Object -> Total Volume Requested to leave
             _totalVolumeDemand.Clear();
-
+            _consumerVolumeSupply.Clear();
             for( int i = 0; i < _pipes.Count; i++ )
             {
                 if( _pipes[i] == null ) continue;
 
                 double rate = proposedFlows[i];
-                if( Math.Abs( rate ) < 1e-9 )
-                    continue;
+                if( Math.Abs( rate ) < 1e-9 ) continue;
 
-                double volRequested = Math.Abs( rate ) * dt;
+                double vol = Math.Abs( rate ) * dt;
 
-                // Identify Source
                 object sourceObj = (rate > 0) ? _pipes[i].FromInlet.Producer : _pipes[i].ToInlet.Producer;
-
-                if( sourceObj != null )
+                if( sourceObj is IResourceProducer producer )
                 {
-                    if( !_totalVolumeDemand.ContainsKey( sourceObj ) )
-                        _totalVolumeDemand[sourceObj] = 0;
+                    if( !_totalVolumeDemand.ContainsKey( producer ) ) _totalVolumeDemand[producer] = 0;
+                    _totalVolumeDemand[producer] += vol;
+                }
 
-                    _totalVolumeDemand[sourceObj] += volRequested;
+                object sinkObj = (rate > 0) ? _pipes[i].ToInlet.Consumer : _pipes[i].FromInlet.Consumer;
+                if( sinkObj is IResourceConsumer consumer )
+                {
+                    if( !_consumerVolumeSupply.ContainsKey( consumer ) ) _consumerVolumeSupply[consumer] = 0;
+                    _consumerVolumeSupply[consumer] += vol;
                 }
             }
 
-            // --- Step 2 & 3: Limit & Scale ---
-            // We compute a scaling factor (0.0 to 1.0) for every pipe.
-            if( _flowScalars.Length < _pipes.Count )
+            _producerScales.Clear();
+            foreach( var kvp in _totalVolumeDemand )
             {
-                Array.Resize( ref _flowScalars, _pipes.Count );
+                if( kvp.Key is FlowTank tank )
+                {
+                    double totalDemand = kvp.Value;
+                    double availableVolume = tank.Volume;
+                    if( totalDemand > availableVolume && totalDemand > 0 )
+                    {
+                        _producerScales[tank] = availableVolume / totalDemand;
+                    }
+                }
             }
-            Array.Fill( _flowScalars, 1.0, 0, _pipes.Count );
+
+            _consumerScales.Clear();
+            foreach( var kvp in _consumerVolumeSupply )
+            {
+                var consumer = kvp.Key;
+                double totalProposedSupply = kvp.Value;
+                double demandVolume = consumer.Demand * dt;
+                if( totalProposedSupply > demandVolume && totalProposedSupply > 0 )
+                {
+                    _consumerScales[consumer] = demandVolume / totalProposedSupply;
+                }
+            }
+
+            if( _flowScalars.Length < _pipes.Count ) Array.Resize( ref _flowScalars, _pipes.Count );
 
             for( int i = 0; i < _pipes.Count; i++ )
             {
+                _flowScalars[i] = 1.0;
                 if( _pipes[i] == null ) continue;
 
                 double rate = proposedFlows[i];
-                if( Math.Abs( rate ) < 1e-9 )
-                    continue;
+                if( Math.Abs( rate ) < 1e-9 ) continue;
 
                 object sourceObj = (rate > 0) ? _pipes[i].FromInlet.Producer : _pipes[i].ToInlet.Producer;
+                object sinkObj = (rate > 0) ? _pipes[i].ToInlet.Consumer : _pipes[i].FromInlet.Consumer;
 
-                if( sourceObj is FlowTank tank )
+                if( sourceObj is IResourceProducer p && _producerScales.TryGetValue( p, out double pScale ) )
                 {
-                    // Retrieve the total demand calculated in Step 1
-                    if( _totalVolumeDemand.TryGetValue( tank, out double totalDemand ) )
-                    {
-                        // Check tank contents (Volume is usually easier to check than specific mass at this stage)
-                        // If your tank mixes fluids, use total volume. 
-                        double availableVolume = tank.Volume; // Or tank.Contents.TotalVolume();
-
-                        if( totalDemand > availableVolume && totalDemand > 0 )
-                        {
-                            // The tank is over-subscribed. Scale down.
-                            // Example: 10L available, 20L demanded. Scale = 0.5.
-                            double scale = availableVolume / totalDemand;
-
-                            // We apply the most restrictive limit found. 
-                            // (Usually a pipe has 1 source, so we just set it, but min protects against edge cases).
-                            _flowScalars[i] = Math.Min( _flowScalars[i], scale );
-                        }
-                    }
+                    _flowScalars[i] = Math.Min( _flowScalars[i], pScale );
+                }
+                if( sinkObj is IResourceConsumer c && _consumerScales.TryGetValue( c, out double cScale ) )
+                {
+                    _flowScalars[i] = Math.Min( _flowScalars[i], cScale );
                 }
             }
 

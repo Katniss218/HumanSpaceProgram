@@ -137,11 +137,12 @@ namespace HSP._DevUtils
             v.RootPart = root;
 
             FResourceConnection_FlowPipe conn = tankP.gameObject.AddComponent<FResourceConnection_FlowPipe>();
+            conn.Conductance = 100f;
             conn.FromInlet = tankL1.GetComponent<FResourceContainer_FlowTank>().Inlets[0];
             //conn.End1.Position = new Vector3( 0.0f, -2.5f, 0.0f );
             conn.FromInlet = tankP.GetComponent<FResourceContainer_FlowTank>().Inlets[0];
             //conn.End2.Position = new Vector3( 0.0f, 1.5f, 0.0f );
-            conn.CrossSectionArea = 0.1f;
+            conn.FromInlet.NominalArea = 0.1f;
 
             Substance sbsF = AssetRegistry.Get<Substance>( "Vanilla::Assets/substances/rp_1" );
             Substance sbsOX = AssetRegistry.Get<Substance>( "Vanilla::Assets/substances/lox" );
@@ -154,18 +155,20 @@ namespace HSP._DevUtils
             };
 
             FResourceConnection_FlowPipe conn21 = engineP1.gameObject.AddComponent<FResourceConnection_FlowPipe>();
+            conn21.Conductance = 100f;
             conn21.FromInlet = tankP.GetComponent<FResourceContainer_FlowTank>().Inlets[1];
             //conn21.End1.Position = new Vector3( 0.0f, -1.5f, 0.0f );
             conn21.ToInlet = engineP1.GetComponent<FRocketEngine>().Inlets[0];
             //conn21.End2.Position = new Vector3( 0.0f, 0.0f, 0.0f );
-            conn21.CrossSectionArea = 60f;
+            conn21.ToInlet.NominalArea = 60f;
 
             FResourceConnection_FlowPipe conn22 = engineP2.gameObject.AddComponent<FResourceConnection_FlowPipe>();
+            conn22.Conductance = 100f;
             conn22.FromInlet = tankP.GetComponent<FResourceContainer_FlowTank>().Inlets[1];
             //conn22.End1.Position = new Vector3( 0.0f, -1.5f, 0.0f );
             conn22.ToInlet = engineP2.GetComponent<FRocketEngine>().Inlets[0];
             //conn22.End2.Position = new Vector3( 0.0f, 0.0f, 0.0f );
-            conn22.CrossSectionArea = 60f;
+            conn22.ToInlet.NominalArea = 60f;
 
             FVesselSeparator t1Sep = t1.gameObject.AddComponent<FVesselSeparator>();
             FVesselSeparator t2Sep = t2.gameObject.AddComponent<FVesselSeparator>();
@@ -185,8 +188,10 @@ namespace HSP._DevUtils
             FAttitudeAvionics atv = capsule.GetComponent<FAttitudeAvionics>();
             FGimbalActuatorController gc = capsule.GetComponent<FGimbalActuatorController>();
             FRocketEngine eng1 = engineP1.GetComponent<FRocketEngine>();
+            eng1.PropellantMixture = new SubstanceStateCollection() { { sbsF, 0.9 }, { sbsOX, 1.1 } };
             F2AxisActuator ac1 = engineP1.GetComponent<F2AxisActuator>();
             FRocketEngine eng2 = engineP2.GetComponent<FRocketEngine>();
+            eng2.PropellantMixture = new SubstanceStateCollection() { { sbsF, 0.9 }, { sbsOX, 1.1 } };
             F2AxisActuator ac2 = engineP2.GetComponent<F2AxisActuator>();
             av.OnSetThrottle.TryConnect( eng1.SetThrottle );
             // av.OnSetThrottle.TryConnect( eng2.SetThrottle );

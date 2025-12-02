@@ -3,7 +3,7 @@ using UnityPlus.Serialization;
 
 namespace HSP.Vanilla.Components
 {
-    public class FResourceConnector_FlowPipeValve : FResourceConnection_FlowPipe
+    public class FResourceConnection_FlowPipeValve : FResourceConnection_FlowPipe
     {
         public float PercentOpen { get; set; } = 0.0f; // 0..1
 
@@ -29,7 +29,7 @@ namespace HSP.Vanilla.Components
                         return BuildFlowResult.Retry;
                     }
 
-                    _cachedPipe = new FlowPipe( flowEnd1, flowEnd2, CrossSectionArea, conductance: PercentOpen );
+                    _cachedPipe = new FlowPipe( flowEnd1, flowEnd2, conductance: Conductance * PercentOpen );
                     c.TryAddFlowObj( this, _cachedPipe );
                 }
             }
@@ -65,10 +65,10 @@ namespace HSP.Vanilla.Components
             }
         }
 
-        [MapsInheritingFrom( typeof( FResourceConnector_FlowPipeValve ) )]
-        public static SerializationMapping FResourceConnector_FlowPipeValveMapping()
+        [MapsInheritingFrom( typeof( FResourceConnection_FlowPipeValve ) )]
+        public static SerializationMapping FResourceConnection_FlowPipeValveMapping()
         {
-            return new MemberwiseSerializationMapping<FResourceConnector_FlowPipeValve>()
+            return new MemberwiseSerializationMapping<FResourceConnection_FlowPipeValve>()
                 .WithMember( "percent_open", o => o.PercentOpen );
         }
     }

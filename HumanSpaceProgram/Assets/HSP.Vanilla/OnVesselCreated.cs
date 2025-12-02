@@ -4,6 +4,7 @@ using HSP.Trajectories.AccelerationProviders;
 using HSP.Trajectories.Components;
 using HSP.Trajectories.TrajectoryIntegrators;
 using HSP.Vanilla.ReferenceFrames;
+using HSP.Vanilla.ResourceFlow;
 using HSP.Vanilla.Scenes.DesignScene;
 using HSP.Vanilla.Scenes.GameplayScene;
 using HSP.Vanilla.Trajectories;
@@ -22,6 +23,7 @@ namespace HSP.Vanilla
         public const string ADD_AERODYNAMIC_INTEGRATOR = HSPEvent.NAMESPACE_HSP + ".598269da-eb9e-4eaf-8511-4d7072791f47";
         public const string ADD_TRAJECTORY_TRANSFORM = HSPEvent.NAMESPACE_HSP + ".add_trajectory_transform";
         public const string TRY_PIN_PHYSICS_OBJECT = HSPEvent.NAMESPACE_HSP + ".try_pin_physics_object";
+        public const string ADD_FLOW_NETWORK = "baf80a33-239a-42bb-b66a-c7caf0ac4043";
 
         [HSPEventListener( HSPEvent_ON_VESSEL_CREATED.ID, ADD_REFERENCE_FRAME_TRANSFORM )]
         private static void AddGameplayReferenceFrameTransform( Vessel v )
@@ -79,6 +81,15 @@ namespace HSP.Vanilla
                     PinnedCelestialBodyReferenceFrameTransform ppo = e.oldRootPart.GetVessel().GetComponent<PinnedCelestialBodyReferenceFrameTransform>();
                     e.v.Pin( ppo.ReferenceBody, ppo.ReferencePosition, ppo.ReferenceRotation );
                 }
+            }
+        }
+
+        [HSPEventListener( HSPEvent_ON_VESSEL_CREATED.ID, ADD_FLOW_NETWORK )]
+        private static void AddFlowNetwork( Vessel v )
+        {
+            if( HSPSceneManager.IsLoaded<GameplaySceneM>() )
+            {
+                v.gameObject.AddComponent<VesselFlowNetwork>();
             }
         }
     }

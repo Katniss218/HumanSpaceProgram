@@ -108,24 +108,4 @@ namespace HSP.ResourceFlow
             return result;
         }
     }
-
-    public static class IReadonlySubstanceStateCollection_Ex
-    {
-        /// <summary>
-        /// Gets the mass fraction (0.0 to 1.0) of a specific substance.
-        /// Returns 0 if total mass is effectively zero.
-        /// </summary>
-        public static double GetMassFraction( this IReadonlySubstanceStateCollection collection, ISubstance substance )
-        {
-            double totalMass = collection.GetMass();
-            if( totalMass <= 1e-9 )
-                return 0.0;
-
-            if( collection.TryGet( substance, out double mass ) )
-            {
-                return mass / totalMass;
-            }
-            return 0.0;
-        }
-    }
 }

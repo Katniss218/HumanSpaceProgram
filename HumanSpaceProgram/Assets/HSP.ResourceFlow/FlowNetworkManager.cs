@@ -1,61 +1,65 @@
 ﻿using HSP.Time;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace HSP.ResourceFlow
 {
     public class FlowNetworkManager : SingletonMonoBehaviour<FlowNetworkManager>
     {
-        FlowNetworkSnapshot[] _cachedFlowNetworks;
-        private readonly List<IBuildsFlowNetwork> _invalidComponentsCache = new();
+        private readonly List<FlowNetworkSnapshot> _networks = new List<FlowNetworkSnapshot>();
+        private readonly List<IBuildsFlowNetwork> _invalidComponentsCache = new List<IBuildsFlowNetwork>();
 
-#warning TODO - needs some component per vessel that will handle discovery and initial build of the network?
-        private void FixedUpdate()
+        public static void Register( FlowNetworkSnapshot network )
         {
-            // This logic assumes a single network for simplicity of demonstration.
-            // A real implementation would loop over `_cachedFlowNetworks`.
-            if( _cachedFlowNetworks == null || _cachedFlowNetworks.Length == 0 )
+#warning TODO - clean up and make safe.
+            if( network != null && !instance._networks.Contains( network ) )
             {
-                // TODO: Discover root objects and perform initial build.
-                // For now, let's assume it's initialized elsewhere.
-                return;
+                instance._networks.Add( network );
             }
+        }
 
-            for( int i = 0; i < _cachedFlowNetworks.Length; i++ )
+        public static void Unregister( FlowNetworkSnapshot network )
+        {
+            if( network != null )
             {
-                var network = _cachedFlowNetworks[i];
+                instance._networks.Remove( network );
+            }
+        }
+
+        void FixedUpdate()
+        {
+            // Iterate over a copy in case the collection is modified during the loop (e.g., a vessel is destroyed).
+            foreach( var network in _networks.ToList() )
+            {
                 if( network == null )
                 {
-                    // Full rebuild if network doesn't exist.
-                    // network = FlowNetworkSnapshot.GetNetworkSnapshot( someRootObject );
-                    // _cachedFlowNetworks[i] = network;
-                    continue; // Skip if no network to process.
+                    continue;
                 }
 
-                // --- PHASE 1: State Synchronization (Cheap) ---
-                // Push latest state (physics, etc.) from components into the live simulation objects.
+                // --- PHASE 1: Synchronize (Unity -> Sim) ---
                 network.SynchronizeStateWithComponents();
 
-                // --- PHASE 2: Detect Structural Changes (Potentially Expensive) ---
+                // --- PHASE 2: Detect and Apply Structural Changes ---
                 _invalidComponentsCache.Clear();
                 network.GetInvalidComponents( _invalidComponentsCache );
 
                 if( _invalidComponentsCache.Count > 0 )
                 {
-                    // --- PHASE 3: Partial Rebuild Transaction ---
                     FlowNetworkBuilder transaction = new FlowNetworkBuilder();
                     foreach( var component in _invalidComponentsCache )
                     {
                         // TODO: Handle Retry/Failure results properly.
                         component.BuildFlowNetwork( transaction );
                     }
-
-                    // --- PHASE 4: Apply Transaction ---
                     network.ApplyTransaction( transaction );
                 }
 
-                // --- PHASE 5: Step Simulation ---
+                // --- PHASE 3: Step Simulation ---
                 network.Step( TimeManager.FixedDeltaTime );
+
+                // --- PHASE 4: Apply (Sim -> Unity) ---
+                network.ApplySnapshotToComponents();
             }
         }
     }

@@ -35,6 +35,7 @@ namespace HSP.ResourceFlow
         public ISubstanceStateCollection Inflow { get; set; } = SubstanceStateCollection.Empty;
         public ISubstanceStateCollection Outflow { get; set; } = SubstanceStateCollection.Empty;
         public FluidState FluidState { get; set; }
+        public double Demand { get; set; } = double.PositiveInfinity;
 
         public double CalculatedVolume { get; private set; }
         public double Volume { get; private set; }
@@ -993,6 +994,34 @@ namespace HSP.ResourceFlow
         private static double Lerp( double a, double b, double t )
         {
             return a + (b - a) * t;
+        }
+
+        public void ApplyFlows( double deltaTime )
+        {
+            if( Outflow != null && !Outflow.IsEmpty() )
+            {
+                Contents.Add( Outflow, -1.0 );
+            }
+            if( Inflow != null && !Inflow.IsEmpty() )
+            {
+                Contents.Add( Inflow, 1.0 );
+            }
+            InvalidateFluids();
+        }
+
+        public void RunInternalSimulationStep( double deltaTime )
+        {
+            if( Contents.IsEmpty() || FluidState.Pressure <= 0.0 )
+            {
+                return;
+            }
+            (ISubstanceStateCollection newContents, FluidState newState) = VaporLiquidEquilibrium.ComputeFlash2( Contents, FluidState, Volume, deltaTime );
+            if( newContents != null )
+            {
+                Contents = newContents;
+                FluidState = newState;
+                InvalidateFluids();
+            }
         }
     }
 }
