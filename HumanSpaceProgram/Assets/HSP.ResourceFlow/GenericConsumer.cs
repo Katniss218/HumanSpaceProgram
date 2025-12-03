@@ -9,7 +9,11 @@ namespace HSP.ResourceFlow
         public Vector3 FluidAngularVelocity { get; set; }
         public ISubstanceStateCollection Inflow { get; set; } = new SubstanceStateCollection();
 
-        public double Demand { get; set; }
+        public double Demand { get; set; } = 0;
+
+        public double? ForcedSuctionPotential { get; set; } = null;
+
+        public bool IsEnabled { get; set; } = false;
 
         public void ApplyFlows( double deltaTime )
         {
@@ -18,8 +22,25 @@ namespace HSP.ResourceFlow
 
         public FluidState Sample( Vector3 localPosition, double holeArea )
         {
-            // A generic consumer acts like a vacuum, pulling resources towards it.
-            return FluidState.Vacuum;
+            if( !IsEnabled )
+            {
+                return new FluidState( 0, 0, 0 ) { FluidSurfacePotential = double.MaxValue }; // Closed valve
+            }
+
+            // If a forced suction potential is active (e.g., during engine spinup), use it directly.
+            if( ForcedSuctionPotential.HasValue )
+            {
+                return new FluidState( 0, 0, 0 ) { FluidSurfacePotential = ForcedSuctionPotential.Value };
+            }
+
+            // In normal operation, potential is a combination of passive drain and active demand.
+            double potential = -1.0; // Small passive potential allows for gravity-fed drain when enabled but demand is zero.
+            if( Demand > 0 )
+            {
+                potential -= Demand * 100000.0; // Strong, demand-driven potential for active pumping.
+            }
+
+            return new FluidState( 0, 0, 0 ) { FluidSurfacePotential = potential };
         }
     }
 }

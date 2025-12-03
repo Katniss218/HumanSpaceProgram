@@ -328,7 +328,12 @@
                         {
                             "$id": "6f3124e3-62cf-43d6-99ef-ca53f2a7d764",
                             "nominal_area": 1,
-                            "local_position": [0, 1, 0]
+                            "local_position": [0.2, 1, 0]
+                        },
+                        {
+                            "$id": "fe550b2c-18f7-49e0-8fa6-3d544ad771fa",
+                            "nominal_area": 1,
+                            "local_position": [-0.2, 1, 0]
                         }
                     ]
                 }
