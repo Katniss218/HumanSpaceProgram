@@ -15,6 +15,11 @@ namespace HSP.ResourceFlow
 
         public bool IsEnabled { get; set; } = false;
 
+        public double GetAvailableInflowVolume( double dt )
+        {
+            return Demand * dt;
+        }
+
         public void ApplyFlows( double deltaTime )
         {
             // This is a proxy object. The owning component is responsible for handling Inflow.

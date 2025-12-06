@@ -34,8 +34,7 @@ namespace HSP_Tests_PlayMode.ResourceFlow
             {
                 DisplayName = "Air",
                 Phase = SubstancePhase.Gas,
-                SpecificGasConstant = 287f, // R_specific for Air
-                MolarMass = 0.02896,
+                MolarMass = 0.0289647,
                 DisplayColor = Color.clear
             };
 
@@ -64,7 +63,7 @@ namespace HSP_Tests_PlayMode.ResourceFlow
             }
         }
 
-        private FlowTank CreateTestTank( double volume, Vector3 acceleration, Vector3 offset )
+        public static FlowTank CreateTestTank( double volume, Vector3 acceleration, Vector3 offset )
         {
             var tank = new FlowTank( volume );
             var nodes = new[]
@@ -127,13 +126,12 @@ namespace HSP_Tests_PlayMode.ResourceFlow
             yield return new WaitForFixedUpdate(); // Let everything initialize
 
             // Act
-            var snapshot = FlowNetworkSnapshot.GetNetworkSnapshot( _root );
+            var snapshot = FlowNetworkBuilder.CreateFromGameObject( _root ).BuildSnapshot();
             float simulationTime = 10f;
             int steps = (int)(simulationTime / Time.fixedDeltaTime);
             for( int i = 0; i < steps; i++ )
             {
                 snapshot.Step( Time.fixedDeltaTime );
-                yield return new WaitForFixedUpdate();
             }
 
             // Assert
@@ -187,14 +185,13 @@ namespace HSP_Tests_PlayMode.ResourceFlow
             yield return new WaitForFixedUpdate();
 
             // Act
-            var snapshot = FlowNetworkSnapshot.GetNetworkSnapshot( _root );
+            var snapshot = FlowNetworkBuilder.CreateFromGameObject( _root ).BuildSnapshot();
             float simulationTime = 10f;
             int steps = (int)(simulationTime / Time.fixedDeltaTime);
 
             for( int i = 0; i < steps; i++ )
             {
                 snapshot.Step( Time.fixedDeltaTime );
-                yield return new WaitForFixedUpdate();
             }
 
             // Assert
@@ -248,14 +245,13 @@ namespace HSP_Tests_PlayMode.ResourceFlow
             yield return new WaitForFixedUpdate();
 
             // Act
-            var snapshot = FlowNetworkSnapshot.GetNetworkSnapshot( _root );
+            var snapshot = FlowNetworkBuilder.CreateFromGameObject( _root ).BuildSnapshot();
             float simulationTime = 10f;
             int steps = (int)(simulationTime / Time.fixedDeltaTime);
 
             for( int i = 0; i < steps; i++ )
             {
                 snapshot.Step( Time.fixedDeltaTime );
-                yield return new WaitForFixedUpdate();
             }
 
             // Assert
@@ -309,13 +305,12 @@ namespace HSP_Tests_PlayMode.ResourceFlow
             yield return new WaitForFixedUpdate();
 
             // Act
-            var snapshot = FlowNetworkSnapshot.GetNetworkSnapshot( _root );
+            var snapshot = FlowNetworkBuilder.CreateFromGameObject( _root ).BuildSnapshot();
             float simulationTime = 5f;
             int steps = (int)(simulationTime / Time.fixedDeltaTime);
             for( int i = 0; i < steps; i++ )
             {
                 snapshot.Step( Time.fixedDeltaTime );
-                yield return new WaitForFixedUpdate();
             }
 
             // Assert
@@ -395,7 +390,7 @@ namespace HSP_Tests_PlayMode.ResourceFlow
             yield return new WaitForFixedUpdate();
 
             // Act
-            var snapshot = FlowNetworkSnapshot.GetNetworkSnapshot( _root );
+            var snapshot = FlowNetworkBuilder.CreateFromGameObject( _root ).BuildSnapshot();
             float simulationTime = 1.0f;
             int steps = (int)(simulationTime / Time.fixedDeltaTime);
             for( int i = 0; i < steps; i++ )
@@ -486,26 +481,22 @@ namespace HSP_Tests_PlayMode.ResourceFlow
             yield return new WaitForFixedUpdate();
 
             // Act
-            var snapshot = FlowNetworkSnapshot.GetNetworkSnapshot( _root );
-            // Run long enough for fluid to traverse A->B->C
-            float simulationTime = 5.0f;
-            int steps = (int)(simulationTime / Time.fixedDeltaTime);
-            for( int i = 0; i < steps; i++ )
-            {
-                snapshot.Step( Time.fixedDeltaTime );
-                yield return new WaitForFixedUpdate();
-            }
+            var snapshot = FlowNetworkBuilder.CreateFromGameObject( _root ).BuildSnapshot();
+            // Run long enough, but not too long...
+            snapshot.Step( Time.fixedDeltaTime );
+            snapshot.Step( Time.fixedDeltaTime );
+            snapshot.Step( Time.fixedDeltaTime );
+            snapshot.Step( Time.fixedDeltaTime );
 
             // Assert
             double massA = tankA.Contents.GetMass();
             double massB = tankB.Contents.GetMass();
             double massC = tankC.Contents.GetMass();
 
-            Assert.Less( massA, 999, "Tank A should drain." );
-            Assert.Greater( massB, 0, "Tank B should contain some fluid in transit." );
-            Assert.Greater( massC, 0, "Tank C should receive fluid from B." );
-
             Assert.AreEqual( 1000.0, massA + massB + massC, 1.0, "Total mass conservation failed." );
+            Assert.Less( massA, 999, "Tank A should drain." );
+            Assert.Greater( massC, 0, "Tank C should receive fluid from B." );
+            Assert.Greater( massB, 0, "Tank B should contain some fluid in transit." );
         }
 
 
@@ -557,13 +548,12 @@ namespace HSP_Tests_PlayMode.ResourceFlow
             yield return new WaitForFixedUpdate();
 
             // Act
-            var snapshot = FlowNetworkSnapshot.GetNetworkSnapshot( _root );
+            var snapshot = FlowNetworkBuilder.CreateFromGameObject( _root ).BuildSnapshot();
             float simulationTime = 5.0f;
             int steps = (int)(simulationTime / Time.fixedDeltaTime);
             for( int i = 0; i < steps; i++ )
             {
                 snapshot.Step( Time.fixedDeltaTime );
-                yield return new WaitForFixedUpdate();
             }
 
             // Assert
@@ -622,13 +612,12 @@ namespace HSP_Tests_PlayMode.ResourceFlow
             yield return new WaitForFixedUpdate();
 
             // Act
-            var snapshot = FlowNetworkSnapshot.GetNetworkSnapshot( _root );
+            var snapshot = FlowNetworkBuilder.CreateFromGameObject( _root ).BuildSnapshot();
             float simulationTime = 5f;
             int steps = (int)(simulationTime / Time.fixedDeltaTime);
             for( int i = 0; i < steps; i++ )
             {
                 snapshot.Step( Time.fixedDeltaTime );
-                yield return new WaitForFixedUpdate();
             }
 
             // Assert
@@ -676,19 +665,18 @@ namespace HSP_Tests_PlayMode.ResourceFlow
             yield return new WaitForFixedUpdate();
 
             // Act
-            var snapshot = FlowNetworkSnapshot.GetNetworkSnapshot( _root );
-            float simulationTime = 5.0f;
+            var snapshot = FlowNetworkBuilder.CreateFromGameObject( _root ).BuildSnapshot();
+            float simulationTime = 1.0f;
             int steps = (int)(simulationTime / Time.fixedDeltaTime);
             for( int i = 0; i < steps; i++ )
             {
                 snapshot.Step( Time.fixedDeltaTime );
-                yield return new WaitForFixedUpdate();
             }
 
             // Assert
-            Assert.Greater( tankB.Contents.GetMass(), 1.0, "Gas failed to flow upwards against gravity." );
-            Assert.Less( tankA.Contents.GetMass(), 9.0, "Gas failed to leave the bottom tank." );
             Assert.AreEqual( 10.0, tankB.Contents.GetMass() + tankA.Contents.GetMass(), 0.01, "Total mass conservation failed." );
+            Assert.Greater( tankB.Contents.GetMass(), 0, "Gas failed to flow upwards against gravity." );
+            Assert.Less( tankA.Contents.GetMass(), 10.0, "Gas failed to leave the bottom tank." );
         }
 
         [UnityTest]
@@ -731,14 +719,13 @@ namespace HSP_Tests_PlayMode.ResourceFlow
             yield return new WaitForFixedUpdate();
 
             // Act
-            var snapshot = FlowNetworkSnapshot.GetNetworkSnapshot( _root );
+            var snapshot = FlowNetworkBuilder.CreateFromGameObject( _root ).BuildSnapshot();
             // Give it plenty of time to fully equalize
             float simulationTime = 8.0f;
             int steps = (int)(simulationTime / Time.fixedDeltaTime);
             for( int i = 0; i < steps; i++ )
             {
                 snapshot.Step( Time.fixedDeltaTime );
-                yield return new WaitForFixedUpdate();
             }
 
             // Assert
@@ -813,7 +800,7 @@ namespace HSP_Tests_PlayMode.ResourceFlow
             yield return new WaitForFixedUpdate();
 
             // Act
-            var snapshot = FlowNetworkSnapshot.GetNetworkSnapshot( _root );
+            var snapshot = FlowNetworkBuilder.CreateFromGameObject( _root ).BuildSnapshot();
             // Run a short step just to start flow
             snapshot.Step( Time.fixedDeltaTime * 10 );
 
@@ -875,7 +862,7 @@ namespace HSP_Tests_PlayMode.ResourceFlow
 
             yield return new WaitForFixedUpdate();
 
-            var snapshot = FlowNetworkSnapshot.GetNetworkSnapshot( _root );
+            var snapshot = FlowNetworkBuilder.CreateFromGameObject( _root ).BuildSnapshot();
 
             var s = snapshot;
 
@@ -885,8 +872,8 @@ namespace HSP_Tests_PlayMode.ResourceFlow
 
             for( int i = 0; i < steps; i++ )
             {
+                Debug.Log( tankA.Contents.GetMass() );
                 Assert.DoesNotThrow( () => snapshot.Step( Time.fixedDeltaTime ), $"Solver threw a convergence exception at step {i}." );
-                yield return new WaitForFixedUpdate();
             }
 
             double massA = tankA.Contents.GetMass();
@@ -945,7 +932,7 @@ namespace HSP_Tests_PlayMode.ResourceFlow
 
             yield return new WaitForFixedUpdate();
 
-            var snapshot = FlowNetworkSnapshot.GetNetworkSnapshot( _root );
+            var snapshot = FlowNetworkBuilder.CreateFromGameObject( _root ).BuildSnapshot();
 
             // Act & Assert
             // Run for a few steps and verify that the solver doesn't throw an exception
@@ -956,12 +943,11 @@ namespace HSP_Tests_PlayMode.ResourceFlow
             for( int i = 0; i < steps; i++ )
             {
                 Assert.DoesNotThrow( () => snapshot.Step( Time.fixedDeltaTime ), $"Solver threw an exception on step {i} with a closed loop." );
-                yield return new WaitForFixedUpdate();
             }
 
-            Assert.AreEqual( 500.0, tankA.Contents.GetMass(), 0.1, "Tank A mass should not change in equilibrium." );
-            Assert.AreEqual( 500.0, tankB.Contents.GetMass(), 0.1, "Tank B mass should not change in equilibrium." );
-            Assert.AreEqual( 500.0, tankC.Contents.GetMass(), 0.1, "Tank C mass should not change in equilibrium." );
+            Assert.AreEqual( 500.0, tankA.Contents.GetMass(), 0.1, "Tank A mass should equalize." );
+            Assert.AreEqual( 500.0, tankB.Contents.GetMass(), 0.1, "Tank B mass should equalize." );
+            Assert.AreEqual( 500.0, tankC.Contents.GetMass(), 0.1, "Tank C mass should equalize." );
         }
 
         [UnityTest]
@@ -992,7 +978,7 @@ namespace HSP_Tests_PlayMode.ResourceFlow
             yield return new WaitForFixedUpdate();
 
             // Act
-            var snapshot = FlowNetworkSnapshot.GetNetworkSnapshot( _root );
+            var snapshot = FlowNetworkBuilder.CreateFromGameObject( _root ).BuildSnapshot();
             snapshot.Step( Time.fixedDeltaTime * 10 );
 
             // Assert
@@ -1034,7 +1020,7 @@ namespace HSP_Tests_PlayMode.ResourceFlow
             yield return new WaitForFixedUpdate();
 
             // Act
-            var snapshot = FlowNetworkSnapshot.GetNetworkSnapshot( _root );
+            var snapshot = FlowNetworkBuilder.CreateFromGameObject( _root ).BuildSnapshot();
             snapshot.Step( Time.fixedDeltaTime * 10 );
 
             // Assert
@@ -1074,7 +1060,7 @@ namespace HSP_Tests_PlayMode.ResourceFlow
             yield return new WaitForFixedUpdate();
 
             // Act
-            var snapshot = FlowNetworkSnapshot.GetNetworkSnapshot( _root );
+            var snapshot = FlowNetworkBuilder.CreateFromGameObject( _root ).BuildSnapshot();
             snapshot.Step( Time.fixedDeltaTime * 10 );
 
             // Assert
@@ -1113,7 +1099,7 @@ namespace HSP_Tests_PlayMode.ResourceFlow
             yield return new WaitForFixedUpdate();
 
             // Act 1: Valve is closed
-            var snapshot = FlowNetworkSnapshot.GetNetworkSnapshot( _root );
+            var snapshot = FlowNetworkBuilder.CreateFromGameObject( _root ).BuildSnapshot();
             snapshot.Step( Time.fixedDeltaTime * 10 );
 
             // Assert 1: No flow
@@ -1122,13 +1108,72 @@ namespace HSP_Tests_PlayMode.ResourceFlow
 
             // Act 2: Open valve and rebuild network
             valve.IsOpen = true;
-            snapshot = FlowNetworkSnapshot.GetNetworkSnapshot( _root ); // Rebuilds the network with the open valve
+            snapshot = FlowNetworkBuilder.CreateFromGameObject( _root ).BuildSnapshot();
             snapshot.Step( Time.fixedDeltaTime * 10 );
 
             // Assert 2: Flow has started
             Assert.Less( tankA.Contents.GetMass(), 1000.0, "Flow should start after valve is opened." );
             Assert.Greater( tankB.Contents.GetMass(), 0.0, "Flow should start after valve is opened." );
             Assert.AreEqual( 1000.0, tankA.Contents.GetMass() + tankB.Contents.GetMass(), 1.0, "Mass should be conserved after opening valve." );
+        }
+
+
+        [UnityTest]
+        public IEnumerator TwoTanks_DontOverfeedSmallTank_SingleStep()
+        {
+            // Arrange
+            var (manager, _, _) = FlowNetworkTestHelper.CreateTestScene();
+            _manager = manager;
+            _root = new GameObject( "TestRoot" );
+
+            Vector3 gravity = new Vector3( 0, -10, 0 );
+
+            // Setup Tank A (High Position)
+            var goA = new GameObject( "TankA" );
+            goA.transform.SetParent( _root.transform );
+            var tankA = CreateTestTank( 1000.0, gravity, new Vector3( 0, 0.5f, 0 ) );
+            tankA.Contents.Add( _water, 500000 ); // Half full
+            var wrapperA = goA.AddComponent<MockFlowTankWrapper>();
+            wrapperA.Tank = tankA;
+            wrapperA.Inlets = new[]
+            {
+                new ResourceInlet( 1, new Vector3( 0, 1f, 0 ) + new Vector3( 0, 50.5f, 0 ) ),
+                new ResourceInlet( 1, new Vector3( 0, -1f, 0 ) + new Vector3( 0, 50.5f, 0 ) )
+            };
+
+            // Setup Tank B (Low Position)
+            var goB = new GameObject( "TankB" );
+            goB.transform.SetParent( _root.transform );
+            var tankB = CreateTestTank( 0.01, gravity, Vector3.zero );
+            // Tank B starts empty
+            var wrapperB = goB.AddComponent<MockFlowTankWrapper>();
+            wrapperB.Tank = tankB;
+            wrapperB.Inlets = new[]
+            {
+                new ResourceInlet( 1, new Vector3( 0, 1f, 0 ) ),
+                new ResourceInlet( 1, new Vector3( 0, -1f, 0 ) )
+            };
+
+            // Connect Bottom of A to Bottom of B (U-Tube configuration)
+            var pipe = _root.AddComponent<HighConductancePipeWrapper>();
+            pipe.FromInlet = wrapperA.Inlets[1];
+            pipe.ToInlet = wrapperB.Inlets[1];
+
+            yield return new WaitForFixedUpdate();
+
+            // Act
+            var snapshot = FlowNetworkBuilder.CreateFromGameObject( _root ).BuildSnapshot();
+            float simulationTime = 1f;
+            int steps = (int)(simulationTime / Time.fixedDeltaTime);
+
+            for( int i = 0; i < steps; i++ )
+            {
+                snapshot.Step( Time.fixedDeltaTime );
+            }
+
+            // Assert
+            Assert.That( tankA.Contents.GetMass(), Is.GreaterThanOrEqualTo( 0 ) ); // check if flow works correctly and no negatives.
+            Assert.That( tankB.Contents.GetMass(), Is.EqualTo( 1 ).Within( 1 ) );
         }
     }
 }

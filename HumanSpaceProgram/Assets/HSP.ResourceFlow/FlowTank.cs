@@ -74,6 +74,20 @@ namespace HSP.ResourceFlow
         }
 
 
+        public double GetAvailableOutflowVolume()
+        {
+            return Contents?.GetVolume( FluidState.Temperature, FluidState.Pressure ) ?? 0.0;
+        }
+
+        public double GetAvailableInflowVolume( double dt )
+        {
+            double currentVolume = Contents?.GetVolume( FluidState.Temperature, FluidState.Pressure ) ?? 0.0;
+            double capacityVolume = Math.Max( 0, Volume - currentVolume );
+            // For a tank, demand is effectively infinite (it will accept as much as it can hold),
+            // so only its remaining physical capacity matters. The `dt` parameter is unused.
+            return capacityVolume;
+        }
+
         /// <summary>
         /// Samples the fluid state. Returns potential in [J/kg].
         /// Potential = Geometric_Potential + (Pressure / Density).
@@ -89,7 +103,6 @@ namespace HSP.ResourceFlow
 
             // 2. Identify Local Properties
             double localPressure = _internalGasPressure;
-            double localDensity = 0.0;
 
             // Top of liquid stack
             double liquidSurfacePot = (_fluidInSlices != null && _fluidInSlices.Length > 0)
@@ -112,13 +125,11 @@ namespace HSP.ResourceFlow
                     // If we are strictly below this layer, add its full weight
                     if( geoPotential < layer.PotentialStart )
                     {
-                        localDensity = layer.Density;
                         hydrostaticPressure += layer.Density * (layer.PotentialEnd - layer.PotentialStart);
                     }
                     // If we are inside this layer
                     else if( geoPotential < layer.PotentialEnd )
                     {
-                        localDensity = layer.Density;
                         hydrostaticPressure += layer.Density * (layer.PotentialEnd - geoPotential);
                         break;
                     }
@@ -126,41 +137,13 @@ namespace HSP.ResourceFlow
 
                 localPressure += hydrostaticPressure;
             }
-            else
-            {
-                // --- GAS PHASE ---
-                // Calculate average gas density for the potential conversion
-                double totalR = 0;
-                double totalMass = 0;
-                foreach( var (sub, mass) in _gasBuffer )
-                {
-                    totalR += sub.SpecificGasConstant * mass;
-                    totalMass += mass;
-                }
-
-#warning TODO - I think we can use the Substance fields here too somehow, but needs more thinking.
-                double specificGasConstant = (totalMass > 0) ? (totalR / totalMass) : 287.0; // get averaged gas constant.
-
-                localDensity = 101325.0 / (specificGasConstant * FluidState.Temperature);
-            }
 
             result.Pressure = localPressure;
-
-            // 3. Calculate Bernoulli Potential
-            // Total Potential = Geometric + PressureHead
-            if( localDensity > 1e-9 )
-            {
-                result.FluidSurfacePotential = geoPotential + (localPressure / localDensity);
-            }
-            else
-            {
-                // Fallback for vacuum or empty tank
-                result.FluidSurfacePotential = geoPotential;
-            }
+            result.FluidSurfacePotential = localPressure;
 
             return result;
         }
-        
+
         public ISampledSubstanceStateCollection SampleSubstances( Vector3 localPosition, double flowRate, double dt )
         {
             RecalculateCache();
@@ -793,6 +776,10 @@ namespace HSP.ResourceFlow
         /// </summary>
         private void DistributeFluidsToPotentials()
         {
+            if( _slices == null )
+            {
+                throw new InvalidOperationException( $"Tank was not sliced. Can't distribute fluids." );
+            }
             int fluidCount = Contents.Count;
 
             // 1. Separate Liquids and Gases

@@ -1,11 +1,12 @@
-﻿using HSP.ControlSystems;
+﻿
+
+using HSP.ControlSystems;
 using HSP.ControlSystems.Controls;
 using HSP.ResourceFlow;
 using HSP.Time;
 using HSP.Vessels;
 using System;
 using System.Linq;
-using UnityEditor.VersionControl;
 using UnityEngine;
 using UnityPlus.Serialization;
 using static HSP.Vanilla.Components.IPropulsion;
@@ -63,6 +64,11 @@ namespace HSP.Vanilla.Components
     {
         const float g = 9.80665f;
 
+        // Heuristic constants for back-calculating physics properties from gameplay stats.
+        private const double NominalFullThrottleManifoldPressure = 60e5; // 60 bar
+        private const double NominalFullThrottleChamberPressure = 50e5;  // 50 bar
+        private const double NominalPressureDelta = NominalFullThrottleManifoldPressure - NominalFullThrottleChamberPressure; // 10 bar = 1e6 Pa
+
         float _thrust;
         /// <summary>
         /// The thrust that the engine is currently producing, in [N].
@@ -89,6 +95,12 @@ namespace HSP.Vanilla.Components
         public float MaxThrust { get; set; } = 10000f;
 
         /// <summary>
+        /// The maximum chamber pressure the engine can withstand before being destroyed, in [Pa].
+        /// </summary>
+        [field: SerializeField]
+        public float MaxChamberPressure { get; set; } = 75e5f; // 75 bar
+
+        /// <summary>
         /// The data-driven definition of this engine's propellant requirements, Isp, and ignition behavior.
         /// </summary>
         [field: SerializeField]
@@ -97,7 +109,13 @@ namespace HSP.Vanilla.Components
         /// <summary>
         /// The maximum mass flow (when thrust = max thrust), in [kg/s].
         /// </summary>
-        public float MaxMassFlow => MaxThrust / (Propellant.NominalIsp * g);
+        public float MaxMassFlow => (Propellant?.NominalIsp > 0) ? MaxThrust / (Propellant.NominalIsp * g) : 0f;
+
+        /// <summary>
+        /// The ratio of chamber pressure to mass flow rate under nominal conditions. [Pa / (kg/s)]
+        /// Used to calculate emergent chamber pressure from actual mass flow.
+        /// </summary>
+        public float ChamberPressureToMassFlowRatio => (MaxMassFlow > 0) ? (float)(NominalFullThrottleChamberPressure / MaxMassFlow) : 0f;
 
         [SerializeField]
         float _throttle;
@@ -139,13 +157,6 @@ namespace HSP.Vanilla.Components
         public double IgnitionGracePeriod { get; set; } = 0.5;
 
         /// <summary>
-        /// The forced potential applied by the engine's turbopumps during the spin-up phase, in [J/kg].
-        /// A large negative value creates strong suction to prime the engine.
-        /// </summary>
-        [field: SerializeField]
-        public double SpinupSuctionPotential { get; set; } = -10.0;
-
-        /// <summary>
         /// The time in seconds that the engine spends in the 'ShuttingDown' state before turning off completely.
         /// Allows for spool-down effects.
         /// </summary>
@@ -155,6 +166,7 @@ namespace HSP.Vanilla.Components
         private IPropulsion.EngineState _currentState = IPropulsion.EngineState.Off;
         private double _ignitionAttemptUT;
         private double _shutdownRequestUT;
+        private bool _isPrimed = false;
 
         [NamedControl( "Throttle", "Connect this to the controller's throttle output." )]
         public ControlleeInput<float> SetThrottle;
@@ -180,6 +192,7 @@ namespace HSP.Vanilla.Components
 
             _currentState = IPropulsion.EngineState.Igniting;
             _ignitionAttemptUT = TimeManager.UT;
+            _isPrimed = false;
             OnAfterIgnite?.Invoke();
         }
 
@@ -211,6 +224,8 @@ namespace HSP.Vanilla.Components
         public event Action OnAfterThrottleChanged;
         public event Action OnAfterThrustChanged;
 
+        EngineFeedSystem _feedSystem;
+
         void Awake()
         {
             SetThrottle ??= new ControlleeInput<float>( SetThrottleListener );
@@ -230,8 +245,6 @@ namespace HSP.Vanilla.Components
             }
         }
 
-        GenericConsumer _cachedConsumer;
-
         public BuildFlowResult BuildFlowNetwork( FlowNetworkBuilder c )
         {
             if( Inlets == null || Inlets.Length == 0 )
@@ -246,13 +259,13 @@ namespace HSP.Vanilla.Components
             }
             Transform reference = vessel.ReferenceTransform;
 
-            _cachedConsumer ??= new GenericConsumer();
-            c.TryAddFlowObj( this, _cachedConsumer );
+            _feedSystem ??= new EngineFeedSystem( 0.01 ); // 10 liter manifold volume.
+            c.TryAddFlowObj( this, _feedSystem );
 
             foreach( var inlet in Inlets )
             {
                 Vector3 inletPosInReferenceSpace = reference.InverseTransformPoint( this.transform.TransformPoint( inlet.LocalPosition ) );
-                FlowPipe.Port flowInlet = new FlowPipe.Port( _cachedConsumer, inletPosInReferenceSpace, inlet.NominalArea );
+                FlowPipe.Port flowInlet = new FlowPipe.Port( _feedSystem, inletPosInReferenceSpace, inlet.NominalArea );
                 c.TryAddFlowObj( inlet, flowInlet );
             }
 
@@ -261,68 +274,91 @@ namespace HSP.Vanilla.Components
 
         public bool IsValid( FlowNetworkSnapshot snapshot )
         {
-            // The engine is always considered valid once built.
             return true;
         }
 
         public void SynchronizeState( FlowNetworkSnapshot snapshot )
         {
-            _cachedConsumer.IsEnabled = (_currentState == EngineState.Igniting || _currentState == EngineState.Running);
+            if( _feedSystem == null )
+                return;
 
+            _feedSystem.IsOutflowEnabled = (_currentState == EngineState.Igniting || _currentState == EngineState.Running);
+
+            // Set injector conductance.
+            if( Propellant != null && Propellant.NominalIsp > 0 )
+            {
+                // Back-calculate the required injector conductance to achieve MaxThrust at a nominal pressure delta.
+                // This allows designers to use Thrust/Isp as primary stats, which are more intuitive than conductance.
+                // Formula from orifice flow: MassFlow = C * sqrt(deltaP) => C = MassFlow / sqrt(deltaP)
+                _feedSystem.InjectorConductance = MaxMassFlow / Math.Sqrt( NominalPressureDelta );
+            }
+            else
+            {
+                _feedSystem.InjectorConductance = 0;
+            }
+
+            double massFlowDemand = 0;
             switch( _currentState )
             {
-                case IPropulsion.EngineState.Igniting:
-                    // During spin-up, apply a strong, constant suction regardless of throttle.
-                    _cachedConsumer.ForcedSuctionPotential = this.SpinupSuctionPotential;
-                    _cachedConsumer.Demand = MaxMassFlow;
+                case EngineState.Igniting:
+                    _feedSystem.PumpPressureRise = 1e5; // 1 bar of suction.
+                    _feedSystem.ChamberPressure = 0.5e5; // 0.5 bar, low pressure target to ensure manifold fills.
+                    massFlowDemand = MaxMassFlow * 1.2; // High fixed demand to prime manifold
                     break;
 
-                case IPropulsion.EngineState.Running:
-                    _cachedConsumer.ForcedSuctionPotential = null;
-                    // Demand is only present if throttled up.
-                    if( Throttle > 0 && Propellant != null && !Propellant.PropellantMixture.IsEmpty() )
-                    {
-                        double massFlowDemand = Throttle * MaxMassFlow;
-                        double idealAverageDensity = Propellant.PropellantMixture.GetAverageDensity( 293.15, 101325 );
+                case EngineState.Running:
+                    _feedSystem.PumpPressureRise = Throttle * 100e5; // 10 bar pump at full throttle.
 
-                        if( idealAverageDensity > 0 )
-                        {
-                            _cachedConsumer.Demand = massFlowDemand / idealAverageDensity;
-                        }
-                        else
-                        {
-                            _cachedConsumer.Demand = 0;
-                        }
+#warning TODO - chamber pressure raises by an order of magnitude when transitioning to Running.
+                    // Chamber pressure is now an emergent property based on the PREVIOUS frame's mass flow.
+                    // This provides a stable feedback loop for the solver.
+                    double lastMassFlow = _feedSystem.MassConsumedLastStep / TimeManager.FixedDeltaTime;
+                    _feedSystem.ChamberPressure = lastMassFlow * ChamberPressureToMassFlowRatio;
+
+                    // Self-regulating demand based on current manifold pressure
+                    double pressureDelta = _feedSystem.ManifoldPressure - _feedSystem.ChamberPressure;
+                    if( pressureDelta > 0 )
+                    {
+                        massFlowDemand = _feedSystem.InjectorConductance * Math.Sqrt( pressureDelta );
                     }
                     else
                     {
-                        _cachedConsumer.Demand = 0;
+                        massFlowDemand = 0;
                     }
                     break;
 
-                case IPropulsion.EngineState.Off:
-                case IPropulsion.EngineState.ShuttingDown:
                 default:
-                    // No suction or demand when off or shutting down.
-                    _cachedConsumer.ForcedSuctionPotential = null;
-                    _cachedConsumer.Demand = 0;
+                    _feedSystem.PumpPressureRise = 0;
+                    _feedSystem.ChamberPressure = 0;
+                    massFlowDemand = 0;
                     break;
             }
-            Debug.Log( Inflow.GetMass() + " : " + _cachedConsumer.ForcedSuctionPotential + " : " + _currentState );
+
+            // CFL Condition: The engine's volumetric demand is a stability constraint for the solver.
+            // By telling the solver how much fluid we expect to consume (Demand), we prevent it
+            // from over-filling the manifold in a single time-step, which would cause oscillations.
+            if( massFlowDemand > 0 && Propellant != null && !Propellant.PropellantMixture.IsEmpty() )
+            {
+                double avgDensity = Propellant.PropellantMixture.GetAverageDensity( 293, 101325 ); // STP approx
+                _feedSystem.Demand = (avgDensity > 0) ? (massFlowDemand / avgDensity) : 0.0;
+            }
+            else
+            {
+                _feedSystem.Demand = 0;
+            }
         }
 
         public void ApplySnapshot( FlowNetworkSnapshot snapshot )
         {
-            if( _cachedConsumer != null && _cachedConsumer.Inflow != null )
-            {
-                this.Inflow = _cachedConsumer.Inflow.Clone();
-            }
-            else
+            if( _feedSystem == null )
             {
                 this.Inflow?.Clear();
+                return;
             }
 
-            bool hasFlow = this.Inflow != null && !this.Inflow.IsEmpty();
+            this.Inflow.Set( _feedSystem.Inflow );
+
+            bool hasFlow = this.Inflow.GetMass() > 1e-6;
 
             switch( _currentState )
             {
@@ -331,31 +367,62 @@ namespace HSP.Vanilla.Components
                     break;
 
                 case EngineState.Igniting:
-                    this.Thrust = 0f; // No thrust during ignition sequence.
+                    this.Thrust = 0f;
+                    Debug.LogWarning( TimeManager.UT + "IGNITING " + this.Inflow.Count + " : " + hasFlow + " : " + _feedSystem.ManifoldPressure + " : " + _feedSystem.ChamberPressure ); // hasFlow is false right after ignition (first iteration here).
 
-                    // Check if we have received a valid propellant mixture to transition to running.
-                    if( hasFlow && CalculatePerformanceScalar( this.Inflow ) > 0.0f && Throttle > 0 )
+                    if( hasFlow && CalculatePerformanceScalar( this.Inflow ) > 0.1f )
+                    {
+                        _isPrimed = true;
+                    }
+
+                    bool isPressurized = _feedSystem.ManifoldPressure > (_feedSystem.ChamberPressure * 0.9);
+
+                    if( _isPrimed && isPressurized && Throttle > 0f )
                     {
                         _currentState = EngineState.Running;
+                        _isPrimed = false;
                     }
-                    // If not, check if our grace period for ignition has expired.
                     else if( TimeManager.UT > _ignitionAttemptUT + IgnitionGracePeriod )
                     {
+                        Debug.LogWarning( $"[{gameObject.name}] Engine Ignition Failed! No propellant flow detected." );
+                        _isPrimed = false;
                         ShutdownListener(); // Failed start.
                     }
                     break;
 
                 case EngineState.Running:
                     float performanceScalar = hasFlow ? CalculatePerformanceScalar( this.Inflow ) : 0f;
-                    if( performanceScalar <= 0.0f )
+                    float actualMassFlow = (float)(_feedSystem.MassConsumedLastStep / TimeManager.FixedDeltaTime);
+#warning TODO - _feedSystem.MassConsumedLastStep is nonsero, but this.Inflow is zero on the 2nd frame of 'running'.
+
+                    Debug.LogWarning( TimeManager.UT + "RUNNING " + performanceScalar + " : " + actualMassFlow + " : " + hasFlow );
+                    if( actualMassFlow <= 1e-6 )
                     {
-                        ShutdownListener(); // Flameout due to starvation or bad mixture.
+                        Debug.LogWarning( $"[{gameObject.name}] Engine Flameout! No propellant flow detected." );
+                        ShutdownListener(); // Flameout due to starvation.
+                        this.Thrust = 0f;
+                        break;
+                    }
+                    if( performanceScalar <= 0.1f )
+                    {
+                        Debug.LogWarning( $"[{gameObject.name}] Engine Flameout! Bad propellant mixture." );
+                        ShutdownListener(); // Flameout due to bad mixture.
                         this.Thrust = 0f;
                         break;
                     }
 
-                    // We have flow and a good mixture. Calculate final thrust.
-                    float actualMassFlow = (float)(this.Inflow.GetMass() / TimeManager.FixedDeltaTime);
+                    // Calculate the emergent chamber pressure for THIS frame based on actual flow.
+                    float currentChamberPressure = actualMassFlow * ChamberPressureToMassFlowRatio;
+
+                    // Check for overpressure failure.
+                    if( currentChamberPressure > MaxChamberPressure )
+                    {
+                        Debug.LogError( $"[{gameObject.name}] Engine Overpressure! Chamber pressure reached {currentChamberPressure / 1e5f:F1} bar, exceeding limit of {MaxChamberPressure / 1e5f:F1} bar. Engine destroyed." );
+                        ShutdownListener();
+                        this.Thrust = 0f;
+                        break;
+                    }
+
                     float effectiveIsp = Propellant.NominalIsp * performanceScalar;
                     this.Thrust = effectiveIsp * g * actualMassFlow;
                     break;
@@ -380,15 +447,15 @@ namespace HSP.Vanilla.Components
             // Monopropellant Case
             if( Propellant.PropellantMixture.Count == 1 )
             {
-                (ISubstance s, double mass) = Propellant.PropellantMixture[0];
+                ISubstance s = Propellant.PropellantMixture[0].s;
                 if( s == null )
                     return 0.0f;
 
                 if( inflow.TryGet( s, out double mass2 ) && mass2 > 0 )
                 {
-                    return 1.0f; // As long as some of the required monoprop is flowing, performance is 100%.
+                    return 1.0f;
                 }
-                return 0.0f; // Required monopropellant not found.
+                return 0.0f;
             }
 
             // Bipropellant (or more) Case
@@ -403,7 +470,6 @@ namespace HSP.Vanilla.Components
 
             float worstEfficiency = 1.0f;
 
-            // Check every other propellant against the primary.
             for( int i = 1; i < Propellant.PropellantMixture.Count; i++ )
             {
                 var (s, mass) = Propellant.PropellantMixture[i];
@@ -412,13 +478,12 @@ namespace HSP.Vanilla.Components
 
                 if( !inflow.TryGet( s, out double secondaryMass ) || secondaryMass <= 1e-9 )
                 {
-                    return 0.0f; // A required propellant is missing.
+                    return 0.0f;
                 }
 
                 double idealRatio = mass / primaryReq.mass;
                 double actualRatio = secondaryMass / primaryMass;
 
-                // Simple linear falloff.
                 float efficiency = (actualRatio < idealRatio)
                     ? (float)(actualRatio / idealRatio)
                     : (float)(idealRatio / actualRatio);
@@ -438,11 +503,11 @@ namespace HSP.Vanilla.Components
         {
             return new MemberwiseSerializationMapping<FRocketEngine>()
                 .WithMember( "max_thrust", o => o.MaxThrust )
+                .WithMember( "max_chamber_pressure", o => o.MaxChamberPressure )
                 .WithMember( "propellant", o => o.Propellant )
                 .WithMember( "throttle", o => o.Throttle )
                 .WithMember( "ignitions", o => o.Ignitions )
                 .WithMember( "ignition_grace_period", o => o.IgnitionGracePeriod )
-                .WithMember( "spinup_suction_potential", o => o.SpinupSuctionPotential )
                 .WithMember( "shutdown_duration", o => o.ShutdownDuration )
                 .WithMember( "current_state", o => o._currentState )
                 .WithMember( "set_throttle", o => o.SetThrottle )

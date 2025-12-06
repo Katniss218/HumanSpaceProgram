@@ -1,6 +1,6 @@
 ﻿namespace HSP.ResourceFlow
 {
-    public enum BuildFlowResult
+    public enum BuildFlowResult : byte
     {
         Finished,
         Retry,

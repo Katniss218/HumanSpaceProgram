@@ -76,7 +76,7 @@ namespace HSP_Tests_PlayMode.ResourceFlow
                 return BuildFlowResult.Retry;
             }
 
-            FlowPipe pipe = new FlowPipe( flowEnd1, flowEnd2, conductance: 1 );
+            FlowPipe pipe = new FlowPipe( flowEnd1, flowEnd2, conductance: 0.01 );
             c.TryAddFlowObj( this, pipe );
             return BuildFlowResult.Finished;
         }
@@ -145,6 +145,8 @@ namespace HSP_Tests_PlayMode.ResourceFlow
             }
 
             Consumer = new GenericConsumer();
+            Consumer.Demand = 100.0; // 100 kg/s demand for testing.
+            Consumer.IsEnabled = true;
             c.TryAddFlowObj( this, Consumer );
 
             FlowPipe.Port flowPort = new FlowPipe.Port( Consumer, Inlet.LocalPosition, Inlet.NominalArea );

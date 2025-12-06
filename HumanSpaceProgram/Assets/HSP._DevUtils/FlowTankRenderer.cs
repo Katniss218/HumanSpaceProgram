@@ -101,7 +101,6 @@ namespace HSP._DevUtils
             {
                 DisplayColor = new Color( 0, 1, 1 ),
                 DisplayName = "Hydrogen",
-                SpecificGasConstant = 4124f,
                 Phase = SubstancePhase.Gas,
                 MolarMass = 0.00201588f
             };

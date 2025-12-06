@@ -92,8 +92,9 @@ namespace HSP.ResourceFlow
                 consumer = ToInlet.Consumer;
             }
             // TODO - bidirectional flow later (diffusion)
+            // TODO - choked flow (speed of sound) clamping flowrate
+            //  - needs to be done either here or in the solver itself because speed of sound depends on the substances moving.
 
-            // Do not clamp. instead we'll use compressibility to determine whether the resources can fit / what flowrate is achievable until equilibrium hits.
             return producer.SampleSubstances( FromInlet.pos, Math.Abs( signedFlowRate ), dt );
         }
     }

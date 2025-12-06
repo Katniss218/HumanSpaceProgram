@@ -38,7 +38,7 @@ namespace HSP.Vanilla.ResourceFlow
         {
             if( _vessel.RootPart != null )
             {
-                _snapshot = FlowNetworkSnapshot.GetNetworkSnapshot( _vessel.RootPart.gameObject );
+                _snapshot = FlowNetworkBuilder.CreateFromGameObject( _vessel.RootPart.gameObject ).BuildSnapshot();
                 FlowNetworkManager.Register( _snapshot );
             }
         }

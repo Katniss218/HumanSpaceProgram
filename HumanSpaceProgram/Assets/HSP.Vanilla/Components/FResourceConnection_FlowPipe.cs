@@ -1,4 +1,5 @@
 ﻿using HSP.ResourceFlow;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityPlus.Serialization;
 
@@ -9,6 +10,8 @@ namespace HSP.Vanilla.Components
         public double Conductance { get; set; } = 1.0;
         public ResourceInlet FromInlet { get; set; }
         public ResourceInlet ToInlet { get; set; }
+
+        public List<IPipeModifier> Modifiers { get; private set; } = new List<IPipeModifier>();
 
         // --- State for Partial Rebuilds ---
         private FlowPipe _cachedPipe;
@@ -60,8 +63,18 @@ namespace HSP.Vanilla.Components
 
         public virtual void SynchronizeState( FlowNetworkSnapshot snapshot )
         {
-            // Base pipe has no dynamic state to synchronize.
-            // Derived classes (like pumps) will override this.
+            if( _cachedPipe != null )
+            {
+                // Reset to base values before applying modifiers
+                _cachedPipe.Conductance = Conductance;
+                _cachedPipe.HeadAdded = 0.0;
+
+                // Apply all modifiers
+                foreach( var modifier in Modifiers )
+                {
+                    modifier.Apply( _cachedPipe );
+                }
+            }
         }
 
         public virtual void ApplySnapshot( FlowNetworkSnapshot snapshot )
@@ -76,7 +89,18 @@ namespace HSP.Vanilla.Components
             return new MemberwiseSerializationMapping<FResourceConnection_FlowPipe>()
                 .WithMember( "from_inlet", ObjectContext.Ref, o => o.FromInlet )
                 .WithMember( "to_inlet", ObjectContext.Ref, o => o.ToInlet )
-                .WithMember( "conductance", o => o.Conductance );
+                .WithMember( "conductance", o => o.Conductance )
+                .WithMember( "modifiers", o => o.Modifiers );
         }
     }
 }
+
+/*
+public class FResourceConnector_FlowPipeCheckValve : FResourceConnector_FlowPipe
+{
+
+}
+public class FResourceConnector_FlowPipeReliefValve : FResourceConnector_FlowPipe
+{
+
+}*/

@@ -21,7 +21,7 @@ namespace HSP.ResourceFlow
             double totalGasMoles = 0.0;
 
             // Sum up gas moles and liquid occupied volume
-            Action<(ISubstance, double)> processSubstance = ( item ) =>
+            void processSubstance( (ISubstance, double) item )
             {
                 (ISubstance substance, double mass) = item;
 
@@ -34,18 +34,14 @@ namespace HSP.ResourceFlow
                 if( substance.Phase == SubstancePhase.Liquid )
                 {
                     // density( T, P ) used to compute occupied volume by this liquid
-                    // note: we pass currentState.Pressure because that's what ComputeFlash used
                     double density = substance.GetDensity( temperature, currentState.Pressure );
-                    // guard against degenerate density
-                    if( density <= 0.0 ) density = 1.0;
-
                     liquidVolume += mass / density;
                 }
                 else if( substance.Phase == SubstancePhase.Gas )
                 {
                     totalGasMoles += moles;
                 }
-            };
+            }
 
             // OPTIMIZATION: Use for loop to avoid enumerator allocation on SubstanceStateCollection
             if( contents is SubstanceStateCollection ssc )
@@ -74,7 +70,10 @@ namespace HSP.ResourceFlow
                 // Bulk-modulus approximation identical to ComputeFlash
                 double fillRatio = liquidVolume / tankVolume;
                 double compressionStrain = Math.Max( 0.0, fillRatio - 1.0 );
-                return compressionStrain * BulkModulus;
+                double pressure = compressionStrain * BulkModulus;
+                if( pressure < 0 )
+                    pressure = 0;
+                return pressure;
             }
             else
             {
@@ -85,6 +84,8 @@ namespace HSP.ResourceFlow
 
                 // Ideas gas law.
                 double pressure = (totalGasMoles * R * temperature) / effectiveGasVolume;
+                if( pressure < 0 )
+                    pressure = 0;
                 return pressure;
             }
         }
@@ -127,7 +128,7 @@ namespace HSP.ResourceFlow
 
 
             // First pass
-            Action<(ISubstance, double)> processSubstance = ( item ) =>
+            void processSubstance( (ISubstance, double) item )
             {
                 (var s, double mass) = item;
 
@@ -141,13 +142,13 @@ namespace HSP.ResourceFlow
                     liquidVolume += mass / s.GetDensity( T, currentState.Pressure );
                     totalHeatCap += mass * s.GetSpecificHeatCapacity( T, currentState.Pressure );
 
-                    var gas = SubstancePhaseMap.GetPartnerPhase( s, SubstancePhase.Gas );
-                    if( gas != null && liquidCount < MaxLiquids )
+                    var gasSubstance = SubstancePhaseMap.GetPartnerPhase( s, SubstancePhase.Gas );
+                    if( gasSubstance != null && liquidCount < MaxLiquids )
                     {
-                        liquids[liquidCount++] = new LiquidEntry
+                        liquids[liquidCount++] = new LiquidEntry()
                         {
                             Liq = s,
-                            Gas = gas,
+                            Gas = gasSubstance,
                             Moles = moles,
                             MolarMass = s.MolarMass,
                             Lv = s.GetLatentHeatOfVaporization()
@@ -160,7 +161,7 @@ namespace HSP.ResourceFlow
                     double cp = s.GetSpecificHeatCapacity( T, currentState.Pressure );
                     totalHeatCap += mass * (cp - s.SpecificGasConstant);
                 }
-            };
+            }
 
             // OPTIMIZATION: Use for loop to avoid enumerator allocation on SubstanceStateCollection
             if( currentContents is SubstanceStateCollection ssc )
@@ -222,9 +223,12 @@ namespace HSP.ResourceFlow
 
                     double dMoles = (dp * Vg) / (R * T) * RelaxationFactor;
 
-                    if( fullOfLiquid && dMoles > 0 ) dMoles = 0;
-                    if( dMoles > 0 ) dMoles = Math.Min( dMoles, e.Moles );
-                    else dMoles = Math.Max( dMoles, -gasMolesThis );
+                    if( fullOfLiquid && dMoles > 0 )
+                        dMoles = 0;
+                    if( dMoles > 0 )
+                        dMoles = Math.Min( dMoles, e.Moles );
+                    else
+                        dMoles = Math.Max( dMoles, -gasMolesThis );
 
                     if( Math.Abs( dMoles ) > MinMoles )
                     {
@@ -258,6 +262,275 @@ namespace HSP.ResourceFlow
 
             var newState = new FluidState( Pfinal, Tfinal, currentState.Velocity );
             return (updatedContents, newState);
+        }
+
+        /// <summary>
+        /// A lightweight, stack-allocated struct that caches the aggregate physical properties 
+        /// of the mixture to allow for O(1) pressure calculations inside solver loops.
+        /// </summary>
+        public struct MixtureProperties
+        {
+            public readonly double TotalMass;
+            public double WeightedInvDensity;    // Sum(w_i / rho_i)
+            public double WeightedInvMolarMass;  // Sum(w_i / M_i)
+            public readonly double AverageBulkModulus;    // Sum(w_i * K_i) / Sum(w_i)
+            public readonly double Temperature;
+            public readonly double TankVolume;
+            public readonly double ReferencePressure;     // The pressure used for property lookups
+
+            private readonly double _RT;
+
+            public MixtureProperties( IReadonlySubstanceStateCollection contents, FluidState state, double volume )
+            {
+                TotalMass = contents.GetMass();
+                TankVolume = volume;
+                Temperature = state.Temperature;
+                ReferencePressure = state.Pressure;
+
+                // Sanity check temperature
+                if( Temperature <= 0.1 || Temperature > 100_000 )
+                    Temperature = 293.15;
+
+                _RT = 8.314462618 * Temperature;
+
+                WeightedInvDensity = 0;
+                WeightedInvMolarMass = 0;
+                AverageBulkModulus = 2.2e9; // Default fallback (Water-like)
+
+                if( TotalMass <= 1e-12 ) return;
+
+                double sumBulkModWeighted = 0;
+                double liquidMassSum = 0;
+
+                // Iterate contents to gather coefficients
+                // We use 'ref' to avoid copying this large struct during the loop
+                if( contents is SubstanceStateCollection ssc )
+                {
+                    for( int i = 0; i < ssc.Count; i++ )
+                        ProcessItem( ssc[i], ref this, ref sumBulkModWeighted, ref liquidMassSum );
+                }
+                else
+                {
+                    foreach( var item in contents )
+                        ProcessItem( item, ref this, ref sumBulkModWeighted, ref liquidMassSum );
+                }
+
+                // Calculate the mass-weighted average Bulk Modulus for the liquid portion
+                if( liquidMassSum > 1e-9 )
+                {
+                    // Average K = Sum(Mass_i * K_i) / TotalLiquidMass
+                    AverageBulkModulus = sumBulkModWeighted / liquidMassSum;
+                }
+            }
+
+            private static void ProcessItem( (ISubstance s, double m) item, ref MixtureProperties props, ref double sumBulkModWeighted, ref double liquidMassSum )
+            {
+                if( item.m <= 1e-12 ) return;
+
+                double w = item.m / props.TotalMass; // Mass fraction relative to total mixture
+
+                if( item.s.Phase == SubstancePhase.Liquid )
+                {
+                    // We use the ReferencePressure (Start of frame pressure) to look up density/modulus.
+                    // This linearizes the properties for the duration of the Newton-Raphson step.
+                    double rho = item.s.GetDensity( props.Temperature, props.ReferencePressure );
+                    double K = item.s.GetBulkModulus( props.Temperature, props.ReferencePressure );
+
+                    if( rho > 1e-9 )
+                    {
+                        props.WeightedInvDensity += w / rho;
+
+                        // Accumulate weighted bulk modulus
+                        sumBulkModWeighted += item.m * K;
+                        liquidMassSum += item.m;
+                    }
+                }
+                else if( item.s.Phase == SubstancePhase.Gas )
+                {
+                    if( item.s.MolarMass > 1e-9 )
+                        props.WeightedInvMolarMass += w / item.s.MolarMass;
+                }
+            }
+
+            /// <summary>
+            /// Calculates P and dP/dM for a specific scaled mass WITHOUT allocating memory.
+            /// </summary>
+            public (double P, double dPdM) GetStateAtMass( double currentMass )
+            {
+                if( currentMass <= 1e-9 ) return (0, 0);
+
+                // 1. Calculate Liquid Volume based on current mass
+                // V_liq = Mass * Sum(w_i / rho_i)
+                double liquidVol = currentMass * WeightedInvDensity;
+
+                double gasVol = TankVolume - liquidVol;
+                double effectiveGasVol = Math.Max( gasVol, 1e-6 );
+
+                // 2. Check Overfill (Liquid Regime)
+                // If gas volume is effectively zero, we are compressing liquid.
+                if( gasVol <= 1e-6 )
+                {
+                    double fillRatio = liquidVol / TankVolume;
+                    double strain = Math.Max( 0.0, fillRatio - 1.0 );
+
+                    // Pressure = Strain * BulkModulus
+                    double P = strain * AverageBulkModulus;
+
+                    // dP/dM = d(strain)/dM * K 
+                    // strain = (M * WeightedInvDensity / V) - 1
+                    // d(strain)/dM = WeightedInvDensity / V
+                    double dPdM = (WeightedInvDensity / TankVolume) * AverageBulkModulus;
+
+                    return (P, dPdM);
+                }
+
+                // 3. Gas/Mixed Regime
+                // Moles_gas = Mass * Sum(w_i / M_i)
+                double gasMoles = currentMass * WeightedInvMolarMass;
+
+                if( gasMoles <= 1e-12 ) return (0, 0);
+
+                // P = (nRT) / (V - V_liq)
+                double numerator = gasMoles * _RT;
+                double P_gas = numerator / effectiveGasVol;
+
+                // Analytical Derivative Quotient Rule: P = u / v
+                // u = M * C1  (where C1 = WeightedInvMolarMass * RT)
+                // v = V_t - M * C2 (where C2 = WeightedInvDensity)
+
+                double C1 = WeightedInvMolarMass * _RT;
+                double C2 = WeightedInvDensity;
+
+                // Result simplifies to: dP/dM = (C1 * V_tank) / (V_gas)^2
+                double dPdM_gas = (C1 * TankVolume) / (effectiveGasVol * effectiveGasVol);
+
+                return (P_gas, dPdM_gas);
+            }
+        }
+
+
+        // Context struct to avoid closure allocation
+        struct Context
+        {
+            public double Temperature;
+            public double Pressure;
+            public double TotalMass;
+            public double LiquidVolume;
+            public double SumGasMoles;
+            public double Sum_w_liquid_over_rho; // Sum(w_i / rho_i) for liquids
+            public double Sum_w_gas_over_MM;     // Sum(w_i / MM_i) for gases
+        }
+
+        /// <summary>
+        /// Computes the pressure of a substance collection in a fixed volume, assuming no phase change,
+        /// and also calculates the analytical derivative of pressure with respect to the total mass of the collection.
+        /// </summary>
+        /// <param name="contents">The collection of substances and their masses.</param>
+        /// <param name="currentState">The current fluid state (used for temperature).</param>
+        /// <param name="tankVolume">The total volume of the container in [m^3].</param>
+        /// <returns>A tuple containing the calculated pressure [Pa] and the derivative ∂P/∂m [Pa/kg].</returns>
+        public static (double pressure, double dPdM) ComputePressureAndDerivativeWrtMass( IReadonlySubstanceStateCollection contents, FluidState currentState, double tankVolume )
+        {
+            const double MinVolume = 1e-6;
+            const double MinMass = 1e-9;
+            const double R = 8.314462618; // Universal gas constant [J/(mol·K)]
+
+            double temperature = currentState.Temperature;
+            if( temperature <= 0.1 || temperature > 100_000 )
+                temperature = 293.15;
+
+            double totalMass = contents.GetMass();
+            if( totalMass <= MinMass )
+            {
+                return (1e-6, 0.0); // Vacuum, no change
+            }
+
+            var context = new Context
+            {
+                Temperature = temperature,
+                Pressure = currentState.Pressure,
+                TotalMass = totalMass
+            };
+
+            static void processSubstance( (ISubstance, double) item, ref Context ctx )
+            {
+                (var substance, double mass) = item;
+
+                if( mass <= 0.0 ) return;
+
+                double massFraction = mass / ctx.TotalMass;
+
+                if( substance.Phase == SubstancePhase.Liquid )
+                {
+                    double density = substance.GetDensity( ctx.Temperature, ctx.Pressure );
+                    if( density > 1e-9 )
+                    {
+                        ctx.LiquidVolume += mass / density;
+                        ctx.Sum_w_liquid_over_rho += massFraction / density;
+                    }
+                }
+                else if( substance.Phase == SubstancePhase.Gas )
+                {
+                    if( substance.MolarMass > 1e-9 )
+                    {
+                        ctx.SumGasMoles += mass / substance.MolarMass;
+                        ctx.Sum_w_gas_over_MM += massFraction / substance.MolarMass;
+                    }
+                }
+            }
+
+            if( contents is SubstanceStateCollection ssc )
+            {
+                for( int i = 0; i < ssc.Count; i++ )
+                {
+                    processSubstance( ssc[i], ref context );
+                }
+            }
+            else
+            {
+                foreach( var item in contents )
+                {
+                    processSubstance( item, ref context );
+                }
+            }
+
+            double gasVolume = tankVolume - context.LiquidVolume;
+            bool isFullOfLiquid = gasVolume <= MinVolume;
+            double effectiveGasVolume = Math.Max( gasVolume, MinVolume );
+
+            if( isFullOfLiquid )
+            {
+                // --- OVERFILLED LIQUID CASE ---
+                double avgBulkModulus = contents.GetAverageBulkModulus( temperature, currentState.Pressure );
+
+                double fillRatio = context.LiquidVolume / tankVolume;
+                double compressionStrain = Math.Max( 0.0, fillRatio - 1.0 );
+                double pressure = compressionStrain * avgBulkModulus;
+                if( pressure < 0 ) pressure = 0;
+
+                // dP/dm_total = (K_avg / V_tank) * sum(w_liquid_i / rho_i)
+                double dPdM = (avgBulkModulus / tankVolume) * context.Sum_w_liquid_over_rho;
+
+                return (pressure, dPdM);
+            }
+            else
+            {
+                // --- GAS OR MIXED PHASE CASE ---
+                if( context.SumGasMoles <= 0.0 )
+                {
+                    return (1e-6, 0.0); // Pure liquid underfilled, effectively vacuum
+                }
+
+                // P = (n_gas * R * T) / V_ullage
+                double pressure = (context.SumGasMoles * R * temperature) / effectiveGasVolume;
+                if( pressure < 0 ) pressure = 0;
+
+                // dP/dm_total = ( (sum(w_gas_i/MM_i) * R * T) * V_tank ) / ( V_ullage^2 )
+                double B = context.Sum_w_gas_over_MM;
+                double dPdM = (B * R * temperature * tankVolume) / (effectiveGasVolume * effectiveGasVolume);
+
+                return (pressure, dPdM);
+            }
         }
     }
 }

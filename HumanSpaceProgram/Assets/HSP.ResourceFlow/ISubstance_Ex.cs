@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using UnityEngine;
 
 namespace HSP.ResourceFlow
 {
@@ -40,6 +38,16 @@ namespace HSP.ResourceFlow
         {
             double density = mass / volume;
             return self.GetPressure( temperature, density );
+        }
+
+        public static double GetPartialPressure( this ISubstance substance, double temperature, double molarVolume )
+        {
+            if( molarVolume <= 1e-9 )
+                return 0.0;
+
+            double density = substance.MolarMass / molarVolume;
+
+            return substance.GetPressure( temperature, density );
         }
 
         public static double GetDensityAtSTP( this ISubstance self )

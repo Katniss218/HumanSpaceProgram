@@ -6,71 +6,11 @@ using UnityEngine;
 namespace HSP.ResourceFlow
 {
     /// <summary>
-    /// Represents a snapshot of the fluid network at a given time.
+    /// Represents a snapshot of the fluid network at a given time. This class contains the core solver logic.
+    /// The solver is iterative, and uses potential-based flow and under-relaxation for stability.
     /// </summary>
     public sealed class FlowNetworkSnapshot
     {
-        public double deltaTime { get; private set; }
-
-        public static FlowNetworkSnapshot GetNetworkSnapshot( GameObject obj )
-        {
-            // return the flow network for this object and its children.
-
-            // iterate over all descendants and collect their pipes. collect the tanks that these pipes connect to.
-            // - No point solving tanks that don't matter.
-            // - Also don't solve pipes that are closed.
-
-            // iterate over gameobjects that implement this.
-            if( obj == null )
-                return null;
-
-            FlowNetworkBuilder builder = new FlowNetworkBuilder();
-
-            IBuildsFlowNetwork[] applyTo = obj.GetComponentsInChildren<IBuildsFlowNetwork>( true );
-
-            List<IBuildsFlowNetwork> retryList = null;
-            List<int> removeRetryIndices = null;
-            foreach( var comp in applyTo )
-            {
-                var result = comp.BuildFlowNetwork( builder );
-                if( result == BuildFlowResult.Retry )
-                {
-                    retryList ??= new();
-                    retryList.Add( comp );
-                }
-            }
-
-            // retry until nothing changes.
-            while( retryList != null && retryList.Count > 0 )
-            {
-                for( int i = 0; i < retryList.Count; i++ )
-                {
-                    var comp = retryList[i];
-                    var result = comp.BuildFlowNetwork( builder );
-                    if( result != BuildFlowResult.Retry )
-                    {
-                        removeRetryIndices ??= new();
-                        removeRetryIndices.Add( i );
-                    }
-                }
-                if( removeRetryIndices != null )
-                {
-                    if( removeRetryIndices.Count == 0 )
-                        throw new Exception( "FlowNetworkBuilder: retry loop did not make progress." );
-
-                    // remove in reverse order.
-                    for( int i = removeRetryIndices.Count - 1; i >= 0; i-- )
-                    {
-                        int indexToRemove = removeRetryIndices[i];
-                        retryList.RemoveAt( indexToRemove );
-                    }
-                    removeRetryIndices.Clear();
-                }
-            }
-
-            return new FlowNetworkSnapshot( obj, builder.Owner, applyTo, builder.Producers.ToList(), builder.Consumers.ToList(), builder.Pipes.ToList() );
-        }
-
         public readonly GameObject RootObject;
 
         private readonly IBuildsFlowNetwork[] _applyTo;
@@ -97,18 +37,18 @@ namespace HSP.ResourceFlow
         private double[] _previousFlowRates; // For oscillation detection
         private double[] _currentFlowRates;
         private double[] _nextFlowRates; // Buffer for unrelaxed flows
-        private double[] _flowScalars;
+        private double[] _pipeFlowScalingFactors;
 
-        private double _relaxationFactor;
+        private double _relaxationFactor = 0.7;
 
         // --- Transport Buffers ---
-        private readonly Dictionary<IResourceProducer, double> _totalVolumeDemand = new();
-        private readonly Dictionary<IResourceConsumer, double> _consumerVolumeSupply = new();
-        private readonly Dictionary<IResourceProducer, double> _producerScales = new();
-        private readonly Dictionary<IResourceConsumer, double> _consumerScales = new();
+        private readonly Dictionary<IResourceConsumer, double> _consumerVolumeDemand = new();
+        private readonly Dictionary<IResourceProducer, double> _producerVolumeSupply = new();
+        private readonly Dictionary<IResourceProducer, double> _producerScalingFactors = new();
+        private readonly Dictionary<IResourceConsumer, double> _consumerScalingFactors = new();
 
 
-        // --- Public Read-only access for debug visualizers ---
+        // --- Public Read-only access for debug visualizers and similar ---
         public IReadOnlyList<FlowPipe> Pipes => _pipes;
         public IReadOnlyList<IResourceProducer> Producers => _producers;
         public IReadOnlyList<IResourceConsumer> Consumers => _consumers;
@@ -126,12 +66,15 @@ namespace HSP.ResourceFlow
 
             // Initialize solver buffers to the correct capacity.
             ResizeSolverBuffers( _pipes.Count, true );
-            _flowScalars = new double[_pipes.Count];
+            _pipeFlowScalingFactors = new double[_pipes.Count];
 
             // Populate reverse lookup maps for the initial state.
-            for( int i = 0; i < _producers.Count; i++ ) _producerToIndex[_producers[i]] = i;
-            for( int i = 0; i < _consumers.Count; i++ ) _consumerToIndex[_consumers[i]] = i;
-            for( int i = 0; i < _pipes.Count; i++ ) _pipeToIndex[_pipes[i]] = i;
+            for( int i = 0; i < _producers.Count; i++ )
+                _producerToIndex[_producers[i]] = i;
+            for( int i = 0; i < _consumers.Count; i++ )
+                _consumerToIndex[_consumers[i]] = i;
+            for( int i = 0; i < _pipes.Count; i++ )
+                _pipeToIndex[_pipes[i]] = i;
 
             // Build initial connectivity maps.
             RebuildConnectivityMaps();
@@ -148,6 +91,22 @@ namespace HSP.ResourceFlow
                 Array.Resize( ref _nextFlowRates, newSize );
                 Array.Resize( ref _currentPotentials, newSize );
             }
+        }
+
+        /// <summary>
+        /// Initializes the solver's flow rates from a previously saved state.
+        /// This is crucial for preventing a "hard reset" of flow on game load.
+        /// </summary>
+        /// <param name="savedRates">The array of flow rates from the last saved state.</param>
+        public void InitializeFlowRates( double[] savedRates )
+        {
+            if( savedRates == null )
+                return;
+
+            // Copy saved rates to both current and previous to prevent the oscillation
+            // detector from firing on the first frame due to a large delta from zero.
+            Array.Copy( savedRates, _currentFlowRates, Math.Min( savedRates.Length, _currentFlowRates.Length ) );
+            Array.Copy( savedRates, _previousFlowRates, Math.Min( savedRates.Length, _previousFlowRates.Length ) );
         }
 
         public bool TryGetFlowObj<T>( object obj, out T flowObj )
@@ -222,7 +181,8 @@ namespace HSP.ResourceFlow
                 structureChanged = true;
                 foreach( var pipe in transaction.Pipes )
                 {
-                    if( _pipeToIndex.ContainsKey( pipe ) ) continue;
+                    if( _pipeToIndex.ContainsKey( pipe ) )
+                        continue;
 
                     if( _freePipeSlots.TryDequeue( out int index ) )
                     {
@@ -242,7 +202,8 @@ namespace HSP.ResourceFlow
                 structureChanged = true;
                 foreach( var producer in transaction.Producers )
                 {
-                    if( _producerToIndex.ContainsKey( producer ) ) continue;
+                    if( _producerToIndex.ContainsKey( producer ) )
+                        continue;
 
                     if( _freeProducerSlots.TryDequeue( out int index ) )
                     {
@@ -262,7 +223,8 @@ namespace HSP.ResourceFlow
                 structureChanged = true;
                 foreach( var consumer in transaction.Consumers )
                 {
-                    if( _consumerToIndex.ContainsKey( consumer ) ) continue;
+                    if( _consumerToIndex.ContainsKey( consumer ) )
+                        continue;
 
                     if( _freeConsumerSlots.TryDequeue( out int index ) )
                     {
@@ -287,9 +249,9 @@ namespace HSP.ResourceFlow
 
                 // Ensure solver buffers are large enough.
                 ResizeSolverBuffers( _pipes.Count, false );
-                if( _flowScalars.Length < _pipes.Count )
+                if( _pipeFlowScalingFactors.Length < _pipes.Count )
                 {
-                    Array.Resize( ref _flowScalars, _pipes.Count );
+                    Array.Resize( ref _pipeFlowScalingFactors, _pipes.Count );
                 }
             }
         }
@@ -304,8 +266,16 @@ namespace HSP.ResourceFlow
         {
             _participants.Clear();
             var uniqueParticipants = new HashSet<object>();
-            foreach( var p in _producers ) if( p != null ) uniqueParticipants.Add( p );
-            foreach( var c in _consumers ) if( c != null ) uniqueParticipants.Add( c );
+            foreach( var p in _producers )
+            {
+                if( p != null )
+                    uniqueParticipants.Add( p );
+            }
+            foreach( var c in _consumers )
+            {
+                if( c != null )
+                    uniqueParticipants.Add( c );
+            }
             _participants.AddRange( uniqueParticipants );
         }
 
@@ -326,7 +296,8 @@ namespace HSP.ResourceFlow
                 for( int j = 0; j < pipes.Count; j++ )
                 {
                     FlowPipe pipe = pipes[j];
-                    if( pipe == null ) continue;
+                    if( pipe == null )
+                        continue;
 
                     bool connected = false;
                     if( node is IResourceConsumer consumer && (ReferenceEquals( pipe.FromInlet.Consumer, consumer ) || ReferenceEquals( pipe.ToInlet.Consumer, consumer )) )
@@ -352,90 +323,44 @@ namespace HSP.ResourceFlow
         /// <param name="dt">Time step, in [s].</param>
         public void Step( float dt )
         {
-            deltaTime = dt;
-
             const int MAX_ITERATIONS = 50;
-            const double CONVERGENCE_THRESHOLD = 0.0001;
-            _relaxationFactor = 0.7; // Start with a reasonable under-relaxation.
-            Array.Clear( _previousFlowRates, 0, _previousFlowRates.Length );
+            //Debug.Log( "_relaxationFactor " + _relaxationFactor );
 
-            // 1. Initial State: Sample potentials based on the tanks' current state (fluid surface potential).
+            // 1. Initial State: Sample potentials based on the tanks' current state.
             UpdatePotentials();
 
             bool converged = false;
-
-            // 2. Solver Loop: Find equilibrium Flow Rates and Potentials.
             for( int iteration = 0; iteration < MAX_ITERATIONS; iteration++ )
             {
-                // A. Calculate Flow Rates based on current Potentials
-                for( int i = 0; i < _pipes.Count; i++ )
-                {
-                    FlowPipe pipe = _pipes[i];
-                    if( pipe == null ) continue;
+                // A. Calculate new flow rates based on current potentials.
+                CalculateUnrelaxedFlows( dt );
 
-                    (double potFrom, double potTo) = _currentPotentials[i];
+                // B. Check convergence and apply relaxation with adaptive damping.
+                converged = CheckConvergenceAndApplyRelaxation( out bool hasOscillations );
 
-                    // ComputeFlowRate typically uses potential difference logic.
-                    // Result > 0 implies Flow From->To. Result < 0 implies To->From.
-                    _nextFlowRates[i] = pipe.ComputeFlowRate( potFrom, potTo );
-                }
-
-                // B. Check Convergence, Detect Oscillation, and Apply Relaxation
-                converged = true;
-                bool hasOscillations = false;
-                for( int i = 0; i < _pipes.Count; i++ )
-                {
-                    if( _pipes[i] == null ) continue;
-
-                    double prevFlow = _currentFlowRates[i];
-                    double prevPrevFlow = _previousFlowRates[i];
-                    double newFlowUnrelaxed = _nextFlowRates[i];
-
-                    // Oscillation detection: check if the flow rate overshot the previous value.
-                    // A negative product means the direction of change has flipped.
-                    if( (newFlowUnrelaxed - prevFlow) * (prevFlow - prevPrevFlow) < -1e-12 )
-                    {
-                        hasOscillations = true;
-                    }
-
-                    // Apply relaxation factor to the change in flow.
-                    double relaxedFlow = prevFlow + (newFlowUnrelaxed - prevFlow) * _relaxationFactor;
-
-                    // Check absolute delta for convergence against the relaxed value.
-                    if( Math.Abs( relaxedFlow - prevFlow ) > CONVERGENCE_THRESHOLD )
-                    {
-                        converged = false;
-                    }
-
-                    // Update history for the next iteration.
-                    _previousFlowRates[i] = prevFlow;
-                    _currentFlowRates[i] = relaxedFlow;
-                }
-
-                // Dynamically adjust relaxation factor for next iteration.
+                // C. Dynamically adjust global relaxation factor for the next iteration.
                 if( hasOscillations )
                 {
-                    // If oscillating, aggressively reduce the factor.
-                    _relaxationFactor = Math.Max( 0.1, _relaxationFactor * 0.9 );
+#warning INFO - related to how much the relaxation can go down in total, since it resets.
+                    _relaxationFactor = Math.Max( 0.1, _relaxationFactor * 0.75 ); // More aggressive damping
                 }
                 else if( !converged )
                 {
-                    // If stable but not converged, gently increase the factor towards 1.0.
-                    _relaxationFactor = Math.Min( 1.0, _relaxationFactor * 1.05 );
+                    _relaxationFactor = Math.Min( 1.0, _relaxationFactor * 1.05 ); // Gently accelerate convergence
                 }
-
 
                 if( converged )
                     break;
 
-                // C. Update Potentials based on new Flow Rates
+                // D. Update potentials based on new (relaxed) flow rates.
                 UpdatePotentials();
             }
 
             if( !converged )
             {
-                Debug.LogWarning( "FlowNetworkSnapshot.Step: Failed to converge within max iterations. Using zero flow for this frame." );
-                return; // This effectively uses zero flow for this frame, as ApplyTransport is skipped.
+                //Debug.LogWarning( "FlowNetworkSnapshot.Step: Failed to converge within max iterations. Using zero flow for this frame." );
+                Array.Clear( _currentFlowRates, 0, _currentFlowRates.Length );
+                return;
             }
 
             // 3. Transport Phase: Move the actual substances based on the solved flow rates.
@@ -473,13 +398,108 @@ namespace HSP.ResourceFlow
             }
         }
 
+#warning TODO - we need (edit mode) tests that test the various relaxation and convergence behaviors, with the flow network created without any wrappers.
+
+        private void CalculateUnrelaxedFlows( double dt )
+        {
+            for( int i = 0; i < _pipes.Count; i++ )
+            {
+                FlowPipe pipe = _pipes[i];
+                if( pipe == null )
+                    continue;
+
+                (double potentialFrom, double potentialTo) = _currentPotentials[i];
+
+                // 1. Calculate the raw flow rate.
+#warning TODO - after splitting, potentials nearly equal -14 -12 = -9950 flowrate. before splitting, flowrate is 80000
+                double rawFlowRate = pipe.ComputeFlowRate( potentialFrom, potentialTo );
+
+                double maxSourceFlow = double.MaxValue;
+                double maxSinkFlow = double.MaxValue;
+
+                bool isForward = rawFlowRate > 0;
+                IResourceProducer source = isForward ? pipe.FromInlet.Producer : pipe.ToInlet.Producer;
+                IResourceConsumer sink = isForward ? pipe.ToInlet.Consumer : pipe.FromInlet.Consumer;
+
+                // 2. Limit flow so it doesn't fill/drain more than ~50% of the available volume in a single frame.
+                const double MAX_FILL_DRAIN_FACTOR = 0.5;
+
+                if( source != null )
+                {
+                    maxSourceFlow = (source.GetAvailableOutflowVolume() * MAX_FILL_DRAIN_FACTOR) / dt;
+                }
+                if( sink != null )
+                {
+                    maxSinkFlow = (sink.GetAvailableInflowVolume( dt ) * MAX_FILL_DRAIN_FACTOR) / dt;
+                }
+
+                // 3. Apply the limit, preserving the sign.
+                double maxFlow = Math.Min( maxSourceFlow, maxSinkFlow );
+                if( Math.Abs( rawFlowRate ) > maxFlow )
+                {
+                    rawFlowRate = Math.Sign( rawFlowRate ) * maxFlow;
+                }
+
+                _nextFlowRates[i] = rawFlowRate;
+            }
+        }
+
+        private bool CheckConvergenceAndApplyRelaxation( out bool hasOscillations )
+        {
+            const double OSCILLATION_RELAXATION = 0.1;
+            const double REL_TOLERANCE = 0.01;
+            const double ABS_TOLERANCE = 0.001;
+
+            bool converged = true;
+            hasOscillations = false;
+
+            for( int i = 0; i < _pipes.Count; i++ )
+            {
+                if( _pipes[i] == null )
+                    continue;
+
+                double prevFlow = _currentFlowRates[i];
+                double prevPrevFlow = _previousFlowRates[i];
+                double newFlowUnrelaxed = _nextFlowRates[i];
+
+                double localRelaxation = _relaxationFactor;
+
+                // 1. Oscillation detection (rapid direction flipping every step).
+                double deltaCurrent = newFlowUnrelaxed - prevFlow;
+                double deltaPrev = prevFlow - prevPrevFlow;
+                if( deltaCurrent * deltaPrev < -1e-12 )
+                {
+#warning TODO - needs a more "implicit" oscillation handling (not detection). The current system doesn't dampen, only clamp.
+                    hasOscillations = true;
+                    localRelaxation = OSCILLATION_RELAXATION;
+                    //_relaxationFactor = OSCILLATION_RELAXATION;
+                    //Debug.LogWarning( "OSCILLATION" );
+                }
+
+                // 2. Apply relaxation and check convergence.
+                double relaxedFlow = prevFlow + (newFlowUnrelaxed - prevFlow) * localRelaxation;
+                double flowDifference = Math.Abs( relaxedFlow - prevFlow );
+                double flowScale = Math.Max( Math.Abs( relaxedFlow ), Math.Abs( prevFlow ) );
+                if( flowDifference > ABS_TOLERANCE && flowDifference > flowScale * REL_TOLERANCE )
+                {
+                    converged = false;
+                }
+
+                _previousFlowRates[i] = prevFlow;
+                _currentFlowRates[i] = relaxedFlow;
+            }
+
+            return converged;
+        }
+
         private void UpdatePotentials()
         {
             // Sample potentials from Producers
             for( int i = 0; i < _producers.Count; i++ )
             {
                 IResourceProducer producer = _producers[i];
-                if( producer == null ) continue;
+                if( producer == null )
+                    continue;
 
                 int[] pipeIndices = _producersAndPipes[i];
 
@@ -487,7 +507,8 @@ namespace HSP.ResourceFlow
                 {
                     int pipeIdx = pipeIndices[k];
                     FlowPipe pipe = _pipes[pipeIdx];
-                    if( pipe == null ) continue;
+                    if( pipe == null )
+                        continue;
 
                     // Sample potential at the connection point
                     if( ReferenceEquals( pipe.FromInlet.Producer, producer ) )
@@ -507,7 +528,8 @@ namespace HSP.ResourceFlow
             for( int i = 0; i < _consumers.Count; i++ )
             {
                 IResourceConsumer consumer = _consumers[i];
-                if( consumer == null ) continue;
+                if( consumer == null )
+                    continue;
 
                 int[] pipeIndices = _consumersAndPipes[i];
 
@@ -515,7 +537,8 @@ namespace HSP.ResourceFlow
                 {
                     int pipeIdx = pipeIndices[k];
                     FlowPipe pipe = _pipes[pipeIdx];
-                    if( pipe == null ) continue;
+                    if( pipe == null )
+                        continue;
 
                     if( ReferenceEquals( pipe.FromInlet.Consumer, consumer ) )
                     {
@@ -536,103 +559,114 @@ namespace HSP.ResourceFlow
             // Clear previous IO states
             foreach( var producer in _producers )
             {
-                if( producer == null ) continue;
+                if( producer == null )
+                    continue;
                 producer.Outflow?.Clear();
             }
             foreach( var consumer in _consumers )
             {
-                if( consumer == null ) continue;
+                if( consumer == null )
+                    continue;
                 consumer.Inflow?.Clear();
             }
 
-            double[] proposedFlows = _currentFlowRates;
-
-            _totalVolumeDemand.Clear();
-            _consumerVolumeSupply.Clear();
+            // 1. Calculate available supply/demand values for each producer/consumer.
+            _consumerVolumeDemand.Clear();
+            _producerVolumeSupply.Clear();
             for( int i = 0; i < _pipes.Count; i++ )
             {
-                if( _pipes[i] == null ) continue;
+                if( _pipes[i] == null )
+                    continue;
 
-                double rate = proposedFlows[i];
-                if( Math.Abs( rate ) < 1e-9 ) continue;
+                double proposedFlowrate = _currentFlowRates[i];
+                if( Math.Abs( proposedFlowrate ) < 1e-9 )
+                    continue;
 
-                double vol = Math.Abs( rate ) * dt;
+                double volume = Math.Abs( proposedFlowrate ) * dt;
 
-                object sourceObj = (rate > 0) ? _pipes[i].FromInlet.Producer : _pipes[i].ToInlet.Producer;
+                object sourceObj = (proposedFlowrate > 0) ? _pipes[i].FromInlet.Producer : _pipes[i].ToInlet.Producer;
                 if( sourceObj is IResourceProducer producer )
                 {
-                    if( !_totalVolumeDemand.ContainsKey( producer ) ) _totalVolumeDemand[producer] = 0;
-                    _totalVolumeDemand[producer] += vol;
+                    if( !_producerVolumeSupply.ContainsKey( producer ) )
+                        _producerVolumeSupply[producer] = 0;
+                    _producerVolumeSupply[producer] += volume;
                 }
 
-                object sinkObj = (rate > 0) ? _pipes[i].ToInlet.Consumer : _pipes[i].FromInlet.Consumer;
+                object sinkObj = (proposedFlowrate > 0) ? _pipes[i].ToInlet.Consumer : _pipes[i].FromInlet.Consumer;
                 if( sinkObj is IResourceConsumer consumer )
                 {
-                    if( !_consumerVolumeSupply.ContainsKey( consumer ) ) _consumerVolumeSupply[consumer] = 0;
-                    _consumerVolumeSupply[consumer] += vol;
+                    if( !_consumerVolumeDemand.ContainsKey( consumer ) )
+                        _consumerVolumeDemand[consumer] = 0;
+                    _consumerVolumeDemand[consumer] += volume;
                 }
             }
 
-            _producerScales.Clear();
-            foreach( var kvp in _totalVolumeDemand )
+            // 2. Calculate scaling factors for producers and consumers that are over capacity.
+            _producerScalingFactors.Clear();
+            _consumerScalingFactors.Clear();
+            foreach( var kvp in _producerVolumeSupply )
             {
-                if( kvp.Key is FlowTank tank )
+                IResourceProducer producer = kvp.Key;
+                double totalSupply = kvp.Value;
+                double availableSupply = producer.GetAvailableOutflowVolume();
+                if( totalSupply > availableSupply && totalSupply > 0 )
                 {
-                    double totalDemand = kvp.Value;
-                    double availableVolume = tank.Volume;
-                    if( totalDemand > availableVolume && totalDemand > 0 )
-                    {
-                        _producerScales[tank] = availableVolume / totalDemand;
-                    }
+                    _producerScalingFactors[producer] = availableSupply / totalSupply;
                 }
             }
-
-            _consumerScales.Clear();
-            foreach( var kvp in _consumerVolumeSupply )
+            foreach( var kvp in _consumerVolumeDemand )
             {
-                var consumer = kvp.Key;
-                double totalProposedSupply = kvp.Value;
-                double demandVolume = consumer.Demand * dt;
-                if( totalProposedSupply > demandVolume && totalProposedSupply > 0 )
+                IResourceConsumer consumer = kvp.Key;
+                double totalDemand = kvp.Value;
+                double availableCapacity = consumer.GetAvailableInflowVolume( dt );
+                if( totalDemand > availableCapacity && totalDemand > 0 )
                 {
-                    _consumerScales[consumer] = demandVolume / totalProposedSupply;
+                    _consumerScalingFactors[consumer] = availableCapacity / totalDemand;
                 }
             }
 
-            if( _flowScalars.Length < _pipes.Count ) Array.Resize( ref _flowScalars, _pipes.Count );
-
+            // 3. Calculate per-pipe flow scaling factors based on producer/consumer limits of each pipe.
+            if( _pipeFlowScalingFactors.Length < _pipes.Count )
+            {
+                Array.Resize( ref _pipeFlowScalingFactors, _pipes.Count );
+            }
             for( int i = 0; i < _pipes.Count; i++ )
             {
-                _flowScalars[i] = 1.0;
-                if( _pipes[i] == null ) continue;
+#warning TODO - optimize - add a flag and only recalc if the _producerScalingFactors / _consumerScalingFactors are non-1.
+                _pipeFlowScalingFactors[i] = 1.0;
+                if( _pipes[i] == null )
+                    continue;
 
-                double rate = proposedFlows[i];
-                if( Math.Abs( rate ) < 1e-9 ) continue;
+                double rate = _currentFlowRates[i];
+                if( Math.Abs( rate ) < 1e-9 )
+                    continue;
 
-                object sourceObj = (rate > 0) ? _pipes[i].FromInlet.Producer : _pipes[i].ToInlet.Producer;
-                object sinkObj = (rate > 0) ? _pipes[i].ToInlet.Consumer : _pipes[i].FromInlet.Consumer;
+                IResourceProducer source = (rate > 0) ? _pipes[i].FromInlet.Producer : _pipes[i].ToInlet.Producer;
+                IResourceConsumer sink = (rate > 0) ? _pipes[i].ToInlet.Consumer : _pipes[i].FromInlet.Consumer;
 
-                if( sourceObj is IResourceProducer p && _producerScales.TryGetValue( p, out double pScale ) )
+                if( _producerScalingFactors.TryGetValue( source, out double pScale ) )
                 {
-                    _flowScalars[i] = Math.Min( _flowScalars[i], pScale );
+                    _pipeFlowScalingFactors[i] = Math.Min( _pipeFlowScalingFactors[i], pScale );
                 }
-                if( sinkObj is IResourceConsumer c && _consumerScales.TryGetValue( c, out double cScale ) )
+                if( _consumerScalingFactors.TryGetValue( sink, out double cScale ) )
                 {
-                    _flowScalars[i] = Math.Min( _flowScalars[i], cScale );
+                    _pipeFlowScalingFactors[i] = Math.Min( _pipeFlowScalingFactors[i], cScale );
                 }
             }
 
-            // --- Step 4: Execution ---
+            // 4. Finally, actually apply the trannsport.
+            // The tank might still do internal clamping, but at least we aren't asking for more than what is available across all pipes.
             for( int i = 0; i < _pipes.Count; i++ )
             {
-                if( _pipes[i] == null ) continue;
+                if( _pipes[i] == null )
+                    continue;
 
-                double rawRate = proposedFlows[i];
+                double rawRate = _currentFlowRates[i];
                 if( Math.Abs( rawRate ) < 1e-9 )
                     continue;
 
                 // Apply the scaling factor we calculated
-                double finalRate = rawRate * _flowScalars[i];
+                double finalRate = rawRate * _pipeFlowScalingFactors[i];
 
                 FlowPipe pipe = _pipes[i];
                 bool flowForward = finalRate > 0;
@@ -643,17 +677,14 @@ namespace HSP.ResourceFlow
                 if( source == null || sink == null )
                     continue;
 
-                // Now we can safely sample. 
-                // The tank might still do internal clamping, but we know physically we aren't asking for more 
-                // than the TOTAL tank contains across all pipes.
-                using( var flowResources = pipe.SampleFlowResources( finalRate, dt ) )
-                {
-                    if( flowResources.IsEmpty() )
-                        continue;
+                    //Debug.LogWarning( "rate " + finalRate + " : " + _currentFlowRates[i] );
 
-                    source.Outflow?.Add( flowResources, 1.0 );
-                    sink.Inflow?.Add( flowResources, 1.0 );
-                }
+                using var flowResources = pipe.SampleFlowResources( finalRate, dt );
+                if( flowResources.IsEmpty() )
+                    continue;
+
+                source.Outflow?.Add( flowResources, 1.0 );
+                sink.Inflow?.Add( flowResources, 1.0 );
             }
         }
     }

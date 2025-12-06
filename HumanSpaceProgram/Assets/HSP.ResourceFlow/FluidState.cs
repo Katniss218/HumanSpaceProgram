@@ -31,9 +31,9 @@ namespace HSP.ResourceFlow
         public double FluidSurfacePotential { get; set; }
 
         /// <summary>
-        /// Returns the fluid state for a perfect vacuum.
+        /// Gets the fluid state for a perfect vacuum.
         /// </summary>
-        public static FluidState Vacuum => new FluidState()
+        public static readonly FluidState Vacuum = new FluidState()
         {
             Pressure = 0.0f,
             Temperature = 0.0f,
@@ -41,7 +41,10 @@ namespace HSP.ResourceFlow
             FluidSurfacePotential = -1e12
         };
 
-        public static FluidState STP => new FluidState()
+        /// <summary>
+        /// Gets the fluid state for standard temperature and pressure (STP).
+        /// </summary>
+        public static readonly FluidState STP = new FluidState()
         {
             Pressure = 101325.0,
             Temperature = 273.15,

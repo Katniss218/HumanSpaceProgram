@@ -24,6 +24,13 @@ namespace HSP.ResourceFlow
         ISubstanceStateCollection Outflow { get; set; }
 
         /// <summary>
+        /// Gets the total volume of fluid currently available for outflow from this producer.
+        /// This is used by the solver to prevent pulling more fluid than exists in a single time step.
+        /// </summary>
+        /// <returns>The available volume in [m^3]. Can be PositiveInfinity for unlimited sources.</returns>
+        double GetAvailableOutflowVolume();
+
+        /// <summary>
         /// Applies the calculated inflows and outflows to the internal contents of the object.
         /// </summary>
         void ApplyFlows( double deltaTime );

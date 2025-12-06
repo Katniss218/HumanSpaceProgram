@@ -14,6 +14,11 @@ namespace HSP.ResourceFlow
             // This is a proxy object. The owning component is responsible for providing Outflow.
         }
 
+        public double GetAvailableOutflowVolume()
+        {
+            return double.PositiveInfinity;
+        }
+
         public FluidState Sample( Vector3 localPosition, double holeArea )
         {
             // A generic producer is assumed to be at some defined state, for now STP.

@@ -50,9 +50,22 @@ namespace HSP.ResourceFlow
         // Physical properties.
 
         /// <summary>
+        /// Computes the bulk modulus (a measure of compressibility), in [Pa], at a given state.
+        /// </summary>
+        double GetBulkModulus( double temperature, double pressure );
+
+        /// <summary>
         /// Computes the pressure, in [Pa].
         /// </summary>
         double GetPressure( double temperature, double density );
+
+        /// <summary>
+        /// Computes the analytical derivative of pressure with respect to mass for a fixed volume and temperature.
+        /// </summary>
+        /// <param name="volume">The fixed volume of the container, in [m^3].</param>
+        /// <param name="temperature">The fixed temperature of the substance, in [K].</param>
+        /// <returns>The rate of change of pressure with respect to mass (∂P/∂m), in [Pa/kg].</returns>
+        double GetPressureDerivativeWrtMass( double volume, double temperature );
 
         /// <summary>
         /// Computes the density, in [kg/m^3].
@@ -94,7 +107,7 @@ namespace HSP.ResourceFlow
 
         // double GetSpecificEnthalpy( double temperature, double pressure );
         // double GetGibbsFreeEnergy( double temperature, double pressure ); // in [J/kg]
-        
+
 
         // phase changes.
 

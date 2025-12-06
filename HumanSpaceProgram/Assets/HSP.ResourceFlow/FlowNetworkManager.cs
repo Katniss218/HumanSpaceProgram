@@ -29,11 +29,13 @@ namespace HSP.ResourceFlow
 
         void FixedUpdate()
         {
-            // Iterate over a copy in case the collection is modified during the loop (e.g., a vessel is destroyed).
-            foreach( var network in _networks.ToList() )
+            // Iterate backwards over the list for safe removal if a network becomes invalid or is destroyed during the loop.
+            for( int i = _networks.Count - 1; i >= 0; i-- )
             {
+                var network = _networks[i];
                 if( network == null )
                 {
+                    _networks.RemoveAt( i );
                     continue;
                 }
 

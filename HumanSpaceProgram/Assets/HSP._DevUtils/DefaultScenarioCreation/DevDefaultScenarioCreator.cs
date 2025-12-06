@@ -170,7 +170,7 @@ namespace HSP._DevUtils
             FResourceConnection_FlowPipe conn22 = engineP2.gameObject.AddComponent<FResourceConnection_FlowPipe>();
             conn22.Conductance = 0.1;
             conn22.FromInlet = tankSmallTank.Inlets[1];
-            conn22.ToInlet = eng1.Inlets[0];
+            conn22.ToInlet = eng2.Inlets[0];
             conn22.FromInlet.NominalArea = 60f;
             conn22.ToInlet.NominalArea = 60f;
 
@@ -184,7 +184,7 @@ namespace HSP._DevUtils
             FResourceConnection_FlowPipe conn22o = engineP2.gameObject.AddComponent<FResourceConnection_FlowPipe>();
             conn22o.Conductance = 0.1;
             conn22o.FromInlet = tankLargeTank.Inlets[1];
-            conn22o.ToInlet = eng1.Inlets[1];
+            conn22o.ToInlet = eng2.Inlets[1];
             conn22o.FromInlet.NominalArea = 60f;
             conn22o.ToInlet.NominalArea = 60f;
 

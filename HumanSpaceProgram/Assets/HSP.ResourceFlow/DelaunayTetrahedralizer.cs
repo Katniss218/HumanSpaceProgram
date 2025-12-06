@@ -5,6 +5,16 @@ using UnityEngine;
 
 namespace HSP.ResourceFlow
 {
+    /// <summary>
+    /// A static utility class that implements the Bowyer-Watson algorithm for generating a 3D Delaunay tetrahedralization from a set of input points. <br/>
+    /// This is a crucial part of the resource flow system, as it allows the arbitrary geometry of a tank part to be voxelized into a set of tetrahedra, <br/>
+    /// whose edges can then be used to accurately model fluid distribution under acceleration. <br/>
+    /// </summary>
+    /// <remarks>
+    /// To improve robustness and prevent failures with highly structured or near-coplanar input points (common in game assets), a small amount of <br/>
+    /// deterministic noise is added to the vertex positions before tetrahedralization. This noise is internal to the algorithm and does not affect <br/>
+    /// the final node positions, ensuring that the resulting tetrahedral mesh is geometrically valid and well-conditioned for the flow simulation.
+    /// </remarks>
     public static class DelaunayTetrahedralizer
     {
         private const float EPSILON = 1e-5f;

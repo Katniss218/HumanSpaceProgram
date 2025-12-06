@@ -23,11 +23,13 @@ namespace HSP.ResourceFlow
         ISubstanceStateCollection Inflow { get; set; }
 
         /// <summary>
-        /// The desired volumetric flow rate into this consumer, in [m^3/s].
-        /// The solver will attempt to meet this demand.
-        /// A value of PositiveInfinity means demand is unlimited.
+        /// Gets the available volumetric capacity for inflow into this consumer for the given timestep, in [m^3].
+        /// This is used by the solver to prevent overfilling capacity-limited objects (like tanks) and to respect
+        /// the demand rate of rate-limited consumers (like engines).
         /// </summary>
-        double Demand { get; set; }
+        /// <param name="dt">The duration of the timestep, in [s].</param>
+        /// <returns>The available capacity in [m^3]. Can be PositiveInfinity for unlimited-demand consumers.</returns>
+        double GetAvailableInflowVolume( double dt );
 
         /// <summary>
         /// Applies the calculated inflows and outflows to the internal contents of the object.

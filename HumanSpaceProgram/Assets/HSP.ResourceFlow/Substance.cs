@@ -7,9 +7,13 @@ namespace HSP.ResourceFlow
     [Serializable]
     public class Substance : ISubstance
     {
+        // 8.31446 J / (mol * K)
+        private const double UniversalGasConstant = 8.314462618;
+
         // --- Backing Fields for Reciprocal Caching ---
         private double _specificGasConstant = 287;
         private double _invSpecificGasConstant = 1.0 / 287.0; // Cache 1/R
+        private double _molarMass;
 
         private double _bulkModulus = 2e9f;
         private double _invBulkModulus = 1.0 / 2e9; // Cache 1/K
@@ -22,20 +26,36 @@ namespace HSP.ResourceFlow
         public Color DisplayColor { get; set; }
         public string[] Tags { get; set; }
         public SubstancePhase Phase { get; set; }
-        public double MolarMass { get; set; }
+        public double MolarMass
+        {
+            get => _molarMass;
+            set
+            {
+                _molarMass = value;
+                RecalculateGasConstants();
+            }
+        }
         public double AdiabaticIndex { get; set; } = 1.4;
         public double? FlashPoint { get; set; }
         public double ReferencePressure { get; set; } = 101325f;
 
+        private void RecalculateGasConstants()
+        {
+            // Safety check to prevent divide by zero
+            if( _molarMass <= 1e-9 )
+            {
+                _specificGasConstant = 0;
+                _invSpecificGasConstant = 0;
+                return;
+            }
+
+            _specificGasConstant = UniversalGasConstant / _molarMass;
+            _invSpecificGasConstant = 1.0 / _specificGasConstant;
+        }
+
         public double SpecificGasConstant
         {
             get => _specificGasConstant;
-            set
-            {
-                _specificGasConstant = value;
-                // Avoid divide by zero if user sets bad data
-                _invSpecificGasConstant = (Math.Abs( value ) > 1e-9) ? 1.0 / value : 0.0;
-            }
         }
 
         public double BulkModulus
@@ -75,17 +95,47 @@ namespace HSP.ResourceFlow
             _invReferenceDensity = 1.0 / _referenceDensity;
         }
 
+
+        public double GetBulkModulus( double temperature, double pressure )
+        {
+            if( Phase == SubstancePhase.Gas )
+            {
+                // For an ideal gas, isothermal bulk modulus K = P.
+                // Adiabatic bulk modulus K = gamma * P. Isothermal is simpler and apparently more stable.
+                return pressure;
+            }
+
+            double k = _bulkModulus + pressure - ReferencePressure;
+            return k > 0 ? k : _bulkModulus; // Failsafe to ensure positive bulk modulus
+        }
+
         public double GetPressure( double temperature, double density )
         {
             if( Phase == SubstancePhase.Gas )
             {
-                if( temperature <= 0f ) return 0f;
+                if( temperature <= 0f )
+                    return 0f;
                 return density * _specificGasConstant * temperature;
             }
 
             // Optimization: Use cached inverse ReferenceDensity to multiply instead of divide
             // P = P0 + K * (rho * (1/rho0) - 1)
             return ReferencePressure + _bulkModulus * (density * _invReferenceDensity - 1.0);
+        }
+
+        public double GetPressureDerivativeWrtMass( double volume, double temperature )
+        {
+            if( volume <= 1e-9 )
+                return double.PositiveInfinity;
+
+            if( Phase == SubstancePhase.Gas )
+            {
+                if( temperature <= 0f )
+                    return 0f;
+                return _specificGasConstant * temperature / volume;
+            }
+
+            return _bulkModulus * _invReferenceDensity / volume;
         }
 
         public double GetDensity( double temperature, double pressure )
@@ -122,7 +172,7 @@ namespace HSP.ResourceFlow
             double cp = EvaluatePolynomialHorner( temperature, SpecificHeatCoeffs );
             return cp < 0 ? 0 : cp;
         }
-
+        
         public double GetSpeedOfSound( double temperature, double pressure )
         {
             if( Phase == SubstancePhase.Gas )
@@ -136,7 +186,7 @@ namespace HSP.ResourceFlow
                 // Using formula c = sqrt(K / rho)
                 double rho = GetDensity( temperature, pressure );
                 if( rho <= 1e-4 ) return 0;
-                return Math.Sqrt( _bulkModulus / rho );
+                return Math.Sqrt( GetBulkModulus( temperature, pressure ) / rho );
             }
         }
 
@@ -199,7 +249,6 @@ namespace HSP.ResourceFlow
                 .WithMember( "phase", o => o.Phase )
                 .WithMember( "molar_mass", o => o.MolarMass )
                 // Note: The setters will trigger, automatically updating the cached reciprocals
-                .WithMember( "specific_gas_constant", o => o.SpecificGasConstant )
                 .WithMember( "adiabatic_index", o => o.AdiabaticIndex )
                 .WithMember( "flash_point", o => o.FlashPoint )
                 .WithMember( "bulk_modulus", o => o.BulkModulus )
