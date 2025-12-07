@@ -15,7 +15,7 @@ namespace HSP_Tests
             DisplayColor = Color.blue
         };
 
-        public static readonly ISubstance Air = new Substance( "air" )
+        public static readonly Substance Air = new Substance( "air" )
         {
             DisplayName = "Air",
             Phase = SubstancePhase.Gas,
@@ -23,7 +23,7 @@ namespace HSP_Tests
             DisplayColor = Color.clear
         };
 
-        public static readonly ISubstance Oil = new Substance( "oil" )
+        public static readonly Substance Oil = new Substance( "oil" )
         {
             DisplayName = "Oil",
             Phase = SubstancePhase.Liquid,
@@ -33,7 +33,7 @@ namespace HSP_Tests
             DisplayColor = Color.yellow
         };
 
-        public static readonly ISubstance Kerosene = new Substance( "fuel" )
+        public static readonly Substance Kerosene = new Substance( "fuel" )
         {
             DisplayName = "Kerosene",
             Phase = SubstancePhase.Liquid,
@@ -43,7 +43,18 @@ namespace HSP_Tests
             DisplayColor = Color.yellow
         };
 
-        public static readonly ISubstance Mercury = new Substance( "mercury" )
+        public static readonly Substance Lox = new Substance( "lox" )
+        {
+            DisplayName = "Liquid Oxygen",
+            Phase = SubstancePhase.Liquid,
+            MolarMass = 0.0319988,
+            ReferenceDensity = 1141f,
+            ReferencePressure = 101325f,
+            BulkModulus = 0.95e9f,
+            DisplayColor = Color.cyan
+        };
+
+        public static readonly Substance Mercury = new Substance( "mercury" )
         {
             DisplayName = "Mercury",
             Phase = SubstancePhase.Liquid,

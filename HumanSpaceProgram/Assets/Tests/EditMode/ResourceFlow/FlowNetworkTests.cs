@@ -1015,5 +1015,130 @@ namespace HSP_Tests_EditMode.ResourceFlow
             Assert.That( tank.Contents.GetMass(), Is.LessThan( 800 ), "Tank should have lost some mass but not be emptied in a single step." );
         }
 
+        [Test]
+        public void ClosedLoopWithPump_MassIsConserved()
+        {
+            // Arrange: A single tank with a pipe looping back to itself, with a pump.
+            // This is a "do-nothing" machine that should just churn fluid.
+            var builder = new FlowNetworkBuilder();
+            var tank = FlowNetworkTestHelper.CreateTestTank( 2.0, Vector3.zero, Vector3.zero );
+            tank.Contents.Add( TestSubstances.Water, 1000 ); // Half full
+
+            builder.TryAddFlowObj( new object(), tank );
+
+            var pipe = CreateAndAddPipe( builder, tank, new Vector3( 0, -1, 0 ), tank, new Vector3( 0, 1, 0 ), 1.0 );
+            pipe.HeadAdded = 100.0; // Pump pushes fluid from bottom to top of the same tank.
+
+            var snapshot = builder.BuildSnapshot();
+            double initialMass = tank.Contents.GetMass();
+
+            // Act & Assert
+            Assert.DoesNotThrow( () =>
+            {
+                for( int i = 0; i < 100; i++ )
+                {
+                    snapshot.Step( 0.02f );
+                }
+            }, "Solver threw an exception on a closed loop with a pump." );
+
+            Assert.That( tank.Contents.GetMass(), Is.EqualTo( initialMass ).Within( 1e-9 ), "Mass must be conserved in a closed loop." );
+        }
+
+        [Test]
+        public void StiffnessShock_HighPressureIntoNearlyFullSmallTank_ConvergesSafely()
+        {
+            // Arrange: A large, full, high-pressure tank connected to a tiny, nearly-full tank.
+            // This is a stiff system prone to overfilling and oscillation.
+            var builder = new FlowNetworkBuilder();
+            Vector3 gravity = new Vector3( 0, -10, 0 );
+
+            var sourceTank = FlowNetworkTestHelper.CreateTestTank( 10.0, gravity, new Vector3( 0, 10, 0 ) );
+            sourceTank.Contents.Add( TestSubstances.Water, 10000 ); // Full
+
+            var stiffSink = FlowNetworkTestHelper.CreateTestTank( 0.1, gravity, Vector3.zero ); // Tiny 100L tank
+            stiffSink.Contents.Add( TestSubstances.Water, 99.9 ); // 99.9% full, very stiff
+
+            builder.TryAddFlowObj( new object(), sourceTank );
+            builder.TryAddFlowObj( new object(), stiffSink );
+
+            CreateAndAddPipe( builder, sourceTank, new Vector3( 0, 9, 0 ), stiffSink, new Vector3( 0, 1, 0 ), 100.0 ); // High conductance pipe
+
+            var snapshot = builder.BuildSnapshot();
+
+            // Act: Run a single step. The solver's damping should prevent a massive overshoot.
+            snapshot.Step( 0.02f );
+
+            // Assert
+            double massInSink = stiffSink.Contents.GetMass();
+            double volumeInSink = massInSink / TestSubstances.Water.ReferenceDensity;
+            double totalMass = sourceTank.Contents.GetMass() + massInSink;
+
+            Assert.That( totalMass, Is.EqualTo( 10099.9 ).Within( 1e-6 ), "Mass must be conserved." );
+            Assert.That( volumeInSink, Is.LessThanOrEqualTo( stiffSink.Volume + 1e-6 ), "Stiff sink should not catastrophically overfill in a single step." );
+            Assert.That( massInSink, Is.GreaterThan( 99.9 ), "Some flow should have occurred." );
+        }
+
+        [Test]
+        public void EnginePullOnNearEmptyTank_HandlesVacuumSafely()
+        {
+            // Arrange
+            var builder = new FlowNetworkBuilder();
+            var tank = FlowNetworkTestHelper.CreateTestTank( 1.0, Vector3.zero, new Vector3( 0, 10, 0 ) );
+            double initialMass = 0.1; // Very little fuel
+            tank.Contents.Add( TestSubstances.Kerosene, initialMass );
+
+            var engine = new EngineFeedSystem( 0.01 )
+            {
+                IsOutflowEnabled = true,
+                PumpPressureRise = 50e5, // Strong suction
+                ChamberPressure = 1e5,
+                InjectorConductance = 1.0, // High demand
+                Demand = 1000.0
+            };
+
+            builder.TryAddFlowObj( new object(), tank );
+            builder.TryAddFlowObj( new object(), engine );
+            CreateAndAddPipe( builder, tank, new Vector3( 0, 9, 0 ), engine, Vector3.zero, 1.0 );
+
+            var snapshot = builder.BuildSnapshot();
+
+            // Act: Run for a few steps, enough to drain the tank.
+            for( int i = 0; i < 50; i++ )
+            {
+                snapshot.Step( 0.02f );
+            }
+
+            // Assert
+            Assert.That( tank.Contents.GetMass(), Is.EqualTo( 0.0 ).Within( 1e-9 ), "Tank should be completely empty." );
+
+            double totalMassConsumed = 0;
+            // The engine's consumption is stateful, so we need to simulate its own ApplyFlows logic
+            // to find the total consumed mass over the simulation period.
+            var tempEngine = new EngineFeedSystem( 0.01 )
+            {
+                IsOutflowEnabled = true,
+                PumpPressureRise = 50e5,
+                ChamberPressure = 1e5,
+                InjectorConductance = 1.0,
+                Demand = 1000.0
+            };
+            var tempTank = FlowNetworkTestHelper.CreateTestTank( 1.0, Vector3.zero, Vector3.zero );
+            tempTank.Contents.Add( TestSubstances.Kerosene, initialMass );
+
+            var tempBuilder = new FlowNetworkBuilder();
+            tempBuilder.TryAddFlowObj( new object(), tempTank );
+            tempBuilder.TryAddFlowObj( new object(), tempEngine );
+            CreateAndAddPipe( tempBuilder, tempTank, new Vector3( 0, -1, 0 ), tempEngine, Vector3.zero, 1.0 );
+            var tempSnapshot = tempBuilder.BuildSnapshot();
+            for( int i = 0; i < 5; i++ )
+            {
+                tempSnapshot.Step( 0.02f );
+                tempEngine.ApplyFlows( 0.02f );
+                totalMassConsumed += tempEngine.MassConsumedLastStep;
+            }
+
+            Assert.That( totalMassConsumed, Is.EqualTo( initialMass ).Within( 1e-9 ), "Engine should have consumed exactly the mass available in the tank." );
+            Assert.That( snapshot.Pipes[0].ComputeFlowRate( tank.Sample( Vector3.zero, 0.1 ).FluidSurfacePotential, engine.Sample( Vector3.zero, 0.1 ).FluidSurfacePotential ), Is.Not.NaN, "Flow rate should not be NaN after draining." );
+        }
     }
 }

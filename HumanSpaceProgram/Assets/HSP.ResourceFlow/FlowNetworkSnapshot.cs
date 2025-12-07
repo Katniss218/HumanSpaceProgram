@@ -695,6 +695,8 @@ namespace HSP.ResourceFlow
                 double volume = Math.Abs( proposedFlowrate ) * dt;
 
                 object sourceObj = (proposedFlowrate > 0) ? _pipes[i].FromInlet.Producer : _pipes[i].ToInlet.Producer;
+                object sinkObj = (proposedFlowrate > 0) ? _pipes[i].ToInlet.Consumer : _pipes[i].FromInlet.Consumer;
+
                 if( sourceObj is IResourceProducer producer )
                 {
                     if( !_producerVolumeSupply.ContainsKey( producer ) )
@@ -702,7 +704,6 @@ namespace HSP.ResourceFlow
                     _producerVolumeSupply[producer] += volume;
                 }
 
-                object sinkObj = (proposedFlowrate > 0) ? _pipes[i].ToInlet.Consumer : _pipes[i].FromInlet.Consumer;
                 if( sinkObj is IResourceConsumer consumer )
                 {
                     if( !_consumerVolumeDemand.ContainsKey( consumer ) )
@@ -753,6 +754,9 @@ namespace HSP.ResourceFlow
 
                 IResourceProducer source = (rate > 0) ? _pipes[i].FromInlet.Producer : _pipes[i].ToInlet.Producer;
                 IResourceConsumer sink = (rate > 0) ? _pipes[i].ToInlet.Consumer : _pipes[i].FromInlet.Consumer;
+
+                if( source == null || sink == null )
+                    continue;
 
                 if( _producerScalingFactors.TryGetValue( source, out double pScale ) )
                 {

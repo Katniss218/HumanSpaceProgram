@@ -1,7 +1,6 @@
 ﻿using HSP.ResourceFlow;
 using System;
 using UnityEngine;
-using static HSP.ResourceFlow.VaporLiquidEquilibrium;
 
 namespace HSP.Vanilla.Components
 {

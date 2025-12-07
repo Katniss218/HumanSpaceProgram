@@ -28,5 +28,17 @@ namespace HSP_Tests
             tank.FluidState = new FluidState( pressure: 101325.0, temperature: 293.15, velocity: 0.0 );
             return tank;
         }
+
+        public static FlowTank CreateTestTank( double volume, Vector3 acceleration, Vector3 offset, ISubstance substance, double mass )
+        {
+            var tank = CreateTestTank(volume, acceleration, offset );
+
+            if( substance != null && mass > 0 )
+            {
+                tank.Contents.Add( substance, mass );
+            }
+
+            return tank;
+        }
     }
 }
