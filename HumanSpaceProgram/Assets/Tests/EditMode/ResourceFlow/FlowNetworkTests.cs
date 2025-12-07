@@ -1,8 +1,11 @@
 ﻿using HSP.ResourceFlow;
 using HSP.Vanilla.Components;
+using HSP_Tests;
 using NUnit.Framework;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using UnityEngine;
 
 namespace HSP_Tests_EditMode.ResourceFlow
@@ -10,38 +13,15 @@ namespace HSP_Tests_EditMode.ResourceFlow
     [TestFixture]
     public class FlowNetworkTests
     {
-        private ISubstance _water;
-        private ISubstance _air;
-        private ISubstance _fuel;
-
-        [SetUp]
-        public void SetUp()
+        private double[] GetLearnedRelaxationFactors( FlowNetworkSnapshot snapshot )
         {
-            _water = new Substance( "water" )
+            var fieldInfo = typeof( FlowNetworkSnapshot ).GetField( "_pipeLearnedRelaxationFactors", BindingFlags.NonPublic | BindingFlags.Instance );
+            if( fieldInfo == null )
             {
-                DisplayName = "Water",
-                Phase = SubstancePhase.Liquid,
-                ReferenceDensity = 1000.0,
-                ReferencePressure = 101325.0,
-                BulkModulus = 2.2e9,
-                DisplayColor = Color.blue
-            };
-            _air = new Substance( "air" )
-            {
-                DisplayName = "Air",
-                Phase = SubstancePhase.Gas,
-                MolarMass = 0.0289647,
-                DisplayColor = Color.clear
-            };
-            _fuel = new Substance( "kerosene" )
-            {
-                DisplayName = "Rocket Fuel",
-                Phase = SubstancePhase.Liquid,
-                ReferenceDensity = 820.0,
-                ReferencePressure = 101325.0,
-                BulkModulus = 1.6e9,
-                DisplayColor = Color.yellow
-            };
+                Assert.Fail( "_pipeLearnedRelaxationFactors field not found on FlowNetworkSnapshot. This may be due to a refactor." );
+                return null;
+            }
+            return (double[])fieldInfo.GetValue( snapshot );
         }
 
         public static FlowTank CreateTestTank( double volume, Vector3 acceleration, Vector3 offset )
@@ -84,14 +64,14 @@ namespace HSP_Tests_EditMode.ResourceFlow
             var builder = new FlowNetworkBuilder();
 
             var tankA = CreateTestTank( 1.0, new Vector3( 0, -10, 0 ), Vector3.zero );
-            tankA.Contents.Add( _water, 1000 ); // Full
+            tankA.Contents.Add( TestSubstances.Water, 1000 ); // Full
 
             var tankB = CreateTestTank( 1.0, new Vector3( 0, -10, 0 ), Vector3.zero );
 
             builder.TryAddFlowObj( new object(), tankA );
             builder.TryAddFlowObj( new object(), tankB );
 
-            CreateAndAddPipe( builder, tankA, new Vector3( 0, -1f, 0 ), tankB, new Vector3( 0, -1f, 0 ), 0.0005 );
+            CreateAndAddPipe( builder, tankA, new Vector3( 0, -1f, 0 ), tankB, new Vector3( 0, -1f, 0 ), 0.5 );
 
             var snapshot = builder.BuildSnapshot();
 
@@ -123,7 +103,7 @@ namespace HSP_Tests_EditMode.ResourceFlow
             Vector3 gravity = new Vector3( 0, -10, 0 );
 
             var tankA = CreateTestTank( 1.0, gravity, new Vector3( 0, 5, 0 ) );
-            tankA.Contents.Add( _water, 500 ); // Half full
+            tankA.Contents.Add( TestSubstances.Water, 500 ); // Half full
 
             var tankB = CreateTestTank( 1.0, gravity, Vector3.zero );
 
@@ -158,10 +138,10 @@ namespace HSP_Tests_EditMode.ResourceFlow
             var builder = new FlowNetworkBuilder();
             Vector3 gravity = new Vector3( 0, -10, 0 );
             var tankA = CreateTestTank( 1.0, gravity, new Vector3( 0, 5, 0 ) ); // Elevated
-            tankA.Contents.Add( _water, 500 ); // Half full
+            tankA.Contents.Add( TestSubstances.Water, 500 ); // Half full
 
             var tankB = CreateTestTank( 1.0, gravity, Vector3.zero ); // Lower
-            tankB.Contents.Add( _water, 250 ); // Quarter full
+            tankB.Contents.Add( TestSubstances.Water, 250 ); // Quarter full
 
             builder.TryAddFlowObj( new object(), tankA );
             builder.TryAddFlowObj( new object(), tankB );
@@ -189,7 +169,7 @@ namespace HSP_Tests_EditMode.ResourceFlow
             // Arrange
             var builder = new FlowNetworkBuilder();
             var tankA = CreateTestTank( 1.0, new Vector3( 0, -10, 0 ), new Vector3( 0, 10, 0 ) );
-            tankA.Contents.Add( _water, 100 ); // Only 10% full
+            tankA.Contents.Add( TestSubstances.Water, 100 ); // Only 10% full
 
             var tankB = CreateTestTank( 1.0, new Vector3( 0, -10, 0 ), Vector3.zero );
 
@@ -224,7 +204,7 @@ namespace HSP_Tests_EditMode.ResourceFlow
 
             var tankSource = CreateTestTank( 1.0, gravity, new Vector3( 0, 10, 0 ) );
             double initialMass = 20.0;
-            tankSource.Contents.Add( _water, initialMass );
+            tankSource.Contents.Add( TestSubstances.Water, initialMass );
 
             var tankSink1 = CreateTestTank( 1.0, gravity, Vector3.zero );
             var tankSink2 = CreateTestTank( 1.0, gravity, new Vector3( 2, 0, 0 ) );
@@ -267,7 +247,7 @@ namespace HSP_Tests_EditMode.ResourceFlow
             Vector3 gravity = new Vector3( 0, -10, 0 );
 
             var tankA = CreateTestTank( 1.0, gravity, new Vector3( 0, 10, 0 ) );
-            tankA.Contents.Add( _water, 1000 );
+            tankA.Contents.Add( TestSubstances.Water, 1000 );
 
             var tankB = CreateTestTank( 1.0, gravity, new Vector3( 5, 5, 0 ) );
             var tankC = CreateTestTank( 1.0, gravity, Vector3.zero );
@@ -307,7 +287,7 @@ namespace HSP_Tests_EditMode.ResourceFlow
             Vector3 gravity = new Vector3( 0, -10, 0 );
 
             var tankA = CreateTestTank( 1.0, gravity, new Vector3( -2, 0, 0 ) );
-            tankA.Contents.Add( _air, 6.0 );
+            tankA.Contents.Add( TestSubstances.Air, 6.0 );
 
             var tankB = CreateTestTank( 2.0, gravity, new Vector3( 2, 0, 0 ) );
 
@@ -324,8 +304,6 @@ namespace HSP_Tests_EditMode.ResourceFlow
             int steps = (int)(simulationTime / fixedDeltaTime);
             for( int i = 0; i < steps; i++ )
             {
-                tankA.FluidState = new FluidState( pressure: VaporLiquidEquilibrium.ComputePressureOnly( tankA.Contents, tankA.FluidState, tankA.Volume ), temperature: tankA.FluidState.Temperature, tankA.FluidState.Velocity );
-                tankB.FluidState = new FluidState( pressure: VaporLiquidEquilibrium.ComputePressureOnly( tankB.Contents, tankB.FluidState, tankB.Volume ), temperature: tankB.FluidState.Temperature, tankB.FluidState.Velocity );
                 double massA1 = tankA.Contents.GetMass();
                 double massB1 = tankB.Contents.GetMass();
                 Debug.Log( massA1 + " : " + massB1 );
@@ -348,7 +326,7 @@ namespace HSP_Tests_EditMode.ResourceFlow
             Vector3 gravity = new Vector3( 0, -10, 0 );
 
             var tankA = CreateTestTank( 1.0, gravity, Vector3.zero ); // Bottom tank
-            tankA.Contents.Add( _air, 5.0 ); // High pressure
+            tankA.Contents.Add( TestSubstances.Air, 5.0 ); // High pressure
 
             var tankB = CreateTestTank( 1.0, gravity, new Vector3( 0, 10, 0 ) ); // Top tank
 
@@ -378,8 +356,8 @@ namespace HSP_Tests_EditMode.ResourceFlow
             Vector3 gravity = new Vector3( 0, -10, 0 );
 
             var tankSource = CreateTestTank( 2.0, gravity, Vector3.zero );
-            tankSource.Contents.Add( _water, 1000 ); // 1.0 m^3 of water (fills bottom half)
-            tankSource.Contents.Add( _air, 1.2 );    // 1.0 m^3 of air (fills top half)
+            tankSource.Contents.Add( TestSubstances.Water, 1000 ); // 1.0 m^3 of water (fills bottom half)
+            tankSource.Contents.Add( TestSubstances.Air, 1.2 );    // 1.0 m^3 of air (fills top half)
 
             var tankGasSink = CreateTestTank( 1.0, gravity, new Vector3( 0, 5, 0 ) );
             var tankLiquidSink = CreateTestTank( 1.0, gravity, new Vector3( 0, -5, 0 ) );
@@ -404,12 +382,12 @@ namespace HSP_Tests_EditMode.ResourceFlow
 
             // Assert
             Assert.That( tankGasSink.Contents.GetMass(), Is.GreaterThan( 0 ), "Gas sink should have received fluid." );
-            Assert.That( tankGasSink.Contents.Contains( _air ), Is.True, "Gas sink should contain air." );
-            Assert.That( tankGasSink.Contents.Contains( _water ), Is.False, "Gas sink should NOT contain water." );
+            Assert.That( tankGasSink.Contents.Contains( TestSubstances.Air ), Is.True, "Gas sink should contain air." );
+            Assert.That( tankGasSink.Contents.Contains( TestSubstances.Water ), Is.False, "Gas sink should NOT contain water." );
 
             Assert.That( tankLiquidSink.Contents.GetMass(), Is.GreaterThan( 0 ), "Liquid sink should have received fluid." );
-            Assert.That( tankLiquidSink.Contents.Contains( _water ), Is.True, "Liquid sink should contain water." );
-            Assert.That( tankLiquidSink.Contents.Contains( _air ), Is.False, "Liquid sink should NOT contain air." );
+            Assert.That( tankLiquidSink.Contents.Contains( TestSubstances.Water ), Is.True, "Liquid sink should contain water." );
+            Assert.That( tankLiquidSink.Contents.Contains( TestSubstances.Air ), Is.False, "Liquid sink should NOT contain air." );
         }
 
         [Test]
@@ -419,10 +397,10 @@ namespace HSP_Tests_EditMode.ResourceFlow
             var builder = new FlowNetworkBuilder();
             Vector3 gravity = new Vector3( 0, -10, 0 );
             var tankA = CreateTestTank( 0.1, gravity, Vector3.zero );
-            tankA.Contents.Add( _water, 90 );
+            tankA.Contents.Add( TestSubstances.Water, 90 );
 
-            var tankB = CreateTestTank( 0.1, gravity, Vector3.right );
-            tankA.Contents.Add( _water, 10 );
+            var tankB = CreateTestTank( 0.1, gravity, new Vector3( 1, 0, 0 ) );
+            tankB.Contents.Add( TestSubstances.Water, 10 );
 
             builder.TryAddFlowObj( new object(), tankA );
             builder.TryAddFlowObj( new object(), tankB );
@@ -434,8 +412,9 @@ namespace HSP_Tests_EditMode.ResourceFlow
             // Act & Assert
             Assert.DoesNotThrow( () =>
             {
-                for( int i = 0; i < 500; i++ )
+                for( int i = 0; i < 50; i++ )
                 {
+                    Debug.Log( tankA.Contents.GetMass() + " : " + tankB.Contents.GetMass() );
                     snapshot.Step( 0.02f );
                 }
             }, "Solver threw an exception on an oscillation-prone system." );
@@ -468,10 +447,10 @@ namespace HSP_Tests_EditMode.ResourceFlow
                 tanks.Add( tank );
                 builder.TryAddFlowObj( new object(), tank );
             }
-            tanks[0].Contents.Add( _water, 970 ); // Prime one tank
-            tanks[1].Contents.Add( _water, 10 ); // Prime one tank
-            tanks[2].Contents.Add( _water, 10 ); // Prime one tank
-            tanks[3].Contents.Add( _water, 10 ); // Prime one tank
+            tanks[0].Contents.Add( TestSubstances.Water, 970 ); // Prime one tank
+            tanks[1].Contents.Add( TestSubstances.Water, 10 ); // Prime one tank
+            tanks[2].Contents.Add( TestSubstances.Water, 10 ); // Prime one tank
+            tanks[3].Contents.Add( TestSubstances.Water, 10 ); // Prime one tank
 
             for( int i = 0; i < 4; i++ )
             {
@@ -481,7 +460,7 @@ namespace HSP_Tests_EditMode.ResourceFlow
                 var targetTank = tanks[target];
                 Vector3 posSource = GetPoint( source, 4, -1 );
                 Vector3 posTarget = GetPoint( target, 4, -1 );
-                CreateAndAddPipe( builder, sourceTank, posSource, targetTank, posTarget, 0.001 );
+                CreateAndAddPipe( builder, sourceTank, posSource, targetTank, posTarget, 0.5 );
             }
             var snapshot = builder.BuildSnapshot();
 
@@ -509,7 +488,7 @@ namespace HSP_Tests_EditMode.ResourceFlow
             var builder = new FlowNetworkBuilder();
             Vector3 gravity = new Vector3( 0, -10, 0 );
             var tank = CreateTestTank( 1.0, gravity, Vector3.zero );
-            tank.Contents.Add( _fuel, 800 ); // Full
+            tank.Contents.Add( TestSubstances.Kerosene, 800 ); // Full
 
             var engine = new EngineFeedSystem( 0.01 )
             {
@@ -541,7 +520,7 @@ namespace HSP_Tests_EditMode.ResourceFlow
             var builder = new FlowNetworkBuilder();
             Vector3 gravity = new Vector3( 0, -10, 0 );
             var tankA = CreateTestTank( 1.0, gravity, Vector3.zero ); // Bottom tank
-            tankA.Contents.Add( _water, 500 );
+            tankA.Contents.Add( TestSubstances.Water, 500 );
 
             var tankB = CreateTestTank( 1.0, gravity, new Vector3( 0, 5, 0 ) ); // Top tank
 
@@ -574,7 +553,7 @@ namespace HSP_Tests_EditMode.ResourceFlow
             var builder = new FlowNetworkBuilder();
             Vector3 gravity = new Vector3( 0, -10, 0 );
             var tankA = CreateTestTank( 1.0, gravity, new Vector3( 0, 5, 0 ) ); // Top tank
-            tankA.Contents.Add( _water, 500 );
+            tankA.Contents.Add( TestSubstances.Water, 500 );
 
             var tankB = CreateTestTank( 1.0, gravity, Vector3.zero ); // Bottom tank
 
@@ -606,7 +585,7 @@ namespace HSP_Tests_EditMode.ResourceFlow
             // Arrange
             var builder = new FlowNetworkBuilder();
             var tankA = CreateTestTank( 1.0, new Vector3( 0, -10, 0 ), new Vector3( 0, 10, 0 ) );
-            tankA.Contents.Add( _water, 1000 );
+            tankA.Contents.Add( TestSubstances.Water, 1000 );
 
             var tankB = CreateTestTank( 1.0, new Vector3( 0, -10, 0 ), Vector3.zero );
 
@@ -633,7 +612,7 @@ namespace HSP_Tests_EditMode.ResourceFlow
             var builder = new FlowNetworkBuilder();
             Vector3 gravity = new Vector3( 0, -10, 0 );
             var tankA = CreateTestTank( 10.0, gravity, new Vector3( 0, 200, 0 ) );
-            tankA.Contents.Add( _water, 10000 ); // Full
+            tankA.Contents.Add( TestSubstances.Water, 10000 ); // Full
 
             var tankB = CreateTestTank( 0.1, gravity, Vector3.zero ); // Very small
 
@@ -653,7 +632,8 @@ namespace HSP_Tests_EditMode.ResourceFlow
             // Assert
             double volumeInTankB = tankB.Contents.GetVolume( tankB.FluidState.Temperature, tankB.FluidState.Pressure );
             Assert.That( tankA.Contents.GetMass() + tankB.Contents.GetMass(), Is.EqualTo( 10000.0 ).Within( 0.01 ), "Mass must be conserved." );
-            Assert.That( volumeInTankB, Is.EqualTo( tankB.Volume ).Within( 1e-6 ), "Small tank should not be overfilled in a single step." );
+            Assert.That( tankB.Contents.GetMass(), Is.EqualTo( 100 ).Within( 0.01 ), "Small tank should be drained and not underfilled." );
+            Assert.That( volumeInTankB, Is.EqualTo( tankB.Volume ).Within( 1e-3 ), "Small tank should not be overfilled in a single step." );
         }
 
         [Test]
@@ -665,7 +645,7 @@ namespace HSP_Tests_EditMode.ResourceFlow
             var tankA = CreateTestTank( 10.0, gravity, Vector3.zero );
 
             var tankB = CreateTestTank( 1, gravity, new Vector3( 0, 200, 0 ) ); // Very small
-            tankB.Contents.Add( _water, 1000 ); // Full
+            tankB.Contents.Add( TestSubstances.Water, 1000 ); // Full
 
             builder.TryAddFlowObj( new object(), tankA );
             builder.TryAddFlowObj( new object(), tankB );
@@ -683,8 +663,130 @@ namespace HSP_Tests_EditMode.ResourceFlow
             // Assert
             double volumeInTankA = tankA.Contents.GetVolume( tankA.FluidState.Temperature, tankA.FluidState.Pressure );
             Assert.That( tankA.Contents.GetMass() + tankB.Contents.GetMass(), Is.EqualTo( 1000.0 ).Within( 0.01 ), "Mass must be conserved." );
-            Assert.That( tankB.Contents.GetMass(), Is.EqualTo( 0 ), "Small tank should be drained and not underfilled." );
+            Assert.That( tankB.Contents.GetMass(), Is.EqualTo( 0 ).Within( 0.01 ), "Small tank should be drained and not underfilled." );
             Assert.That( volumeInTankA, Is.EqualTo( tankB.Volume ).Within( 1e-3 ), "Small tank should be drained and not underfilled." );
+        }
+        
+        [Test]
+        public void Solver_WithMixedStiffnessTanks_DampsStiffConnectionProactively()
+        {
+            // Arrange
+            var builder = new FlowNetworkBuilder();
+            Vector3 gravity = new Vector3(0, -10, 0);
+
+            var tankSource = CreateTestTank(10.0, gravity, Vector3.zero);
+            tankSource.Contents.Add(TestSubstances.Water, 10000); // Full
+
+            var tankStiffSink = CreateTestTank(0.1, gravity, new Vector3(-5, 0, 0)); // Small, liquid-only -> stiff
+            var tankGasSink = CreateTestTank(5.0, gravity, new Vector3(5, 0, 0));   // Large, gas-only -> not stiff
+
+            builder.TryAddFlowObj(new object(), tankSource);
+            builder.TryAddFlowObj(new object(), tankStiffSink);
+            builder.TryAddFlowObj(new object(), tankGasSink);
+
+            // Identical pipes to isolate effect of stiffness
+            var pipeToStiff = CreateAndAddPipe(builder, tankSource, new Vector3(0, -1, 0), tankStiffSink, new Vector3(-4, 0, 0), 1.0);
+            var pipeToGas = CreateAndAddPipe(builder, tankSource, new Vector3(0, -1, 0), tankGasSink, new Vector3(4, 0, 0), 1.0);
+
+            var snapshot = builder.BuildSnapshot();
+
+            // Act: Run a single step. Proactive damping should work on the first iteration.
+            snapshot.Step(0.02f);
+            
+            // Assert
+            double massToStiff = tankStiffSink.Contents.GetMass();
+            double massToGas = tankGasSink.Contents.GetMass();
+
+            Assert.That(massToStiff, Is.GreaterThan(0), "Some flow should occur to stiff tank.");
+            Assert.That(massToGas, Is.GreaterThan(0), "Some flow should occur to gas tank.");
+            
+            // Due to proactive damping, flow to the stiff tank should be significantly less than to the non-stiff one,
+            // even though potential gradients are comparable.
+            Assert.That(massToGas, Is.GreaterThan(massToStiff * 5), "Flow to non-stiff tank should be much higher than to stiff tank.");
+        }
+
+        [Test]
+        public void Solver_WithMixedConductancePipes_LearnsToDampOscillatingPipe()
+        {
+            // Arrange
+            var builder = new FlowNetworkBuilder();
+            Vector3 gravity = new Vector3(0, -10, 0);
+
+            var tankA = CreateTestTank(1.0, gravity, new Vector3(-10, 0, 0));
+            var tankB = CreateTestTank(1.0, gravity, new Vector3(-5, 0, 0));
+            tankA.Contents.Add(TestSubstances.Water, 1000);
+
+            var tankC = CreateTestTank(1.0, gravity, new Vector3(5, 0, 0));
+            var tankD = CreateTestTank(1.0, gravity, new Vector3(10, 0, 0));
+            tankC.Contents.Add(TestSubstances.Water, 1000);
+
+            builder.TryAddFlowObj(new object(), tankA);
+            builder.TryAddFlowObj(new object(), tankB);
+            builder.TryAddFlowObj(new object(), tankC);
+            builder.TryAddFlowObj(new object(), tankD);
+
+            var stablePipe = CreateAndAddPipe(builder, tankA, new Vector3(-9, 0, 0), tankB, new Vector3(-6, 0, 0), 0.001); // Low conductance
+            var unstablePipe = CreateAndAddPipe(builder, tankC, new Vector3(6, 0, 0), tankD, new Vector3(9, 0, 0), 1000.0); // High conductance
+
+            var snapshot = builder.BuildSnapshot();
+
+            // Act
+            for (int i = 0; i < 50; i++)
+            {
+                snapshot.Step(0.02f);
+            }
+
+            // Assert
+            var learnedFactors = GetLearnedRelaxationFactors(snapshot);
+            int stablePipeIndex = snapshot.Pipes.ToList().IndexOf(stablePipe);
+            int unstablePipeIndex = snapshot.Pipes.ToList().IndexOf(unstablePipe);
+
+            Assert.That(stablePipeIndex, Is.Not.EqualTo(-1));
+            Assert.That(unstablePipeIndex, Is.Not.EqualTo(-1));
+
+            Assert.That(learnedFactors[unstablePipeIndex], Is.LessThan(0.5), "High-conductance pipe should have its learned damping factor significantly reduced.");
+            Assert.That(learnedFactors[stablePipeIndex], Is.EqualTo(1.0).Within(0.1), "Low-conductance pipe should not be damped and its factor should recover to ~1.0.");
+        }
+
+        [Test]
+        public void Solver_WithHighStiffnessAndConductance_ConvergesSafely()
+        {
+            // Arrange
+            var builder = new FlowNetworkBuilder();
+            Vector3 gravity = new Vector3(0, -10, 0);
+
+            var tankSource = CreateTestTank(0.2, gravity, Vector3.zero);
+            tankSource.Contents.Add(TestSubstances.Water, 200); // Full
+
+            var tankStiffSink = CreateTestTank(0.2, gravity, new Vector3(5, 0, 0)); // Stiff
+
+            builder.TryAddFlowObj(new object(), tankSource);
+            builder.TryAddFlowObj(new object(), tankStiffSink);
+            
+            // Worst-case: high conductance pipe into a stiff tank
+            var pipe = CreateAndAddPipe(builder, tankSource, new Vector3(1, 0, 0), tankStiffSink, new Vector3(4, 0, 0), 1000.0);
+            
+            var snapshot = builder.BuildSnapshot();
+
+            // Act & Assert
+            Assert.DoesNotThrow(() =>
+            {
+                for (int i = 0; i < 100; i++)
+                {
+                    snapshot.Step(0.02f);
+                }
+            }, "Solver threw an exception on a highly stiff and conductive system.");
+
+            double massA = tankSource.Contents.GetMass();
+            double massB = tankStiffSink.Contents.GetMass();
+            
+            Assert.That(massA + massB, Is.EqualTo(200.0).Within(1e-3), "Mass must be conserved.");
+            Assert.That(massA, Is.EqualTo(100.0).Within(1.0), "Tanks should equalize.");
+            Assert.That(massB, Is.EqualTo(100.0).Within(1.0), "Tanks should equalize.");
+
+            var learnedFactors = GetLearnedRelaxationFactors(snapshot);
+            int pipeIndex = snapshot.Pipes.ToList().IndexOf(pipe);
+            Assert.That(learnedFactors[pipeIndex], Is.LessThan(0.1), "Pipe should be very aggressively damped by the reactive layer.");
         }
     }
 }

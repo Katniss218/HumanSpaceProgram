@@ -118,7 +118,7 @@
         }
 
 
-        public static double GetAveragePressureDerivativeWrtMass( this ISubstanceStateCollection collection, double volume, double temp )
+        public static double GetAveragePressureDerivativeWrtMass( this IReadonlySubstanceStateCollection collection, double volume, double temp )
         {
             double totalMass = collection.GetMass();
             if( totalMass <= 1e-9 )

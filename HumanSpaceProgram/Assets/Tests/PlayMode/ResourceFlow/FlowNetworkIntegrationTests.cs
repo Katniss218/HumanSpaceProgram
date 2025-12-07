@@ -2,20 +2,16 @@
 using HSP.Vanilla.Components;
 using NUnit.Framework;
 using UnityEngine;
+using HSP_Tests;
 
 namespace HSP_Tests_PlayMode.ResourceFlow
 {
     [TestFixture]
     public class DirectFlowNetworkIntegrationTests
     {
-        private Substance _water;
-        private Substance _fuel;
-
         [SetUp]
         public void SetUp()
         {
-            _water = new Substance( "water" ) { Phase = SubstancePhase.Liquid, ReferenceDensity = 1000 };
-            _fuel = new Substance( "fuel" ) { Phase = SubstancePhase.Liquid, ReferenceDensity = 800 };
         }
 
         [Test]
@@ -24,10 +20,10 @@ namespace HSP_Tests_PlayMode.ResourceFlow
             // Arrange
             var builder = new FlowNetworkBuilder();
 
-            var tankA = FlowNetworkTests.CreateTestTank( 1.0, new Vector3( 0, -10, 0 ), Vector3.zero );
-            tankA.Contents.Add( _water, 1000 ); // Full
+            var tankA = FlowNetworkTestHelper.CreateTestTank( 1.0, new Vector3( 0, -10, 0 ), Vector3.zero );
+            tankA.Contents.Add( TestSubstances.Water, 1000 ); // Full
 
-            var tankB = FlowNetworkTests.CreateTestTank( 1.0, new Vector3( 0, -10, 0 ), Vector3.zero );
+            var tankB = FlowNetworkTestHelper.CreateTestTank( 1.0, new Vector3( 0, -10, 0 ), Vector3.zero );
 
             var ownerA = new object();
             var ownerB = new object();
@@ -67,8 +63,8 @@ namespace HSP_Tests_PlayMode.ResourceFlow
             // Arrange
             var builder = new FlowNetworkBuilder();
 
-            var tank = FlowNetworkTests.CreateTestTank( 1.0, new Vector3( 0, -10, 0 ), Vector3.zero );
-            tank.Contents.Add( _fuel, 800 ); // Full
+            var tank = FlowNetworkTestHelper.CreateTestTank( 1.0, new Vector3( 0, -10, 0 ), Vector3.zero );
+            tank.Contents.Add( TestSubstances.Kerosene, 800 ); // Full
 
             var engineFeed = new EngineFeedSystem( 0.01 );
             engineFeed.IsOutflowEnabled = true;
@@ -106,7 +102,7 @@ namespace HSP_Tests_PlayMode.ResourceFlow
             snapshot.Step( 0.02f );
 
             // Assert 2: Consumption occurred
-           // Assert.Greater( engineFeed.MassConsumedLastStep, 0.0, "Engine should have consumed propellant." );
+            // Assert.Greater( engineFeed.MassConsumedLastStep, 0.0, "Engine should have consumed propellant." );
             double massAfterStep2 = tank.Contents.GetMass() + (engineFeed.Inflow.GetMass() - engineFeed.MassConsumedLastStep);
             Assert.AreEqual( massAfterStep1, massAfterStep2, 1e-9, "Mass should be conserved after step 2." );
         }

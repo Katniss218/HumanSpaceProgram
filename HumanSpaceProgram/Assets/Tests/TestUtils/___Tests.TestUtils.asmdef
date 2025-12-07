@@ -1,10 +1,9 @@
 {
-    "name": "HSP.Tests.PlayMode",
+    "name": "HSP.Tests.TestUtils",
     "rootNamespace": "",
     "references": [
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
-        "HSP.Tests.TestUtils",
         "_UnityEngine",
         "_UnityPlus",
         "_UnityPlus.AssetManagement",

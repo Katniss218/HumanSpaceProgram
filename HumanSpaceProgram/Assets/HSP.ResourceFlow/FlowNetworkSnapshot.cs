@@ -38,6 +38,9 @@ namespace HSP.ResourceFlow
         private double[] _currentFlowRates;
         private double[] _nextFlowRates; // Buffer for unrelaxed flows
         private double[] _pipeFlowScalingFactors;
+        private double[] _pipeLearnedRelaxationFactors;
+        private double[] _producerStiffness;
+        private double[] _consumerStiffness;
 
         private double _relaxationFactor = 0.7;
 
@@ -65,7 +68,14 @@ namespace HSP.ResourceFlow
             _pipes = pipes;
 
             // Initialize solver buffers to the correct capacity.
+            _pipeLearnedRelaxationFactors = new double[_pipes.Count];
+            for( int i = 0; i < _pipes.Count; i++ )
+            {
+                _pipeLearnedRelaxationFactors[i] = 1.0;
+            }
+
             ResizeSolverBuffers( _pipes.Count, true );
+            ResizeStiffnessBuffers( _producers.Count, _consumers.Count, true );
             _pipeFlowScalingFactors = new double[_pipes.Count];
 
             // Populate reverse lookup maps for the initial state.
@@ -85,11 +95,36 @@ namespace HSP.ResourceFlow
         {
             if( _currentFlowRates == null || _currentFlowRates.Length < capacity )
             {
-                int newSize = exact ? capacity : Math.Max( capacity, (_currentFlowRates?.Length ?? 0) * 2 );
+                int oldSize = _currentFlowRates?.Length ?? 0;
+                int newSize = exact ? capacity : Math.Max( capacity, oldSize * 2 );
                 Array.Resize( ref _currentFlowRates, newSize );
                 Array.Resize( ref _previousFlowRates, newSize );
                 Array.Resize( ref _nextFlowRates, newSize );
                 Array.Resize( ref _currentPotentials, newSize );
+                Array.Resize( ref _pipeLearnedRelaxationFactors, newSize );
+
+                if( newSize > oldSize )
+                {
+                    // Initialize new elements for learned relaxation factors
+                    for( int i = oldSize; i < newSize; i++ )
+                    {
+                        _pipeLearnedRelaxationFactors[i] = 1.0;
+                    }
+                }
+            }
+        }
+
+        private void ResizeStiffnessBuffers( int producerCapacity, int consumerCapacity, bool exact )
+        {
+            if( _producerStiffness == null || _producerStiffness.Length < producerCapacity )
+            {
+                int newSize = exact ? producerCapacity : Math.Max( producerCapacity, _producerStiffness?.Length * 2 ?? producerCapacity );
+                Array.Resize( ref _producerStiffness, newSize );
+            }
+            if( _consumerStiffness == null || _consumerStiffness.Length < consumerCapacity )
+            {
+                int newSize = exact ? consumerCapacity : Math.Max( consumerCapacity, _consumerStiffness?.Length * 2 ?? consumerCapacity );
+                Array.Resize( ref _consumerStiffness, newSize );
             }
         }
 
@@ -249,6 +284,7 @@ namespace HSP.ResourceFlow
 
                 // Ensure solver buffers are large enough.
                 ResizeSolverBuffers( _pipes.Count, false );
+                ResizeStiffnessBuffers( _producers.Count, _consumers.Count, false );
                 if( _pipeFlowScalingFactors.Length < _pipes.Count )
                 {
                     Array.Resize( ref _pipeFlowScalingFactors, _pipes.Count );
@@ -326,7 +362,8 @@ namespace HSP.ResourceFlow
             const int MAX_ITERATIONS = 50;
             //Debug.Log( "_relaxationFactor " + _relaxationFactor );
 
-            // 1. Initial State: Sample potentials based on the tanks' current state.
+            // 1. Initial State: Sample potentials and stiffness based on the tanks' current state.
+            UpdateStiffnessCache();
             UpdatePotentials();
 
             bool converged = false;
@@ -351,9 +388,6 @@ namespace HSP.ResourceFlow
 
                 if( converged )
                     break;
-
-                // D. Update potentials based on new (relaxed) flow rates.
-                UpdatePotentials();
             }
 
             if( !converged )
@@ -398,98 +432,24 @@ namespace HSP.ResourceFlow
             }
         }
 
-#warning TODO - we need (edit mode) tests that test the various relaxation and convergence behaviors, with the flow network created without any wrappers.
-
-        private void CalculateUnrelaxedFlows( double dt )
+        private void UpdateStiffnessCache()
         {
-            for( int i = 0; i < _pipes.Count; i++ )
+            for( int i = 0; i < _producers.Count; i++ )
             {
-                FlowPipe pipe = _pipes[i];
-                if( pipe == null )
-                    continue;
-
-                (double potentialFrom, double potentialTo) = _currentPotentials[i];
-
-                // 1. Calculate the raw flow rate.
-#warning TODO - after splitting, potentials nearly equal -14 -12 = -9950 flowrate. before splitting, flowrate is 80000
-                double rawFlowRate = pipe.ComputeFlowRate( potentialFrom, potentialTo );
-
-                double maxSourceFlow = double.MaxValue;
-                double maxSinkFlow = double.MaxValue;
-
-                bool isForward = rawFlowRate > 0;
-                IResourceProducer source = isForward ? pipe.FromInlet.Producer : pipe.ToInlet.Producer;
-                IResourceConsumer sink = isForward ? pipe.ToInlet.Consumer : pipe.FromInlet.Consumer;
-
-                // 2. Limit flow so it doesn't fill/drain more than ~50% of the available volume in a single frame.
-                const double MAX_FILL_DRAIN_FACTOR = 0.5;
-
-                if( source != null )
-                {
-                    maxSourceFlow = (source.GetAvailableOutflowVolume() * MAX_FILL_DRAIN_FACTOR) / dt;
-                }
-                if( sink != null )
-                {
-                    maxSinkFlow = (sink.GetAvailableInflowVolume( dt ) * MAX_FILL_DRAIN_FACTOR) / dt;
-                }
-
-                // 3. Apply the limit, preserving the sign.
-                double maxFlow = Math.Min( maxSourceFlow, maxSinkFlow );
-                if( Math.Abs( rawFlowRate ) > maxFlow )
-                {
-                    rawFlowRate = Math.Sign( rawFlowRate ) * maxFlow;
-                }
-
-                _nextFlowRates[i] = rawFlowRate;
+                var p = _producers[i];
+                if( p is IStiffnessProvider sp )
+                    _producerStiffness[i] = sp.GetPotentialDerivativeWrtVolume();
+                else
+                    _producerStiffness[i] = 0.0;
             }
-        }
-
-        private bool CheckConvergenceAndApplyRelaxation( out bool hasOscillations )
-        {
-            const double OSCILLATION_RELAXATION = 0.1;
-            const double REL_TOLERANCE = 0.01;
-            const double ABS_TOLERANCE = 0.001;
-
-            bool converged = true;
-            hasOscillations = false;
-
-            for( int i = 0; i < _pipes.Count; i++ )
+            for( int i = 0; i < _consumers.Count; i++ )
             {
-                if( _pipes[i] == null )
-                    continue;
-
-                double prevFlow = _currentFlowRates[i];
-                double prevPrevFlow = _previousFlowRates[i];
-                double newFlowUnrelaxed = _nextFlowRates[i];
-
-                double localRelaxation = _relaxationFactor;
-
-                // 1. Oscillation detection (rapid direction flipping every step).
-                double deltaCurrent = newFlowUnrelaxed - prevFlow;
-                double deltaPrev = prevFlow - prevPrevFlow;
-                if( deltaCurrent * deltaPrev < -1e-12 )
-                {
-#warning TODO - needs a more "implicit" oscillation handling (not detection). The current system doesn't dampen, only clamp.
-                    hasOscillations = true;
-                    localRelaxation = OSCILLATION_RELAXATION;
-                    //_relaxationFactor = OSCILLATION_RELAXATION;
-                    //Debug.LogWarning( "OSCILLATION" );
-                }
-
-                // 2. Apply relaxation and check convergence.
-                double relaxedFlow = prevFlow + (newFlowUnrelaxed - prevFlow) * localRelaxation;
-                double flowDifference = Math.Abs( relaxedFlow - prevFlow );
-                double flowScale = Math.Max( Math.Abs( relaxedFlow ), Math.Abs( prevFlow ) );
-                if( flowDifference > ABS_TOLERANCE && flowDifference > flowScale * REL_TOLERANCE )
-                {
-                    converged = false;
-                }
-
-                _previousFlowRates[i] = prevFlow;
-                _currentFlowRates[i] = relaxedFlow;
+                var c = _consumers[i];
+                if( c is IStiffnessProvider sp )
+                    _consumerStiffness[i] = sp.GetPotentialDerivativeWrtVolume();
+                else
+                    _consumerStiffness[i] = 0.0;
             }
-
-            return converged;
         }
 
         private void UpdatePotentials()
@@ -552,6 +512,135 @@ namespace HSP.ResourceFlow
                     }
                 }
             }
+        }
+
+#warning TODO - we need (edit mode) tests that test the various relaxation and convergence behaviors, with the flow network created without any wrappers.
+
+        private void CalculateUnrelaxedFlows( double dt )
+        {
+            for( int i = 0; i < _pipes.Count; i++ )
+            {
+                FlowPipe pipe = _pipes[i];
+                if( pipe == null )
+                    continue;
+
+                (double potentialFrom, double potentialTo) = _currentPotentials[i];
+
+                // 1. Calculate the raw flow rate.
+#warning TODO - after splitting, potentials nearly equal -14 -12 = -9950 flowrate. before splitting, flowrate is 80000
+                double rawFlowRate = pipe.ComputeFlowRate( potentialFrom, potentialTo );
+
+                double maxSourceFlow = double.MaxValue;
+                double maxSinkFlow = double.MaxValue;
+
+                bool isForward = rawFlowRate > 0;
+                IResourceProducer source = isForward ? pipe.FromInlet.Producer : pipe.ToInlet.Producer;
+                IResourceConsumer sink = isForward ? pipe.ToInlet.Consumer : pipe.FromInlet.Consumer;
+
+                // 2. Limit flow so it doesn't fill/drain more than ~50% of the available volume in a single frame.
+                const double MAX_FILL_DRAIN_FACTOR = 0.5;
+
+                if( source != null )
+                {
+                    maxSourceFlow = (source.GetAvailableOutflowVolume() * MAX_FILL_DRAIN_FACTOR) / dt;
+                }
+                if( sink != null )
+                {
+                    maxSinkFlow = (sink.GetAvailableInflowVolume( dt ) * MAX_FILL_DRAIN_FACTOR) / dt;
+                }
+
+                // 3. Apply the limit, preserving the sign.
+                double maxFlow = Math.Min( maxSourceFlow, maxSinkFlow );
+                if( Math.Abs( rawFlowRate ) > maxFlow )
+                {
+                    rawFlowRate = Math.Sign( rawFlowRate ) * maxFlow;
+                }
+
+                _nextFlowRates[i] = rawFlowRate;
+            }
+        }
+
+        private bool CheckConvergenceAndApplyRelaxation( out bool hasOscillations )
+        {
+            const double OSCILLATION_RELAXATION = 0.2;
+            const double RELAXATION_RECOVERY = 1.05;
+            const double REL_TOLERANCE = 0.01;
+            const double ABS_TOLERANCE = 0.001;
+
+            bool converged = true;
+            hasOscillations = false;
+
+            for( int i = 0; i < _pipes.Count; i++ )
+            {
+                FlowPipe pipe = _pipes[i];
+                if( pipe == null )
+                    continue;
+
+                double prevFlow = _currentFlowRates[i];
+                double prevPrevFlow = _previousFlowRates[i];
+                double newFlowUnrelaxed = _nextFlowRates[i];
+
+                double localRelaxation = _relaxationFactor;
+
+                // Reactive Learned Damping (History-Based)
+                double learnedFactor = _pipeLearnedRelaxationFactors[i];
+
+                // 1. Oscillation detection (rapid sign flipping every step).
+                double deltaCurrent = newFlowUnrelaxed - prevFlow;
+                double deltaPrev = prevFlow - prevPrevFlow;
+                if( deltaCurrent * deltaPrev < -1e-10 )
+                {
+                    hasOscillations = true;
+                    // Aggressively damp this specific pipe
+                    learnedFactor = Math.Max( 0.01, learnedFactor * OSCILLATION_RELAXATION );
+                }
+                else
+                {
+                    // Slowly recover if stable
+                    learnedFactor = Math.Min( 1.0, learnedFactor * RELAXATION_RECOVERY );
+                }
+                _pipeLearnedRelaxationFactors[i] = learnedFactor;
+
+                localRelaxation = Math.Min( localRelaxation, learnedFactor );
+
+                // Proactive Stiffness Damping
+                const double STIFFNESS_DAMPING_K = 1e-6; // Tuning constant
+                double stiffnessA = 0.0;
+                double stiffnessB = 0.0;
+
+                var componentA = pipe.FromInlet.Consumer ?? (object)pipe.FromInlet.Producer;
+                if( componentA is IResourceConsumer consumerA && _consumerToIndex.TryGetValue( consumerA, out int cIdxA ) )
+                    stiffnessA = _consumerStiffness[cIdxA];
+                else if( componentA is IResourceProducer producerA && _producerToIndex.TryGetValue( producerA, out int pIdxA ) )
+                    stiffnessA = _producerStiffness[pIdxA];
+
+                var componentB = pipe.ToInlet.Consumer ?? (object)pipe.ToInlet.Producer;
+                if( componentB is IResourceConsumer consumerB && _consumerToIndex.TryGetValue( consumerB, out int cIdxB ) )
+                    stiffnessB = _consumerStiffness[cIdxB];
+                else if( componentB is IResourceProducer producerB && _producerToIndex.TryGetValue( producerB, out int pIdxB ) )
+                    stiffnessB = _producerStiffness[pIdxB];
+
+                double totalStiffness = stiffnessA + stiffnessB;
+                if( totalStiffness > 1e-9 )
+                {
+                    double proactiveDamping = 1.0 / (1.0 + STIFFNESS_DAMPING_K * pipe.Conductance * totalStiffness);
+                    localRelaxation = Math.Min( localRelaxation, proactiveDamping );
+                }
+
+                // 2. Apply relaxation and check convergence.
+                double relaxedFlow = prevFlow + (newFlowUnrelaxed - prevFlow) * localRelaxation;
+                double flowDifference = Math.Abs( relaxedFlow - prevFlow );
+                double flowScale = Math.Max( Math.Abs( relaxedFlow ), Math.Abs( prevFlow ) );
+                if( flowDifference > ABS_TOLERANCE && flowDifference > flowScale * REL_TOLERANCE )
+                {
+                    converged = false;
+                }
+
+                _previousFlowRates[i] = prevFlow;
+                _currentFlowRates[i] = relaxedFlow;
+            }
+
+            return converged;
         }
 
         private void ApplyTransport( float dt )
@@ -677,7 +766,7 @@ namespace HSP.ResourceFlow
                 if( source == null || sink == null )
                     continue;
 
-                    //Debug.LogWarning( "rate " + finalRate + " : " + _currentFlowRates[i] );
+                //Debug.LogWarning( "rate " + finalRate + " : " + _currentFlowRates[i] );
 
                 using var flowResources = pipe.SampleFlowResources( finalRate, dt );
                 if( flowResources.IsEmpty() )

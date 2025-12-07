@@ -5,7 +5,7 @@ using static HSP.ResourceFlow.VaporLiquidEquilibrium;
 
 namespace HSP.Vanilla.Components
 {
-    public sealed class EngineFeedSystem : IResourceConsumer
+    public sealed class EngineFeedSystem : IResourceConsumer, IStiffnessProvider
     {
         public Vector3 FluidAcceleration { get; set; }
         public Vector3 FluidAngularVelocity { get; set; }
@@ -40,6 +40,7 @@ namespace HSP.Vanilla.Components
 
         private readonly double _manifoldVolume;
         private double _manifoldPressure;
+        private double _cachedPressureDerivative;
 
         /// <param name="manifoldVolume">The internal volume of the manifold, used for pressure calculation, in [m^3].</param>
         public EngineFeedSystem( double manifoldVolume )
@@ -68,7 +69,9 @@ namespace HSP.Vanilla.Components
             {
                 // Compute pressure that corresponds to current contents mass
                 // (ComputePressureOnly should be able to compute pressure from the current _contents)
-                _manifoldPressure = VaporLiquidEquilibrium.ComputePressureOnly( _contents, new FluidState( _manifoldPressure, FluidState.STP.Temperature, FluidState.STP.Velocity ), _manifoldVolume );
+                var (p, dPdM) = VaporLiquidEquilibrium.ComputePressureAndDerivativeWrtMass( _contents, new FluidState( _manifoldPressure, FluidState.STP.Temperature, FluidState.STP.Velocity ), _manifoldVolume );
+                _manifoldPressure = p;
+                _cachedPressureDerivative = dPdM;
                 MassConsumedLastStep = 0.0;
                 return;
             }
@@ -77,13 +80,16 @@ namespace HSP.Vanilla.Components
             if( M0 <= 1e-9 )
             {
                 // empty manifold -> pressure from zero mass (vacuum / baseline)
-                _manifoldPressure = VaporLiquidEquilibrium.ComputePressureOnly( _contents, new FluidState( _manifoldPressure, FluidState.STP.Temperature, FluidState.STP.Velocity ), _manifoldVolume );
+                var (p, dPdM) = VaporLiquidEquilibrium.ComputePressureAndDerivativeWrtMass( _contents, new FluidState( _manifoldPressure, FluidState.STP.Temperature, FluidState.STP.Velocity ), _manifoldVolume );
+                _manifoldPressure = p;
+                _cachedPressureDerivative = dPdM;
                 MassConsumedLastStep = 0.0;
                 return;
             }
 
             // Pre-compute the aggregate mixture properties once, before the solver loop.
             var mixtureProps = new MixtureProperties( _contents, new FluidState( _manifoldPressure, FluidState.STP.Temperature, FluidState.STP.Velocity ), _manifoldVolume );
+            _cachedPressureDerivative = mixtureProps.GetStateAtMass( M0 ).dPdM;
 
             double Pc = ChamberPressure;
             double C = InjectorConductance;
@@ -187,12 +193,20 @@ namespace HSP.Vanilla.Components
 
             // Prevent singularity when empty
             double density = Contents.GetAverageDensity( FluidState.STP.Temperature, inletPressure );
-            if( density <= 1e-9 ) density = 800.0;
+            if( density <= 1e-9 )
+                density = 800.0;
 
             return new FluidState( inletPressure, 293, 0 )
             {
                 FluidSurfacePotential = inletPressure / density
             };
+        }
+
+        public double GetPotentialDerivativeWrtVolume()
+        {
+            // Per the roadmap and interface remarks, this is approximately dP/dM.
+            // This value is cached during ApplyFlows for efficiency.
+            return _cachedPressureDerivative;
         }
     }
 }

@@ -2,6 +2,7 @@ using HSP.ResourceFlow;
 using NUnit.Framework;
 using System.Collections.Generic;
 using UnityEngine;
+using HSP_Tests;
 
 namespace HSP_Tests_EditMode.ResourceFlow
 {
@@ -9,42 +10,12 @@ namespace HSP_Tests_EditMode.ResourceFlow
     public class FlowTankTests2
     {
         private FlowTank _tank;
-        private ISubstance _water; // Density 1000
-        private ISubstance _oil;   // Density 800
-        private ISubstance _mercury; // Density 13500
 
         [SetUp]
         public void SetUp()
         {
             // Standard tank volume 1.0
             _tank = new FlowTank( 1.0 );
-            _water = new Substance( "water" )
-            {
-                DisplayName = "Water",
-                Phase = SubstancePhase.Liquid,
-                ReferenceDensity = 1000f,
-                ReferencePressure = 101325f,
-                BulkModulus = 2.2e9f, // Water is slightly compressible
-                DisplayColor = Color.blue
-            };
-            _oil = new Substance( "oil" )
-            {
-                DisplayName = "Oil",
-                Phase = SubstancePhase.Liquid,
-                ReferenceDensity = 800f,
-                ReferencePressure = 101325f,
-                BulkModulus = 1.5e9f,
-                DisplayColor = Color.yellow
-            };
-            _mercury = new Substance( "mercury" )
-            {
-                DisplayName = "Mercury",
-                Phase = SubstancePhase.Liquid,
-                ReferenceDensity = 13500f,
-                ReferencePressure = 101325f,
-                BulkModulus = 2.85e9f,
-                DisplayColor = Color.gray
-            };
         }
 
         // --- HELPER: Create Geometry ---
@@ -97,7 +68,7 @@ namespace HSP_Tests_EditMode.ResourceFlow
             // the CoM would shift downwards or upwards artificially.
 
             SetupUnitCubeTank();
-            _tank.Contents.Add( _water, 500 ); // 0.5 volume (Half full)
+            _tank.Contents.Add( TestSubstances.Water, 500 ); // 0.5 volume (Half full)
             _tank.ForceRecalculateCache();
 
             Vector3 com = _tank.GetCenterOfMass();
@@ -115,7 +86,7 @@ namespace HSP_Tests_EditMode.ResourceFlow
         public void CenterOfMass_RotatedGravity_ShiftsCorrectly()
         {
             SetupUnitCubeTank();
-            _tank.Contents.Add( _water, 500 ); // Half full
+            _tank.Contents.Add( TestSubstances.Water, 500 ); // Half full
 
             // Gravity pointing Right (-X is Down potential)
             _tank.FluidAcceleration = new Vector3( 10, 0, 0 );
@@ -135,19 +106,19 @@ namespace HSP_Tests_EditMode.ResourceFlow
         public void Stratification_HeavyFluidSinks()
         {
             SetupUnitCubeTank();
-            _tank.Contents.Add( _oil, 250 );   // Light
-            _tank.Contents.Add( _water, 250 ); // Heavy
+            _tank.Contents.Add( TestSubstances.Oil, 250 );   // Light
+            _tank.Contents.Add( TestSubstances.Water, 250 ); // Heavy
             _tank.ForceRecalculateCache();
 
             // Sample bottom (Heavy should be here)
             var bottomSample = _tank.SampleSubstances( new Vector3( 0, -0.4f, 0 ), 1, 1 );
-            Assert.IsTrue( bottomSample.Contains( _water ), "Bottom should contain water" );
-            Assert.IsFalse( bottomSample.Contains( _oil ), "Bottom should not contain oil" );
+            Assert.IsTrue( bottomSample.Contains( TestSubstances.Water ), "Bottom should contain water" );
+            Assert.IsFalse( bottomSample.Contains( TestSubstances.Oil ), "Bottom should not contain oil" );
 
             // Sample top (Light should be here)
             var topSample = _tank.SampleSubstances( new Vector3( 0, -0.1f, 0 ), 1, 1 );
-            Assert.IsTrue( topSample.Contains( _oil ), "Top should contain oil" );
-            Assert.IsFalse( topSample.Contains( _water ), "Top should not contain water" );
+            Assert.IsTrue( topSample.Contains( TestSubstances.Oil ), "Top should contain oil" );
+            Assert.IsFalse( topSample.Contains( TestSubstances.Water ), "Top should not contain water" );
         }
 
         [Test]
@@ -155,21 +126,21 @@ namespace HSP_Tests_EditMode.ResourceFlow
         {
             SetupUnitCubeTank();
             double vol = 333; // 1/3rd roughly
-            _tank.Contents.Add( _water, vol * _water.GetDensityAtSTP() );
-            _tank.Contents.Add( _mercury, vol * _mercury.GetDensityAtSTP() );
-            _tank.Contents.Add( _oil, vol * _oil.GetDensityAtSTP() );
+            _tank.Contents.Add( TestSubstances.Water, vol * TestSubstances.Water.GetDensityAtSTP() );
+            _tank.Contents.Add( TestSubstances.Mercury, vol * TestSubstances.Mercury.GetDensityAtSTP() );
+            _tank.Contents.Add( TestSubstances.Oil, vol * TestSubstances.Oil.GetDensityAtSTP() );
             _tank.ForceRecalculateCache();
 
             // Mercury (13500) -> Water (1000) -> Oil (800)
 
             var s1 = _tank.SampleSubstances( new Vector3( 0, -0.45f, 0 ), 1, 1 );
-            Assert.IsTrue( s1.Contains( _mercury ) );
+            Assert.IsTrue( s1.Contains( TestSubstances.Mercury ) );
 
             var s2 = _tank.SampleSubstances( new Vector3( 0, 0f, 0 ), 1, 1 );
-            Assert.IsTrue( s2.Contains( _water ) );
+            Assert.IsTrue( s2.Contains( TestSubstances.Water ) );
 
             var s3 = _tank.SampleSubstances( new Vector3( 0, 0.45f, 0 ), 1, 1 );
-            Assert.IsTrue( s3.Contains( _oil ) );
+            Assert.IsTrue( s3.Contains( TestSubstances.Oil ) );
         }
 
         // --- SECTION 3: Pressure & Potentials ---
@@ -178,7 +149,7 @@ namespace HSP_Tests_EditMode.ResourceFlow
         public void HydrostaticPressure_CalculatesCorrectly()
         {
             SetupUnitCubeTank(); // 1m high (-0.5 to 0.5)
-            _tank.Contents.Add( _water, 1000 ); // Full tank
+            _tank.Contents.Add( TestSubstances.Water, 1000 ); // Full tank
             _tank.FluidAcceleration = new Vector3( 0, -10, 0 ); // g = 10
             _tank.ForceRecalculateCache();
 
@@ -196,7 +167,7 @@ namespace HSP_Tests_EditMode.ResourceFlow
         public void RotationalPotential_CentrifugeEffect()
         {
             SetupUnitCubeTank();
-            _tank.Contents.Add( _water, 200 ); // Small amount
+            _tank.Contents.Add( TestSubstances.Water, 200 ); // Small amount
 
             // No Gravity, Only Spinning around Y
             _tank.FluidAcceleration = Vector3.zero;
@@ -210,7 +181,7 @@ namespace HSP_Tests_EditMode.ResourceFlow
 
             // Corner (0.5, -0.5, 0.5) should have fluid
             var cornerSample = _tank.SampleSubstances( new Vector3( 0.5f, -0.5f, 0.5f ), 1, 1 );
-            Assert.IsTrue( cornerSample.Contains( _water ), "Outer corner should have fluid" );
+            Assert.IsTrue( cornerSample.Contains( TestSubstances.Water ), "Outer corner should have fluid" );
         }
 
         // --- SECTION 4: Edge Cases ---
@@ -220,7 +191,7 @@ namespace HSP_Tests_EditMode.ResourceFlow
         {
             SetupUnitCubeTank();
             // Try to add 2.0m^3 to a 1.0m^3 tank
-            _tank.Contents.Add( _water, 2000 );
+            _tank.Contents.Add( TestSubstances.Water, 2000 );
             _tank.ForceRecalculateCache();
 
             // Logic dictates it compresses or clamps. 
@@ -261,8 +232,6 @@ namespace HSP_Tests_EditMode.ResourceFlow
     public class FlowTankTests
     {
         private FlowTank _tank;
-        private ISubstance _water;
-        private ISubstance _oil;
 
         [SetUp]
         public void SetUp()
@@ -288,25 +257,6 @@ namespace HSP_Tests_EditMode.ResourceFlow
             };
             _tank.SetNodes( nodes, inlets );
             _tank.FluidAcceleration = new Vector3( 0, -10, 0 ); // Gravity
-
-            _water = new Substance( "water" )
-            {
-                DisplayName = "Water",
-                Phase = SubstancePhase.Liquid,
-                ReferenceDensity = 1000f,
-                ReferencePressure = 101325f,
-                BulkModulus = 2.2e9f, // Water is slightly compressible
-                DisplayColor = Color.blue
-            };
-            _oil = new Substance( "oil" )
-            {
-                DisplayName = "Oil",
-                Phase = SubstancePhase.Liquid,
-                ReferenceDensity = 800f,
-                ReferencePressure = 101325f,
-                BulkModulus = 1.5e9f,
-                DisplayColor = Color.yellow
-            };
         }
 
         [Test]
@@ -332,7 +282,7 @@ namespace HSP_Tests_EditMode.ResourceFlow
             // Fill tank with 0.5 m^3 of water. Since total vol is 1, it should fill halfway up.
             // Potential at y=-1 is 10. Potential at y=1 is -10. Total span 20.
             // A half-full tank should have its surface at y=0, which corresponds to potential 0.
-            _tank.Contents.Add( _water, 500 ); // 0.5 m^3
+            _tank.Contents.Add( TestSubstances.Water, 500 ); // 0.5 m^3
             _tank.ForceRecalculateCache();
             var portPosition = new Vector3( 0, 0, 0 );
 
@@ -347,8 +297,8 @@ namespace HSP_Tests_EditMode.ResourceFlow
         public void Sample_FluidSurfacePotential_StratifiedTank_IsTopFluidSurface()
         {
             // Arrange
-            _tank.Contents.Add( _water, 250 ); // 0.25 m^3
-            _tank.Contents.Add( _oil, 200 ); // 0.25 m^3
+            _tank.Contents.Add( TestSubstances.Water, 250 ); // 0.25 m^3
+            _tank.Contents.Add( TestSubstances.Oil, 200 ); // 0.25 m^3
             _tank.ForceRecalculateCache();
             // Total volume is 0.5m^3, so surface is at y=0, potential=0. Oil is on top.
             var portPosition = new Vector3( 0, -0.8f, 0 );
@@ -364,8 +314,8 @@ namespace HSP_Tests_EditMode.ResourceFlow
         public void SampleSubstances_SamplesCorrectLayer_FromBottom()
         {
             // Arrange
-            _tank.Contents.Add( _water, 250 ); // 0.25 m^3, bottom layer
-            _tank.Contents.Add( _oil, 200 );   // 0.25 m^3, top layer
+            _tank.Contents.Add( TestSubstances.Water, 250 ); // 0.25 m^3, bottom layer
+            _tank.Contents.Add( TestSubstances.Oil, 200 );   // 0.25 m^3, top layer
             _tank.ForceRecalculateCache();
 
             // Port at the bottom of the tank (y=-1)
@@ -376,16 +326,16 @@ namespace HSP_Tests_EditMode.ResourceFlow
 
             // Assert
             Assert.AreEqual( 1, sampled.Count );
-            Assert.IsTrue( sampled.Contains( _water ) );
-            Assert.IsFalse( sampled.Contains( _oil ) );
+            Assert.IsTrue( sampled.Contains( TestSubstances.Water ) );
+            Assert.IsFalse( sampled.Contains( TestSubstances.Oil ) );
         }
 
         [Test]
         public void SampleSubstances_SamplesCorrectLayer_FromMiddle()
         {
             // Arrange
-            _tank.Contents.Add( _water, 250 ); // 0.25 m^3, bottom layer (-1 to -0.5)
-            _tank.Contents.Add( _oil, 200 );   // 0.25 m^3, top layer (-0.5 to 0)
+            _tank.Contents.Add( TestSubstances.Water, 250 ); // 0.25 m^3, bottom layer (-1 to -0.5)
+            _tank.Contents.Add( TestSubstances.Oil, 200 );   // 0.25 m^3, top layer (-0.5 to 0)
             _tank.ForceRecalculateCache();
 
             // Port in the middle of the top (oil) layer
@@ -396,8 +346,8 @@ namespace HSP_Tests_EditMode.ResourceFlow
 
             // Assert
             Assert.AreEqual( 1, sampled.Count );
-            Assert.IsFalse( sampled.Contains( _water ) );
-            Assert.IsTrue( sampled.Contains( _oil ) );
+            Assert.IsFalse( sampled.Contains( TestSubstances.Water ) );
+            Assert.IsTrue( sampled.Contains( TestSubstances.Oil ) );
         }
     }
 }

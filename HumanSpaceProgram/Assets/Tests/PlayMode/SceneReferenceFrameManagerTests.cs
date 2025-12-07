@@ -1,6 +1,6 @@
 using HSP.ReferenceFrames;
 using HSP.Time;
-using HSP_Tests_PlayMode.NUnit;
+using HSP_Tests.NUnit;
 using NUnit.Framework;
 using System;
 using System.Collections;

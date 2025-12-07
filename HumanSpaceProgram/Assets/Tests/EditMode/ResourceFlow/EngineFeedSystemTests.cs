@@ -3,6 +3,7 @@ using HSP.Vanilla.Components;
 using NUnit.Framework;
 using System;
 using UnityEngine;
+using HSP_Tests;
 
 namespace HSP_Tests_EditMode.ResourceFlow
 {
@@ -10,7 +11,6 @@ namespace HSP_Tests_EditMode.ResourceFlow
     public class EngineFeedSystemTests
     {
         private EngineFeedSystem _feedSystem;
-        private Substance _air;
 
         private const double MANIFOLD_VOLUME = 0.01; // 10 liters.
 
@@ -18,13 +18,6 @@ namespace HSP_Tests_EditMode.ResourceFlow
         public void SetUp()
         {
             _feedSystem = new EngineFeedSystem( MANIFOLD_VOLUME );
-            _air = new Substance( "air" )
-            {
-                DisplayName = "Air",
-                Phase = SubstancePhase.Gas,
-                MolarMass = 0.0289647,
-                DisplayColor = Color.clear
-            };
         }
 
         [Test]
@@ -32,11 +25,11 @@ namespace HSP_Tests_EditMode.ResourceFlow
         {
             // Arrange
             const double targetManifoldPressure = 2e5;
-            double requiredMass = _air.GetMass( MANIFOLD_VOLUME, targetManifoldPressure, FluidState.STP.Temperature );
+            double requiredMass = TestSubstances.Air.GetMass( MANIFOLD_VOLUME, targetManifoldPressure, FluidState.STP.Temperature );
             _feedSystem.IsOutflowEnabled = false;
 
             // Act
-            _feedSystem.Inflow.Add( _air, requiredMass );
+            _feedSystem.Inflow.Add( TestSubstances.Air, requiredMass );
             _feedSystem.ApplyFlows( 0.01 );
             _feedSystem.Inflow.Clear();
 
@@ -50,11 +43,11 @@ namespace HSP_Tests_EditMode.ResourceFlow
         {
             // Arrange
             const double targetManifoldPressure = 2e5;
-            double requiredMass = _air.GetMass( MANIFOLD_VOLUME, targetManifoldPressure, FluidState.STP.Temperature );
+            double requiredMass = TestSubstances.Air.GetMass( MANIFOLD_VOLUME, targetManifoldPressure, FluidState.STP.Temperature );
             _feedSystem.IsOutflowEnabled = false;
 
             // Act
-            _feedSystem.Inflow.Add( _air, requiredMass );
+            _feedSystem.Inflow.Add( TestSubstances.Air, requiredMass );
             _feedSystem.ApplyFlows( 0.01 );
             _feedSystem.Inflow.Clear();
 
@@ -85,11 +78,11 @@ namespace HSP_Tests_EditMode.ResourceFlow
         {
             // Arrange
             const double targetManifoldPressure = 2e5;
-            double requiredMass = _air.GetMass( MANIFOLD_VOLUME, targetManifoldPressure, FluidState.STP.Temperature );
+            double requiredMass = TestSubstances.Air.GetMass( MANIFOLD_VOLUME, targetManifoldPressure, FluidState.STP.Temperature );
             _feedSystem.IsOutflowEnabled = false;
 
             // Act
-            _feedSystem.Inflow.Add( _air, requiredMass );
+            _feedSystem.Inflow.Add( TestSubstances.Air, requiredMass );
             _feedSystem.ApplyFlows( 0.01 );
             _feedSystem.Inflow.Clear();
             var state = _feedSystem.Sample( Vector3.zero, 0.01 );
@@ -108,11 +101,11 @@ namespace HSP_Tests_EditMode.ResourceFlow
         {
             // Arrange
             const double targetManifoldPressure = 2e5;
-            double requiredMass = _air.GetMass( MANIFOLD_VOLUME, targetManifoldPressure, FluidState.STP.Temperature );
+            double requiredMass = TestSubstances.Air.GetMass( MANIFOLD_VOLUME, targetManifoldPressure, FluidState.STP.Temperature );
             _feedSystem.IsOutflowEnabled = false;
 
             // Act
-            _feedSystem.Inflow.Add( _air, requiredMass );
+            _feedSystem.Inflow.Add( TestSubstances.Air, requiredMass );
             _feedSystem.ApplyFlows( 0.01 );
             _feedSystem.Inflow.Clear();
 
@@ -136,7 +129,7 @@ namespace HSP_Tests_EditMode.ResourceFlow
             // Arrange
             _feedSystem.IsOutflowEnabled = false;
             double inflowMass = 8.0;
-            _feedSystem.Inflow.Add( _air, inflowMass );
+            _feedSystem.Inflow.Add( TestSubstances.Air, inflowMass );
 
             // Act
             _feedSystem.ApplyFlows( 0.02 );
@@ -144,7 +137,7 @@ namespace HSP_Tests_EditMode.ResourceFlow
             // Assert
             Assert.That( _feedSystem.MassConsumedLastStep, Is.EqualTo( 0 ) );
 
-            double expectedPressure = _air.GetPressure( inflowMass, MANIFOLD_VOLUME, FluidState.STP.Temperature );
+            double expectedPressure = TestSubstances.Air.GetPressure( inflowMass, MANIFOLD_VOLUME, FluidState.STP.Temperature );
 
             Assert.That( _feedSystem.ManifoldPressure, Is.EqualTo( expectedPressure ).Within( 1.0 ) );
         }
@@ -154,10 +147,10 @@ namespace HSP_Tests_EditMode.ResourceFlow
         {
             // Arrange: Prime manifold to a pressure BELOW chamber pressure
             const double targetManifoldPressure = 40e5;
-            double requiredMass = _air.GetMass( MANIFOLD_VOLUME, targetManifoldPressure, FluidState.STP.Temperature );
+            double requiredMass = TestSubstances.Air.GetMass( MANIFOLD_VOLUME, targetManifoldPressure, FluidState.STP.Temperature );
             _feedSystem.IsOutflowEnabled = false;
 
-            _feedSystem.Inflow.Add( _air, requiredMass );
+            _feedSystem.Inflow.Add( TestSubstances.Air, requiredMass );
             _feedSystem.ApplyFlows( 0.01 );
             _feedSystem.Inflow.Clear();
 
@@ -178,10 +171,10 @@ namespace HSP_Tests_EditMode.ResourceFlow
         {
             // Arrange: Prime manifold to a pressure BELOW chamber pressure
             const double targetManifoldPressure = 60e5;
-            double requiredMass = _air.GetMass( MANIFOLD_VOLUME, targetManifoldPressure, FluidState.STP.Temperature );
+            double requiredMass = TestSubstances.Air.GetMass( MANIFOLD_VOLUME, targetManifoldPressure, FluidState.STP.Temperature );
             _feedSystem.IsOutflowEnabled = false;
 
-            _feedSystem.Inflow.Add( _air, requiredMass );
+            _feedSystem.Inflow.Add( TestSubstances.Air, requiredMass );
             _feedSystem.ApplyFlows( 0.01 );
             _feedSystem.Inflow.Clear();
 
@@ -206,10 +199,10 @@ namespace HSP_Tests_EditMode.ResourceFlow
         {
             // Arrange: High pressure gradient but very little mass
             const double targetManifoldPressure = 60e5;
-            double requiredMass = _air.GetMass( MANIFOLD_VOLUME, targetManifoldPressure, FluidState.STP.Temperature );
+            double requiredMass = TestSubstances.Air.GetMass( MANIFOLD_VOLUME, targetManifoldPressure, FluidState.STP.Temperature );
             _feedSystem.IsOutflowEnabled = false;
 
-            _feedSystem.Inflow.Add( _air, requiredMass );
+            _feedSystem.Inflow.Add( TestSubstances.Air, requiredMass );
             _feedSystem.ApplyFlows( 0.01 );
             _feedSystem.Inflow.Clear();
 
@@ -257,7 +250,7 @@ namespace HSP_Tests_EditMode.ResourceFlow
             while( ticks < maxTicks )
             {
                 // Add constant mass every tick
-                _feedSystem.Inflow.Add( _air, inflowRate * dt );
+                _feedSystem.Inflow.Add( TestSubstances.Air, inflowRate * dt );
                 _feedSystem.ApplyFlows( dt );
                 _feedSystem.Inflow.Clear(); // Clear buffer for next tick
 
@@ -288,8 +281,8 @@ namespace HSP_Tests_EditMode.ResourceFlow
             const double staticPressure = 2e5;
 
             // Fill with static amount of air
-            double mass = _air.GetMass( MANIFOLD_VOLUME, staticPressure, FluidState.STP.Temperature );
-            _feedSystem.Inflow.Add( _air, mass );
+            double mass = TestSubstances.Air.GetMass( MANIFOLD_VOLUME, staticPressure, FluidState.STP.Temperature );
+            _feedSystem.Inflow.Add( TestSubstances.Air, mass );
             _feedSystem.ApplyFlows( 0 );
             _feedSystem.Inflow.Clear();
             _feedSystem.IsOutflowEnabled = false; // Closed system, just testing pump potential
