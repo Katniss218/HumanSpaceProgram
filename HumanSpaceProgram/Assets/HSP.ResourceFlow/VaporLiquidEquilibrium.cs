@@ -4,6 +4,154 @@ using System.Linq;
 
 namespace HSP.ResourceFlow
 {
+    /// <summary>
+    /// A lightweight, stack-allocated struct that caches the aggregate physical properties 
+    /// of the mixture to allow for O(1) pressure calculations inside solver loops.
+    /// </summary>
+    public struct MixtureProperties
+    {
+        public readonly double TotalMass;
+        public double WeightedInvDensity;    // Sum(w_i / rho_i)
+        public double WeightedInvMolarMass;  // Sum(w_i / M_i)
+        public readonly double AverageBulkModulus;    // Sum(w_i * K_i) / Sum(w_i)
+        public readonly double Temperature;
+        public readonly double TankVolume;
+        public readonly double ReferencePressure;     // The pressure used for property lookups
+
+        private readonly double _RT;
+
+        public MixtureProperties( IReadonlySubstanceStateCollection contents, FluidState state, double volume )
+        {
+            TotalMass = contents.GetMass();
+            TankVolume = volume;
+            Temperature = state.Temperature;
+            ReferencePressure = state.Pressure;
+
+            // Sanity check temperature
+            if( Temperature <= 0.1 || Temperature > 100_000 )
+                Temperature = 293.15;
+
+            _RT = 8.314462618 * Temperature;
+
+            WeightedInvDensity = 0;
+            WeightedInvMolarMass = 0;
+            AverageBulkModulus = 2.2e9; // Default fallback (Water-like)
+
+            if( TotalMass <= 1e-12 )
+                return;
+
+            double sumBulkModWeighted = 0;
+            double liquidMassSum = 0;
+
+            // Iterate contents to gather coefficients
+            // We use 'ref' to avoid copying this large struct during the loop
+            if( contents is SubstanceStateCollection ssc )
+            {
+                for( int i = 0; i < ssc.Count; i++ )
+                    ProcessItem( ssc[i], ref this, ref sumBulkModWeighted, ref liquidMassSum );
+            }
+            else
+            {
+                foreach( var item in contents )
+                    ProcessItem( item, ref this, ref sumBulkModWeighted, ref liquidMassSum );
+            }
+
+            // Calculate the mass-weighted average Bulk Modulus for the liquid portion
+            if( liquidMassSum > 1e-9 )
+            {
+                // Average K = Sum(Mass_i * K_i) / TotalLiquidMass
+                AverageBulkModulus = sumBulkModWeighted / liquidMassSum;
+            }
+        }
+
+        private static void ProcessItem( (ISubstance s, double m) item, ref MixtureProperties props, ref double sumBulkModWeighted, ref double liquidMassSum )
+        {
+            if( item.m <= 1e-12 )
+                return;
+
+            double w = item.m / props.TotalMass; // Mass fraction relative to total mixture
+
+            if( item.s.Phase == SubstancePhase.Liquid )
+            {
+                // We use the ReferencePressure (Start of frame pressure) to look up density/modulus.
+                // This linearizes the properties for the duration of the Newton-Raphson step.
+                double rho = item.s.GetDensity( props.Temperature, props.ReferencePressure );
+                double K = item.s.GetBulkModulus( props.Temperature, props.ReferencePressure );
+
+                if( rho > 1e-9 )
+                {
+                    props.WeightedInvDensity += w / rho;
+
+                    // Accumulate weighted bulk modulus
+                    sumBulkModWeighted += item.m * K;
+                    liquidMassSum += item.m;
+                }
+            }
+            else if( item.s.Phase == SubstancePhase.Gas )
+            {
+                if( item.s.MolarMass > 1e-9 )
+                    props.WeightedInvMolarMass += w / item.s.MolarMass;
+            }
+        }
+
+        /// <summary>
+        /// Calculates P and dP/dM for a specific scaled mass WITHOUT allocating memory.
+        /// </summary>
+        public (double P, double dPdM) GetStateAtMass( double currentMass )
+        {
+            if( currentMass <= 1e-9 ) 
+                return (0, 0);
+
+            // 1. Calculate Liquid Volume based on current mass
+            // V_liq = Mass * Sum(w_i / rho_i)
+            double liquidVol = currentMass * WeightedInvDensity;
+
+            double gasVol = TankVolume - liquidVol;
+            double effectiveGasVol = Math.Max( gasVol, 1e-6 );
+
+            // 2. Check Overfill (Liquid Regime)
+            // If gas volume is effectively zero, we are compressing liquid.
+            if( gasVol <= 1e-6 )
+            {
+                double fillRatio = liquidVol / TankVolume;
+                double strain = Math.Max( 0.0, fillRatio - 1.0 );
+
+                // Pressure = Strain * BulkModulus
+                double P = strain * AverageBulkModulus;
+
+                // dP/dM = d(strain)/dM * K 
+                // strain = (M * WeightedInvDensity / V) - 1
+                // d(strain)/dM = WeightedInvDensity / V
+                double dPdM = (WeightedInvDensity / TankVolume) * AverageBulkModulus;
+
+                return (P, dPdM);
+            }
+
+            // 3. Gas/Mixed Regime
+            // Moles_gas = Mass * Sum(w_i / M_i)
+            double gasMoles = currentMass * WeightedInvMolarMass;
+
+            if( gasMoles <= 1e-12 ) 
+                return (0, 0);
+
+            // P = (nRT) / (V - V_liq)
+            double numerator = gasMoles * _RT;
+            double P_gas = numerator / effectiveGasVol;
+
+            // Analytical Derivative Quotient Rule: P = u / v
+            // u = M * C1  (where C1 = WeightedInvMolarMass * RT)
+            // v = V_t - M * C2 (where C2 = WeightedInvDensity)
+
+            double C1 = WeightedInvMolarMass * _RT;
+
+            // Result simplifies to: dP/dM = (C1 * V_tank) / (V_gas)^2
+            double dPdM_gas = (C1 * TankVolume) / (effectiveGasVol * effectiveGasVol);
+
+            return (P_gas, dPdM_gas);
+        }
+    }
+
+
     public static class VaporLiquidEquilibrium
     {
         public static double ComputePressureOnly( IReadonlySubstanceStateCollection contents, FluidState currentState, double tankVolume )
@@ -262,150 +410,6 @@ namespace HSP.ResourceFlow
 
             var newState = new FluidState( Pfinal, Tfinal, currentState.Velocity );
             return (updatedContents, newState);
-        }
-
-        /// <summary>
-        /// A lightweight, stack-allocated struct that caches the aggregate physical properties 
-        /// of the mixture to allow for O(1) pressure calculations inside solver loops.
-        /// </summary>
-        public struct MixtureProperties
-        {
-            public readonly double TotalMass;
-            public double WeightedInvDensity;    // Sum(w_i / rho_i)
-            public double WeightedInvMolarMass;  // Sum(w_i / M_i)
-            public readonly double AverageBulkModulus;    // Sum(w_i * K_i) / Sum(w_i)
-            public readonly double Temperature;
-            public readonly double TankVolume;
-            public readonly double ReferencePressure;     // The pressure used for property lookups
-
-            private readonly double _RT;
-
-            public MixtureProperties( IReadonlySubstanceStateCollection contents, FluidState state, double volume )
-            {
-                TotalMass = contents.GetMass();
-                TankVolume = volume;
-                Temperature = state.Temperature;
-                ReferencePressure = state.Pressure;
-
-                // Sanity check temperature
-                if( Temperature <= 0.1 || Temperature > 100_000 )
-                    Temperature = 293.15;
-
-                _RT = 8.314462618 * Temperature;
-
-                WeightedInvDensity = 0;
-                WeightedInvMolarMass = 0;
-                AverageBulkModulus = 2.2e9; // Default fallback (Water-like)
-
-                if( TotalMass <= 1e-12 ) return;
-
-                double sumBulkModWeighted = 0;
-                double liquidMassSum = 0;
-
-                // Iterate contents to gather coefficients
-                // We use 'ref' to avoid copying this large struct during the loop
-                if( contents is SubstanceStateCollection ssc )
-                {
-                    for( int i = 0; i < ssc.Count; i++ )
-                        ProcessItem( ssc[i], ref this, ref sumBulkModWeighted, ref liquidMassSum );
-                }
-                else
-                {
-                    foreach( var item in contents )
-                        ProcessItem( item, ref this, ref sumBulkModWeighted, ref liquidMassSum );
-                }
-
-                // Calculate the mass-weighted average Bulk Modulus for the liquid portion
-                if( liquidMassSum > 1e-9 )
-                {
-                    // Average K = Sum(Mass_i * K_i) / TotalLiquidMass
-                    AverageBulkModulus = sumBulkModWeighted / liquidMassSum;
-                }
-            }
-
-            private static void ProcessItem( (ISubstance s, double m) item, ref MixtureProperties props, ref double sumBulkModWeighted, ref double liquidMassSum )
-            {
-                if( item.m <= 1e-12 ) return;
-
-                double w = item.m / props.TotalMass; // Mass fraction relative to total mixture
-
-                if( item.s.Phase == SubstancePhase.Liquid )
-                {
-                    // We use the ReferencePressure (Start of frame pressure) to look up density/modulus.
-                    // This linearizes the properties for the duration of the Newton-Raphson step.
-                    double rho = item.s.GetDensity( props.Temperature, props.ReferencePressure );
-                    double K = item.s.GetBulkModulus( props.Temperature, props.ReferencePressure );
-
-                    if( rho > 1e-9 )
-                    {
-                        props.WeightedInvDensity += w / rho;
-
-                        // Accumulate weighted bulk modulus
-                        sumBulkModWeighted += item.m * K;
-                        liquidMassSum += item.m;
-                    }
-                }
-                else if( item.s.Phase == SubstancePhase.Gas )
-                {
-                    if( item.s.MolarMass > 1e-9 )
-                        props.WeightedInvMolarMass += w / item.s.MolarMass;
-                }
-            }
-
-            /// <summary>
-            /// Calculates P and dP/dM for a specific scaled mass WITHOUT allocating memory.
-            /// </summary>
-            public (double P, double dPdM) GetStateAtMass( double currentMass )
-            {
-                if( currentMass <= 1e-9 ) return (0, 0);
-
-                // 1. Calculate Liquid Volume based on current mass
-                // V_liq = Mass * Sum(w_i / rho_i)
-                double liquidVol = currentMass * WeightedInvDensity;
-
-                double gasVol = TankVolume - liquidVol;
-                double effectiveGasVol = Math.Max( gasVol, 1e-6 );
-
-                // 2. Check Overfill (Liquid Regime)
-                // If gas volume is effectively zero, we are compressing liquid.
-                if( gasVol <= 1e-6 )
-                {
-                    double fillRatio = liquidVol / TankVolume;
-                    double strain = Math.Max( 0.0, fillRatio - 1.0 );
-
-                    // Pressure = Strain * BulkModulus
-                    double P = strain * AverageBulkModulus;
-
-                    // dP/dM = d(strain)/dM * K 
-                    // strain = (M * WeightedInvDensity / V) - 1
-                    // d(strain)/dM = WeightedInvDensity / V
-                    double dPdM = (WeightedInvDensity / TankVolume) * AverageBulkModulus;
-
-                    return (P, dPdM);
-                }
-
-                // 3. Gas/Mixed Regime
-                // Moles_gas = Mass * Sum(w_i / M_i)
-                double gasMoles = currentMass * WeightedInvMolarMass;
-
-                if( gasMoles <= 1e-12 ) return (0, 0);
-
-                // P = (nRT) / (V - V_liq)
-                double numerator = gasMoles * _RT;
-                double P_gas = numerator / effectiveGasVol;
-
-                // Analytical Derivative Quotient Rule: P = u / v
-                // u = M * C1  (where C1 = WeightedInvMolarMass * RT)
-                // v = V_t - M * C2 (where C2 = WeightedInvDensity)
-
-                double C1 = WeightedInvMolarMass * _RT;
-                double C2 = WeightedInvDensity;
-
-                // Result simplifies to: dP/dM = (C1 * V_tank) / (V_gas)^2
-                double dPdM_gas = (C1 * TankVolume) / (effectiveGasVol * effectiveGasVol);
-
-                return (P_gas, dPdM_gas);
-            }
         }
 
 

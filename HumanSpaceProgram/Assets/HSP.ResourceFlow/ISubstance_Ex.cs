@@ -15,7 +15,7 @@ namespace HSP.ResourceFlow
         {
             if( self.MolarMass <= 0.0 )
                 return 0.0;
-            return moles * self.MolarMass;
+            return moles / self.MolarMass;
         }
 
         // mass / volume / pressure

@@ -1,6 +1,7 @@
 ﻿using HSP.ResourceFlow;
 using System;
 using UnityEngine;
+using static HSP.ResourceFlow.VaporLiquidEquilibrium;
 
 namespace HSP.Vanilla.Components
 {
@@ -81,6 +82,9 @@ namespace HSP.Vanilla.Components
                 return;
             }
 
+            // Pre-compute the aggregate mixture properties once, before the solver loop.
+            var mixtureProps = new MixtureProperties( _contents, new FluidState( _manifoldPressure, FluidState.STP.Temperature, FluidState.STP.Velocity ), _manifoldVolume );
+
             double Pc = ChamberPressure;
             double C = InjectorConductance;
             double dt = deltaTime;
@@ -107,14 +111,8 @@ namespace HSP.Vanilla.Components
                 double M_final = Math.Max( 0.0, M0 - mRemoved );
 
                 // 2. Get pressure and derivative from VLE for this final mass
-                ISubstanceStateCollection tmpContents = _contents.Clone();
-                double currentMass = tmpContents.GetMass();
-                if( currentMass > 1e-9 )
-                {
-                    tmpContents.Scale( M_final / currentMass );
-                }
-
-                var (P_from_mass, dPdM) = VaporLiquidEquilibrium.ComputePressureAndDerivativeWrtMass( tmpContents, new FluidState( P_candidate, FluidState.STP.Temperature, FluidState.STP.Velocity ), _manifoldVolume );
+                // OPTIMIZED: Use the pre-computed mixture properties for an O(1) calculation.
+                var (P_from_mass, dPdM) = mixtureProps.GetStateAtMass( M_final );
 
                 // 3. Calculate residual and its derivative
                 double residual = P_from_mass - P_candidate;

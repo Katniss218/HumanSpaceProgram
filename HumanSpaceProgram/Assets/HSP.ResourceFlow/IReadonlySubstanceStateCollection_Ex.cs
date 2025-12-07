@@ -44,6 +44,27 @@
         }
 
         /// <summary>
+        /// Gets the molar fraction (0.0 to 1.0) of a specific substance.
+        /// Returns 0 if total amount of moles is effectively zero.
+        /// </summary>
+        public static double GetMolarFraction( this IReadonlySubstanceStateCollection collection, ISubstance substance )
+        {
+            double totalMoles = 0.0;
+            double targetMoles = 0.0;
+
+            foreach( (ISubstance s, double mass) in collection )
+            {
+                double moles = s.ToMoles( mass );
+                totalMoles += moles;
+                if( s == substance ) targetMoles = moles;
+            }
+
+            if( totalMoles <= 1e-9 )
+                return 0.0;
+            return targetMoles / totalMoles;
+        }
+
+        /// <summary>
         /// Calculates the average density of the liquid components in a substance collection.
         /// </summary>
         /// <param name="collection">The substance collection.</param>
