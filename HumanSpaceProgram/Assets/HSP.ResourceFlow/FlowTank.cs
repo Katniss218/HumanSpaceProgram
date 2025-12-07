@@ -18,7 +18,7 @@ namespace HSP.ResourceFlow
 
         */
 
-        private readonly FluidDistributionCache _cache;
+        private readonly FlowTankCache _cache;
 
         internal FlowTetrahedron[] _tetrahedra;
         internal FlowNode[] _nodes;
@@ -73,7 +73,7 @@ namespace HSP.ResourceFlow
         public FlowTank( double volume )
         {
             this.Volume = volume;
-            _cache = new FluidDistributionCache( this );
+            _cache = new FlowTankCache( this );
         }
 
 
@@ -181,7 +181,7 @@ namespace HSP.ResourceFlow
                     }
                 }
 
-                if( totalLen <= FluidDistributionCache.EPSILON_OVERLAP )
+                if( totalLen <= FlowTankCache.EPSILON_OVERLAP )
                     continue;
 
                 // Distribute

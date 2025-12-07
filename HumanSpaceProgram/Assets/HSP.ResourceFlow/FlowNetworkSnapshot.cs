@@ -34,7 +34,7 @@ namespace HSP.ResourceFlow
 
         // --- Solver Buffers ---
         private (double, double)[] _currentPotentials;
-        private double[] _previousFlowRates; // For oscillation detection
+        private double[] _flowRatesLastStep; // For oscillation detection
         private double[] _currentFlowRates;
         private double[] _nextFlowRates; // Buffer for unrelaxed flows
         private double[] _pipeFlowScalingFactors;
@@ -98,7 +98,7 @@ namespace HSP.ResourceFlow
                 int oldSize = _currentFlowRates?.Length ?? 0;
                 int newSize = exact ? capacity : Math.Max( capacity, oldSize * 2 );
                 Array.Resize( ref _currentFlowRates, newSize );
-                Array.Resize( ref _previousFlowRates, newSize );
+                Array.Resize( ref _flowRatesLastStep, newSize );
                 Array.Resize( ref _nextFlowRates, newSize );
                 Array.Resize( ref _currentPotentials, newSize );
                 Array.Resize( ref _pipeLearnedRelaxationFactors, newSize );
@@ -138,10 +138,10 @@ namespace HSP.ResourceFlow
             if( savedRates == null )
                 return;
 
-            // Copy saved rates to both current and previous to prevent the oscillation
+            // Copy saved rates to both current and last step buffers to prevent the oscillation
             // detector from firing on the first frame due to a large delta from zero.
             Array.Copy( savedRates, _currentFlowRates, Math.Min( savedRates.Length, _currentFlowRates.Length ) );
-            Array.Copy( savedRates, _previousFlowRates, Math.Min( savedRates.Length, _previousFlowRates.Length ) );
+            Array.Copy( savedRates, _flowRatesLastStep, Math.Min( savedRates.Length, _flowRatesLastStep.Length ) );
         }
 
         public bool TryGetFlowObj<T>( object obj, out T flowObj )
@@ -383,7 +383,7 @@ namespace HSP.ResourceFlow
                 }
                 else if( !converged )
                 {
-                    _relaxationFactor = Math.Min( 1.0, _relaxationFactor * 1.05 ); // Gently accelerate convergence
+                    _relaxationFactor = Math.Min( 1.0, _relaxationFactor * 1.01 ); // Gently accelerate convergence
                 }
 
                 if( converged )
@@ -392,9 +392,12 @@ namespace HSP.ResourceFlow
 
             if( !converged )
             {
-                //Debug.LogWarning( "FlowNetworkSnapshot.Step: Failed to converge within max iterations. Using zero flow for this frame." );
-                Array.Clear( _currentFlowRates, 0, _currentFlowRates.Length );
-                return;
+                // Revert to last known stable state if convergence fails.
+                // This is safer than zeroing flow, which can cause sudden stops/starts.
+                if( _pipes.Count > 0 )
+                {
+                    Array.Copy( _flowRatesLastStep, _currentFlowRates, _pipes.Count );
+                }
             }
 
             // 3. Transport Phase: Move the actual substances based on the solved flow rates.
@@ -412,6 +415,13 @@ namespace HSP.ResourceFlow
                     // This handles cases where an object is only a consumer
                     consumer.ApplyFlows( dt );
                 }
+            }
+
+            // After the solver has run and flows have been applied to simulation objects for this step,
+            // store the final flow rates. These will be used as the stable starting point for the next step's solver.
+            if( _pipes.Count > 0 )
+            {
+                Array.Copy( _currentFlowRates, _flowRatesLastStep, _pipes.Count );
             }
         }
 
@@ -563,9 +573,9 @@ namespace HSP.ResourceFlow
         private bool CheckConvergenceAndApplyRelaxation( out bool hasOscillations )
         {
             const double OSCILLATION_RELAXATION = 0.2;
-            const double RELAXATION_RECOVERY = 1.05;
-            const double REL_TOLERANCE = 0.01;
-            const double ABS_TOLERANCE = 0.001;
+            const double RELAXATION_RECOVERY = 1.03;
+            const double REL_TOLERANCE = 0.5; // Tuning the tolerances can change the convergence value, not just speed of convergence.
+            const double ABS_TOLERANCE = 0.1;
 
             bool converged = true;
             hasOscillations = false;
@@ -577,7 +587,7 @@ namespace HSP.ResourceFlow
                     continue;
 
                 double prevFlow = _currentFlowRates[i];
-                double prevPrevFlow = _previousFlowRates[i];
+                double startOfStepFlow = _flowRatesLastStep[i];
                 double newFlowUnrelaxed = _nextFlowRates[i];
 
                 double localRelaxation = _relaxationFactor;
@@ -585,17 +595,19 @@ namespace HSP.ResourceFlow
                 // Reactive Learned Damping (History-Based)
                 double learnedFactor = _pipeLearnedRelaxationFactors[i];
 
-                // 1. Oscillation detection (rapid sign flipping every step).
-                double deltaCurrent = newFlowUnrelaxed - prevFlow;
-                double deltaPrev = prevFlow - prevPrevFlow;
-                if( deltaCurrent * deltaPrev < -1e-10 )
+                // 1. Oscillation detection (sign flipping in subsequent steps).
+                bool isOscillating = (newFlowUnrelaxed * startOfStepFlow < -1e-10) || (prevFlow * startOfStepFlow < -1e-10);
+                if( isOscillating )
                 {
+                    //Debug.LogWarning( "OSCILLATION" );
                     hasOscillations = true;
                     // Aggressively damp this specific pipe
                     learnedFactor = Math.Max( 0.01, learnedFactor * OSCILLATION_RELAXATION );
                 }
+#warning TODO - don't relax within the same step? (this causes slower convergence, because the current relaxed flow limit keeps moving relative to the previous flow)
                 else
                 {
+                    //Debug.Log( "recovery" );
                     // Slowly recover if stable
                     learnedFactor = Math.Min( 1.0, learnedFactor * RELAXATION_RECOVERY );
                 }
@@ -609,16 +621,16 @@ namespace HSP.ResourceFlow
                 double stiffnessB = 0.0;
 
                 var componentA = pipe.FromInlet.Consumer ?? (object)pipe.FromInlet.Producer;
-                if( componentA is IResourceConsumer consumerA && _consumerToIndex.TryGetValue( consumerA, out int cIdxA ) )
-                    stiffnessA = _consumerStiffness[cIdxA];
-                else if( componentA is IResourceProducer producerA && _producerToIndex.TryGetValue( producerA, out int pIdxA ) )
-                    stiffnessA = _producerStiffness[pIdxA];
+                if( componentA is IResourceConsumer consumerA && _consumerToIndex.TryGetValue( consumerA, out int ca ) )
+                    stiffnessA = _consumerStiffness[ca];
+                else if( componentA is IResourceProducer producerA && _producerToIndex.TryGetValue( producerA, out int pa ) )
+                    stiffnessA = _producerStiffness[pa];
 
                 var componentB = pipe.ToInlet.Consumer ?? (object)pipe.ToInlet.Producer;
-                if( componentB is IResourceConsumer consumerB && _consumerToIndex.TryGetValue( consumerB, out int cIdxB ) )
-                    stiffnessB = _consumerStiffness[cIdxB];
-                else if( componentB is IResourceProducer producerB && _producerToIndex.TryGetValue( producerB, out int pIdxB ) )
-                    stiffnessB = _producerStiffness[pIdxB];
+                if( componentB is IResourceConsumer consumerB && _consumerToIndex.TryGetValue( consumerB, out int cb ) )
+                    stiffnessB = _consumerStiffness[cb];
+                else if( componentB is IResourceProducer producerB && _producerToIndex.TryGetValue( producerB, out int pb ) )
+                    stiffnessB = _producerStiffness[pb];
 
                 double totalStiffness = stiffnessA + stiffnessB;
                 if( totalStiffness > 1e-9 )
@@ -628,7 +640,17 @@ namespace HSP.ResourceFlow
                 }
 
                 // 2. Apply relaxation and check convergence.
-                double relaxedFlow = prevFlow + (newFlowUnrelaxed - prevFlow) * localRelaxation;
+                double relaxedFlow;
+                if( isOscillating )
+                {
+                    // Not using prevFlow on oscillations prevents the sign of the flowrate from flipping and the solver getting "latched" on the wrong sign.
+                    relaxedFlow = newFlowUnrelaxed * localRelaxation;
+                }
+                else
+                {
+                    // Standard relaxation from the previous iteration's value.
+                    relaxedFlow = prevFlow + (newFlowUnrelaxed - prevFlow) * localRelaxation;
+                }
                 double flowDifference = Math.Abs( relaxedFlow - prevFlow );
                 double flowScale = Math.Max( Math.Abs( relaxedFlow ), Math.Abs( prevFlow ) );
                 if( flowDifference > ABS_TOLERANCE && flowDifference > flowScale * REL_TOLERANCE )
@@ -636,7 +658,6 @@ namespace HSP.ResourceFlow
                     converged = false;
                 }
 
-                _previousFlowRates[i] = prevFlow;
                 _currentFlowRates[i] = relaxedFlow;
             }
 

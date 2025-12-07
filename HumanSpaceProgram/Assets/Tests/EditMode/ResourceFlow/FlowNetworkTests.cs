@@ -666,43 +666,43 @@ namespace HSP_Tests_EditMode.ResourceFlow
             Assert.That( tankB.Contents.GetMass(), Is.EqualTo( 0 ).Within( 0.01 ), "Small tank should be drained and not underfilled." );
             Assert.That( volumeInTankA, Is.EqualTo( tankB.Volume ).Within( 1e-3 ), "Small tank should be drained and not underfilled." );
         }
-        
+
         [Test]
         public void Solver_WithMixedStiffnessTanks_DampsStiffConnectionProactively()
         {
             // Arrange
             var builder = new FlowNetworkBuilder();
-            Vector3 gravity = new Vector3(0, -10, 0);
+            Vector3 gravity = new Vector3( 0, -10, 0 );
 
-            var tankSource = CreateTestTank(10.0, gravity, Vector3.zero);
-            tankSource.Contents.Add(TestSubstances.Water, 10000); // Full
+            var tankSource = CreateTestTank( 10.0, gravity, Vector3.zero );
+            tankSource.Contents.Add( TestSubstances.Water, 10000 ); // Full
 
-            var tankStiffSink = CreateTestTank(0.1, gravity, new Vector3(-5, 0, 0)); // Small, liquid-only -> stiff
-            var tankGasSink = CreateTestTank(5.0, gravity, new Vector3(5, 0, 0));   // Large, gas-only -> not stiff
+            var tankStiffSink = CreateTestTank( 0.1, gravity, new Vector3( -5, 0, 0 ) ); // Small, liquid-only -> stiff
+            var tankGasSink = CreateTestTank( 5.0, gravity, new Vector3( 5, 0, 0 ) );   // Large, gas-only -> not stiff
 
-            builder.TryAddFlowObj(new object(), tankSource);
-            builder.TryAddFlowObj(new object(), tankStiffSink);
-            builder.TryAddFlowObj(new object(), tankGasSink);
+            builder.TryAddFlowObj( new object(), tankSource );
+            builder.TryAddFlowObj( new object(), tankStiffSink );
+            builder.TryAddFlowObj( new object(), tankGasSink );
 
             // Identical pipes to isolate effect of stiffness
-            var pipeToStiff = CreateAndAddPipe(builder, tankSource, new Vector3(0, -1, 0), tankStiffSink, new Vector3(-4, 0, 0), 1.0);
-            var pipeToGas = CreateAndAddPipe(builder, tankSource, new Vector3(0, -1, 0), tankGasSink, new Vector3(4, 0, 0), 1.0);
+            var pipeToStiff = CreateAndAddPipe( builder, tankSource, new Vector3( 0, -1, 0 ), tankStiffSink, new Vector3( -4, 0, 0 ), 1.0 );
+            var pipeToGas = CreateAndAddPipe( builder, tankSource, new Vector3( 0, -1, 0 ), tankGasSink, new Vector3( 4, 0, 0 ), 1.0 );
 
             var snapshot = builder.BuildSnapshot();
 
             // Act: Run a single step. Proactive damping should work on the first iteration.
-            snapshot.Step(0.02f);
-            
+            snapshot.Step( 0.02f );
+
             // Assert
             double massToStiff = tankStiffSink.Contents.GetMass();
             double massToGas = tankGasSink.Contents.GetMass();
 
-            Assert.That(massToStiff, Is.GreaterThan(0), "Some flow should occur to stiff tank.");
-            Assert.That(massToGas, Is.GreaterThan(0), "Some flow should occur to gas tank.");
-            
+            Assert.That( massToStiff, Is.GreaterThan( 0 ), "Some flow should occur to stiff tank." );
+            Assert.That( massToGas, Is.GreaterThan( 0 ), "Some flow should occur to gas tank." );
+
             // Due to proactive damping, flow to the stiff tank should be significantly less than to the non-stiff one,
             // even though potential gradients are comparable.
-            Assert.That(massToGas, Is.GreaterThan(massToStiff * 5), "Flow to non-stiff tank should be much higher than to stiff tank.");
+            Assert.That( massToGas, Is.GreaterThan( massToStiff * 5 ), "Flow to non-stiff tank should be much higher than to stiff tank." );
         }
 
         [Test]
@@ -710,42 +710,42 @@ namespace HSP_Tests_EditMode.ResourceFlow
         {
             // Arrange
             var builder = new FlowNetworkBuilder();
-            Vector3 gravity = new Vector3(0, -10, 0);
+            Vector3 gravity = new Vector3( 0, -10, 0 );
 
-            var tankA = CreateTestTank(1.0, gravity, new Vector3(-10, 0, 0));
-            var tankB = CreateTestTank(1.0, gravity, new Vector3(-5, 0, 0));
-            tankA.Contents.Add(TestSubstances.Water, 1000);
+            var tankA = CreateTestTank( 1.0, gravity, new Vector3( -10, 0, 0 ) );
+            var tankB = CreateTestTank( 1.0, gravity, new Vector3( -5, 0, 0 ) );
+            tankA.Contents.Add( TestSubstances.Water, 1000 );
 
-            var tankC = CreateTestTank(1.0, gravity, new Vector3(5, 0, 0));
-            var tankD = CreateTestTank(1.0, gravity, new Vector3(10, 0, 0));
-            tankC.Contents.Add(TestSubstances.Water, 1000);
+            var tankC = CreateTestTank( 1.0, gravity, new Vector3( 5, 0, 0 ) );
+            var tankD = CreateTestTank( 1.0, gravity, new Vector3( 10, 0, 0 ) );
+            tankC.Contents.Add( TestSubstances.Water, 1000 );
 
-            builder.TryAddFlowObj(new object(), tankA);
-            builder.TryAddFlowObj(new object(), tankB);
-            builder.TryAddFlowObj(new object(), tankC);
-            builder.TryAddFlowObj(new object(), tankD);
+            builder.TryAddFlowObj( new object(), tankA );
+            builder.TryAddFlowObj( new object(), tankB );
+            builder.TryAddFlowObj( new object(), tankC );
+            builder.TryAddFlowObj( new object(), tankD );
 
-            var stablePipe = CreateAndAddPipe(builder, tankA, new Vector3(-9, 0, 0), tankB, new Vector3(-6, 0, 0), 0.001); // Low conductance
-            var unstablePipe = CreateAndAddPipe(builder, tankC, new Vector3(6, 0, 0), tankD, new Vector3(9, 0, 0), 1000.0); // High conductance
+            var stablePipe = CreateAndAddPipe( builder, tankA, new Vector3( -9, 0, 0 ), tankB, new Vector3( -6, 0, 0 ), 0.001 ); // Low conductance
+            var unstablePipe = CreateAndAddPipe( builder, tankC, new Vector3( 6, 0, 0 ), tankD, new Vector3( 9, 0, 0 ), 1000.0 ); // High conductance
 
             var snapshot = builder.BuildSnapshot();
 
             // Act
-            for (int i = 0; i < 50; i++)
+            for( int i = 0; i < 50; i++ )
             {
-                snapshot.Step(0.02f);
+                snapshot.Step( 0.02f );
             }
 
             // Assert
-            var learnedFactors = GetLearnedRelaxationFactors(snapshot);
-            int stablePipeIndex = snapshot.Pipes.ToList().IndexOf(stablePipe);
-            int unstablePipeIndex = snapshot.Pipes.ToList().IndexOf(unstablePipe);
+            var learnedFactors = GetLearnedRelaxationFactors( snapshot );
+            int stablePipeIndex = snapshot.Pipes.ToList().IndexOf( stablePipe );
+            int unstablePipeIndex = snapshot.Pipes.ToList().IndexOf( unstablePipe );
 
-            Assert.That(stablePipeIndex, Is.Not.EqualTo(-1));
-            Assert.That(unstablePipeIndex, Is.Not.EqualTo(-1));
+            Assert.That( stablePipeIndex, Is.Not.EqualTo( -1 ) );
+            Assert.That( unstablePipeIndex, Is.Not.EqualTo( -1 ) );
 
-            Assert.That(learnedFactors[unstablePipeIndex], Is.LessThan(0.5), "High-conductance pipe should have its learned damping factor significantly reduced.");
-            Assert.That(learnedFactors[stablePipeIndex], Is.EqualTo(1.0).Within(0.1), "Low-conductance pipe should not be damped and its factor should recover to ~1.0.");
+            Assert.That( learnedFactors[unstablePipeIndex], Is.LessThan( 0.5 ), "High-conductance pipe should have its learned damping factor significantly reduced." );
+            Assert.That( learnedFactors[stablePipeIndex], Is.EqualTo( 1.0 ).Within( 0.1 ), "Low-conductance pipe should not be damped and its factor should recover to ~1.0." );
         }
 
         [Test]
@@ -753,40 +753,267 @@ namespace HSP_Tests_EditMode.ResourceFlow
         {
             // Arrange
             var builder = new FlowNetworkBuilder();
-            Vector3 gravity = new Vector3(0, -10, 0);
+            Vector3 gravity = new Vector3( 0, -10, 0 );
 
-            var tankSource = CreateTestTank(0.2, gravity, Vector3.zero);
-            tankSource.Contents.Add(TestSubstances.Water, 200); // Full
+            var tankSource = CreateTestTank( 0.2, gravity, Vector3.zero );
+            tankSource.Contents.Add( TestSubstances.Water, 200 ); // Full
 
-            var tankStiffSink = CreateTestTank(0.2, gravity, new Vector3(5, 0, 0)); // Stiff
+            var tankStiffSink = CreateTestTank( 0.2, gravity, new Vector3( 5, 0, 0 ) ); // Stiff
 
-            builder.TryAddFlowObj(new object(), tankSource);
-            builder.TryAddFlowObj(new object(), tankStiffSink);
-            
+            builder.TryAddFlowObj( new object(), tankSource );
+            builder.TryAddFlowObj( new object(), tankStiffSink );
+
             // Worst-case: high conductance pipe into a stiff tank
-            var pipe = CreateAndAddPipe(builder, tankSource, new Vector3(1, 0, 0), tankStiffSink, new Vector3(4, 0, 0), 1000.0);
-            
+            var pipe = CreateAndAddPipe( builder, tankSource, new Vector3( 1, 0, 0 ), tankStiffSink, new Vector3( 4, 0, 0 ), 1000.0 );
+
             var snapshot = builder.BuildSnapshot();
 
             // Act & Assert
-            Assert.DoesNotThrow(() =>
+            Assert.DoesNotThrow( () =>
             {
-                for (int i = 0; i < 100; i++)
+                for( int i = 0; i < 100; i++ )
                 {
-                    snapshot.Step(0.02f);
+                    Debug.Log( tankSource.Contents.GetMass() + " : " + tankStiffSink.Contents.GetMass() );
+                    snapshot.Step( 0.02f );
                 }
-            }, "Solver threw an exception on a highly stiff and conductive system.");
+            }, "Solver threw an exception on a highly stiff and conductive system." );
 
             double massA = tankSource.Contents.GetMass();
             double massB = tankStiffSink.Contents.GetMass();
-            
-            Assert.That(massA + massB, Is.EqualTo(200.0).Within(1e-3), "Mass must be conserved.");
-            Assert.That(massA, Is.EqualTo(100.0).Within(1.0), "Tanks should equalize.");
-            Assert.That(massB, Is.EqualTo(100.0).Within(1.0), "Tanks should equalize.");
 
-            var learnedFactors = GetLearnedRelaxationFactors(snapshot);
-            int pipeIndex = snapshot.Pipes.ToList().IndexOf(pipe);
-            Assert.That(learnedFactors[pipeIndex], Is.LessThan(0.1), "Pipe should be very aggressively damped by the reactive layer.");
+            Assert.That( massA + massB, Is.EqualTo( 200.0 ).Within( 1e-3 ), "Mass must be conserved." );
+            Assert.That( massA, Is.EqualTo( 100.0 ).Within( 1.0 ), "Tanks should equalize." );
+            Assert.That( massB, Is.EqualTo( 100.0 ).Within( 1.0 ), "Tanks should equalize." );
+
+            var learnedFactors = GetLearnedRelaxationFactors( snapshot );
+            int pipeIndex = snapshot.Pipes.ToList().IndexOf( pipe );
+            Assert.That( learnedFactors[pipeIndex], Is.LessThan( 0.1 ), "Pipe should be very aggressively damped by the reactive layer." );
         }
+
+        // Additional tests for edge-cases and failure modes
+        [Test]
+        public void LiquidFlow___ZeroVolumeTank_HandledSafelyAndMassConserved()
+        {
+            // Arrange
+            var builder = new FlowNetworkBuilder();
+            Vector3 gravity = new Vector3( 0, -10, 0 );
+
+            var tankSource = CreateTestTank( 1.0, gravity, new Vector3( 0, 2, 0 ) );
+            tankSource.Contents.Add( TestSubstances.Water, 1000 );
+
+            // Create a zero-volume tank (edge-case)
+            var tankZero = CreateTestTank( 0.0, gravity, Vector3.zero );
+            // Even if volume is zero, API should not throw and mass should remain zero or be handled gracefully
+            // Do not add mass to zero-volume tank.
+
+            builder.TryAddFlowObj( new object(), tankSource );
+            builder.TryAddFlowObj( new object(), tankZero );
+
+            var pipe = CreateAndAddPipe( builder, tankSource, new Vector3( 0, 1, 0 ), tankZero, new Vector3( 0, -1, 0 ), 1.0 );
+
+            var snapshot = builder.BuildSnapshot();
+
+            // Act & Assert: stepping should not throw and mass must be conserved.
+            Assert.DoesNotThrow( () =>
+            {
+                for( int i = 0; i < 20; i++ )
+                {
+                    snapshot.Step( 0.02f );
+                }
+            }, "Solver threw with a zero-volume tank." );
+
+            Assert.That( tankSource.Contents.GetMass() + tankZero.Contents.GetMass(), Is.EqualTo( 1000.0 ).Within( 1e-6 ), "Total mass must be conserved." );
+            // Zero-volume tank should not contain any fluid mass (or must be capped by implementation).
+            Assert.That( tankZero.Contents.GetMass(), Is.EqualTo( 0.0 ).Within( 1e-6 ), "Zero-volume tank must not gain mass." );
+        }
+
+        [Test]
+        public void LiquidFlow___ValveToggledMidSimulation_StopsFlowAndConservesMass()
+        {
+            // Arrange
+            var builder = new FlowNetworkBuilder();
+            var tankA = CreateTestTank( 1.0, new Vector3( 0, -10, 0 ), new Vector3( 0, 5, 0 ) );
+            var tankB = CreateTestTank( 1.0, new Vector3( 0, -10, 0 ), Vector3.zero );
+
+            tankA.Contents.Add( TestSubstances.Water, 500 );
+            tankB.Contents.Add( TestSubstances.Water, 0 );
+
+            builder.TryAddFlowObj( new object(), tankA );
+            builder.TryAddFlowObj( new object(), tankB );
+
+            var pipe = CreateAndAddPipe( builder, tankA, new Vector3( 0, 4, 0 ), tankB, new Vector3( 0, 1, 0 ), 5.0 );
+
+            var snapshot = builder.BuildSnapshot();
+
+            // Act: run a few steps with valve open
+            for( int i = 0; i < 10; i++ ) snapshot.Step( 0.02f );
+
+            double massAfterOpen = tankB.Contents.GetMass();
+
+            // Toggle valve closed
+            pipe.Conductance = 0.0;
+
+            // Run more steps; no further flow should occur
+            for( int i = 0; i < 20; i++ ) snapshot.Step( 0.02f );
+
+            // Assert
+            Assert.That( tankB.Contents.GetMass(), Is.EqualTo( massAfterOpen ).Within( 1e-6 ), "No additional mass should pass after valve closed." );
+            Assert.That( tankA.Contents.GetMass() + tankB.Contents.GetMass(), Is.EqualTo( 500.0 ).Within( 1e-6 ), "Total mass must be conserved." );
+        }
+
+        [Test]
+        public void MultiSubstance___TwoSourcesDifferentSubstances_MixInSink()
+        {
+            // Arrange
+            var builder = new FlowNetworkBuilder();
+            Vector3 gravity = new Vector3( 0, -10, 0 );
+
+            var sourceA = CreateTestTank( 1.0, gravity, new Vector3( -2, 10, 0 ) );
+            sourceA.Contents.Add( TestSubstances.Water, 500 );
+
+            var sourceB = CreateTestTank( 1.0, gravity, new Vector3( 2, 10, 0 ) );
+            sourceB.Contents.Add( TestSubstances.Kerosene, 250 );
+
+            var sink = CreateTestTank( 2.0, gravity, Vector3.zero );
+
+            builder.TryAddFlowObj( new object(), sourceA );
+            builder.TryAddFlowObj( new object(), sourceB );
+            builder.TryAddFlowObj( new object(), sink );
+
+            CreateAndAddPipe( builder, sourceA, new Vector3( -2, 9, 0 ), sink, new Vector3( 0, 1, 0 ), 1.0 );
+            CreateAndAddPipe( builder, sourceB, new Vector3( 2, 9, 0 ), sink, new Vector3( 0, 1, 0 ), 1.0 );
+
+            var snapshot = builder.BuildSnapshot();
+
+            // Act: run until flows transfer some mass
+            for( int i = 0; i < 200; i++ ) snapshot.Step( 0.02f );
+
+            // Assert: sink must contain both substances and global mass conserved
+            Assert.That( sink.Contents.Contains( TestSubstances.Water ), Is.True, "Sink should contain water from source A." );
+            Assert.That( sink.Contents.Contains( TestSubstances.Kerosene ), Is.True, "Sink should contain kerosene from source B." );
+
+            double totalMass = sourceA.Contents.GetMass() + sourceB.Contents.GetMass() + sink.Contents.GetMass();
+            Assert.That( totalMass, Is.EqualTo( 500 + 250 ).Within( 1e-6 ), "Total mass must be conserved across multiple substances." );
+        }
+
+        [Test]
+        public void Pump_ReverseHead_BackAndForth_DoesNotProduceMassOrThrow()
+        {
+            // Arrange
+            var builder = new FlowNetworkBuilder();
+            var tankA = CreateTestTank( 1.0, new Vector3( 0, -10, 0 ), new Vector3( -1, 0, 0 ) );
+            var tankB = CreateTestTank( 1.0, new Vector3( 0, -10, 0 ), new Vector3( 1, 0, 0 ) );
+
+            tankA.Contents.Add( TestSubstances.Water, 600 );
+            tankB.Contents.Add( TestSubstances.Water, 400 );
+
+            builder.TryAddFlowObj( new object(), tankA );
+            builder.TryAddFlowObj( new object(), tankB );
+
+            var pipe = CreateAndAddPipe( builder, tankA, new Vector3( 0, -1, 0 ), tankB, new Vector3( 0, -1, 0 ), 10.0 );
+
+            var snapshot = builder.BuildSnapshot();
+
+            // Act: repeatedly change pump head (simulate quick reversal) and step
+            Assert.DoesNotThrow( () =>
+            {
+                for( int cycle = 0; cycle < 20; cycle++ )
+                {
+                    // pump in direction A->B
+                    pipe.HeadAdded = 200.0;
+                    snapshot.Step( 0.02f );
+                    // pump in direction B->A (negative head)
+                    pipe.HeadAdded = -200.0;
+                    snapshot.Step( 0.02f );
+                    // neutral
+                    pipe.HeadAdded = 0.0;
+                    snapshot.Step( 0.02f );
+                }
+            }, "Solver threw when pump head reversed rapidly." );
+
+            // Assert conservation of mass
+            double total = tankA.Contents.GetMass() + tankB.Contents.GetMass();
+            Assert.That( total, Is.EqualTo( 1000.0 ).Within( 1e-6 ), "Mass must be conserved under rapid pump reversals." );
+        }
+
+        [Test]
+        public void NumericStability___TinyTimeStepRepeated_SumsToSameMass()
+        {
+            // Arrange
+            var builder = new FlowNetworkBuilder();
+            Vector3 gravity = new Vector3( 0, -10, 0 );
+
+            var tankA = CreateTestTank( 1.0, gravity, new Vector3( -1, 0, 0 ) );
+            var tankB = CreateTestTank( 1.0, gravity, new Vector3( 1, 0, 0 ) );
+
+            tankA.Contents.Add( TestSubstances.Air, 10.0 ); // gas
+            tankB.Contents.Add( TestSubstances.Air, 0.0 );
+
+            builder.TryAddFlowObj( new object(), tankA );
+            builder.TryAddFlowObj( new object(), tankB );
+
+            CreateAndAddPipe( builder, tankA, new Vector3( 0, 0, 0 ), tankB, new Vector3( 0, 0, 0 ), 0.1 );
+
+            var snapshot = builder.BuildSnapshot();
+
+            // Act: many tiny steps vs one large step should not create/destroy mass
+            int tinySteps = 1000;
+            float tinyDt = 1e-5f;
+            for( int i = 0; i < tinySteps; i++ )
+            {
+                snapshot.Step( tinyDt );
+            }
+
+            double totalAfterTiny = tankA.Contents.GetMass() + tankB.Contents.GetMass();
+
+            // Reset and do single-step equivalent
+            builder = new FlowNetworkBuilder();
+            tankA = CreateTestTank( 1.0, gravity, new Vector3( -1, 0, 0 ) );
+            tankB = CreateTestTank( 1.0, gravity, new Vector3( 1, 0, 0 ) );
+            tankA.Contents.Add( TestSubstances.Air, 10.0 );
+            builder.TryAddFlowObj( new object(), tankA );
+            builder.TryAddFlowObj( new object(), tankB );
+            CreateAndAddPipe( builder, tankA, new Vector3( 0, 0, 0 ), tankB, new Vector3( 0, 0, 0 ), 0.1 );
+            var snapshot2 = builder.BuildSnapshot();
+
+            snapshot2.Step( tinySteps * tinyDt );
+
+            double totalAfterLarge = tankA.Contents.GetMass() + tankB.Contents.GetMass();
+
+            Assert.That( totalAfterTiny, Is.EqualTo( totalAfterLarge ).Within( 1e-6 ), "Many tiny steps should conserve mass equivalently to one larger step." );
+            Assert.That( totalAfterTiny, Is.EqualTo( 10.0 ).Within( 1e-6 ), "Total mass must be conserved after many tiny steps." );
+        }
+
+        [Test]
+        public void EngineDemand_IsLimited_By_InjectorConductance()
+        {
+            // Arrange
+            var builder = new FlowNetworkBuilder();
+            var tank = CreateTestTank( 1.0, new Vector3( 0, -10, 0 ), Vector3.zero );
+            tank.Contents.Add( TestSubstances.Kerosene, 800 );
+
+            var engine = new EngineFeedSystem( 0.01 )
+            {
+                IsOutflowEnabled = true,
+                ChamberPressure = 1e5,
+                InjectorConductance = 0.0001, // tiny injector conductance should cap flow
+                Demand = 10000.0 // wildly large demand
+            };
+
+            builder.TryAddFlowObj( new object(), tank );
+            builder.TryAddFlowObj( new object(), engine );
+            var pipe = CreateAndAddPipe( builder, tank, new Vector3( 0, -1, 0 ), engine, Vector3.zero, 1.0 );
+
+            var snapshot = builder.BuildSnapshot();
+
+            // Act
+            snapshot.Step( 0.02f );
+
+            // Assert: engine must have consumed mass but should be limited by injector conductance (not consume entire tank)
+            Assert.That( engine.MassConsumedLastStep, Is.GreaterThan( 0 ), "Engine should have consumed some mass." );
+            Assert.That( engine.MassConsumedLastStep, Is.LessThan( tank.Contents.GetMass() ), "Engine must not instantly consume whole tank; consumption limited by injector conductance." );
+            Assert.That( tank.Contents.GetMass(), Is.LessThan( 800 ), "Tank should have lost some mass but not be emptied in a single step." );
+        }
+
     }
 }

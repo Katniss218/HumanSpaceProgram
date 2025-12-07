@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace HSP.ResourceFlow
 {
-    internal class FluidDistributionCache
+    internal class FlowTankCache
     {
         private readonly FlowTank _owner;
 
@@ -77,7 +77,7 @@ namespace HSP.ResourceFlow
 #warning TODO - split contents into gas and liquid contents? I think it would be better to just filter over the main contents array, the length is small (mostly 2-3 subs)
         private readonly List<(ISubstance sub, double mass)> _gasBuffer = new(); // Temp buffer for gas calc
 
-        public FluidDistributionCache( FlowTank owner )
+        public FlowTankCache( FlowTank owner )
         {
             _owner = owner;
         }
@@ -484,18 +484,21 @@ namespace HSP.ResourceFlow
                     }
                 }
                 localPressure += hydrostaticPressure;
+
+                // For a liquid, the effective potential driving flow out of any submerged
+                // orifice is the potential of the free surface.
+                result.FluidSurfacePotential = liquidSurfacePot;
+            }
+            else
+            {
+                // --- GAS PHASE ---
+                // In gas, pressure potential matters for equalization. The reference density
+                // acts as a consistent scaling factor for pressure head.
+                const double POTENTIAL_REFERENCE_DENSITY = 1000.0;
+                result.FluidSurfacePotential = geoPotential + (localPressure / POTENTIAL_REFERENCE_DENSITY);
             }
 
             result.Pressure = localPressure;
-
-            const double POTENTIAL_REFERENCE_DENSITY = 1000.0; // kg/m^3, reference for converting pressure to potential head.
-
-            // The unified fluid potential is the sum of geometric potential (from gravity/acceleration)
-            // and pressure potential (from pressure). We convert pressure to a potential by dividing
-            // by a constant reference density. This ensures that for gases, where P/rho is constant,
-            // the solver still sees a pressure gradient, driving flow towards equalization. For liquids,
-            // this behaves similarly to a head of a reference fluid (like water).
-            result.FluidSurfacePotential = geoPotential + (localPressure / POTENTIAL_REFERENCE_DENSITY);
 
             return result;
         }
@@ -532,7 +535,6 @@ namespace HSP.ResourceFlow
 
                     // Simple availability check (without the transient fix for now)
                     double availableMass = layer.Volume * layer.Density;
-                    availableMass += _owner.Inflow[layer.Substance];
 
                     result.Add( layer.Substance, Math.Min( requestedMass, availableMass ) );
                 }

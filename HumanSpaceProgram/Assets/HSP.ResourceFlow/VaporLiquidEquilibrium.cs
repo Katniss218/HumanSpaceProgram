@@ -99,7 +99,7 @@ namespace HSP.ResourceFlow
         /// </summary>
         public (double P, double dPdM) GetStateAtMass( double currentMass )
         {
-            if( currentMass <= 1e-9 ) 
+            if( currentMass <= 1e-9 )
                 return (0, 0);
 
             // 1. Calculate Liquid Volume based on current mass
@@ -131,7 +131,7 @@ namespace HSP.ResourceFlow
             // Moles_gas = Mass * Sum(w_i / M_i)
             double gasMoles = currentMass * WeightedInvMolarMass;
 
-            if( gasMoles <= 1e-12 ) 
+            if( gasMoles <= 1e-12 )
                 return (0, 0);
 
             // P = (nRT) / (V - V_liq)
