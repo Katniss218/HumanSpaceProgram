@@ -137,11 +137,11 @@ namespace HSP._DevUtils
             v.RootPart = root;
 
             FResourceConnection_FlowPipe conn = tankP.gameObject.AddComponent<FResourceConnection_FlowPipe>();
-            conn.Conductance = 0;
+            conn.ConductivityFactor = 1.0;
             conn.FromInlet = tankL1.GetComponent<FResourceContainer_FlowTank>().Inlets[1];
             conn.ToInlet = tankP.GetComponent<FResourceContainer_FlowTank>().Inlets[0];
-            conn.FromInlet.NominalArea = 60f;
-            conn.ToInlet.NominalArea = 60f;
+            conn.FromInlet.NominalArea = 0.1f;
+            conn.ToInlet.NominalArea = 0.1f;
 
             Substance sbsF = AssetRegistry.Get<Substance>( "Vanilla::Assets/substances/rp_1" );
             Substance sbsOX = AssetRegistry.Get<Substance>( "Vanilla::Assets/substances/lox" );
@@ -161,32 +161,32 @@ namespace HSP._DevUtils
             FRocketEngine eng2 = engineP2.GetComponent<FRocketEngine>();
 
             FResourceConnection_FlowPipe conn21 = engineP1.gameObject.AddComponent<FResourceConnection_FlowPipe>();
-            conn21.Conductance = 0.1;
+            conn.ConductivityFactor = 1.0;
             conn21.FromInlet = tankSmallTank.Inlets[1];
             conn21.ToInlet = eng1.Inlets[0];
-            conn21.FromInlet.NominalArea = 60f;
-            conn21.ToInlet.NominalArea = 60f;
+            conn.FromInlet.NominalArea = 0.1f;
+            conn.ToInlet.NominalArea = 0.1f;
 
             FResourceConnection_FlowPipe conn22 = engineP2.gameObject.AddComponent<FResourceConnection_FlowPipe>();
-            conn22.Conductance = 0.1;
+            conn.ConductivityFactor = 1.0;
             conn22.FromInlet = tankSmallTank.Inlets[1];
             conn22.ToInlet = eng2.Inlets[0];
-            conn22.FromInlet.NominalArea = 60f;
-            conn22.ToInlet.NominalArea = 60f;
+            conn22.FromInlet.NominalArea = 0.1f;
+            conn22.ToInlet.NominalArea = 0.1f;
 
             FResourceConnection_FlowPipe conn21o = engineP1.gameObject.AddComponent<FResourceConnection_FlowPipe>();
-            conn21o.Conductance = 0.1;
+            conn.ConductivityFactor = 1.0;
             conn21o.FromInlet = tankLargeTank.Inlets[1];
             conn21o.ToInlet = eng1.Inlets[1];
-            conn21o.FromInlet.NominalArea = 60f;
-            conn21o.ToInlet.NominalArea = 60f;
+            conn21o.FromInlet.NominalArea = 0.1f;
+            conn21o.ToInlet.NominalArea = 0.1f;
 
             FResourceConnection_FlowPipe conn22o = engineP2.gameObject.AddComponent<FResourceConnection_FlowPipe>();
-            conn22o.Conductance = 0.1;
+            conn.ConductivityFactor = 1.0;
             conn22o.FromInlet = tankLargeTank.Inlets[1];
             conn22o.ToInlet = eng2.Inlets[1];
-            conn22o.FromInlet.NominalArea = 60f;
-            conn22o.ToInlet.NominalArea = 60f;
+            conn22o.FromInlet.NominalArea = 0.1f;
+            conn22o.ToInlet.NominalArea = 0.1f;
 
 
             FVesselSeparator t1Sep = t1.gameObject.AddComponent<FVesselSeparator>();

@@ -57,7 +57,7 @@ namespace HSP_Tests_EditMode.ResourceFlow
             // The system should normalize the geometry volume to match the logical volume.
 
             // Allow small float error
-            Assert.AreEqual( 1.0, _tank.CalculatedVolume, 1e-4 );
+            Assert.That( _tank.CalculatedVolume, Is.EqualTo( 1.0 ).Within( 1e-4 ) );
         }
 
         [Test]
@@ -77,9 +77,9 @@ namespace HSP_Tests_EditMode.ResourceFlow
             // X and Z should be 0.
             // Y should be -0.25.
 
-            Assert.AreEqual( 0.0f, com.x, 1e-3, "CoM X deviation" );
-            Assert.AreEqual( 0.0f, com.z, 1e-3, "CoM Z deviation" );
-            Assert.AreEqual( -0.25f, com.y, 0.05f, "CoM Y deviation - If this fails significantly, volume distribution is skewed" );
+            Assert.That( com.x, Is.EqualTo( 0.0f ).Within( 1e-3 ), "CoM X deviation" );
+            Assert.That( com.z, Is.EqualTo( 0.0f ).Within( 1e-3 ), "CoM Z deviation" );
+            Assert.That( com.y, Is.EqualTo( -0.25f ).Within( 0.05f ), "CoM Y deviation - If this fails significantly, volume distribution is skewed" );
         }
 
         [Test]
@@ -96,8 +96,8 @@ namespace HSP_Tests_EditMode.ResourceFlow
 
             // Fluid should pool at X = -0.5.
             // Center of that mass is X = -0.25.
-            Assert.AreEqual( -0.25f, com.x, 0.05f );
-            Assert.AreEqual( 0.0f, com.y, 1e-3 );
+            Assert.That( com.x, Is.EqualTo( -0.25f ).Within( 0.05f ) );
+            Assert.That( com.y, Is.EqualTo( 0.0f ).Within( 1e-3 ) );
         }
 
         // --- SECTION 2: Stratification Tests ---
@@ -111,14 +111,14 @@ namespace HSP_Tests_EditMode.ResourceFlow
             _tank.ForceRecalculateCache();
 
             // Sample bottom (Heavy should be here)
-            var bottomSample = _tank.SampleSubstances( new Vector3( 0, -0.4f, 0 ), 1, 1 );
-            Assert.IsTrue( bottomSample.Contains( TestSubstances.Water ), "Bottom should contain water" );
-            Assert.IsFalse( bottomSample.Contains( TestSubstances.Oil ), "Bottom should not contain oil" );
+            var bottomSample = _tank.SampleSubstances( new Vector3( 0, -0.4f, 0 ), 1 );
+            Assert.That( bottomSample.Contains( TestSubstances.Water ), Is.True, "Bottom should contain water" );
+            Assert.That( bottomSample.Contains( TestSubstances.Oil ), Is.False, "Bottom should not contain oil" );
 
             // Sample top (Light should be here)
-            var topSample = _tank.SampleSubstances( new Vector3( 0, -0.1f, 0 ), 1, 1 );
-            Assert.IsTrue( topSample.Contains( TestSubstances.Oil ), "Top should contain oil" );
-            Assert.IsFalse( topSample.Contains( TestSubstances.Water ), "Top should not contain water" );
+            var topSample = _tank.SampleSubstances( new Vector3( 0, -0.1f, 0 ), 1 );
+            Assert.That( topSample.Contains( TestSubstances.Oil ), Is.True, "Top should contain oil" );
+            Assert.That( topSample.Contains( TestSubstances.Water ), Is.False, "Top should not contain water" );
         }
 
         [Test]
@@ -133,14 +133,14 @@ namespace HSP_Tests_EditMode.ResourceFlow
 
             // Mercury (13500) -> Water (1000) -> Oil (800)
 
-            var s1 = _tank.SampleSubstances( new Vector3( 0, -0.45f, 0 ), 1, 1 );
-            Assert.IsTrue( s1.Contains( TestSubstances.Mercury ) );
+            var s1 = _tank.SampleSubstances( new Vector3( 0, -0.45f, 0 ), 1 );
+            Assert.That( s1.Contains( TestSubstances.Mercury ), Is.True );
 
-            var s2 = _tank.SampleSubstances( new Vector3( 0, 0f, 0 ), 1, 1 );
-            Assert.IsTrue( s2.Contains( TestSubstances.Water ) );
+            var s2 = _tank.SampleSubstances( new Vector3( 0, 0f, 0 ), 1 );
+            Assert.That( s2.Contains( TestSubstances.Water ), Is.True );
 
-            var s3 = _tank.SampleSubstances( new Vector3( 0, 0.45f, 0 ), 1, 1 );
-            Assert.IsTrue( s3.Contains( TestSubstances.Oil ) );
+            var s3 = _tank.SampleSubstances( new Vector3( 0, 0.45f, 0 ), 1 );
+            Assert.That( s3.Contains( TestSubstances.Oil ), Is.True );
         }
 
         // --- SECTION 3: Pressure & Potentials ---
@@ -155,12 +155,12 @@ namespace HSP_Tests_EditMode.ResourceFlow
 
             // Pressure at top (0.5) should be 0 (gauge pressure)
             var topState = _tank.Sample( new Vector3( 0, 0.5f, 0 ), 0.1 );
-            Assert.AreEqual( 0.0, topState.Pressure, 1.0 );
+            Assert.That( topState.Pressure, Is.EqualTo( 0.0 ).Within( 1.0 ) );
 
             // Pressure at bottom (-0.5) 
             // h = 1m, rho = 1000, g = 10. P = 10,000.
             var botState = _tank.Sample( new Vector3( 0, -0.5f, 0 ), 0.1 );
-            Assert.AreEqual( 10000.0, botState.Pressure, 100.0 ); // Allow loose tolerance for discretized slicing
+            Assert.That( botState.Pressure, Is.EqualTo( 10000.0 ).Within( 100.0 ) ); // Allow loose tolerance for discretized slicing
         }
 
         [Test]
@@ -176,12 +176,12 @@ namespace HSP_Tests_EditMode.ResourceFlow
 
             // Fluid should be pushed to the furthest X/Z points (corners).
             // Center (0,0,0) should be empty.
-            var centerSample = _tank.SampleSubstances( Vector3.zero, 1, 1 );
-            Assert.AreEqual( 0, centerSample.Count, "Center should be empty in centrifuge" );
+            var centerSample = _tank.SampleSubstances( Vector3.zero, 1 );
+            Assert.That( centerSample.Count, Is.EqualTo( 0 ), "Center should be empty in centrifuge" );
 
             // Corner (0.5, -0.5, 0.5) should have fluid
-            var cornerSample = _tank.SampleSubstances( new Vector3( 0.5f, -0.5f, 0.5f ), 1, 1 );
-            Assert.IsTrue( cornerSample.Contains( TestSubstances.Water ), "Outer corner should have fluid" );
+            var cornerSample = _tank.SampleSubstances( new Vector3( 0.5f, -0.5f, 0.5f ), 1 );
+            Assert.That( cornerSample.Contains( TestSubstances.Water ), Is.True, "Outer corner should have fluid" );
         }
 
         // --- SECTION 4: Edge Cases ---
@@ -200,11 +200,11 @@ namespace HSP_Tests_EditMode.ResourceFlow
 
             // Check that Sample returns valid pressure (high) but not infinite
             var state = _tank.Sample( new Vector3( 0, -0.5f, 0 ), 0.1 );
-            Assert.Greater( state.Pressure, 0 );
+            Assert.That( state.Pressure, Is.GreaterThan( 0 ) );
 
             // Check CoM is simply the center of the tank (0,0,0) because it's uniformly full
             Vector3 com = _tank.GetCenterOfMass();
-            Assert.AreEqual( 0.0f, com.y, 1e-3 );
+            Assert.That( com.y, Is.EqualTo( 0.0f ).Within( 1e-3 ) );
         }
 
         [Test]
@@ -219,11 +219,11 @@ namespace HSP_Tests_EditMode.ResourceFlow
             var state = _tank.Sample( pt, 0.1 );
 
             // Pressure should be 0
-            Assert.AreEqual( 0.0, state.Pressure );
+            Assert.That( state.Pressure, Is.EqualTo( 0.0 ) );
 
             // Potential should match point potential (sink behavior)
             double pot = _tank.GetPotentialAt( pt );
-            Assert.AreEqual( pot, state.FluidSurfacePotential, 1e-5 );
+            Assert.That( state.FluidSurfacePotential, Is.EqualTo( pot ).Within( 1e-5 ) );
         }
     }
 
@@ -272,7 +272,7 @@ namespace HSP_Tests_EditMode.ResourceFlow
             FluidState state = _tank.Sample( portPosition, 0.1 );
 
             // Assert
-            Assert.AreEqual( expectedPotential, state.FluidSurfacePotential, 1e-9 );
+            Assert.That( state.FluidSurfacePotential, Is.EqualTo( expectedPotential ).Within( 1e-9 ) );
         }
 
         [Test]
@@ -290,7 +290,7 @@ namespace HSP_Tests_EditMode.ResourceFlow
             FluidState state = _tank.Sample( portPosition, 0.1 );
 
             // Assert
-            Assert.AreEqual( 0.0, state.FluidSurfacePotential, 1e-3 );
+            Assert.That( state.FluidSurfacePotential, Is.EqualTo( 0.0 ).Within( 1e-3 ) );
         }
 
         [Test]
@@ -307,7 +307,7 @@ namespace HSP_Tests_EditMode.ResourceFlow
             FluidState state = _tank.Sample( portPosition, 0.1 );
 
             // Assert
-            Assert.AreEqual( 0.0, state.FluidSurfacePotential, 1e-9 );
+            Assert.That( state.FluidSurfacePotential, Is.EqualTo( 0.0 ).Within( 1e-9 ) );
         }
 
         [Test]
@@ -322,12 +322,12 @@ namespace HSP_Tests_EditMode.ResourceFlow
             var portPosition = new Vector3( 0, -1, 0 );
 
             // Act
-            var sampled = _tank.SampleSubstances( portPosition, 0.1, 1.0 );
+            var sampled = _tank.SampleSubstances( portPosition, 0.1 );
 
             // Assert
-            Assert.AreEqual( 1, sampled.Count );
-            Assert.IsTrue( sampled.Contains( TestSubstances.Water ) );
-            Assert.IsFalse( sampled.Contains( TestSubstances.Oil ) );
+            Assert.That( sampled.Count, Is.EqualTo( 1 ) );
+            Assert.That( sampled.Contains( TestSubstances.Water ), Is.True );
+            Assert.That( sampled.Contains( TestSubstances.Oil ), Is.False );
         }
 
         [Test]
@@ -342,12 +342,12 @@ namespace HSP_Tests_EditMode.ResourceFlow
             var portPosition = new Vector3( 0, -0.25f, 0 );
 
             // Act
-            var sampled = _tank.SampleSubstances( portPosition, 0.1, 1.0 );
+            var sampled = _tank.SampleSubstances( portPosition, 0.1 );
 
             // Assert
-            Assert.AreEqual( 1, sampled.Count );
-            Assert.IsFalse( sampled.Contains( TestSubstances.Water ) );
-            Assert.IsTrue( sampled.Contains( TestSubstances.Oil ) );
+            Assert.That( sampled.Count, Is.EqualTo( 1 ) );
+            Assert.That( sampled.Contains( TestSubstances.Water ), Is.False );
+            Assert.That( sampled.Contains( TestSubstances.Oil ), Is.True );
         }
     }
 }

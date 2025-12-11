@@ -172,7 +172,7 @@ namespace HSP.ResourceFlow
             double cp = EvaluatePolynomialHorner( temperature, SpecificHeatCoeffs );
             return cp < 0 ? 0 : cp;
         }
-        
+
         public double GetSpeedOfSound( double temperature, double pressure )
         {
             if( Phase == SubstancePhase.Gas )

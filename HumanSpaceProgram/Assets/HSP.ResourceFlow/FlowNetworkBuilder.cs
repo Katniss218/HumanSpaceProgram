@@ -174,8 +174,8 @@ namespace HSP.ResourceFlow
             return false;
         }
 
-        internal IEnumerable<IResourceConsumer> Consumers => _consumers.Values.SelectMany( n => n );
-        internal IEnumerable<IResourceProducer> Producers => _producers.Values.SelectMany( n => n );
-        internal IEnumerable<FlowPipe> Pipes => _pipes.Values.SelectMany( n => n );
+        public IEnumerable<IResourceConsumer> Consumers => _consumers.Values.SelectMany( n => n );
+        public IEnumerable<IResourceProducer> Producers => _producers.Values.SelectMany( n => n );
+        public IEnumerable<FlowPipe> Pipes => _pipes.Values.SelectMany( n => n );
     }
 }

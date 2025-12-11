@@ -39,30 +39,48 @@ namespace HSP.ResourceFlow
         }
 
         public Port FromInlet { get; }
-
         public Port ToInlet { get; }
 
+        public double Length { get; }
+        public double Area { get; }
+        public double Diameter { get; }
+
         /// <summary>
-        /// Volumetric conductance, in [m^3/(s*(J/kg))]
+        /// Mass flow conductance, in [kg*s/m^2].
+        /// This is a linearized coefficient, where Mass Flow Rate (kg/s) = Conductance * Potential Difference (J/kg).
+        /// This value is dynamically calculated and updated by the solver each frame.
         /// </summary>
-        public double Conductance { get; set; }
+        public double MassFlowConductance { get; set; }
 
         /// <summary>
         /// Pump added head potential, positive when pushing from <see cref="FromInlet"/> to <see cref="ToInlet"/>, in [J/kg]
         /// </summary>
         public double HeadAdded { get; set; }
 
-        public FlowPipe( Port fromInlet, Port toInlet, double conductance = 1.0, double headAdded = 0.0 )
+        // --- State for solver ---
+        internal double MassFlowRateLastStep { get; set; }
+        internal double DensityLastStep { get; set; }
+        internal double ViscosityLastStep { get; set; }
+        internal double ConductanceLastStep { get; set; }
+
+
+        public FlowPipe( Port fromInlet, Port toInlet, double length, double area )
         {
             FromInlet = fromInlet;
             ToInlet = toInlet;
-            Conductance = conductance;
-            HeadAdded = headAdded;
+            Length = Math.Max( length, 0.001 ); // Min length 1mm
+            Area = area;
+            Diameter = Math.Sqrt( 4 * area / Math.PI );
+            MassFlowConductance = 0; // Initial value, will be calculated by solver.
+            MassFlowRateLastStep = 0;
+            DensityLastStep = 0;
+            ViscosityLastStep = 0;
+            ConductanceLastStep = 0;
         }
 
-        public double ComputeFlowRate( double potentialFrom, double potentialTo )
+        public double ComputeMassFlowRate( double potentialFrom, double potentialTo )
         {
-            double flowrate = Conductance * (potentialFrom - potentialTo + HeadAdded);
+            double flowrate = MassFlowConductance * (potentialFrom - potentialTo + HeadAdded);
             if( !double.IsFinite( flowrate ) )
                 flowrate = 0f;
 
@@ -70,32 +88,36 @@ namespace HSP.ResourceFlow
         }
 
         /// <summary>
-        /// Samples the actual flow that would occur through this pipe for the given flowrate (uses tanks' accelerations to determine solids flows).
+        /// Samples the actual flow that would occur through this pipe for the given mass flow (uses tanks' accelerations to determine solids flows).
         /// </summary>
-        /// <param name="signedFlowRate">Volumetric flow rate (positive is flow from FromInlet to ToInlet), in [m^3/s].</param>
+        /// <param name="signedMassFlow">Mass flow rate (positive is flow from FromInlet to ToInlet), in [kg/s].</param>
         /// <param name="dt"">Timestep used for scaling the flowing resources, in [s].</param>
-        public ISampledSubstanceStateCollection SampleFlowResources( double signedFlowRate, double dt )
+        public ISampledSubstanceStateCollection SampleFlowResources( double signedMassFlow, double dt )
         {
-            if( signedFlowRate == 0f )
+            if( Math.Abs( signedMassFlow ) < 1e-9 )
                 return PooledReadonlySubstanceStateCollection.Get();
 
             IResourceConsumer consumer;
             IResourceProducer producer;
-            if( signedFlowRate < 0 )
+            Vector3 samplePos;
+            if( signedMassFlow < 0 )
             {
                 producer = ToInlet.Producer;
                 consumer = FromInlet.Consumer;
+                samplePos = ToInlet.pos;
             }
             else
             {
                 producer = FromInlet.Producer;
                 consumer = ToInlet.Consumer;
+                samplePos = FromInlet.pos;
             }
-            // TODO - bidirectional flow later (diffusion)
-            // TODO - choked flow (speed of sound) clamping flowrate
-            //  - needs to be done either here or in the solver itself because speed of sound depends on the substances moving.
 
-            return producer.SampleSubstances( FromInlet.pos, Math.Abs( signedFlowRate ), dt );
+            if( producer == null || consumer == null )
+                return PooledReadonlySubstanceStateCollection.Get();
+
+            double massToTransfer = Math.Abs( signedMassFlow ) * dt;
+            return producer.SampleSubstances( samplePos, massToTransfer );
         }
     }
 }

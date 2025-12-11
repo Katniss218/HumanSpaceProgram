@@ -328,11 +328,11 @@ namespace HSP._DevUtils
                     int sampleCount = 0;
                     const float sampleOffset = 0.0125f;
 
-                    using( var s = TargetTank.SampleSubstances( localPos, 1, 1 ) ) { total.Add( s ); sampleCount++; }
-                    using( var s = TargetTank.SampleSubstances( localPos + new Vector3( -sampleOffset, -sampleOffset, sampleOffset ), 1, 1 ) ) { total.Add( s ); sampleCount++; }
-                    using( var s = TargetTank.SampleSubstances( localPos + new Vector3( -sampleOffset, sampleOffset, sampleOffset ), 1, 1 ) ) { total.Add( s ); sampleCount++; }
-                    using( var s = TargetTank.SampleSubstances( localPos + new Vector3( sampleOffset, -sampleOffset, -sampleOffset ), 1, 1 ) ) { total.Add( s ); sampleCount++; }
-                    using( var s = TargetTank.SampleSubstances( localPos + new Vector3( sampleOffset, sampleOffset, -sampleOffset ), 1, 1 ) ) { total.Add( s ); sampleCount++; }
+                    using( var s = TargetTank.SampleSubstances( localPos, 0.001 ) ) { total.Add( s ); sampleCount++; }
+                    using( var s = TargetTank.SampleSubstances( localPos + new Vector3( -sampleOffset, -sampleOffset, sampleOffset ), 0.001 ) ) { total.Add( s ); sampleCount++; }
+                    using( var s = TargetTank.SampleSubstances( localPos + new Vector3( -sampleOffset, sampleOffset, sampleOffset ), 0.001 ) ) { total.Add( s ); sampleCount++; }
+                    using( var s = TargetTank.SampleSubstances( localPos + new Vector3( sampleOffset, -sampleOffset, -sampleOffset ), 0.001 ) ) { total.Add( s ); sampleCount++; }
+                    using( var s = TargetTank.SampleSubstances( localPos + new Vector3( sampleOffset, sampleOffset, -sampleOffset ), 0.001 ) ) { total.Add( s ); sampleCount++; }
 
                     if( sampleCount > 0 )
                     {

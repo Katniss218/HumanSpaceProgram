@@ -114,9 +114,9 @@ namespace HSP.ResourceFlow
             return _cache.Sample( localPosition, holeArea );
         }
 
-        public ISampledSubstanceStateCollection SampleSubstances( Vector3 localPosition, double flowRate, double dt )
+        public ISampledSubstanceStateCollection SampleSubstances( Vector3 localPosition, double mass )
         {
-            return _cache.SampleSubstances( localPosition, flowRate, dt );
+            return _cache.SampleSubstances( localPosition, mass );
         }
 
         public Vector3 GetCenterOfMass()

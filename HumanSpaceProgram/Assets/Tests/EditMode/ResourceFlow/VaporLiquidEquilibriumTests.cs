@@ -33,6 +33,8 @@ namespace HSP_Tests_EditMode.ResourceFlow
             public Func<double, double, double> SpecificHeatCapacityCurve { get; set; } = ( temp, press ) => 1.0;
             public Func<double, double, double> DensityCurve { get; set; } = ( temp, press ) => 1000.0;
 
+            public double AdiabaticIndex { get; set; }
+
             public double GetBulkModulus( double pressure, double temperature ) => throw new NotImplementedException();
             public double GetBoilingPoint( double pressure ) => throw new NotImplementedException();
             public double GetDensity( double temperature, double pressure ) => DensityCurve( temperature, pressure );

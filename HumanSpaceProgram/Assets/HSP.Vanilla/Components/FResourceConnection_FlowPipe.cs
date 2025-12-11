@@ -1,4 +1,5 @@
 ﻿using HSP.ResourceFlow;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityPlus.Serialization;
@@ -7,7 +8,17 @@ namespace HSP.Vanilla.Components
 {
     public class FResourceConnection_FlowPipe : MonoBehaviour, IBuildsFlowNetwork
     {
-        public double Conductance { get; set; } = 1.0;
+        /// <summary>
+        /// A multiplier for conductance, representing pipe type or losses from bends. [unitless]
+        /// Final conductance is ConductivityFactor * Area / Length.
+        /// </summary>
+        public double ConductivityFactor { get; set; } = 1.0;
+
+        /// <summary>
+        /// The length of the pipe, in [m].
+        /// </summary>
+        public double Length { get; set; } = 1.0;
+
         public ResourceInlet FromInlet { get; set; }
         public ResourceInlet ToInlet { get; set; }
 
@@ -41,7 +52,10 @@ namespace HSP.Vanilla.Components
                     return BuildFlowResult.Retry;
                 }
 
-                _cachedPipe = new FlowPipe( flowEnd1, flowEnd2, Conductance );
+                double area = Math.Min( FromInlet.NominalArea, ToInlet.NominalArea );
+                double length = Math.Max( Length, 0.01 ); // Min length 1cm
+
+                _cachedPipe = new FlowPipe( flowEnd1, flowEnd2, length, area );
                 c.TryAddFlowObj( this, _cachedPipe );
                 _isInNetwork = true;
             }
@@ -65,11 +79,11 @@ namespace HSP.Vanilla.Components
         {
             if( _cachedPipe != null )
             {
-                // Reset to base values before applying modifiers
-                _cachedPipe.Conductance = Conductance;
+                // The solver is now responsible for calculating the base physical conductance.
+                // This method is now only for applying modifiers like pumps or valves.
                 _cachedPipe.HeadAdded = 0.0;
 
-                // Apply all modifiers
+                // Apply all modifiers, which can alter conductance or add head.
                 foreach( var modifier in Modifiers )
                 {
                     modifier.Apply( _cachedPipe );
@@ -89,11 +103,13 @@ namespace HSP.Vanilla.Components
             return new MemberwiseSerializationMapping<FResourceConnection_FlowPipe>()
                 .WithMember( "from_inlet", ObjectContext.Ref, o => o.FromInlet )
                 .WithMember( "to_inlet", ObjectContext.Ref, o => o.ToInlet )
-                .WithMember( "conductance", o => o.Conductance )
+                .WithMember( "conductivity_factor", o => o.ConductivityFactor )
+                .WithMember( "length", o => o.Length )
                 .WithMember( "modifiers", o => o.Modifiers );
         }
     }
 }
+
 
 /*
 public class FResourceConnector_FlowPipeCheckValve : FResourceConnector_FlowPipe

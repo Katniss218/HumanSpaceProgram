@@ -193,14 +193,11 @@ namespace HSP._DevUtils
             _lineRenderer.Clear();
             _edgeColorBuffer.Clear();
 
-            // Access the raw geometry arrays from the Tank
-            // Assuming FlowTank exposes these (based on the previous implementation structure)
             var edges = TargetTank.Edges;
             var nodes = TargetTank.Nodes;
 
             if( edges == null || nodes == null ) return;
 
-            // We need the transform to convert Tank-Space to World-Space
             Matrix4x4 tankToWorld = targetTransform.localToWorldMatrix;
 
             for( int i = 0; i < edges.Count; i++ )
@@ -211,7 +208,6 @@ namespace HSP._DevUtils
 
                 _lineRenderer.AddLine( p1, p2, Color.gray, PipeThickness );
 
-                // Initialize buffer with empty color
                 _edgeColorBuffer.Add( Color.black );
             }
 
@@ -220,7 +216,6 @@ namespace HSP._DevUtils
 
         private void UpdateFlowColors()
         {
-            // Logic to determine color based on Potential
             var edges = TargetTank.Edges;
             var nodes = TargetTank.Nodes;
 
@@ -230,13 +225,10 @@ namespace HSP._DevUtils
             int edgeCount = edges.Count;
             if( _edgeColorBuffer.Count != edgeCount )
             {
-                // Mismatch (topology changed?), rebuild
                 RebuildEdges();
                 return;
             }
 
-            // To visualize what's in the pipe, we sample the fluid at the CENTER of the pipe.
-            // Since the tank is stateless, we just ask "What substance is at this potential?"
             using( var total = PooledReadonlySubstanceStateCollection.Get() )
             {
                 for( int i = 0; i < edgeCount; i++ )
@@ -249,7 +241,7 @@ namespace HSP._DevUtils
                     for( int j = 0; j < sampleCount; j++ )
                     {
                         Vector3 samplePoint = Vector3.Lerp( p1, p2, (j + 0.5f) / sampleCount );
-                        using( var sample = TargetTank.SampleSubstances( samplePoint, 1, 1 ) )
+                        using( var sample = TargetTank.SampleSubstances( samplePoint, 0.001 ) )
                         {
                             total.Add( sample );
                         }
@@ -265,7 +257,6 @@ namespace HSP._DevUtils
         private void RebuildNodesAndInlets()
         {
             var nodes = TargetTank.Nodes;
-            // Assuming InletNodes is exposed as Dictionary<FlowNode, double> or similar
             var inletsDict = TargetTank.InletNodes;
 
             if( nodes == null ) return;
@@ -284,7 +275,6 @@ namespace HSP._DevUtils
 
                 nodeMats.Add( Matrix4x4.TRS( worldPos, Quaternion.identity, Vector3.one * nodeScale ) );
 
-                // Check Inlets
                 if( inletsDict != null && inletsDict.TryGetValue( node, out double area ) )
                 {
                     float physRadius = (float)Math.Sqrt( area / Math.PI );
@@ -301,8 +291,6 @@ namespace HSP._DevUtils
             _inletMatrices = inletMats.ToArray();
             _inletInnerRadii = inletRadii.ToArray();
         }
-
-        // --- Standard Instancing Helpers (Unchanged) ---
 
         private void DrawBatchedInstanced( Mesh mesh, Material mat, Matrix4x4[] matrices, MaterialPropertyBlock props, Action<MaterialPropertyBlock> setupProps )
         {

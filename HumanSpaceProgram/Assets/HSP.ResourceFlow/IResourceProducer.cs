@@ -46,12 +46,17 @@ namespace HSP.ResourceFlow
         FluidState Sample( Vector3 localPosition, double holeArea );
 
         /// <summary>
-        /// Calculates the amount of resources that would flow out if a portal of a given flowrate was created at the specified position, and held open for the specified amount of time.
+        /// Calculates the total mass of each substance that would flow out from a specific point over a given time interval,
+        /// assuming a constant volumetric flow rate.
         /// </summary>
         /// <remarks>
-        /// It should take into account the amount of resources available (not including Inflow/Outflow) in the tank.
+        /// This method samples the producer's current contents at the specified `localPosition` to determine the substance composition and density.
+        /// It then converts the requested volumetric flow into a mass transfer. The calculation is based on the current state and does not account
+        /// for other inflows or outflows that might occur during the time interval.
         /// </remarks>
-        /// <param name="flowRate">Volumetric flow rate, in [m^3/s].</param>
-        ISampledSubstanceStateCollection SampleSubstances( Vector3 localPosition, double flowRate, double dt );
+        /// <param name="localPosition">The point in the producer's local space from which to sample the substance(s).</param>
+        /// <param name="mass">The total mass of fluid to be transferred in [kg].</param>
+        /// <returns>A collection representing the total mass of each substance transferred.</returns>
+        ISampledSubstanceStateCollection SampleSubstances( Vector3 localPosition, double mass );
     }
 }

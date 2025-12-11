@@ -8,8 +8,9 @@ namespace HSP.ResourceFlow
 
         public void Apply( FlowPipe pipe )
         {
+#warning TODO - this is brittle and non-reversible.
             // A valve's effect is to scale the pipe's base conductance.
-            pipe.Conductance *= PercentOpen;
+            pipe.MassFlowConductance *= PercentOpen;
         }
 
         [MapsInheritingFrom( typeof( ValveModifier ) )]

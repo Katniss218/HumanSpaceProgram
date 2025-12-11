@@ -41,6 +41,11 @@ namespace HSP.ResourceFlow
         double SpecificGasConstant { get; }
 
         /// <summary>
+        /// The ratio of specific heats (Cp/Cv), dimensionless.
+        /// </summary>
+        double AdiabaticIndex { get; }
+
+        /// <summary>
         /// Gets the temperature at which the substance ignites, in [K]. <br/>
         /// Null if non-flammable.
         /// </summary>

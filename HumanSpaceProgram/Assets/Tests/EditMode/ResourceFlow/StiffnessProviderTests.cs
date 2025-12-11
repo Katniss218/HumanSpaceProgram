@@ -1,7 +1,5 @@
 using HSP.ResourceFlow;
-using HSP.Vanilla.Components;
 using NUnit.Framework;
-using UnityEngine;
 using HSP_Tests;
 
 namespace HSP_Tests_EditMode.ResourceFlow
@@ -113,36 +111,6 @@ namespace HSP_Tests_EditMode.ResourceFlow
             Assert.That( dPdM_half, Is.Positive );
             Assert.That( dPdM_nearFull, Is.Positive );
             Assert.That( dPdM_nearFull, Is.GreaterThan( dPdM_half * 1000 ), "Stiffness should increase exponentially as the tank fills with liquid." );
-        }
-
-        [Test]
-        public void EngineFeedSystem_GetPotentialDerivativeWrtVolume_IsCachedAndPositive()
-        {
-            // Arrange
-            var feedSystem = new EngineFeedSystem( 0.01 );
-            feedSystem.Inflow.Add( TestSubstances.Air, 1.0 );
-            feedSystem.IsOutflowEnabled = true;
-
-            // Act
-            feedSystem.ApplyFlows( 0.02 );
-            double dPdM = (feedSystem as IStiffnessProvider).GetPotentialDerivativeWrtVolume();
-
-            // Assert
-            Assert.That( dPdM, Is.GreaterThan( 0 ) );
-        }
-
-        [Test]
-        public void EngineFeedSystem_GetPotentialDerivativeWrtVolume_Empty_IsZero()
-        {
-            // Arrange
-            var feedSystem = new EngineFeedSystem( 0.01 );
-
-            // Act
-            feedSystem.ApplyFlows( 0.02 );
-            double dPdM = (feedSystem as IStiffnessProvider).GetPotentialDerivativeWrtVolume();
-
-            // Assert
-            Assert.That( dPdM, Is.EqualTo( 0.0 ) );
         }
     }
 }

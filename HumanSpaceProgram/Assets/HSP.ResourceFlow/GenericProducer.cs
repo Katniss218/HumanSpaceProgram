@@ -25,7 +25,7 @@ namespace HSP.ResourceFlow
             return FluidState.STP;
         }
 
-        public ISampledSubstanceStateCollection SampleSubstances( Vector3 localPosition, double flowRate, double dt )
+        public ISampledSubstanceStateCollection SampleSubstances( Vector3 localPosition, double mass )
         {
             // A generic producer needs to have its contents supplied by the owning component.
             // By default, it produces nothing.

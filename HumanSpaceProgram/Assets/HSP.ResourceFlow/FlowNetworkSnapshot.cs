@@ -1,10 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
 namespace HSP.ResourceFlow
 {
+    using System;
+
+    namespace HSP.ResourceFlow
+    {
+    }
+
     /// <summary>
     /// Represents a snapshot of the fluid network at a given time. This class contains the core solver logic.
     /// The solver is iterative, and uses potential-based flow and under-relaxation for stability.
@@ -43,6 +48,7 @@ namespace HSP.ResourceFlow
         private double[] _consumerStiffness;
 
         private double _relaxationFactor = 0.7;
+        private const double ZERO_FLOW_TOLERANCE = 1e-9;
 
         // --- Transport Buffers ---
         private readonly Dictionary<IResourceConsumer, double> _consumerVolumeDemand = new();
@@ -355,30 +361,27 @@ namespace HSP.ResourceFlow
 
         /// <summary>
         /// Solves the flow network iteratively until convergence or max iterations.
+        /// The process is: Synchronize state -> Solve for flow rates -> Apply transport -> Apply state back to components.
         /// </summary>
         /// <param name="dt">Time step, in [s].</param>
         public void Step( float dt )
         {
             const int MAX_ITERATIONS = 50;
-            //Debug.Log( "_relaxationFactor " + _relaxationFactor );
 
-            // 1. Initial State: Sample potentials and stiffness based on the tanks' current state.
+            // --- PHASE 1: Initial State & Conductance Calculation ---
             UpdateStiffnessCache();
             UpdatePotentials();
+            UpdateConductances( dt );
 
+            // --- PHASE 2: Iterative Solver ---
+            // Iteratively solve for a stable MASS flow rate [kg/s] for each pipe.
             bool converged = false;
             for( int iteration = 0; iteration < MAX_ITERATIONS; iteration++ )
             {
-                // A. Calculate new flow rates based on current potentials.
                 CalculateUnrelaxedFlows( dt );
-
-                // B. Check convergence and apply relaxation with adaptive damping.
                 converged = CheckConvergenceAndApplyRelaxation( out bool hasOscillations );
-
-                // C. Dynamically adjust global relaxation factor for the next iteration.
                 if( hasOscillations )
                 {
-#warning INFO - related to how much the relaxation can go down in total, since it resets.
                     _relaxationFactor = Math.Max( 0.1, _relaxationFactor * 0.75 ); // More aggressive damping
                 }
                 else if( !converged )
@@ -392,18 +395,19 @@ namespace HSP.ResourceFlow
 
             if( !converged )
             {
-                // Revert to last known stable state if convergence fails.
-                // This is safer than zeroing flow, which can cause sudden stops/starts.
+                // Revert to last known stable state if convergence fails to prevent erratic behavior.
                 if( _pipes.Count > 0 )
                 {
                     Array.Copy( _flowRatesLastStep, _currentFlowRates, _pipes.Count );
                 }
             }
 
-            // 3. Transport Phase: Move the actual substances based on the solved flow rates.
+            // --- PHASE 3: Transport Phase ---
+            // Convert the solved mass flow rates into mass [kg] and move the substances.
             ApplyTransport( dt );
 
-            // Apply flows to simulation objects
+            // --- PHASE 4: Component Update ---
+            // Allow components to process their new inflows/outflows (e.g., engine consumption).
             foreach( var participant in _participants )
             {
                 if( participant is IResourceProducer producer )
@@ -417,17 +421,20 @@ namespace HSP.ResourceFlow
                 }
             }
 
-            // After the solver has run and flows have been applied to simulation objects for this step,
-            // store the final flow rates. These will be used as the stable starting point for the next step's solver.
+            // Store the final flow rates for the next frame's convergence check.
             if( _pipes.Count > 0 )
             {
                 Array.Copy( _currentFlowRates, _flowRatesLastStep, _pipes.Count );
+                for( int i = 0; i < _pipes.Count; i++ )
+                {
+                    if( _pipes[i] != null )
+                        _pipes[i].MassFlowRateLastStep = _currentFlowRates[i];
+                }
             }
         }
 
         public void ApplySnapshotToComponents()
         {
-            // 4. Notify objects
             foreach( var a in _applyTo )
             {
                 try
@@ -524,8 +531,6 @@ namespace HSP.ResourceFlow
             }
         }
 
-#warning TODO - we need (edit mode) tests that test the various relaxation and convergence behaviors, with the flow network created without any wrappers.
-
         private void CalculateUnrelaxedFlows( double dt )
         {
             for( int i = 0; i < _pipes.Count; i++ )
@@ -536,35 +541,8 @@ namespace HSP.ResourceFlow
 
                 (double potentialFrom, double potentialTo) = _currentPotentials[i];
 
-                // 1. Calculate the raw flow rate.
-#warning TODO - after splitting, potentials nearly equal -14 -12 = -9950 flowrate. before splitting, flowrate is 80000
-                double rawFlowRate = pipe.ComputeFlowRate( potentialFrom, potentialTo );
-
-                double maxSourceFlow = double.MaxValue;
-                double maxSinkFlow = double.MaxValue;
-
-                bool isForward = rawFlowRate > 0;
-                IResourceProducer source = isForward ? pipe.FromInlet.Producer : pipe.ToInlet.Producer;
-                IResourceConsumer sink = isForward ? pipe.ToInlet.Consumer : pipe.FromInlet.Consumer;
-
-                // 2. Limit flow so it doesn't fill/drain more than ~50% of the available volume in a single frame.
-                const double MAX_FILL_DRAIN_FACTOR = 0.5;
-
-                if( source != null )
-                {
-                    maxSourceFlow = (source.GetAvailableOutflowVolume() * MAX_FILL_DRAIN_FACTOR) / dt;
-                }
-                if( sink != null )
-                {
-                    maxSinkFlow = (sink.GetAvailableInflowVolume( dt ) * MAX_FILL_DRAIN_FACTOR) / dt;
-                }
-
-                // 3. Apply the limit, preserving the sign.
-                double maxFlow = Math.Min( maxSourceFlow, maxSinkFlow );
-                if( Math.Abs( rawFlowRate ) > maxFlow )
-                {
-                    rawFlowRate = Math.Sign( rawFlowRate ) * maxFlow;
-                }
+                // 1. Calculate the raw mass flow rate.
+                double rawFlowRate = pipe.ComputeMassFlowRate( potentialFrom, potentialTo );
 
                 _nextFlowRates[i] = rawFlowRate;
             }
@@ -604,7 +582,6 @@ namespace HSP.ResourceFlow
                     // Aggressively damp this specific pipe
                     learnedFactor = Math.Max( 0.01, learnedFactor * OSCILLATION_RELAXATION );
                 }
-#warning TODO - don't relax within the same step? (this causes slower convergence, because the current relaxed flow limit keeps moving relative to the previous flow)
                 else
                 {
                     //Debug.Log( "recovery" );
@@ -635,7 +612,7 @@ namespace HSP.ResourceFlow
                 double totalStiffness = stiffnessA + stiffnessB;
                 if( totalStiffness > 1e-9 )
                 {
-                    double proactiveDamping = 1.0 / (1.0 + STIFFNESS_DAMPING_K * pipe.Conductance * totalStiffness);
+                    double proactiveDamping = 1.0 / (1.0 + STIFFNESS_DAMPING_K * pipe.MassFlowConductance * totalStiffness);
                     localRelaxation = Math.Min( localRelaxation, proactiveDamping );
                 }
 
@@ -680,7 +657,7 @@ namespace HSP.ResourceFlow
                 consumer.Inflow?.Clear();
             }
 
-            // 1. Calculate available supply/demand values for each producer/consumer.
+            // 1. Calculate PROPOSED VOLUMETRIC supply/demand by converting mass flow to volume flow
             _consumerVolumeDemand.Clear();
             _producerVolumeSupply.Clear();
             for( int i = 0; i < _pipes.Count; i++ )
@@ -688,15 +665,17 @@ namespace HSP.ResourceFlow
                 if( _pipes[i] == null )
                     continue;
 
-                double proposedFlowrate = _currentFlowRates[i];
-                if( Math.Abs( proposedFlowrate ) < 1e-9 )
+                double proposedMassFlowrate = _currentFlowRates[i]; // [kg/s]
+                if( Math.Abs( proposedMassFlowrate ) < ZERO_FLOW_TOLERANCE )
                     continue;
 
-                double volume = Math.Abs( proposedFlowrate ) * dt;
+                double density = _pipes[i].DensityLastStep;
+                if( density < ZERO_FLOW_TOLERANCE ) continue;
 
-                object sourceObj = (proposedFlowrate > 0) ? _pipes[i].FromInlet.Producer : _pipes[i].ToInlet.Producer;
-                object sinkObj = (proposedFlowrate > 0) ? _pipes[i].ToInlet.Consumer : _pipes[i].FromInlet.Consumer;
+                double volumeFlowRate = Math.Abs( proposedMassFlowrate ) / density;
+                double volume = volumeFlowRate * dt; // [m^3]
 
+                object sourceObj = (proposedMassFlowrate > 0) ? _pipes[i].FromInlet.Producer : _pipes[i].ToInlet.Producer;
                 if( sourceObj is IResourceProducer producer )
                 {
                     if( !_producerVolumeSupply.ContainsKey( producer ) )
@@ -704,6 +683,7 @@ namespace HSP.ResourceFlow
                     _producerVolumeSupply[producer] += volume;
                 }
 
+                object sinkObj = (proposedMassFlowrate > 0) ? _pipes[i].ToInlet.Consumer : _pipes[i].FromInlet.Consumer;
                 if( sinkObj is IResourceConsumer consumer )
                 {
                     if( !_consumerVolumeDemand.ContainsKey( consumer ) )
@@ -743,63 +723,269 @@ namespace HSP.ResourceFlow
             }
             for( int i = 0; i < _pipes.Count; i++ )
             {
-#warning TODO - optimize - add a flag and only recalc if the _producerScalingFactors / _consumerScalingFactors are non-1.
                 _pipeFlowScalingFactors[i] = 1.0;
                 if( _pipes[i] == null )
                     continue;
 
                 double rate = _currentFlowRates[i];
-                if( Math.Abs( rate ) < 1e-9 )
+                if( Math.Abs( rate ) < ZERO_FLOW_TOLERANCE )
                     continue;
 
                 IResourceProducer source = (rate > 0) ? _pipes[i].FromInlet.Producer : _pipes[i].ToInlet.Producer;
                 IResourceConsumer sink = (rate > 0) ? _pipes[i].ToInlet.Consumer : _pipes[i].FromInlet.Consumer;
 
-                if( source == null || sink == null )
-                    continue;
-
-                if( _producerScalingFactors.TryGetValue( source, out double pScale ) )
+                if( source != null && _producerScalingFactors.TryGetValue( source, out double pScale ) )
                 {
                     _pipeFlowScalingFactors[i] = Math.Min( _pipeFlowScalingFactors[i], pScale );
                 }
-                if( _consumerScalingFactors.TryGetValue( sink, out double cScale ) )
+                if( sink != null && _consumerScalingFactors.TryGetValue( sink, out double cScale ) )
                 {
                     _pipeFlowScalingFactors[i] = Math.Min( _pipeFlowScalingFactors[i], cScale );
                 }
             }
 
-            // 4. Finally, actually apply the trannsport.
-            // The tank might still do internal clamping, but at least we aren't asking for more than what is available across all pipes.
+            // 4. Finally, actually apply the transport using MASS flow rate.
             for( int i = 0; i < _pipes.Count; i++ )
             {
-                if( _pipes[i] == null )
-                    continue;
-
-                double rawRate = _currentFlowRates[i];
-                if( Math.Abs( rawRate ) < 1e-9 )
-                    continue;
-
-                // Apply the scaling factor we calculated
-                double finalRate = rawRate * _pipeFlowScalingFactors[i];
-
                 FlowPipe pipe = _pipes[i];
-                bool flowForward = finalRate > 0;
+                if( pipe == null )
+                    continue;
 
+                double rawMassRate = _currentFlowRates[i];
+                if( Math.Abs( rawMassRate ) < ZERO_FLOW_TOLERANCE )
+                    continue;
+
+                double finalMassRate = rawMassRate * _pipeFlowScalingFactors[i];
+
+                bool flowForward = finalMassRate > 0;
                 IResourceProducer source = flowForward ? pipe.FromInlet.Producer : pipe.ToInlet.Producer;
                 IResourceConsumer sink = flowForward ? pipe.ToInlet.Consumer : pipe.FromInlet.Consumer;
 
                 if( source == null || sink == null )
                     continue;
 
-                //Debug.LogWarning( "rate " + finalRate + " : " + _currentFlowRates[i] );
-
-                using var flowResources = pipe.SampleFlowResources( finalRate, dt );
+                using var flowResources = pipe.SampleFlowResources( finalMassRate, dt );
                 if( flowResources.IsEmpty() )
                     continue;
 
                 source.Outflow?.Add( flowResources, 1.0 );
                 sink.Inflow?.Add( flowResources, 1.0 );
             }
+        }
+
+        private void UpdateConductances( double dt )
+        {
+            for( int i = 0; i < _pipes.Count; i++ )
+            {
+                FlowPipe pipe = _pipes[i];
+                if( pipe == null )
+                    continue;
+
+                double lastMassFlow = pipe.MassFlowRateLastStep;
+                (double potentialFrom, double potentialTo) = _currentPotentials[i];
+                double deltaPotential = potentialFrom - potentialTo;
+
+                bool flowDirectionGuess = lastMassFlow >= 0;
+                if( Math.Abs( lastMassFlow ) < ZERO_FLOW_TOLERANCE )
+                {
+                    flowDirectionGuess = deltaPotential >= 0;
+                }
+
+                var sourcePort = flowDirectionGuess ? pipe.FromInlet : pipe.ToInlet;
+                var sinkPort = flowDirectionGuess ? pipe.ToInlet : pipe.FromInlet;
+
+                var sourceProducer = sourcePort.Producer;
+                var sinkProducer = sinkPort.Producer;
+
+                double density, viscosity, speedOfSound;
+                bool isGas;
+
+                if( sourceProducer != null )
+                {
+                    var sourceState = sourceProducer.Sample( sourcePort.pos, sourcePort.area );
+                    // If there was no flow last frame, we sample with a tiny "probe" mass to get the substance properties.
+                    // This is to determine what fluid *would* flow.
+                    double sampleMass = Math.Abs( lastMassFlow * dt ) > ZERO_FLOW_TOLERANCE ? Math.Abs( lastMassFlow * dt ) : 1;
+                    using( var substances = sourceProducer.SampleSubstances( sourcePort.pos, sampleMass ) )
+                    {
+                        if( !substances.IsEmpty() )
+                        {
+                            isGas = IsMixtureGaseous( substances );
+                            density = substances.GetAverageDensity( sourceState.Temperature, sourceState.Pressure );
+                            viscosity = GetAverageViscosity( substances, sourceState.Temperature, sourceState.Pressure );
+                            if( isGas )
+                            {
+                                speedOfSound = GetAverageSpeedOfSound( substances, sourceState.Temperature, sourceState.Pressure );
+                            }
+                            else
+                            {
+                                speedOfSound = 1500; // Default for liquids
+                            }
+                        }
+                        else
+                        {
+                            isGas = false;
+                            density = pipe.DensityLastStep > ZERO_FLOW_TOLERANCE ? pipe.DensityLastStep : 1000.0;
+                            viscosity = pipe.ViscosityLastStep > ZERO_FLOW_TOLERANCE ? pipe.ViscosityLastStep : 0.001;
+                            speedOfSound = 1500;
+                        }
+                    }
+                }
+                else
+                {
+                    isGas = false;
+                    density = pipe.DensityLastStep > ZERO_FLOW_TOLERANCE ? pipe.DensityLastStep : 1000.0;
+                    viscosity = pipe.ViscosityLastStep > ZERO_FLOW_TOLERANCE ? pipe.ViscosityLastStep : 0.001;
+                    speedOfSound = 1500;
+                }
+
+                if( Math.Abs( lastMassFlow ) < (0.01 * pipe.Diameter) && sinkProducer != null )
+                {
+                    var sinkState = sinkProducer.Sample( sinkPort.pos, sinkPort.area );
+                    double sampleMass = Math.Abs( lastMassFlow * dt ) > ZERO_FLOW_TOLERANCE ? Math.Abs( lastMassFlow * dt ) : 1;
+                    using( var sinkSubstances = sinkProducer.SampleSubstances( sinkPort.pos, sampleMass ) )
+                    {
+                        if( !sinkSubstances.IsEmpty() )
+                        {
+                            double sinkDensity = sinkSubstances.GetAverageDensity( sinkState.Temperature, sinkState.Pressure );
+                            double sinkViscosity = GetAverageViscosity( sinkSubstances, sinkState.Temperature, sinkState.Pressure );
+
+                            double t = 0.5;
+                            density = (1 - t) * density + t * sinkDensity;
+                            viscosity = (1 - t) * viscosity + t * sinkViscosity;
+                        }
+                    }
+                }
+
+                pipe.DensityLastStep = density;
+                pipe.ViscosityLastStep = viscosity;
+
+                double reynolds;
+                double massConductance;
+
+                if( Math.Abs( lastMassFlow ) < ZERO_FLOW_TOLERANCE )
+                {
+                    double potentialVelocity = Math.Sqrt( 2 * Math.Abs( deltaPotential ) );
+                    double potentialMassFlow = pipe.Area * density * potentialVelocity;
+                    reynolds = FlowEquations.GetReynoldsNumber( potentialMassFlow, pipe.Diameter, viscosity );
+
+                    if( reynolds > 4000 )
+                    {
+                        double frictionFactor = FlowEquations.GetDarcyFrictionFactor_Blasius( reynolds );
+                        massConductance = FlowEquations.GetMassConductance_Turbulent( density, pipe.Area, pipe.Diameter, pipe.Length, frictionFactor, potentialMassFlow );
+                    }
+                    else
+                    {
+                        massConductance = FlowEquations.GetMassConductance_Laminar( density, pipe.Area, pipe.Length, viscosity );
+                    }
+                }
+                else
+                {
+                    reynolds = FlowEquations.GetReynoldsNumber( lastMassFlow, pipe.Diameter, viscosity );
+                    if( reynolds < 2300 )
+                    {
+                        massConductance = FlowEquations.GetMassConductance_Laminar( density, pipe.Area, pipe.Length, viscosity );
+                    }
+                    else if( reynolds > 4000 )
+                    {
+                        double frictionFactor = FlowEquations.GetDarcyFrictionFactor_Blasius( reynolds );
+                        massConductance = FlowEquations.GetMassConductance_Turbulent( density, pipe.Area, pipe.Diameter, pipe.Length, frictionFactor, lastMassFlow );
+                    }
+                    else
+                    {
+                        double laminarC = FlowEquations.GetMassConductance_Laminar( density, pipe.Area, pipe.Length, viscosity );
+                        double reTurbulent = 4000.01;
+                        double frictionFactor = FlowEquations.GetDarcyFrictionFactor_Blasius( reTurbulent );
+                        double turbulentMassFlow = reTurbulent * Math.PI * pipe.Diameter * viscosity / 4.0;
+                        double turbulentC = FlowEquations.GetMassConductance_Turbulent( density, pipe.Area, pipe.Diameter, pipe.Length, frictionFactor, turbulentMassFlow );
+
+                        double t = (reynolds - 2300.0) / (4000.0 - 2300.0);
+                        massConductance = (1.0 - t) * laminarC + t * turbulentC;
+                    }
+                }
+
+                double learnedFactor = _pipeLearnedRelaxationFactors[i];
+                double alpha = learnedFactor * learnedFactor;
+                massConductance = (alpha * massConductance) + ((1 - alpha) * pipe.ConductanceLastStep);
+                pipe.ConductanceLastStep = massConductance;
+
+                if( isGas )
+                {
+                    double maxMassFlow = FlowEquations.GetMaxMassFlow_Choked( density, pipe.Area, speedOfSound );
+                    if( Math.Abs( deltaPotential ) > ZERO_FLOW_TOLERANCE )
+                    {
+                        double potentialMaxConductance = maxMassFlow / Math.Abs( deltaPotential );
+                        if( massConductance > potentialMaxConductance )
+                        {
+                            massConductance = potentialMaxConductance;
+                        }
+                    }
+                }
+#warning TODO - move these from pipe to the solver state intself (in an array) (SOA)
+                pipe.MassFlowConductance = massConductance;
+            }
+        }
+
+        private static bool IsMixtureGaseous( IReadonlySubstanceStateCollection substances )
+        {
+            if( substances.IsEmpty() ) return false;
+            foreach( var (sub, mass) in substances )
+            {
+                if( sub.Phase != SubstancePhase.Gas ) return false;
+            }
+            return true;
+        }
+
+        private static double GetAverageViscosity( IReadonlySubstanceStateCollection substances, double temp, double press )
+        {
+            double totalMass = substances.GetMass();
+            if( totalMass < 1e-9 ) return 1e-5;
+
+            double weightedSum = 0;
+            foreach( var (sub, mass) in substances )
+            {
+                weightedSum += sub.GetViscosity( temp, press ) * mass;
+            }
+            return weightedSum / totalMass;
+        }
+
+        private static double GetAverageSpeedOfSound( IReadonlySubstanceStateCollection substances, double temp, double press )
+        {
+            double totalMass = substances.GetMass();
+            if( totalMass < 1e-9 ) return 343;
+
+            double weightedSum = 0;
+            foreach( var (sub, mass) in substances )
+            {
+                weightedSum += sub.GetSpeedOfSound( temp, press ) * mass;
+            }
+            return weightedSum / totalMass;
+        }
+
+        private static double GetAverageAdiabaticIndex( IReadonlySubstanceStateCollection substances )
+        {
+            double totalMass = substances.GetMass();
+            if( totalMass < 1e-9 ) return 1.4;
+
+            double weightedSum = 0;
+            foreach( var (sub, mass) in substances )
+            {
+                weightedSum += sub.AdiabaticIndex * mass;
+            }
+            return weightedSum / totalMass;
+        }
+
+        private static double GetAverageSpecificGasConstant( IReadonlySubstanceStateCollection substances )
+        {
+            double totalMass = substances.GetMass();
+            if( totalMass < 1e-9 ) return 287;
+
+            double weightedSum = 0;
+            foreach( var (sub, mass) in substances )
+            {
+                weightedSum += sub.SpecificGasConstant * mass;
+            }
+            return weightedSum / totalMass;
         }
     }
 }

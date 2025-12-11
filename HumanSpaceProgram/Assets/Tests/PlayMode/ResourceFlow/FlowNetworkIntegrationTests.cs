@@ -34,7 +34,7 @@ namespace HSP_Tests_PlayMode.ResourceFlow
 
             var portA = new FlowPipe.Port( (IResourceConsumer)tankA, new Vector3( 0, -1, 0 ), 0.1f );
             var portB = new FlowPipe.Port( (IResourceConsumer)tankB, new Vector3( 0, -1, 0 ), 0.1f );
-            var pipe = new FlowPipe( portA, portB, conductance: 1.0 );
+            var pipe = new FlowPipe( portA, portB, 1.0, 0.1f ); // Use length and area
 
             builder.TryAddFlowObj( ownerPipe, pipe );
 
@@ -47,14 +47,16 @@ namespace HSP_Tests_PlayMode.ResourceFlow
             for( int i = 0; i < steps; i++ )
             {
                 snapshot.Step( fixedDeltaTime );
+                tankA.ApplyFlows( fixedDeltaTime ); // Apply flows to update tank state
+                tankB.ApplyFlows( fixedDeltaTime );
             }
 
             // Assert
             double massA = tankA.Contents.GetMass();
             double massB = tankB.Contents.GetMass();
-            Assert.AreEqual( 500.0, massA, 5.0, "Tank A should have half the mass." );
-            Assert.AreEqual( 500.0, massB, 5.0, "Tank B should have half the mass." );
-            Assert.AreEqual( 1000.0, massA + massB, 1e-9, "Mass should be conserved." );
+            Assert.That( massA, Is.EqualTo( 500.0 ).Within( 5.0 ), "Tank A should have half the mass." );
+            Assert.That( massB, Is.EqualTo( 500.0 ).Within( 5.0 ), "Tank B should have half the mass." );
+            Assert.That( massA + massB, Is.EqualTo( 1000.0 ).Within( 1e-9 ), "Mass should be conserved." );
         }
 
         [Test]
@@ -66,12 +68,10 @@ namespace HSP_Tests_PlayMode.ResourceFlow
             var tank = FlowNetworkTestHelper.CreateTestTank( 1.0, new Vector3( 0, -10, 0 ), Vector3.zero );
             tank.Contents.Add( TestSubstances.Kerosene, 800 ); // Full
 
-            var engineFeed = new EngineFeedSystem( 0.01 );
-            engineFeed.IsOutflowEnabled = true;
-            engineFeed.PumpPressureRise = 2e5; // 2 bar suction
-            engineFeed.ChamberPressure = 50e5; // High, so it consumes little, allowing manifold to fill
-            engineFeed.InjectorConductance = 0.001;
-            engineFeed.Demand = 1.0; // High demand
+            var engineFeed = new EngineFeedSystem();
+            // Simulate an engine at full throttle demanding pressure
+            engineFeed.TargetPressure = 10e5; // 10 bar, a typical RequiredInletPressure
+            engineFeed.ExpectedDensity = TestSubstances.Kerosene.GetDensityAtSTP();
 
             var ownerTank = new object();
             var ownerEngine = new object();
@@ -82,29 +82,32 @@ namespace HSP_Tests_PlayMode.ResourceFlow
 
             var portTank = new FlowPipe.Port( (IResourceConsumer)tank, new Vector3( 0, -1, 0 ), 0.1f );
             var portEngine = new FlowPipe.Port( engineFeed, new Vector3( 0, 1, 0 ), 0.1f );
-            var pipe = new FlowPipe( portTank, portEngine, conductance: 1.0 );
+            var pipe = new FlowPipe( portTank, portEngine, 1.0, 0.01 ); // Use length and area
 
             builder.TryAddFlowObj( ownerPipe, pipe );
 
             var snapshot = builder.BuildSnapshot();
+            double massBefore = tank.Contents.GetMass();
 
-            // Act 1: First step to initiate flow
+            // Act: First step to initiate flow
             snapshot.Step( 0.02f );
+            tank.ApplyFlows( 0.02f );
+            engineFeed.ApplyFlows( 0.02f ); // Engine processes its inflow
 
             // Assert 1: Flow started
-            Assert.Less( tank.Contents.GetMass(), 800.0, "Tank should have lost mass." );
-            Assert.Greater( engineFeed.Inflow.GetMass(), 0.0, "Engine inflow should be positive." );
-            double massAfterStep1 = tank.Contents.GetMass() + (engineFeed.Inflow.GetMass() - engineFeed.MassConsumedLastStep);
-            Assert.AreEqual( 800.0, massAfterStep1, 1e-9, "Mass should be conserved after step 1." );
+            double massAfterStep1 = tank.Contents.GetMass();
+            Assert.That( massAfterStep1, Is.LessThan( massBefore ), "Tank should have lost mass." );
+            Assert.That( engineFeed.ActualMassFlow_LastStep, Is.GreaterThan( 0.0 ), "Engine ActualMassFlow_LastStep should be positive." );
 
-
-            // Act 2: Second step to ensure consumption happens
+            // Act 2: Second step to ensure consumption continues
             snapshot.Step( 0.02f );
+            tank.ApplyFlows( 0.02f );
+            engineFeed.ApplyFlows( 0.02f );
 
             // Assert 2: Consumption occurred
-            // Assert.Greater( engineFeed.MassConsumedLastStep, 0.0, "Engine should have consumed propellant." );
-            double massAfterStep2 = tank.Contents.GetMass() + (engineFeed.Inflow.GetMass() - engineFeed.MassConsumedLastStep);
-            Assert.AreEqual( massAfterStep1, massAfterStep2, 1e-9, "Mass should be conserved after step 2." );
+            Assert.That( engineFeed.ActualMassFlow_LastStep, Is.GreaterThan( 0.0 ), "Engine should continue to have positive mass flow." );
+            double massAfterStep2 = tank.Contents.GetMass();
+            Assert.That( massAfterStep2, Is.LessThan( massAfterStep1 ), "Tank mass should continue to decrease." );
         }
     }
 }
