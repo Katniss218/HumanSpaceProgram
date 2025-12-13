@@ -61,10 +61,10 @@ namespace HSP.ResourceFlow
         public double HeadAdded { get; set; }
 
         // --- State for solver ---
-        internal double MassFlowRateLastStep { get; set; }
-        internal double DensityLastStep { get; set; }
-        internal double ViscosityLastStep { get; set; }
-        internal double ConductanceLastStep { get; set; }
+        public double MassFlowRateLastStep { get; set; }
+        public double DensityLastStep { get; set; }
+        public double ViscosityLastStep { get; set; }
+        public double ConductanceLastStep { get; set; }
 
 
         public FlowPipe( Port fromInlet, Port toInlet, double length, double area )
