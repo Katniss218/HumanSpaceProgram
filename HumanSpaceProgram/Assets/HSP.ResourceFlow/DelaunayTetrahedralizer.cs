@@ -19,6 +19,8 @@ namespace HSP.ResourceFlow
     {
         private const float EPSILON = 1e-5f;
         private const float NOISE_SCALE = 0.05f;
+        private const float MAX_VALID_CIRCUMRADIUS_SQR = 10_000f * 10_000f;
+        private const float MIN_VALID_TET_VOLUME = 0.001f;
 
         public class TetrahedronVertex
         {
@@ -81,6 +83,7 @@ namespace HSP.ResourceFlow
                 if( Mathf.Abs( denominator ) < EPSILON )
                 {
                     SetInvalid();
+                    return;
                 }
 
                 Vector3 numerator =
@@ -93,7 +96,7 @@ namespace HSP.ResourceFlow
                 Circumcenter = A.Position + offset;
                 CircumradiusSqr = offset.sqrMagnitude;
 
-                if( CircumradiusSqr > 10_000f * 10_000f )
+                if( CircumradiusSqr > MAX_VALID_CIRCUMRADIUS_SQR )
                 {
                     SetInvalid();
                 }
@@ -110,7 +113,9 @@ namespace HSP.ResourceFlow
             {
                 // Skip invalid or coplanar.
                 if( !IsValid )
+                {
                     return false;
+                }
 
                 float distSqr = (point - Circumcenter).sqrMagnitude;
                 return distSqr <= CircumradiusSqr + EPSILON;
@@ -170,19 +175,28 @@ namespace HSP.ResourceFlow
         {
             // Bowyer-Watson Delaunay Tetrahedralization
             if( inputPoints == null || inputPoints.Count < 4 )
+            {
                 return (new List<FlowNode>(), new List<FlowEdge>(), new List<FlowTetrahedron>());
+            }
+
+            // Deduplication
+            var uniquePoints = inputPoints.Distinct().ToList();
+            if( uniquePoints.Count < 4 )
+            {
+                return (new List<FlowNode>(), new List<FlowEdge>(), new List<FlowTetrahedron>());
+            }
 
             // Note - floating point Bowyer-Watson fails on aligned grids/near-coplanar inputs.
 
-            TetrahedronVertex[] vertices = new TetrahedronVertex[inputPoints.Count];
-            List<FlowNode> nodes = new List<FlowNode>( inputPoints.Count );
+            TetrahedronVertex[] vertices = new TetrahedronVertex[uniquePoints.Count];
+            List<FlowNode> nodes = new List<FlowNode>( uniquePoints.Count );
 
-            Vector3 min = inputPoints[0];
-            Vector3 max = inputPoints[0];
+            Vector3 min = uniquePoints[0];
+            Vector3 max = uniquePoints[0];
 
-            for( int i = 0; i < inputPoints.Count; i++ )
+            for( int i = 0; i < uniquePoints.Count; i++ )
             {
-                Vector3 point = inputPoints[i];
+                Vector3 point = uniquePoints[i];
 
                 FlowNode node = new FlowNode( point );
                 nodes.Add( node );
@@ -270,37 +284,50 @@ namespace HSP.ResourceFlow
                 }
             }
 
-            // 4. Cleanup and Output
+            // Cleanup and Output
             List<FlowTetrahedron> finalTets = new();
             List<FlowEdge> finalEdges = new();
             HashSet<long> edgeSet = new();
             Dictionary<FlowNode, int> nodeToIndex = new();
 
-            for( int i = 0; i < nodes.Count; ++i ) nodeToIndex[nodes[i]] = i;
+            for( int i = 0; i < nodes.Count; ++i )
+            {
+                nodeToIndex[nodes[i]] = i;
+            }
 
             foreach( var tet in tetrahedra )
             {
                 // Ignore super-tet vertices and invalid tets
                 if( !tet.IsValid )
+                {
                     continue;
+                }
 
                 bool isSuper = tet.A.OriginalIndex < 0 || tet.B.OriginalIndex < 0 ||
                                tet.C.OriginalIndex < 0 || tet.D.OriginalIndex < 0;
                 if( isSuper )
+                {
                     continue;
+                }
 
                 // Ensure positive volume winding for final output
                 float vol = Tetrahedron.GetSignedVolume( tet.A.Position, tet.B.Position, tet.C.Position, tet.D.Position );
 
                 // Second safety check for slivers that might have barely passed the epsilon
-                if( Mathf.Abs( vol ) < 0.001 )
+                if( Mathf.Abs( vol ) < MIN_VALID_TET_VOLUME )
+                {
                     continue;
+                }
 
                 FlowTetrahedron newTet;
                 if( vol < 0 )
+                {
                     newTet = new FlowTetrahedron( tet.A.NodeReference, tet.C.NodeReference, tet.B.NodeReference, tet.D.NodeReference );
+                }
                 else
+                {
                     newTet = new FlowTetrahedron( tet.A.NodeReference, tet.B.NodeReference, tet.C.NodeReference, tet.D.NodeReference );
+                }
 
                 finalTets.Add( newTet );
 

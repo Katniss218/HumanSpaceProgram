@@ -10,7 +10,8 @@ namespace HSP.ResourceFlow
     public static class FlowEquations
     {
         private const double ZERO_FLOW_TOLERANCE = 1e-9;
-        private const double PI = Math.PI;
+        private const double MIN_REYNOLDS_FOR_FRICTION = 1.0;
+        private const double HIGH_CONDUCTANCE_FALLBACK = 1e9;
 
         /// <summary>
         /// Calculates the Reynolds number for a given mass flow rate in a pipe.
@@ -25,7 +26,7 @@ namespace HSP.ResourceFlow
             {
                 return 0.0;
             }
-            return (4.0 * Math.Abs( massFlowRate )) / (PI * diameter * viscosity);
+            return (4.0 * Math.Abs( massFlowRate )) / (Math.PI * diameter * viscosity);
         }
 
         /// <summary>
@@ -34,9 +35,9 @@ namespace HSP.ResourceFlow
         /// </summary>
         /// <param name="reynoldsNumber">The Reynolds number.</param>
         /// <returns>The Darcy friction factor.</returns>
-        public static double GetDarcyFrictionFactor_Blasius( double reynoldsNumber )
+        public static double GetDarcyFrictionFactor( double reynoldsNumber )
         {
-            if( reynoldsNumber < 1.0 )
+            if( reynoldsNumber < MIN_REYNOLDS_FOR_FRICTION )
             {
                 return 0.3164; // Fallback for zero flow
             }
@@ -52,9 +53,9 @@ namespace HSP.ResourceFlow
         /// <param name="length">Pipe length in [m].</param>
         /// <param name="viscosity">Fluid dynamic viscosity in [Pa*s].</param>
         /// <returns>Mass flow conductance in [kg*s/m^2].</returns>
-        public static double GetMassConductance_Laminar( double density, double area, double length, double viscosity )
+        public static double GetLaminarMassConductance( double density, double area, double length, double viscosity )
         {
-            double denominator = 8.0 * PI * viscosity * length;
+            double denominator = 8.0 * Math.PI * viscosity * length;
             if( denominator < ZERO_FLOW_TOLERANCE )
             {
                 return double.PositiveInfinity;
@@ -72,14 +73,14 @@ namespace HSP.ResourceFlow
         /// <param name="frictionFactor">The Darcy friction factor for the flow.</param>
         /// <param name="lastMassFlowRate">The absolute mass flow rate from the previous step in [kg/s].</param>
         /// <returns>Effective mass flow conductance in [kg*s/m^2].</returns>
-        public static double GetMassConductance_Turbulent( double density, double area, double diameter, double length, double frictionFactor, double lastMassFlowRate )
+        public static double GetTurbulentMassConductance( double density, double area, double diameter, double length, double frictionFactor, double lastMassFlowRate )
         {
             double denominator = frictionFactor * length * Math.Max( Math.Abs( lastMassFlowRate ), ZERO_FLOW_TOLERANCE );
             if( denominator < ZERO_FLOW_TOLERANCE )
             {
                 // For near-zero flow, a very large conductance can be returned to allow flow to start.
                 // The solver's relaxation will handle the initial large step.
-                return 1e9;
+                return HIGH_CONDUCTANCE_FALLBACK;
             }
             return (2.0 * density * density * area * area * diameter) / denominator;
         }
@@ -91,7 +92,7 @@ namespace HSP.ResourceFlow
         /// <param name="area">The cross-sectional area of the pipe in [m^2].</param>
         /// <param name="speedOfSound">The speed of sound in the gas in [m/s].</param>
         /// <returns>The maximum (choked) mass flow rate in [kg/s].</returns>
-        public static double GetMaxMassFlow_Choked( double density, double area, double speedOfSound )
+        public static double GetChokedMassFlow( double density, double area, double speedOfSound )
         {
             return density * area * speedOfSound;
         }

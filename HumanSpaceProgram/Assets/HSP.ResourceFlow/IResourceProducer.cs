@@ -24,6 +24,11 @@ namespace HSP.ResourceFlow
         ISubstanceStateCollection Outflow { get; set; }
 
         /// <summary>
+        /// Called before the main solver step to run any internal simulation logic.
+        /// </summary>
+        void PreSolveUpdate( double deltaTime );
+
+        /// <summary>
         /// Gets the total volume of fluid currently available for outflow from this producer.
         /// This is used by the solver to prevent pulling more fluid than exists in a single time step.
         /// </summary>
@@ -31,9 +36,9 @@ namespace HSP.ResourceFlow
         double GetAvailableOutflowVolume();
 
         /// <summary>
-        /// Applies the calculated inflows and outflows to the internal contents of the object.
+        /// Applies the results of the network solve (inflows/outflows) to the internal state of the object.
         /// </summary>
-        void ApplyFlows( double deltaTime );
+        void ApplySolveResults( double deltaTime );
 
         /// <summary>
         /// Calculates the pressure acting at any given point inside the container.

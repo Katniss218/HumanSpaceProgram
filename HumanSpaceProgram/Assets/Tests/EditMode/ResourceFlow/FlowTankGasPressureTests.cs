@@ -25,7 +25,7 @@ namespace HSP_Tests_EditMode.ResourceFlow
             _tank.Inflow.Add( TestSubstances.Air, addedMass );
 
             // Act
-            _tank.ApplyFlows( 0.02 );
+            _tank.ApplySolveResults( 0.02 );
 
             // Assert
             double expectedMoles = addedMass / TestSubstances.Air.MolarMass;
@@ -48,7 +48,7 @@ namespace HSP_Tests_EditMode.ResourceFlow
             _tank.Outflow.Add( TestSubstances.Air, removedMass );
 
             // Act
-            _tank.ApplyFlows( 0.02 );
+            _tank.ApplySolveResults( 0.02 );
 
             // Assert
             double finalMass = initialMass - removedMass;
@@ -73,7 +73,7 @@ namespace HSP_Tests_EditMode.ResourceFlow
             _tank.Inflow.Add( TestSubstances.Water, liquidMass );
 
             // Act
-            _tank.ApplyFlows( 0.02 );
+            _tank.ApplySolveResults( 0.02 );
 
             // Assert
             double liquidVolume = liquidMass / TestSubstances.Water.GetDensity( 300, _tank.FluidState.Pressure );

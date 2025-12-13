@@ -5,6 +5,8 @@ namespace HSP.ResourceFlow
 {
     public sealed class GenericConsumer : IResourceConsumer
     {
+        private const double DEMAND_TO_POTENTIAL_SCALAR = 100000.0;
+
         public Vector3 FluidAcceleration { get; set; }
         public Vector3 FluidAngularVelocity { get; set; }
         public ISubstanceStateCollection Inflow { get; set; } = new SubstanceStateCollection();
@@ -15,12 +17,14 @@ namespace HSP.ResourceFlow
 
         public bool IsEnabled { get; set; } = false;
 
+        public void PreSolveUpdate( double deltaTime ) { }
+
         public double GetAvailableInflowVolume( double dt )
         {
             return Demand * dt;
         }
 
-        public void ApplyFlows( double deltaTime )
+        public void ApplySolveResults( double deltaTime )
         {
             // This is a proxy object. The owning component is responsible for handling Inflow.
         }
@@ -42,7 +46,7 @@ namespace HSP.ResourceFlow
             double potential = -1.0; // Small passive potential allows for gravity-fed drain when enabled but demand is zero.
             if( Demand > 0 )
             {
-                potential -= Demand * 100000.0; // Strong, demand-driven potential for active pumping.
+                potential -= Demand * DEMAND_TO_POTENTIAL_SCALAR; // Strong, demand-driven potential for active pumping.
             }
 
             return new FluidState( 0, 0, 0 ) { FluidSurfacePotential = potential };

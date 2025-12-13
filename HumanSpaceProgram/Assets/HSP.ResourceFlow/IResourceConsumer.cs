@@ -23,6 +23,11 @@ namespace HSP.ResourceFlow
         ISubstanceStateCollection Inflow { get; set; }
 
         /// <summary>
+        /// Called before the main solver step to run any internal simulation logic.
+        /// </summary>
+        void PreSolveUpdate( double deltaTime );
+
+        /// <summary>
         /// Gets the available volumetric capacity for inflow into this consumer for the given timestep, in [m^3].
         /// This is used by the solver to prevent overfilling capacity-limited objects (like tanks) and to respect
         /// the demand rate of rate-limited consumers (like engines).
@@ -32,9 +37,9 @@ namespace HSP.ResourceFlow
         double GetAvailableInflowVolume( double dt );
 
         /// <summary>
-        /// Applies the calculated inflows and outflows to the internal contents of the object.
+        /// Applies the results of the network solve (inflows/outflows) to the internal state of the object.
         /// </summary>
-        void ApplyFlows( double deltaTime );
+        void ApplySolveResults( double deltaTime );
 
         /// <summary>
         /// Calculates the pressure acting at any given point inside the container.

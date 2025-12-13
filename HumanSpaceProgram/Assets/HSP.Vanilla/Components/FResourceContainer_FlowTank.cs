@@ -97,7 +97,6 @@ namespace HSP.Vanilla.Components
 
                 _cachedTank.FluidAcceleration = (Vector3)netAcceleration;
                 _cachedTank.FluidAngularVelocity = (Vector3)frameAngularVelocity;
-                _cachedTank.RunInternalSimulationStep( TimeManager.FixedDeltaTime );
             }
         }
 

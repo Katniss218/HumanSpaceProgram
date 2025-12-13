@@ -9,7 +9,9 @@ namespace HSP.ResourceFlow
         public Vector3 FluidAngularVelocity { get; set; }
         public ISubstanceStateCollection Outflow { get; set; } = new SubstanceStateCollection();
 
-        public void ApplyFlows( double deltaTime )
+        public void PreSolveUpdate( double deltaTime ) { }
+
+        public void ApplySolveResults( double deltaTime )
         {
             // This is a proxy object. The owning component is responsible for providing Outflow.
         }

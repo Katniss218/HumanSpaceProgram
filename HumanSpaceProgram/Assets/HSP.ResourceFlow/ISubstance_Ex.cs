@@ -4,17 +4,23 @@ namespace HSP.ResourceFlow
 {
     public static class ISubstance_Ex
     {
+        private const double MIN_MOLAR_VOLUME = 1e-9;
+
         public static double ToMoles( this ISubstance self, double mass )
         {
             if( self.MolarMass <= 0.0 )
+            {
                 return 0.0;
+            }
             return mass * self.MolarMass;
         }
 
         public static double ToMass( this ISubstance self, double moles )
         {
             if( self.MolarMass <= 0.0 )
+            {
                 return 0.0;
+            }
             return moles / self.MolarMass;
         }
 
@@ -24,7 +30,9 @@ namespace HSP.ResourceFlow
         {
             double density = self.GetDensity( temperature, pressure );
             if( density <= 0.0 )
+            {
                 throw new ArgumentException();
+            }
             return mass / density;
         }
 
@@ -42,8 +50,10 @@ namespace HSP.ResourceFlow
 
         public static double GetPartialPressure( this ISubstance substance, double temperature, double molarVolume )
         {
-            if( molarVolume <= 1e-9 )
+            if( molarVolume <= MIN_MOLAR_VOLUME )
+            {
                 return 0.0;
+            }
 
             double density = substance.MolarMass / molarVolume;
 
@@ -92,7 +102,10 @@ namespace HSP.ResourceFlow
             }
 
             if( pressure <= pSat )
+            {
                 return SubstancePhase.Gas;
+            }
+
             return SubstancePhase.Liquid;
         }
     }

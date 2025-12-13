@@ -18,6 +18,8 @@ namespace HSP.ResourceFlow
 
         */
 
+        private const float MIN_PHYSICS_VECTOR_CHANGE_SQR = 0.005f;
+
         private readonly FlowTankCache _cache;
 
         internal FlowTetrahedron[] _tetrahedra;
@@ -47,7 +49,7 @@ namespace HSP.ResourceFlow
             get => _fluidAcceleration;
             set
             {
-                if( (_fluidAcceleration - value).sqrMagnitude > 0.05f )
+                if( (_fluidAcceleration - value).sqrMagnitude > MIN_PHYSICS_VECTOR_CHANGE_SQR )
                 {
                     _fluidAcceleration = value;
                     InvalidateGeometryAndFluids();
@@ -60,7 +62,7 @@ namespace HSP.ResourceFlow
             get => _fluidAngularVelocity;
             set
             {
-                if( (_fluidAngularVelocity - value).sqrMagnitude > 0.05f )
+                if( (_fluidAngularVelocity - value).sqrMagnitude > MIN_PHYSICS_VECTOR_CHANGE_SQR )
                 {
                     _fluidAngularVelocity = value;
                     InvalidateGeometryAndFluids();
@@ -79,7 +81,10 @@ namespace HSP.ResourceFlow
 
         public double GetAvailableOutflowVolume()
         {
-            if( Contents == null || IsEmpty ) return 0.0;
+            if( Contents == null || IsEmpty )
+            {
+                return 0.0;
+            }
             // Calculate pressure based on current contents, not stale FluidState property, to get correct gas density.
             double currentPressure = VaporLiquidEquilibrium.ComputePressureOnly( Contents, FluidState, Volume );
             return Contents.GetVolume( FluidState.Temperature, currentPressure );
@@ -135,84 +140,80 @@ namespace HSP.ResourceFlow
 
         private void RecalculateEdgeVolumes()
         {
-            if( _tetrahedra == null || _edges == null )
+            if( _tetrahedra == null || _edges == null || _nodes == null )
+            {
                 return;
+            }
 
-            // 1. Calculate Tetrahedra Volumes
-            double totalDes = 0;
+            // 1. Calculate Tetrahedra Volumes and scale them to match the tank's total volume.
+            double totalTetrahedralVolume = 0;
             double[] tetVolumes = new double[_tetrahedra.Length];
             for( int i = 0; i < _tetrahedra.Length; i++ )
             {
                 tetVolumes[i] = _tetrahedra[i].GetVolume();
-                totalDes += tetVolumes[i];
+                totalTetrahedralVolume += tetVolumes[i];
             }
 
-            // Scale to match actual volume.
-            double scale = (totalDes > 0)
-                ? Volume / totalDes
-                : 0;
-            for( int i = 0; i < tetVolumes.Length; i++ )
-                tetVolumes[i] *= scale;
+            double scale = (totalTetrahedralVolume > 0) ? Volume / totalTetrahedralVolume : 0;
+            if( scale > 0 )
+            {
+                for( int i = 0; i < tetVolumes.Length; i++ )
+                {
+                    tetVolumes[i] *= scale;
+                }
+            }
 
-            // 2. Distribute to Edges
-            Dictionary<long, double> edgeToVolume = new();
+            // 2. Distribute 1/4 of each tetrahedron's volume to each of its four vertices (nodes).
+            double[] nodeVolumes = new double[_nodes.Length];
+            var nodeToIndex = new Dictionary<FlowNode, int>( _nodes.Length );
+            for( int i = 0; i < _nodes.Length; i++ )
+            {
+                nodeToIndex[_nodes[i]] = i;
+            }
 
             for( int i = 0; i < _tetrahedra.Length; i++ )
             {
                 var t = _tetrahedra[i];
-                int[] ni = new[]
-                {
-                    Array.IndexOf( _nodes, t.v0 ),
-                    Array.IndexOf( _nodes, t.v1 ),
-                    Array.IndexOf( _nodes, t.v2 ),
-                    Array.IndexOf( _nodes, t.v3 )
-                };
+                double volPerNode = tetVolumes[i] * 0.25;
 
-                // Calc lengths
-                double totalLen = 0;
-                double[] lens = new double[6];
-                int k = 0;
-                for( int a = 0; a < 4; a++ )
-                {
-                    for( int b = a + 1; b < 4; b++ )
-                    {
-                        lens[k] = Vector3.Distance( _nodes[ni[a]].pos, _nodes[ni[b]].pos );
-                        totalLen += lens[k++];
-                    }
-                }
-
-                if( totalLen <= FlowTankCache.EPSILON_OVERLAP )
-                    continue;
-
-                // Distribute
-                k = 0;
-                for( int a = 0; a < 4; a++ )
-                {
-                    for( int b = a + 1; b < 4; b++ )
-                    {
-                        long key = PackCanonicalEdgeKey( GetCanonicalEdgeKeyByIndex( ni[a], ni[b] ) );
-                        double vol = (lens[k++] / totalLen) * tetVolumes[i];
-
-                        edgeToVolume.TryGetValue( key, out double existing );
-                        edgeToVolume[key] = existing + vol;
-                    }
-                }
+                if( nodeToIndex.TryGetValue( t.v0, out int idx0 ) )
+                    nodeVolumes[idx0] += volPerNode;
+                if( nodeToIndex.TryGetValue( t.v1, out int idx1 ) )
+                    nodeVolumes[idx1] += volPerNode;
+                if( nodeToIndex.TryGetValue( t.v2, out int idx2 ) )
+                    nodeVolumes[idx2] += volPerNode;
+                if( nodeToIndex.TryGetValue( t.v3, out int idx3 ) )
+                    nodeVolumes[idx3] += volPerNode;
             }
 
-            // 3. Rebuild Array with calculated volumes
+            // 3. Assign volume to edges as the average of the volumes of their two endpoint nodes.
             FlowEdge[] newEdges = new FlowEdge[_edges.Length];
-            CalculatedVolume = 0;
-
+            double totalEdgeVolumeAssigned = 0;
             for( int i = 0; i < _edges.Length; i++ )
             {
                 FlowEdge oldEdge = _edges[i];
-                long key = PackCanonicalEdgeKey( GetCanonicalEdgeKeyByIndex( oldEdge.end1, oldEdge.end2 ) );
-
-                edgeToVolume.TryGetValue( key, out double volume );
-
-                newEdges[i] = new FlowEdge( oldEdge.end1, oldEdge.end2, volume );
-                CalculatedVolume += volume;
+                double vol = (nodeVolumes[oldEdge.end1] + nodeVolumes[oldEdge.end2]) * 0.5;
+                newEdges[i] = new FlowEdge( oldEdge.end1, oldEdge.end2, vol );
+                totalEdgeVolumeAssigned += vol;
             }
+
+            // 4. Normalize the assigned edge volumes to ensure the total volume matches the tank's volume exactly.
+            double finalScale = (Volume > 0 && totalEdgeVolumeAssigned > 0) ? Volume / totalEdgeVolumeAssigned : 0;
+            if( finalScale > 0 )
+            {
+                CalculatedVolume = 0;
+                for( int i = 0; i < newEdges.Length; i++ )
+                {
+                    FlowEdge oldEdge = newEdges[i];
+                    newEdges[i] = new FlowEdge( oldEdge.end1, oldEdge.end2, oldEdge.Volume * finalScale );
+                    CalculatedVolume += newEdges[i].Volume;
+                }
+            }
+            else
+            {
+                CalculatedVolume = 0;
+            }
+
             _edges = newEdges;
         }
 
@@ -226,13 +227,19 @@ namespace HSP.ResourceFlow
         {
             // If there are no provided nodes, ensure arrays are non-null for later logic.
             if( localPositions == null )
+            {
                 throw new ArgumentNullException( nameof( localPositions ) );
+            }
             if( inlets == null )
+            {
                 throw new ArgumentNullException( nameof( inlets ) );
+            }
 
             // Make sure internal arrays exist so other code won't null-ref.
             if( _nodes == null )
+            {
                 _nodes = new FlowNode[0];
+            }
 
             const float SNAP_DISTANCE = 0.05f;   // if a provided node is within this distance to exactly one inlet, we will skip adding it (it will be represented by the inlet)
             const float DEDUPE_DISTANCE = 0.01f; // positions closer than this to an already-added position will be treated as duplicates
@@ -245,7 +252,9 @@ namespace HSP.ResourceFlow
                 for( int i = 0; i < allPositions.Count; i++ )
                 {
                     if( Vector3.Distance( allPositions[i], candidate ) <= DEDUPE_DISTANCE )
+                    {
                         return true;
+                    }
                 }
                 return false;
             }
@@ -336,7 +345,9 @@ namespace HSP.ResourceFlow
                 {
                     // For now map to 0f (no forced inflow/outflow); the float slot can be used later for metadata like max flow rate or openness.
                     if( !_inletNodes.ContainsKey( bestNode ) )
+                    {
                         _inletNodes.Add( bestNode, 0.0f );
+                    }
                 }
                 else
                 {
@@ -359,13 +370,22 @@ namespace HSP.ResourceFlow
         public void InvalidateFluids() => _cache.InvalidateFluids();
         public void ForceRecalculateCache() => _cache.RecalculateCache( true );
 
-        public void ApplyFlows( double deltaTime )
+        public void PreSolveUpdate( double deltaTime )
+        {
+            RunInternalSimulationStep( deltaTime );
+        }
+
+        public void ApplySolveResults( double deltaTime )
         {
             if( Outflow != null && !Outflow.IsEmpty() )
+            {
                 Contents.Add( Outflow, -1.0 );
+            }
 
             if( Inflow != null && !Inflow.IsEmpty() )
+            {
                 Contents.Add( Inflow, 1.0 );
+            }
 
             // Recalculate pressure based on new contents.
             double newPressure = VaporLiquidEquilibrium.ComputePressureOnly( this.Contents, this.FluidState, this.Volume );
@@ -413,7 +433,9 @@ namespace HSP.ResourceFlow
         private static (int a, int b) GetCanonicalEdgeKeyByIndex( int i1, int i2 )
         {
             if( i1 <= i2 )
+            {
                 return (i1, i2);
+            }
             return (i2, i1);
         }
 

@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace HSP.ResourceFlow
 {
@@ -8,15 +6,15 @@ namespace HSP.ResourceFlow
     /// A lightweight, stack-allocated struct that caches the aggregate physical properties 
     /// of the mixture to allow for O(1) pressure calculations inside solver loops.
     /// </summary>
-    public struct MixtureProperties
+    internal struct MixtureProperties
     {
         public readonly double TotalMass;
-        public double WeightedInvDensity;    // Sum(w_i / rho_i)
-        public double WeightedInvMolarMass;  // Sum(w_i / M_i)
-        public readonly double AverageBulkModulus;    // Sum(w_i * K_i) / Sum(w_i)
+        public double WeightedInvDensity;
+        public double WeightedInvMolarMass;
+        public readonly double AverageBulkModulus;
         public readonly double Temperature;
         public readonly double TankVolume;
-        public readonly double ReferencePressure;     // The pressure used for property lookups
+        public readonly double ReferencePressure;
 
         private readonly double _RT;
 
@@ -132,7 +130,24 @@ namespace HSP.ResourceFlow
             double gasMoles = currentMass * WeightedInvMolarMass;
 
             if( gasMoles <= 1e-12 )
-                return (0, 0);
+            {
+                // Pure liquid underfilled. The ullage is vacuum, so ullage pressure is zero.
+                // The stiffness in this regime comes from approaching the volume limit.
+                // A simple model: stiffness is low when far from full, and ramps up to the liquid's
+                // compressive stiffness as ullage disappears.
+                double fillRatio = liquidVol / TankVolume;
+                if( TankVolume <= 1e-6 ) fillRatio = 1.0;
+
+                // Use a steep power function to make stiffness significant only when almost full.
+                // A power of 20 makes stiffness at 99% fill about 80% of max, but at 90% it's only 12%.
+                double stiffnessFactor = Math.Pow( Math.Max( 0, fillRatio ), 20 );
+
+                // dP/dM_max = (K_avg / V_tank) * WeightedInvDensity
+                double max_dPdM = (AverageBulkModulus / TankVolume) * WeightedInvDensity;
+
+                return (1e-6, max_dPdM * stiffnessFactor);
+            }
+
 
             // P = (nRT) / (V - V_liq)
             double numerator = gasMoles * _RT;
@@ -435,106 +450,8 @@ namespace HSP.ResourceFlow
         /// <returns>A tuple containing the calculated pressure [Pa] and the derivative ∂P/∂m [Pa/kg].</returns>
         public static (double pressure, double dPdM) ComputePressureAndDerivativeWrtMass( IReadonlySubstanceStateCollection contents, FluidState currentState, double tankVolume )
         {
-            const double MinVolume = 1e-6;
-            const double MinMass = 1e-9;
-            const double R = 8.314462618; // Universal gas constant [J/(mol·K)]
-
-            double temperature = currentState.Temperature;
-            if( temperature <= 0.1 || temperature > 100_000 )
-                temperature = 293.15;
-
-            double totalMass = contents.GetMass();
-            if( totalMass <= MinMass )
-            {
-                return (1e-6, 0.0); // Vacuum, no change
-            }
-
-            var context = new Context
-            {
-                Temperature = temperature,
-                Pressure = currentState.Pressure,
-                TotalMass = totalMass
-            };
-
-            static void processSubstance( (ISubstance, double) item, ref Context ctx )
-            {
-                (var substance, double mass) = item;
-
-                if( mass <= 0.0 ) return;
-
-                double massFraction = mass / ctx.TotalMass;
-
-                if( substance.Phase == SubstancePhase.Liquid )
-                {
-                    double density = substance.GetDensity( ctx.Temperature, ctx.Pressure );
-                    if( density > 1e-9 )
-                    {
-                        ctx.LiquidVolume += mass / density;
-                        ctx.Sum_w_liquid_over_rho += massFraction / density;
-                    }
-                }
-                else if( substance.Phase == SubstancePhase.Gas )
-                {
-                    if( substance.MolarMass > 1e-9 )
-                    {
-                        ctx.SumGasMoles += mass / substance.MolarMass;
-                        ctx.Sum_w_gas_over_MM += massFraction / substance.MolarMass;
-                    }
-                }
-            }
-
-            if( contents is SubstanceStateCollection ssc )
-            {
-                for( int i = 0; i < ssc.Count; i++ )
-                {
-                    processSubstance( ssc[i], ref context );
-                }
-            }
-            else
-            {
-                foreach( var item in contents )
-                {
-                    processSubstance( item, ref context );
-                }
-            }
-
-            double gasVolume = tankVolume - context.LiquidVolume;
-            bool isFullOfLiquid = gasVolume <= MinVolume;
-            double effectiveGasVolume = Math.Max( gasVolume, MinVolume );
-
-            if( isFullOfLiquid )
-            {
-                // --- OVERFILLED LIQUID CASE ---
-                double avgBulkModulus = contents.GetAverageBulkModulus( temperature, currentState.Pressure );
-
-                double fillRatio = context.LiquidVolume / tankVolume;
-                double compressionStrain = Math.Max( 0.0, fillRatio - 1.0 );
-                double pressure = compressionStrain * avgBulkModulus;
-                if( pressure < 0 ) pressure = 0;
-
-                // dP/dm_total = (K_avg / V_tank) * sum(w_liquid_i / rho_i)
-                double dPdM = (avgBulkModulus / tankVolume) * context.Sum_w_liquid_over_rho;
-
-                return (pressure, dPdM);
-            }
-            else
-            {
-                // --- GAS OR MIXED PHASE CASE ---
-                if( context.SumGasMoles <= 0.0 )
-                {
-                    return (1e-6, 0.0); // Pure liquid underfilled, effectively vacuum
-                }
-
-                // P = (n_gas * R * T) / V_ullage
-                double pressure = (context.SumGasMoles * R * temperature) / effectiveGasVolume;
-                if( pressure < 0 ) pressure = 0;
-
-                // dP/dm_total = ( (sum(w_gas_i/MM_i) * R * T) * V_tank ) / ( V_ullage^2 )
-                double B = context.Sum_w_gas_over_MM;
-                double dPdM = (B * R * temperature * tankVolume) / (effectiveGasVolume * effectiveGasVolume);
-
-                return (pressure, dPdM);
-            }
+            var props = new MixtureProperties( contents, currentState, tankVolume );
+            return props.GetStateAtMass( contents.GetMass() );
         }
     }
 }

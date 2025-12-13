@@ -131,15 +131,21 @@ namespace HSP.ResourceFlow
             }
             distinct.RemoveRange( write, distinct.Count - write );
 
-            int sliceCount = Math.Max( 1, distinct.Count - 1 );
-            _slices = new PotentialSlice[sliceCount];
-            if( sliceCount == 1 )
+            int sliceCount;
+            if( distinct.Count <= 1 )
             {
+                // All points have the same potential, or there are no points.
+                // Create a single slice that covers all possibilities.
+                sliceCount = 1;
+                _slices = new PotentialSlice[sliceCount];
                 _slices[0].PotentialBottom = double.NegativeInfinity;
                 _slices[0].PotentialTop = double.PositiveInfinity;
             }
             else
             {
+                // We have at least two distinct potential levels, creating N-1 slices.
+                sliceCount = distinct.Count - 1;
+                _slices = new PotentialSlice[sliceCount];
                 for( int i = 0; i < sliceCount; i++ )
                 {
                     _slices[i].PotentialBottom = distinct[i];
@@ -393,13 +399,36 @@ namespace HSP.ResourceFlow
                     double volInOverlap = slice.VolumeCapacity * fillRatio;
                     double mass = volInOverlap * density;
 
-                    totalMoment += slice.Centroid * (float)mass;
+                    Vector3 centroidToUse = slice.Centroid;
+                    if( fillRatio < 0.9999 ) // It's a partial slice
+                    {
+                        double accel_mag = _owner.FluidAcceleration.magnitude;
+                        if( accel_mag > 1e-6 )
+                        {
+                            Vector3 V_up = -_owner.FluidAcceleration / (float)accel_mag;
+                            double slice_height_approx = sliceSpan / accel_mag;
+
+                            double t_start_frac = (intersectStart - slice.PotentialBottom) / sliceSpan;
+                            double t_end_frac = (intersectEnd - slice.PotentialBottom) / sliceSpan;
+
+                            // Midpoint of filled fraction, relative to slice bottom (0) to top (1)
+                            double mid_frac = (t_start_frac + t_end_frac) / 2.0;
+
+                            // Shift from full-slice centroid (at 0.5) to partial-slice centroid (at mid_frac)
+                            double shift_frac = mid_frac - 0.5;
+
+                            centroidToUse = slice.Centroid + V_up * (float)(slice_height_approx * shift_frac);
+                        }
+                    }
+
+                    totalMoment += centroidToUse * (float)mass;
                     totalMass += mass;
                 }
             }
 
             return (totalMass > 1e-9) ? totalMoment / (float)totalMass : Vector3.zero;
         }
+
 
         public FluidState Sample( Vector3 localPosition, double holeArea )
         {
@@ -486,7 +515,7 @@ namespace HSP.ResourceFlow
 
             double p = GetPotentialAt( localPosition );
 
-#warning TODO - _fluidInSlices[^1].PotentialEnd was NaN
+#warning TODO - _fluidInSlices[^1].PotentialEnd was NaN if there is only 1 slice, leading to no flow ever.
             double liquidSurfacePot = (_fluidInSlices != null && _fluidInSlices.Length > 0)
                 ? _fluidInSlices[^1].PotentialEnd
                 : double.MinValue;

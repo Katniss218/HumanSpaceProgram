@@ -1,9 +1,9 @@
 ﻿using HSP.ResourceFlow;
-using NUnit.Framework;
 using HSP_Tests;
+using NUnit.Framework;
 using System.Collections.Generic;
-using UnityEngine;
 using System.Linq;
+using UnityEngine;
 
 namespace HSP_Tests_EditMode.ResourceFlow
 {
@@ -11,213 +11,177 @@ namespace HSP_Tests_EditMode.ResourceFlow
     public class FlowNetworkDynamicTests
     {
         private const double DT = 0.02;
+        private static readonly Vector3 GRAVITY = new Vector3( 0, -10, 0 );
 
         /// <summary>
-        /// A mock IBuildsFlowNetwork component that can be enabled or disabled to test network rebuilds.
+        /// A mock IBuildsFlowNetwork component used to test invalidation.
+        /// Its IsValid implementation allows us to trigger a rebuild, and its
+        /// BuildFlowNetwork method correctly removes its old pipe if disabled.
         /// </summary>
-        private class ToggleablePipeComponent : IBuildsFlowNetwork
+        private class MockPipeProvider : IBuildsFlowNetwork
         {
             public bool IsEnabled = true;
-            private bool _wasEnabledLastBuild = true;
-
-            private readonly IResourceConsumer _from;
-            private readonly IResourceConsumer _to;
-            private readonly double _length;
-            private readonly object _owner = new object();
+            public FlowTank TankA, TankB;
 
             private FlowPipe _pipe;
 
-            public ToggleablePipeComponent( IResourceConsumer from, IResourceConsumer to, double length )
+            public BuildFlowResult BuildFlowNetwork( FlowNetworkBuilder c )
             {
-                _from = from;
-                _to = to;
-                _length = length;
+                // If we are being rebuilt, assume we must remove old contributions first.
+                if( _pipe != null )
+                {
+                    c.TryRemoveFlowObj( _pipe );
+                    _pipe = null;
+                }
+
+                if( IsEnabled )
+                {
+                    var portA = new FlowPipe.Port( (IResourceConsumer)TankA, Vector3.zero, 0.1f );
+                    var portB = new FlowPipe.Port( (IResourceConsumer)TankB, Vector3.zero, 0.1f );
+                    _pipe = new FlowPipe( portA, portB, 1.0, 0.1 );
+                    c.TryAddFlowObj( this, _pipe );
+                }
+                return BuildFlowResult.Finished;
             }
 
             public bool IsValid( FlowNetworkSnapshot snapshot )
             {
-                return IsEnabled == _wasEnabledLastBuild;
-            }
-
-
-
-            public BuildFlowResult BuildFlowNetwork( FlowNetworkBuilder c )
-            {
-                _wasEnabledLastBuild = IsEnabled;
-
-                // If it was in the network but is now disabled, remove it.
-                if( !IsEnabled && _pipe != null )
-                {
-                    c.TryRemoveFlowObj( _pipe );
-                    _pipe = null;
-                    return BuildFlowResult.Finished;
-                }
-
-                // If it should be in the network but isn't yet, add it.
-                if( IsEnabled && _pipe == null )
-                {
-                    var portA = new FlowPipe.Port( _from, Vector3.zero, 0.1f );
-                    var portB = new FlowPipe.Port( _to, Vector3.zero, 0.1f );
-
-                    _pipe = new FlowPipe( portA, portB, _length, 0.1f );
-                    c.TryAddFlowObj( _owner, _pipe );
-                }
-
-                return BuildFlowResult.Finished;
+                // To trigger a rebuild, we report invalid if our enabled state
+                // doesn't match the network's current state (i.e., if the pipe exists when it shouldn't).
+                bool isPipeInNetwork = _pipe != null && snapshot.Pipes.Contains( _pipe );
+                return IsEnabled == isPipeInNetwork;
             }
 
             public void SynchronizeState( FlowNetworkSnapshot snapshot ) { }
             public void ApplySnapshot( FlowNetworkSnapshot snapshot ) { }
         }
 
-        [Test, Description( "Verifies that adding a pipe to a previously disconnected system initiates flow." )]
-        public void AddPipe_StartsFlow()
+        [Test]
+        public void RuntimePipeAddition___WhenTransactionApplied___FlowStarts()
         {
             // Arrange
             var builder = new FlowNetworkBuilder();
-            var tankA = FlowNetworkTestHelper.CreateTestTank( 1.0, new Vector3( 0, -10, 0 ), Vector3.zero );
-            tankA.Contents.Add( TestSubstances.Water, 1000 ); // Full
-            var tankB = FlowNetworkTestHelper.CreateTestTank( 1.0, new Vector3( 0, -10, 0 ), new Vector3( 2, 0, 0 ) );
-
-            var ownerA = new object();
-            var ownerB = new object();
-            builder.TryAddFlowObj( ownerA, tankA );
-            builder.TryAddFlowObj( ownerB, tankB );
-
-            // Start with a snapshot that has no pipes.
-            var snapshot = builder.BuildSnapshot();
-
-            // Act 1: Simulate a few steps to confirm no flow occurs.
-            for( int i = 0; i < 5; i++ )
-            {
-                snapshot.Step( (float)DT );
-            }
-
-            // Assert 1: No flow should have occurred.
-            Assert.That( tankA.Contents.GetMass(), Is.EqualTo( 1000.0 ).Within( 1e-9 ), "Mass should not change before pipe is added." );
-            Assert.That( tankB.Contents.GetMass(), Is.EqualTo( 0.0 ).Within( 1e-9 ), "Mass should not change before pipe is added." );
-
-            // Act 2: Create a transaction to add a pipe and apply it.
-            var transaction = new FlowNetworkBuilder();
-            var portA = new FlowPipe.Port( (IResourceConsumer)tankA, new Vector3( 1, 0, 0 ), 0.1f );
-            var portB = new FlowPipe.Port( (IResourceConsumer)tankB, new Vector3( 1, 0, 0 ), 0.1f );
-            var pipe = new FlowPipe( portA, portB, 1.0, 0.1f );
-            transaction.TryAddFlowObj( new object(), pipe );
-            snapshot.ApplyTransaction( transaction );
-
-            // Act 3: Simulate a few more steps.
-            for( int i = 0; i < 10; i++ )
-            {
-                snapshot.Step( (float)DT );
-            }
-
-            // Assert 3: Flow should now have occurred.
-            Assert.That( tankA.Contents.GetMass(), Is.LessThan( 1000.0 ), "Tank A should have lost mass after pipe was added." );
-            Assert.That( tankB.Contents.GetMass(), Is.GreaterThan( 0.0 ), "Tank B should have gained mass after pipe was added." );
-            Assert.That( tankA.Contents.GetMass() + tankB.Contents.GetMass(), Is.EqualTo( 1000.0 ).Within( 0.01 ).Percent, "Total mass must be conserved." );
-        }
-
-        [Test, Description( "Verifies that removing a pipe from an active system correctly halts the flow." )]
-        public void RemovePipe_StopsFlow()
-        {
-            // Arrange
-            var builder = new FlowNetworkBuilder();
-            var tankA = FlowNetworkTestHelper.CreateTestTank( 1.0, new Vector3( 0, -10, 0 ), Vector3.zero );
-            tankA.Contents.Add( TestSubstances.Water, 1000 );
-            var tankB = FlowNetworkTestHelper.CreateTestTank( 1.0, new Vector3( 0, -10, 0 ), new Vector3( 2, 0, 0 ) );
+            var tankA = FlowNetworkTestHelper.CreateTestTank( 1.0, GRAVITY, new Vector3( 0, 10, 0 ), TestSubstances.Water, 1000 );
+            var tankB = FlowNetworkTestHelper.CreateTestTank( 1.0, GRAVITY, Vector3.zero );
 
             builder.TryAddFlowObj( new object(), tankA );
             builder.TryAddFlowObj( new object(), tankB );
 
-            var portA = new FlowPipe.Port( (IResourceConsumer)tankA, new Vector3( 1, 0, 0 ), 0.1f );
-            var portB = new FlowPipe.Port( (IResourceConsumer)tankB, new Vector3( 1, 0, 0 ), 0.1f );
-            var pipe = new FlowPipe( portA, portB, 1.0, 0.1f );
-            builder.TryAddFlowObj( new object(), pipe );
-
             var snapshot = builder.BuildSnapshot();
 
-            // Act 1: Simulate to confirm flow is active.
-            for( int i = 0; i < 10; i++ )
+            // Act: Run for a bit without a pipe
+            for( int i = 0; i < 50; i++ )
             {
                 snapshot.Step( (float)DT );
             }
 
-            // Assert 1: Flow is active.
-            double massB_beforeRemoval = tankB.Contents.GetMass();
-            Assert.That( massB_beforeRemoval, Is.GreaterThan( 0.0 ), "Tank B should have received mass while connected." );
+            // Assert: No flow occurred
+            Assert.That( tankB.Contents.GetMass(), Is.EqualTo( 0.0 ), "Mass should not transfer before pipe is added." );
 
-            // Act 2: Create a transaction to remove the pipe and apply it.
+            // Act: Add a pipe via a transaction
+            var transaction = new FlowNetworkBuilder();
+            FlowNetworkTestHelper.CreateAndAddPipe( transaction, tankA, new Vector3( 0, 9, 0 ), tankB, new Vector3( 0, 1, 0 ), 1.0f );
+            snapshot.ApplyTransaction( transaction );
+
+            // Act: Run for more steps with the pipe
+            for( int i = 0; i < 100; i++ )
+            {
+                snapshot.Step( (float)DT );
+            }
+
+            // Assert: Flow has started
+            Assert.That( tankB.Contents.GetMass(), Is.GreaterThan( 1.0 ), "Mass should transfer after pipe is added." );
+            Assert.That( tankA.Contents.GetMass() + tankB.Contents.GetMass(), Is.EqualTo( 1000.0 ).Within( 1e-6 ) );
+        }
+
+        [Test]
+        public void RuntimePipeRemoval___WhenTransactionApplied___FlowStops()
+        {
+            // Arrange
+            var builder = new FlowNetworkBuilder();
+            var tankA = FlowNetworkTestHelper.CreateTestTank( 1.0, GRAVITY, new Vector3( 0, 10, 0 ), TestSubstances.Water, 1000 );
+            var tankB = FlowNetworkTestHelper.CreateTestTank( 1.0, GRAVITY, Vector3.zero );
+
+            builder.TryAddFlowObj( new object(), tankA );
+            builder.TryAddFlowObj( new object(), tankB );
+            var pipe = FlowNetworkTestHelper.CreateAndAddPipe( builder, tankA, new Vector3( 0, 9, 0 ), tankB, new Vector3( 0, 1, 0 ), 1.0f );
+
+            var snapshot = builder.BuildSnapshot();
+
+            // Act: Run for a bit with the pipe
+            for( int i = 0; i < 50; i++ )
+            {
+                snapshot.Step( (float)DT );
+            }
+
+            // Assert: Flow occurred
+            double massAfterInitialFlow = tankB.Contents.GetMass();
+            Assert.That( massAfterInitialFlow, Is.GreaterThan( 1.0 ), "Mass should transfer while pipe exists." );
+
+            // Act: Remove the pipe via a transaction
             var transaction = new FlowNetworkBuilder();
             transaction.TryRemoveFlowObj( pipe );
             snapshot.ApplyTransaction( transaction );
 
-            // Act 3: Simulate more steps.
-            for( int i = 0; i < 10; i++ )
+            // Act: Run for more steps without the pipe
+            for( int i = 0; i < 100; i++ )
             {
                 snapshot.Step( (float)DT );
             }
 
-            // Assert 3: Flow should have stopped.
-            double massB_afterRemoval = tankB.Contents.GetMass();
-            Assert.That( massB_afterRemoval, Is.EqualTo( massB_beforeRemoval ).Within( 0.01 ).Percent, "Tank B mass should not change after pipe is removed." );
-            Assert.That( tankA.Contents.GetMass() + tankB.Contents.GetMass(), Is.EqualTo( 1000.0 ).Within( 0.01 ).Percent, "Total mass must be conserved." );
+            // Assert: Flow has stopped
+            Assert.That( tankB.Contents.GetMass(), Is.EqualTo( massAfterInitialFlow ).Within( 1e-9 ), "Mass should not transfer after pipe is removed." );
+            Assert.That( tankA.Contents.GetMass() + tankB.Contents.GetMass(), Is.EqualTo( 1000.0 ).Within( 1e-6 ) );
         }
 
-        [Test, Description( "Verifies that a component becoming invalid correctly triggers a network rebuild that removes its pipe." )]
-        public void ComponentInvalidation_TriggersRebuildAndStopsFlow()
+        [Test]
+        public void ComponentInvalidation___WhenComponentBecomesInvalid___PipeIsRemoved()
         {
             // Arrange
-            var tankA = FlowNetworkTestHelper.CreateTestTank( 1.0, new Vector3( 0, -10, 0 ), Vector3.zero );
-            tankA.Contents.Add( TestSubstances.Water, 1000 );
-            var tankB = FlowNetworkTestHelper.CreateTestTank( 1.0, new Vector3( 0, -10, 0 ), new Vector3( 2, 0, 0 ) );
-            var toggleablePipe = new ToggleablePipeComponent( tankA, tankB, 1.0 );
+            var tankA = FlowNetworkTestHelper.CreateTestTank( 1.0, GRAVITY, new Vector3( 0, 10, 0 ), TestSubstances.Water, 1000 );
+            var tankB = FlowNetworkTestHelper.CreateTestTank( 1.0, GRAVITY, Vector3.zero );
+            var mockPipeProvider = new MockPipeProvider { IsEnabled = true, TankA = tankA, TankB = tankB };
 
+            // Simulate initial network build from components
             var builder = new FlowNetworkBuilder();
-            builder.TryAddFlowObj( tankA, tankA ); // Use tanks as their own owners for simplicity
-            builder.TryAddFlowObj( tankB, tankB );
+            builder.TryAddFlowObj( new object(), tankA );
+            builder.TryAddFlowObj( new object(), tankB );
+            mockPipeProvider.BuildFlowNetwork( builder );
+            var snapshot = builder.BuildSnapshot();
 
-            // The component adds its own pipe to the builder
-            toggleablePipe.BuildFlowNetwork( builder );
-
-            // Pass the component to the snapshot so its validity can be checked.
-            var components = new IBuildsFlowNetwork[] { toggleablePipe };
-            var snapshot = new FlowNetworkSnapshot( null, builder.Owner, components, builder.Producers.ToList(), builder.Consumers.ToList(), builder.Pipes.ToList() );
-
-            // Act 1: Simulate a few steps with the pipe enabled.
-            for( int i = 0; i < 10; i++ )
+            // Act: Run for a bit with the pipe enabled
+            for( int i = 0; i < 50; i++ )
             {
                 snapshot.Step( (float)DT );
             }
-            double massB_beforeToggle = tankB.Contents.GetMass();
-            Assert.That( massB_beforeToggle, Is.GreaterThan( 0.0 ), "Flow should occur when pipe is enabled." );
 
-            // Act 2: Disable the component, making it invalid.
-            toggleablePipe.IsEnabled = false;
+            // Assert: Flow occurred
+            double massAfterInitialFlow = tankB.Contents.GetMass();
+            Assert.That( massAfterInitialFlow, Is.GreaterThan( 1.0 ), "Mass should transfer while component is valid." );
 
-            // Act 3: Simulate the manager's invalidation-check-and-rebuild loop.
+            // Act: Invalidate the component and simulate the manager's rebuild logic
+            mockPipeProvider.IsEnabled = false;
+
             var invalidComponents = new List<IBuildsFlowNetwork>();
-            snapshot.GetInvalidComponents( invalidComponents );
-
-            Assert.That( invalidComponents, Does.Contain( toggleablePipe ), "GetInvalidComponents should have detected the state change." );
-            Assert.That( invalidComponents.Count, Is.EqualTo( 1 ) );
+            snapshot.GetInvalidComponents( invalidComponents ); // Snapshot detects the invalid component
+            Assert.That( invalidComponents, Does.Contain( mockPipeProvider ) );
 
             var transaction = new FlowNetworkBuilder();
-            foreach( var invalid in invalidComponents )
+            foreach( var component in invalidComponents )
             {
-                invalid.BuildFlowNetwork( transaction );
+                component.BuildFlowNetwork( transaction ); // Rebuild invalid component, which removes its pipe
             }
             snapshot.ApplyTransaction( transaction );
 
-            // Act 4: Simulate a few more steps.
-            for( int i = 0; i < 10; i++ )
+            // Act: Run for more steps
+            for( int i = 0; i < 100; i++ )
             {
                 snapshot.Step( (float)DT );
             }
 
-            // Assert
-            double massB_afterToggle = tankB.Contents.GetMass();
-            Assert.That( massB_afterToggle, Is.EqualTo( massB_beforeToggle ).Within( 0.01 ).Percent, "Mass should not change after component is disabled and network rebuilt." );
-            Assert.That( tankA.Contents.GetMass() + tankB.Contents.GetMass(), Is.EqualTo( 1000.0 ).Within( 0.01 ).Percent, "Total mass must be conserved." );
+            // Assert: Flow has stopped
+            Assert.That( tankB.Contents.GetMass(), Is.EqualTo( massAfterInitialFlow ).Within( 1e-9 ), "Mass should not transfer after component is invalidated." );
+            Assert.That( tankA.Contents.GetMass() + tankB.Contents.GetMass(), Is.EqualTo( 1000.0 ).Within( 1e-6 ) );
         }
     }
 }

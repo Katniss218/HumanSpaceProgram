@@ -10,6 +10,16 @@ namespace HSP.ResourceFlow
         // 8.31446 J / (mol * K)
         private const double UniversalGasConstant = 8.314462618;
 
+        private const double MIN_MOLAR_MASS = 1e-9;
+        private const double MIN_VALUE_FOR_RECIPROCAL = 1e-9;
+        private const double MIN_VOLUME_FOR_DERIVATIVE = 1e-9;
+        private const double MIN_DENSITY_FALLBACK = 1e-6;
+        private const double MIN_VISCOSITY_FALLBACK = 1e-9;
+        private const double MIN_DENOMINATOR_FOR_ANTOINE = 1e-5;
+        private const double MIN_PRESSURE_FOR_BOILING_POINT = 1e-6;
+        private const double WATER_BOILING_POINT_K_FALLBACK = 373.15;
+        private const double MIN_DENOMINATOR_FOR_BOILING_POINT = 1e-5;
+
         // --- Backing Fields for Reciprocal Caching ---
         private double _specificGasConstant = 287;
         private double _invSpecificGasConstant = 1.0 / 287.0; // Cache 1/R
@@ -42,7 +52,7 @@ namespace HSP.ResourceFlow
         private void RecalculateGasConstants()
         {
             // Safety check to prevent divide by zero
-            if( _molarMass <= 1e-9 )
+            if( _molarMass <= MIN_MOLAR_MASS )
             {
                 _specificGasConstant = 0;
                 _invSpecificGasConstant = 0;
@@ -64,7 +74,7 @@ namespace HSP.ResourceFlow
             set
             {
                 _bulkModulus = value;
-                _invBulkModulus = (Math.Abs( value ) > 1e-9f) ? 1.0 / value : 0.0;
+                _invBulkModulus = (Math.Abs( value ) > MIN_VALUE_FOR_RECIPROCAL) ? 1.0 / value : 0.0;
             }
         }
 
@@ -74,7 +84,7 @@ namespace HSP.ResourceFlow
             set
             {
                 _referenceDensity = value;
-                _invReferenceDensity = (Math.Abs( value ) > 1e-9f) ? 1.0 / value : 0.0;
+                _invReferenceDensity = (Math.Abs( value ) > MIN_VALUE_FOR_RECIPROCAL) ? 1.0 / value : 0.0;
             }
         }
 
@@ -114,7 +124,9 @@ namespace HSP.ResourceFlow
             if( Phase == SubstancePhase.Gas )
             {
                 if( temperature <= 0f )
+                {
                     return 0f;
+                }
                 return density * _specificGasConstant * temperature;
             }
 
@@ -125,13 +137,17 @@ namespace HSP.ResourceFlow
 
         public double GetPressureDerivativeWrtMass( double volume, double temperature )
         {
-            if( volume <= 1e-9 )
+            if( volume <= MIN_VOLUME_FOR_DERIVATIVE )
+            {
                 return double.PositiveInfinity;
+            }
 
             if( Phase == SubstancePhase.Gas )
             {
                 if( temperature <= 0f )
+                {
                     return 0f;
+                }
                 return _specificGasConstant * temperature / volume;
             }
 
@@ -142,7 +158,10 @@ namespace HSP.ResourceFlow
         {
             if( Phase == SubstancePhase.Gas )
             {
-                if( temperature <= 0f ) return 0f;
+                if( temperature <= 0f )
+                {
+                    return 0f;
+                }
                 // Optimization: pressure * (1/R) * (1/T)
                 return pressure * _invSpecificGasConstant * (1.0 / temperature);
             }
@@ -152,13 +171,13 @@ namespace HSP.ResourceFlow
             double density = _referenceDensity * (1.0 + (pressure - ReferencePressure) * _invBulkModulus);
 
             // Realism: Prevent negative density (vacuum/suction limits)
-            return density > 1e-6 ? density : 1e-6;
+            return density > MIN_DENSITY_FALLBACK ? density : MIN_DENSITY_FALLBACK;
         }
 
         public double GetViscosity( double temperature, double pressure )
         {
             double v = EvaluatePolynomialHorner( temperature, ViscosityCoeffs );
-            return v < 1e-9 ? 1e-9 : v;
+            return v < MIN_VISCOSITY_FALLBACK ? MIN_VISCOSITY_FALLBACK : v;
         }
 
         public double GetThermalConductivity( double temperature, double pressure )
@@ -177,7 +196,10 @@ namespace HSP.ResourceFlow
         {
             if( Phase == SubstancePhase.Gas )
             {
-                if( temperature <= 0 ) return 0;
+                if( temperature <= 0 )
+                {
+                    return 0;
+                }
                 return Math.Sqrt( AdiabaticIndex * _specificGasConstant * temperature );
             }
             else
@@ -185,7 +207,10 @@ namespace HSP.ResourceFlow
                 // Re-calculate density here locally or pass it in? 
                 // Using formula c = sqrt(K / rho)
                 double rho = GetDensity( temperature, pressure );
-                if( rho <= 1e-4 ) return 0;
+                if( rho <= MIN_DENSITY_FALLBACK )
+                {
+                    return 0;
+                }
                 return Math.Sqrt( GetBulkModulus( temperature, pressure ) / rho );
             }
         }
@@ -193,11 +218,17 @@ namespace HSP.ResourceFlow
         public double GetVaporPressure( double temperature )
         {
             // Antoine: log10(P) = A - B / (T + C)
-            if( AntoineCoeffs == null || AntoineCoeffs.Length < 3 ) return 0.0;
+            if( AntoineCoeffs == null || AntoineCoeffs.Length < 3 )
+            {
+                return 0.0;
+            }
 
             double denominator = temperature + AntoineCoeffs[2];
             // Safety: Avoid divide by zero singularity
-            if( Math.Abs( denominator ) < 1e-5 ) return 0.0;
+            if( Math.Abs( denominator ) < MIN_DENOMINATOR_FOR_ANTOINE )
+            {
+                return 0.0;
+            }
 
             double exponent = AntoineCoeffs[0] - (AntoineCoeffs[1] / denominator);
             return Math.Pow( 10, exponent );
@@ -205,13 +236,22 @@ namespace HSP.ResourceFlow
 
         public double GetBoilingPoint( double pressure )
         {
-            if( pressure <= 1e-6 ) return 0;
-            if( AntoineCoeffs == null || AntoineCoeffs.Length < 3 ) return 373.15;
+            if( pressure <= MIN_PRESSURE_FOR_BOILING_POINT )
+            {
+                return 0;
+            }
+            if( AntoineCoeffs == null || AntoineCoeffs.Length < 3 )
+            {
+                return WATER_BOILING_POINT_K_FALLBACK;
+            }
 
             double logP = Math.Log10( pressure );
             double denominator = AntoineCoeffs[0] - logP;
 
-            if( Math.Abs( denominator ) < 1e-5 ) return double.MaxValue;
+            if( Math.Abs( denominator ) < MIN_DENOMINATOR_FOR_BOILING_POINT )
+            {
+                return double.MaxValue;
+            }
 
             return (AntoineCoeffs[1] / denominator) - AntoineCoeffs[2];
         }
@@ -226,7 +266,10 @@ namespace HSP.ResourceFlow
         /// </summary>
         private static double EvaluatePolynomialHorner( double x, double[] coeffs )
         {
-            if( coeffs == null || coeffs.Length == 0 ) return 0.0;
+            if( coeffs == null || coeffs.Length == 0 )
+            {
+                return 0.0;
+            }
 
             // Loop backwards
             double result = coeffs[coeffs.Length - 1];

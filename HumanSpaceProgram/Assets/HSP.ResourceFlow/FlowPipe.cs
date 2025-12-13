@@ -8,6 +8,9 @@ namespace HSP.ResourceFlow
     /// </summary>
     public class FlowPipe
     {
+        private const double MIN_PIPE_LENGTH = 0.001;
+        private const double ZERO_FLOW_TOLERANCE = 1e-9;
+
         /// <summary>
         /// Represents an inlet/outlet.
         /// </summary>
@@ -68,7 +71,7 @@ namespace HSP.ResourceFlow
         {
             FromInlet = fromInlet;
             ToInlet = toInlet;
-            Length = Math.Max( length, 0.001 ); // Min length 1mm
+            Length = Math.Max( length, MIN_PIPE_LENGTH );
             Area = area;
             Diameter = Math.Sqrt( 4 * area / Math.PI );
             MassFlowConductance = 0; // Initial value, will be calculated by solver.
@@ -82,7 +85,9 @@ namespace HSP.ResourceFlow
         {
             double flowrate = MassFlowConductance * (potentialFrom - potentialTo + HeadAdded);
             if( !double.IsFinite( flowrate ) )
+            {
                 flowrate = 0f;
+            }
 
             return flowrate;
         }
@@ -94,8 +99,10 @@ namespace HSP.ResourceFlow
         /// <param name="dt"">Timestep used for scaling the flowing resources, in [s].</param>
         public ISampledSubstanceStateCollection SampleFlowResources( double signedMassFlow, double dt )
         {
-            if( Math.Abs( signedMassFlow ) < 1e-9 )
+            if( Math.Abs( signedMassFlow ) < ZERO_FLOW_TOLERANCE )
+            {
                 return PooledReadonlySubstanceStateCollection.Get();
+            }
 
             IResourceConsumer consumer;
             IResourceProducer producer;
@@ -114,7 +121,9 @@ namespace HSP.ResourceFlow
             }
 
             if( producer == null || consumer == null )
+            {
                 return PooledReadonlySubstanceStateCollection.Get();
+            }
 
             double massToTransfer = Math.Abs( signedMassFlow ) * dt;
             return producer.SampleSubstances( samplePos, massToTransfer );

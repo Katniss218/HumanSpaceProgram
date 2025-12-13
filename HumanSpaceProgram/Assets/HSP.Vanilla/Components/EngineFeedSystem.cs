@@ -34,6 +34,8 @@ namespace HSP.Vanilla.Components
             Inflow.Clear();
         }
 
+        public void PreSolveUpdate( double deltaTime ) { }
+
         public double GetAvailableInflowVolume( double dt )
         {
             // A pump-like consumer has effectively infinite demand capacity.
@@ -41,7 +43,7 @@ namespace HSP.Vanilla.Components
             return double.PositiveInfinity;
         }
 
-        public void ApplyFlows( double deltaTime )
+        public void ApplySolveResults( double deltaTime )
         {
             if( deltaTime <= 1e-9 )
             {
