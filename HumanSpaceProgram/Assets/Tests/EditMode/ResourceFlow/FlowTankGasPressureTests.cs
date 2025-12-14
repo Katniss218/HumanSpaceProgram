@@ -42,7 +42,7 @@ namespace HSP_Tests_EditMode.ResourceFlow
             // Arrange
             double initialMass = 1.2;
             _tank.Contents.Add( TestSubstances.Air, initialMass );
-            _tank.FluidState = new FluidState( VaporLiquidEquilibrium.ComputePressureOnly( _tank.Contents, _tank.FluidState, _tank.Volume ), 300, 0 );
+            _tank.FluidState = new FluidState( _tank.Contents.GetPressureInVolume( _tank.Volume, _tank.FluidState ), 300, 0 );
 
             double removedMass = 0.6;
             _tank.Outflow.Add( TestSubstances.Air, removedMass );
@@ -66,7 +66,7 @@ namespace HSP_Tests_EditMode.ResourceFlow
             // Arrange
             double gasMass = 1.2;
             _tank.Contents.Add( TestSubstances.Air, gasMass );
-            _tank.FluidState = new FluidState( VaporLiquidEquilibrium.ComputePressureOnly( _tank.Contents, _tank.FluidState, _tank.Volume ), 300, 0 );
+            _tank.FluidState = new FluidState( _tank.Contents.GetPressureInVolume( _tank.Volume, _tank.FluidState ), 300, 0 );
             double initialPressure = _tank.FluidState.Pressure;
 
             double liquidMass = 500; // 0.5 m^3 of water

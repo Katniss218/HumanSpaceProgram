@@ -6,115 +6,52 @@ using UnityEngine;
 namespace HSP_Tests_EditMode.ResourceFlow
 {
     [TestFixture]
-    public class VaporLiquidEquilibriumTests
+    public class VaporLiquidSolidEquilibriumTests
     {
-        private VLETestSubstance _lqWater;
-        private VLETestSubstance _gasWater;
-        private VLETestSubstance _lqEthanol;
-        private VLETestSubstance _gasEthanol;
-        private VLETestSubstance _nonVolatileLiquid;
-
-        // Helper class for creating testable substances with specific thermodynamic properties.
-        private class VLETestSubstance : ISubstance
-        {
-            public string ID { get; set; }
-            public string DisplayName { get; set; }
-            public Color DisplayColor { get; set; }
-            public string[] Tags { get; set; }
-            public SubstancePhase Phase { get; set; }
-            public double MolarMass { get; set; }
-            public double SpecificGasConstant { get; set; }
-            public double? FlashPoint { get; set; }
-            public double BulkModulus { get; set; } = 2.2e9;
-
-            // Funcs for curves
-            public Func<double, double> VaporPressureCurve { get; set; } = temp => 0.0;
-            public Func<double> LatentHeatCurve { get; set; } = () => 0.0;
-            public Func<double, double, double> SpecificHeatCapacityCurve { get; set; } = ( temp, press ) => 1.0;
-            public Func<double, double, double> DensityCurve { get; set; } = ( temp, press ) => 1000.0;
-
-            public double AdiabaticIndex { get; set; }
-
-            public double GetBulkModulus( double pressure, double temperature ) => throw new NotImplementedException();
-            public double GetBoilingPoint( double pressure ) => throw new NotImplementedException();
-            public double GetDensity( double temperature, double pressure ) => DensityCurve( temperature, pressure );
-            public double GetLatentHeatOfFusion() => throw new NotImplementedException();
-            public double GetLatentHeatOfVaporization() => LatentHeatCurve();
-            public double GetPressure( double temperature, double density ) => (SpecificGasConstant > 0) ? density * SpecificGasConstant * temperature : 0.0;
-            public double GetSpecificHeatCapacity( double temperature, double pressure ) => SpecificHeatCapacityCurve( temperature, pressure );
-            public double GetSpeedOfSound( double temperature, double pressure ) => throw new NotImplementedException();
-            public double GetThermalConductivity( double temperature, double pressure ) => throw new NotImplementedException();
-            public double GetVaporPressure( double temperature ) => VaporPressureCurve( temperature );
-            public double GetViscosity( double temperature, double pressure ) => throw new NotImplementedException();
-
-            public double GetPressureDerivativeWrtMass( double volume, double temperature )
-            {
-                throw new NotImplementedException();
-            }
-        }
+        private Substance _lqWater;
+        private Substance _gasWater;
+        private Substance _ice;
 
         [SetUp]
         public void SetUp()
         {
             const double WATER_MOLAR_MASS = 0.01801528; // kg/mol
-            const double ETHANOL_MOLAR_MASS = 0.04607;  // kg/mol
 
-            _lqWater = new VLETestSubstance
+            _lqWater = new Substance( "lq_water" )
             {
-                ID = "lq_water",
                 Phase = SubstancePhase.Liquid,
                 MolarMass = WATER_MOLAR_MASS,
-                DensityCurve = ( t, p ) => 997, // kg/m^3 at ~300K
-                VaporPressureCurve = temp => 3537, // Pa at 300K
-                LatentHeatCurve = () => 2.26e6, // J/kg
-                SpecificHeatCapacityCurve = ( t, p ) => 4186 // J/(kg*K)
+                ReferenceDensity = 997, // kg/m^3 at ~300K
+                BulkModulus = 2.2e9,
+                AntoineCoeffs = new double[] { 10.196, 1730.63, -39.724 }, // Pa at 300K -> ~3537
+                LatentHeatVaporization = 2.26e6, // J/kg
+                LatentHeatFusion = 3.34e5, // J/kg
+                SpecificHeatCoeffs = new double[] { 4186 }, // J/(kg*K)
+                MeltingPointSTP = 273.15
             };
 
-            _gasWater = new VLETestSubstance
+            _gasWater = new Substance( "gas_water" )
             {
-                ID = "gas_water",
                 Phase = SubstancePhase.Gas,
                 MolarMass = WATER_MOLAR_MASS,
-                SpecificGasConstant = 461.5, // J/(kg*K)
-                DensityCurve = ( t, p ) => p / (461.5 * t),
-                SpecificHeatCapacityCurve = ( t, p ) => 1480 // Cv for steam
+                SpecificHeatCoeffs = new double[] { 1941.5 }, // Cp for steam
             };
 
-            _lqEthanol = new VLETestSubstance
+            _ice = new Substance( "ice" )
             {
-                ID = "lq_ethanol",
-                Phase = SubstancePhase.Liquid,
-                MolarMass = ETHANOL_MOLAR_MASS,
-                DensityCurve = ( t, p ) => 789,
-                VaporPressureCurve = temp => 7880, // More volatile than water at 300K
-                LatentHeatCurve = () => 8.41e5,
-                SpecificHeatCapacityCurve = ( t, p ) => 2440
-            };
-
-            _gasEthanol = new VLETestSubstance
-            {
-                ID = "gas_ethanol",
-                Phase = SubstancePhase.Gas,
-                MolarMass = ETHANOL_MOLAR_MASS,
-                SpecificGasConstant = 180.5,
-                DensityCurve = ( t, p ) => p / (180.5 * t),
-                SpecificHeatCapacityCurve = ( t, p ) => 1430 // Cv
-            };
-
-            _nonVolatileLiquid = new VLETestSubstance
-            {
-                ID = "heavy_oil",
-                Phase = SubstancePhase.Liquid,
-                MolarMass = 0.3,
-                DensityCurve = ( t, p ) => 900,
-                VaporPressureCurve = temp => 0 // Non-volatile
+                Phase = SubstancePhase.Solid,
+                MolarMass = WATER_MOLAR_MASS,
+                ReferenceDensity = 917,
+                MeltingPointSTP = 273.15,
+                LatentHeatFusion = 3.34e5,
+                SpecificHeatCoeffs = new double[] { 2108 } // J/(kg*K) for ice
             };
 
             SubstancePhaseMap.Clear();
             SubstancePhaseMap.RegisterPhasePartner( _lqWater, SubstancePhase.Gas, _gasWater );
             SubstancePhaseMap.RegisterPhasePartner( _gasWater, SubstancePhase.Liquid, _lqWater );
-            SubstancePhaseMap.RegisterPhasePartner( _lqEthanol, SubstancePhase.Gas, _gasEthanol );
-            SubstancePhaseMap.RegisterPhasePartner( _gasEthanol, SubstancePhase.Liquid, _lqEthanol );
+            SubstancePhaseMap.RegisterPhasePartner( _lqWater, SubstancePhase.Solid, _ice );
+            SubstancePhaseMap.RegisterPhasePartner( _ice, SubstancePhase.Liquid, _lqWater );
         }
 
         [TearDown]
@@ -123,225 +60,439 @@ namespace HSP_Tests_EditMode.ResourceFlow
             SubstancePhaseMap.Clear();
         }
 
+        #region GetPressureInVolume Tests
+
         [Test]
-        public void ComputePressureOnly_GasOnly_MatchesIdealGasLaw()
+        public void GetPressureInVolume_GasOnly_MatchesIdealGasLaw()
         {
-            // Arrange
-            double tankVolume = 2.0; // m^3
-            double temperature = 300; // K
-            double mass = 1.0; // kg
+            double tankVolume = 2.0;
+            double temperature = 300;
+            double mass = 1.0;
             var contents = new SubstanceStateCollection { { _gasWater, mass } };
             var currentState = new FluidState( 0, temperature, 0 );
 
-            // Act
-            double pressure = VaporLiquidEquilibrium.ComputePressureOnly( contents, currentState, tankVolume );
+            double pressure = contents.GetPressureInVolume( tankVolume, currentState );
 
-            // Assert
             double moles = mass / _gasWater.MolarMass;
-            double R = 8.314462618;
+            const double R = 8.314462618;
             double expectedPressure = (moles * R * temperature) / tankVolume;
 
-            Assert.AreEqual( expectedPressure, pressure, 1e-3 );
+            Assert.That( pressure, Is.EqualTo( expectedPressure ).Within( 1e-3 ) );
         }
 
         [Test]
-        public void ComputePressureOnly_LiquidOnlyBelowCapacity_IsEffectivelyVacuum()
+        public void GetPressureInVolume_LiquidOnlyBelowCapacity_IsEffectivelyVacuum()
         {
-            // Arrange
-            var contents = new SubstanceStateCollection { { _lqWater, 100 } }; // 100kg of water
+            var contents = new SubstanceStateCollection { { _lqWater, 100 } };
             var currentState = new FluidState( 0, 300, 0 );
 
-            // Act
-            double pressure = VaporLiquidEquilibrium.ComputePressureOnly( contents, currentState, 1.0 );
+            double pressure = contents.GetPressureInVolume( 1.0, currentState );
 
-            // Assert
-            Assert.AreEqual( 1e-6, pressure );
+            Assert.That( pressure, Is.EqualTo( 1e-6 ) );
         }
 
         [Test]
-        public void ComputePressureOnly_LiquidOverfilled_CalculatesHighPressureViaBulkModulus()
+        public void GetPressureInVolume_LiquidOverfilled_CalculatesHighPressureViaBulkModulus()
         {
-            // Arrange
-            double tankVolume = 1.0; // m^3
+            double tankVolume = 1.0;
             double liquidDensity = _lqWater.GetDensity( 300, 101325 );
             double mass = liquidDensity * 1.1; // 10% overfill
             var contents = new SubstanceStateCollection { { _lqWater, mass } };
             var currentState = new FluidState( 0, 300, 0 );
 
-            // Act
-            double pressure = VaporLiquidEquilibrium.ComputePressureOnly( contents, currentState, tankVolume );
+            double pressure = contents.GetPressureInVolume( tankVolume, currentState );
 
-            // Assert
             double fillRatio = (mass / liquidDensity) / tankVolume;
-            double expectedPressure = (fillRatio - 1.0) * 2.2e9; // 2.2e9 is the hardcoded bulk modulus
-            Assert.AreEqual( expectedPressure, pressure, 1e-3 );
+            double expectedPressure = (fillRatio - 1.0) * _lqWater.BulkModulus;
+
+            Assert.That( pressure, Is.EqualTo( expectedPressure ).Within( 0.1 ).Percent );
         }
 
         [Test]
-        public void ComputePressureOnly_MixedLiquidAndGas_UsesUllageVolume()
+        public void GetPressureInVolume_MixedLiquidAndGas_UsesUllageVolume()
         {
-            // Arrange
-            double tankVolume = 10.0; // m^3
-            double temperature = 300; // K
+            double tankVolume = 10.0;
+            double temperature = 300;
             double liquidMass = 997; // ~1 m^3 of water
-            double gasMass = 1.0; // kg of steam
+            double gasMass = 1.0;
             var contents = new SubstanceStateCollection { { _lqWater, liquidMass }, { _gasWater, gasMass } };
             var currentState = new FluidState( 0, temperature, 0 );
 
-            // Act
-            double pressure = VaporLiquidEquilibrium.ComputePressureOnly( contents, currentState, tankVolume );
+            double pressure = contents.GetPressureInVolume( tankVolume, currentState );
 
-            // Assert
             double liquidVolume = liquidMass / _lqWater.GetDensity( temperature, 0 );
             double ullageVolume = tankVolume - liquidVolume;
             double gasMoles = gasMass / _gasWater.MolarMass;
-            double R = 8.314462618;
+            const double R = 8.314462618;
             double expectedPressure = (gasMoles * R * temperature) / ullageVolume;
 
-            Assert.AreEqual( expectedPressure, pressure, 1e-3 );
+            Assert.That( pressure, Is.EqualTo( expectedPressure ).Within( 1e-3 ) );
         }
 
+        #endregion
+
+        #region ComputeFlash_Stable VLE Tests
+
         [Test]
-        public void ComputeFlash2_EvaporationOccurs_WhenPartialPressureIsLow()
+        public void ComputeFlash_Stable_EvaporationOccurs_WhenPartialPressureIsLow()
         {
-            // Arrange
             double tankVolume = 10.0;
-            double temperature = 300;
-            var contents = new SubstanceStateCollection { { _lqWater, 1.0 } }; // Only liquid, so partial pressure of gas is 0
-            var currentState = new FluidState( 0, temperature, 0 );
+            double temperature = 300; // Use a standard temperature
+            var contents = new SubstanceStateCollection { { _lqWater, 1.0 } };
+            // Start with vacuum ullage, this is an unstable state that should cause boiling.
+            var currentState = new FluidState( 0.01, temperature, 0 );
 
-            // Vapor pressure of water at 300K is ~3537 Pa. Since partial pressure is 0, evaporation should occur.
+            (var updatedContents, var newState) = VaporLiquidEquilibrium.ComputeFlash_Stable( contents, currentState, tankVolume, 0, 1.0 );
 
-            // Act
-            (var updatedContents, var newState) = VaporLiquidEquilibrium.ComputeFlash2( contents, currentState, tankVolume, 1.0 );
-
-            // Assert
-            Assert.Less( updatedContents[_lqWater], 1.0, "Liquid mass should decrease due to evaporation." );
-            Assert.Greater( updatedContents[_gasWater], 0.0, "Gas mass should increase due to evaporation." );
-            Assert.Less( newState.Temperature, temperature, "Temperature should drop due to latent heat of vaporization." );
+            Assert.That( updatedContents[_lqWater], Is.LessThan( 1.0 ) );
+            Assert.That( updatedContents.Contains( _gasWater ), Is.True );
+            Assert.That( updatedContents[_gasWater], Is.GreaterThan( 0.0 ) );
+            Assert.That( newState.Temperature, Is.LessThan( temperature ) );
         }
 
         [Test]
-        public void ComputeFlash2_CondensationOccurs_WhenPartialPressureIsHigh()
+        public void ComputeFlash_Stable_CondensationOccurs_WhenPartialPressureIsHigh()
         {
-            // Arrange
             double tankVolume = 1.0;
             double temperature = 300;
-            // High mass of gas in a small volume to create high partial pressure
+            // Start with gas pressure far above vapor pressure for this temp (~3537 Pa)
             var contents = new SubstanceStateCollection { { _lqWater, 0.01 }, { _gasWater, 1.0 } };
             var currentState = new FluidState( 0, temperature, 0 );
 
-            // Vapor pressure at 300K is ~3537 Pa. The initial pressure from the gas will be much higher, so condensation should occur.
+            (var updatedContents, var newState) = VaporLiquidEquilibrium.ComputeFlash_Stable( contents, currentState, tankVolume, 0, 1.0 );
 
-            // Act
-            (var updatedContents, var newState) = VaporLiquidEquilibrium.ComputeFlash2( contents, currentState, tankVolume, 1.0 );
-
-            // Assert
-            Assert.Greater( updatedContents[_lqWater], 0.01, "Liquid mass should increase due to condensation." );
-            Assert.Less( updatedContents[_gasWater], 1.0, "Gas mass should decrease due to condensation." );
-            Assert.Greater( newState.Temperature, temperature, "Temperature should rise due to latent heat of condensation." );
+            Assert.That( updatedContents[_lqWater], Is.GreaterThan( 0.01 ) );
+            Assert.That( updatedContents[_gasWater], Is.LessThan( 1.0 ) );
+            Assert.That( newState.Temperature, Is.GreaterThan( temperature ) );
         }
 
         [Test]
-        public void ComputeFlash2_MassIsConserved_DuringPhaseChange()
+        public void ComputeFlash_Stable_Equilibrium_ResultsInNoSignificantChange()
         {
-            // Arrange
+            double tankVolume = 10.0;
+            double temperature = 300;
+            double vaporPressure = _lqWater.GetVaporPressure( temperature );
+            double liquidVolume = 1.0 / _lqWater.GetDensity( temperature, vaporPressure );
+            double ullageVolume = tankVolume - liquidVolume;
+            double gasMass = _gasWater.GetMassForPressureInVolume( vaporPressure, ullageVolume, temperature );
+
+            var contents = new SubstanceStateCollection()
+            {
+                { _lqWater, 1.0 },
+                { _gasWater, gasMass }
+            };
+            var currentState = new FluidState( vaporPressure, temperature, 0 );
+
+            (var updatedContents, var newState) = VaporLiquidEquilibrium.ComputeFlash_Stable( contents, currentState, tankVolume, 0, 1.0 );
+
+            Assert.That( updatedContents[_lqWater], Is.EqualTo( 1.0 ).Within( 1e-2 ) );
+            Assert.That( updatedContents[_gasWater], Is.EqualTo( gasMass ).Within( 1e-2 ) );
+            Assert.That( newState.Temperature, Is.EqualTo( temperature ).Within( 1e-2 ) );
+        }
+
+        #endregion
+
+        #region ComputeFlash_Stable SLE Tests
+
+        [Test]
+        public void ComputeFlash_Stable_MeltingOccurs_WhenAboveMeltingPointWithHeat()
+        {
+            double temperature = 273.15; // At melting point
+            var contents = new SubstanceStateCollection { { _ice, 1.0 } };
+            var currentState = new FluidState( 101325, temperature, 0 );
+
+            (var updatedContents, var newState) = VaporLiquidEquilibrium.ComputeFlash_Stable( contents, currentState, 1.0, 10000, 1.0 );
+
+            Assert.That( updatedContents[_ice], Is.LessThan( 1.0 ), "Ice mass should decrease." );
+            Assert.That( updatedContents.Contains( _lqWater ), Is.True, "Liquid water should be created." );
+            Assert.That( updatedContents[_lqWater], Is.GreaterThan( 0.0 ), "Liquid water should be created." );
+            Assert.That( newState.Temperature, Is.EqualTo( temperature ).Within( 1e-3 ), "Temperature should remain at melting point during phase change." );
+        }
+
+        [Test]
+        public void ComputeFlash_Stable_FreezingOccurs_WhenBelowFreezingPointWithCooling()
+        {
+            double temperature = 273.15; // At freezing point
+            var contents = new SubstanceStateCollection { { _lqWater, 1.0 } };
+            var currentState = new FluidState( 101325, temperature, 0 );
+
+            (var updatedContents, var newState) = VaporLiquidEquilibrium.ComputeFlash_Stable( contents, currentState, 1.0, -10000, 1.0 );
+
+            Assert.That( updatedContents[_lqWater], Is.LessThan( 1.0 ), "Liquid mass should decrease." );
+            Assert.That( updatedContents.Contains( _ice ), Is.True, "Ice should be created." );
+            Assert.That( updatedContents[_ice], Is.GreaterThan( 0.0 ), "Ice should be created." );
+            Assert.That( newState.Temperature, Is.EqualTo( temperature ).Within( 1e-3 ), "Temperature should remain at freezing point during phase change." );
+        }
+
+        [Test]
+        public void ComputeFlash_Stable_HeatingSolid_RaisesTemperatureBelowMeltingPoint()
+        {
+            double temperature = 260.0; // Below freezing
+            var contents = new SubstanceStateCollection { { _ice, 1.0 } };
+            var currentState = new FluidState( 101325, temperature, 0 );
+
+            (var updatedContents, var newState) = VaporLiquidEquilibrium.ComputeFlash_Stable( contents, currentState, 1.0, 1000, 1.0 );
+
+            Assert.That( updatedContents.Contains( _lqWater ), Is.False, "No melting should occur below melting point." );
+            Assert.That( newState.Temperature, Is.GreaterThan( temperature ), "Temperature should rise." );
+        }
+
+        #endregion
+
+        #region Conservation & Stability Tests
+
+        [Test]
+        public void ComputeFlash_Stable_MassIsConserved_DuringPhaseChange()
+        {
             var contents = new SubstanceStateCollection { { _lqWater, 1.0 } };
             var currentState = new FluidState( 0, 300, 0 );
             double initialTotalMass = contents.GetMass();
 
-            // Act
-            (var updatedContents, var newState) = VaporLiquidEquilibrium.ComputeFlash2( contents, currentState, 10.0, 1.0 );
+            (var updatedContents, var newState) = VaporLiquidEquilibrium.ComputeFlash_Stable( contents, currentState, 10.0, 10000, 1.0 );
 
-            // Assert
             double finalTotalMass = updatedContents.GetMass();
-            Assert.AreEqual( initialTotalMass, finalTotalMass, 1e-9, "Total mass of substance should be conserved across phases." );
+            Assert.That( finalTotalMass, Is.EqualTo( initialTotalMass ).Within( 1e-9 ) );
         }
 
         [Test]
-        public void ComputeFlash2_HydraulicLock_PreventsEvaporation()
+        public void ComputeFlash_Stable_HydraulicLock_PreventsEvaporation()
         {
-            // Arrange
             double tankVolume = 1.0;
             double liquidDensity = _lqWater.GetDensity( 300, 0 );
-            // Fill tank exactly with liquid
-            var contents = new SubstanceStateCollection { { _lqWater, liquidDensity * tankVolume } };
+            var contents = new SubstanceStateCollection { { _lqWater, liquidDensity * tankVolume * 1.01 } };
             var currentState = new FluidState( 0, 300, 0 );
 
-            // Act
-            (var updatedContents, var newState) = VaporLiquidEquilibrium.ComputeFlash2( contents, currentState, tankVolume, 1.0 );
+            (var updatedContents, var newState) = VaporLiquidEquilibrium.ComputeFlash_Stable( contents, currentState, tankVolume, 1000, 1.0 );
 
-            // Assert
-            Assert.IsFalse( updatedContents.Contains( _gasWater ), "No gas should be created when tank is full of liquid." );
-            Assert.AreEqual( contents.GetMass(), updatedContents.GetMass(), 1e-9, "Liquid mass should not change." );
+            Assert.That( updatedContents.Contains( _gasWater ), Is.False, "No gas should be created when tank is full." );
+            Assert.That( updatedContents.GetMass(), Is.EqualTo( contents.GetMass() ).Within( 1e-9 ) );
         }
 
         [Test]
-        public void ComputeFlash2_Equilibrium_ResultsInNoSignificantChange()
+        public void ComputeFlash_Stable_EnergyIsConserved_WhenBoiling()
         {
-            // Arrange
             double tankVolume = 10.0;
             double temperature = 300;
-            // Create a state that is already at equilibrium
-            // Partial pressure of gas = Vapor pressure of liquid at this temp
-            double vaporPressure = _lqWater.GetVaporPressure( temperature ); // 3537 Pa
-            double R = 8.314462618;
-            double requiredMoles = (vaporPressure * tankVolume) / (R * temperature);
-            double requiredMass = requiredMoles * _gasWater.MolarMass;
-
-            var contents = new SubstanceStateCollection { { _lqWater, 1.0 }, { _gasWater, requiredMass } };
-            var currentState = new FluidState( vaporPressure, temperature, 0 );
-
-            // Act
-            (var updatedContents, var newState) = VaporLiquidEquilibrium.ComputeFlash2( contents, currentState, tankVolume, 1.0 );
-
-            // Assert
-            Assert.AreEqual( 1.0, updatedContents[_lqWater], 1e-2, "Liquid mass should not change significantly at equilibrium." );
-            Assert.AreEqual( requiredMass, updatedContents[_gasWater], 1e-2, "Gas mass should not change significantly at equilibrium." );
-            Assert.AreEqual( temperature, newState.Temperature, 1e-2, "Temperature should not change significantly at equilibrium." );
-        }
-
-        [Test]
-        public void ComputeFlash2_MultipleVolatiles_BothEvaporate()
-        {
-            // Arrange
-            double tankVolume = 10.0;
-            double temperature = 300;
-            var contents = new SubstanceStateCollection { { _lqWater, 1.0 }, { _lqEthanol, 1.0 } };
+            double heatInput = 0; // W
+            var contents = new SubstanceStateCollection { { _lqWater, 1.0 } };
             var currentState = new FluidState( 0, temperature, 0 );
 
-            // Act
-            (var updatedContents, var newState) = VaporLiquidEquilibrium.ComputeFlash2( contents, currentState, tankVolume, 1.0 );
+            (var updatedContents, var newState) = VaporLiquidEquilibrium.ComputeFlash_Stable( contents, currentState, tankVolume, heatInput, 1.0 );
 
-            // Assert
-            Assert.Less( updatedContents[_lqWater], 1.0, "Water should evaporate." );
-            Assert.Less( updatedContents[_lqEthanol], 1.0, "Ethanol should evaporate." );
-            Assert.Greater( updatedContents[_gasWater], 0.0, "Water vapor should be produced." );
-            Assert.Greater( updatedContents[_gasEthanol], 0.0, "Ethanol vapor should be produced." );
-            Assert.Less( newState.Temperature, temperature );
+            double massBoiled = 1.0 - updatedContents[_lqWater];
+            double latentHeatUsed = massBoiled * _lqWater.GetLatentHeatOfVaporization();
+
+            // Calculate total heat capacity of the final mixture
+            double finalHeatCapacity = 0;
+            foreach( var (sub, mass) in updatedContents )
+            {
+                finalHeatCapacity += mass * sub.GetSpecificHeatCapacity( temperature, 0 );
+            }
+
+            double sensibleHeatChange = (newState.Temperature - temperature) * finalHeatCapacity;
+
+            double energyBalance = heatInput - latentHeatUsed;
+
+            Assert.That( sensibleHeatChange, Is.EqualTo( energyBalance ).Within( 3.0 ).Percent, "Energy balance (Heat In = Latent Heat + Sensible Heat) must be maintained." );
         }
 
         [Test]
-        public void ComputeFlash2_InvalidMolarMass_Zero_IsStable()
+        public void ComputeFlash_Stable_EnergyIsConserved_WhenMelting()
+        {
+            double temperature = 273.15; // At melting point
+            double heatInput = 10000; // J (since dt=1.0)
+            var contents = new SubstanceStateCollection { { _ice, 1.0 } };
+            var currentState = new FluidState( 101325, temperature, 0 );
+
+            (var updatedContents, var newState) = VaporLiquidEquilibrium.ComputeFlash_Stable( contents, currentState, 1.0, heatInput, 1.0 );
+
+            double massMelted = 1.0 - updatedContents[_ice];
+            double latentHeatUsed = massMelted * _ice.GetLatentHeatOfFusion();
+
+            // With partial melting, temp should be constant, so sensible heat change should be 0.
+            Assert.That( newState.Temperature, Is.EqualTo( temperature ).Within( 1e-3 ), "Temperature should remain at melting point during partial melting." );
+            // All input heat should go into latent heat.
+            Assert.That( latentHeatUsed, Is.EqualTo( heatInput ).Within( 0.1 ).Percent, "Energy balance (Heat In = Latent Heat) must be maintained during melting." );
+            Assert.That( updatedContents[_lqWater], Is.EqualTo( massMelted ).Within( 1e-9 ) );
+        }
+
+        [Test]
+        public void ComputeFlash_Stable_EnergyIsConserved_WhenFreezing()
+        {
+            double temperature = 273.15; // At freezing point
+            double heatInput = -10000; // J (cooling)
+            var contents = new SubstanceStateCollection { { _lqWater, 1.0 } };
+            var currentState = new FluidState( 101325, temperature, 0 );
+
+            (var updatedContents, var newState) = VaporLiquidEquilibrium.ComputeFlash_Stable( contents, currentState, 1.0, heatInput, 1.0 );
+
+            double massFrozen = updatedContents.Contains( _ice ) ? updatedContents[_ice] : 0.0;
+            double latentHeatReleased = massFrozen * _lqWater.GetLatentHeatOfFusion();
+
+            // With partial freezing, temp should be constant.
+            Assert.That( newState.Temperature, Is.EqualTo( temperature ).Within( 1e-3 ), "Temperature should remain at freezing point during partial freezing." );
+            // All heat removed should equal latent heat released.
+            Assert.That( latentHeatReleased, Is.EqualTo( -heatInput ).Within( 0.1 ).Percent, "Energy balance (Heat Out = Latent Heat) must be maintained during freezing." );
+            Assert.That( 1.0 - updatedContents[_lqWater], Is.EqualTo( massFrozen ).Within( 1e-9 ) );
+        }
+
+        [Test]
+        public void ComputeFlash_Stable_UnstableStateWithNoHeat_MovesTowardEquilibrium()
         {
             // Arrange
-            var badSubstance = new VLETestSubstance { ID = "bad", Phase = SubstancePhase.Liquid, MolarMass = 0.0 };
-            SubstancePhaseMap.RegisterPhasePartner( badSubstance, SubstancePhase.Gas, badSubstance ); // Map to self to avoid nullref
-
-            var contents = new SubstanceStateCollection { { _lqWater, 1.0 }, { badSubstance, 1.0 } };
-            var currentState = new FluidState( 0, 300, 0 );
+            double temp = 280; // Not near any phase change for water
+            var contents = new SubstanceStateCollection { { _lqWater, 1.0 } };
+            var currentState = new FluidState( 101325, temp, 0 );
 
             // Act
-            (var updatedContents, var newState) = VaporLiquidEquilibrium.ComputeFlash2( contents, currentState, 10.0, 1.0 );
+            (var updatedContents, var newState) = VaporLiquidEquilibrium.ComputeFlash_Stable( contents, currentState, 10.0, 0.0, 1.0 );
+
+            // Assert: The physically correct result is that the state changes.
+            // Some liquid boils to create vapor pressure, and the temperature drops as a result.
+            Assert.That( updatedContents[_lqWater], Is.LessThan( 1.0 ), "Some liquid should have boiled." );
+            Assert.That( updatedContents.Contains( _gasWater ), Is.True, "Gas should have been created." );
+            Assert.That( newState.Temperature, Is.LessThan( currentState.Temperature ), "Temperature should drop due to boiling." );
+            double expectedPressure = _lqWater.GetVaporPressure( newState.Temperature );
+            Assert.That( newState.Pressure, Is.EqualTo( expectedPressure ).Within( 10.0 ).Percent, "Pressure should be close to vapor pressure." );
+        }
+
+        #endregion
+
+        #region Sensible Heat Tests
+
+        [Test]
+        public void ComputeFlash_Stable_HeatingLiquid_RaisesTemperature_NoPhaseChange()
+        {
+            // Arrange
+            double temperature = 300.0; // Well between freezing and boiling
+            double tankVolume = 1.0;
+            // Overfill the tank to prevent boiling due to pressure.
+            double liquidMass = _lqWater.GetDensity( temperature, 101325 ) * tankVolume * 1.001;
+            var contents = new SubstanceStateCollection { { _lqWater, liquidMass } };
+            var currentState = new FluidState( 101325, temperature, 0 );
+            double heatInput = 1000.0; // W
+            double deltaTime = 1.0; // s
+
+            // Act
+            (var updatedContents, var newState) = VaporLiquidEquilibrium.ComputeFlash_Stable( contents, currentState, tankVolume, heatInput, deltaTime );
 
             // Assert
-            Assert.IsFalse( double.IsNaN( newState.Pressure ), "Pressure should not be NaN." );
-            Assert.IsFalse( double.IsNaN( newState.Temperature ), "Temperature should not be NaN." );
-            Assert.IsFalse( double.IsNaN( updatedContents[_lqWater] ), "Water mass should not be NaN." );
-            Assert.IsFalse( double.IsNaN( updatedContents[badSubstance] ), "Bad substance mass should not be NaN." );
+            double totalHeatCapacity = liquidMass * _lqWater.GetSpecificHeatCapacity( temperature, currentState.Pressure );
+            double expectedTempChange = (heatInput * deltaTime) / totalHeatCapacity;
+            double expectedFinalTemp = temperature + expectedTempChange;
 
-            // The bad substance should effectively be ignored by the VLE calculation
-            Assert.AreEqual( 1.0, updatedContents[badSubstance], 1e-9 );
+            Assert.That( updatedContents.Contains( _gasWater ), Is.False, "No gas should have been created in a full tank." );
+            Assert.That( updatedContents.Contains( _ice ), Is.False, "No freezing should occur." );
+            Assert.That( updatedContents[_lqWater], Is.EqualTo( liquidMass ).Within( 1e-9 ), "Liquid mass should remain constant." );
+            Assert.That( newState.Temperature, Is.EqualTo( expectedFinalTemp ).Within( 1e-6 ), "Temperature should rise due to heating." );
         }
+
+        [Test]
+        public void ComputeFlash_Stable_CoolingLiquid_LowersTemperature_NoPhaseChange()
+        {
+            // Arrange
+            double temperature = 325.0;
+            double tankVolume = 1.0;
+            // Overfill the tank to prevent boiling due to pressure.
+            double liquidMass = _lqWater.GetDensity( temperature, 101325 ) * tankVolume * 1.001;
+            var contents = new SubstanceStateCollection { { _lqWater, liquidMass } };
+            var currentState = new FluidState( 101325, temperature, 0 );
+            double heatInput = -1000.0; // Cooling
+            double deltaTime = 1.0;
+
+            // Act
+            (var updatedContents, var newState) = VaporLiquidEquilibrium.ComputeFlash_Stable( contents, currentState, tankVolume, heatInput, deltaTime );
+
+            // Assert
+            double totalHeatCapacity = liquidMass * _lqWater.GetSpecificHeatCapacity( temperature, currentState.Pressure );
+            double expectedTempChange = (heatInput * deltaTime) / totalHeatCapacity;
+            double expectedFinalTemp = temperature + expectedTempChange;
+
+            Assert.That( updatedContents.Contains( _gasWater ), Is.False, "No phase change should occur." );
+            Assert.That( updatedContents.Contains( _ice ), Is.False, "No freezing should occur." );
+            Assert.That( updatedContents[_lqWater], Is.EqualTo( liquidMass ).Within( 1e-9 ), "Liquid mass should remain constant." );
+            Assert.That( newState.Temperature, Is.EqualTo( expectedFinalTemp ).Within( 1e-6 ), "Temperature should fall due to cooling." );
+        }
+
+        [Test]
+        public void ComputeFlash_Stable_HeatingGas_RaisesTemperature_NoPhaseChange()
+        {
+            // Arrange
+            double temperature = 400.0; // Well above boiling
+            double mass = 1.0;
+            double tankVolume = 1.0;
+            var contents = new SubstanceStateCollection { { _gasWater, mass } };
+            var currentState = new FluidState( contents.GetPressureInVolume( tankVolume, new FluidState( 0, temperature, 0 ) ), temperature, 0 );
+            double heatInput = 1000.0;
+            double deltaTime = 1.0;
+
+            // Act
+            (var updatedContents, var newState) = VaporLiquidEquilibrium.ComputeFlash_Stable( contents, currentState, tankVolume, heatInput, deltaTime );
+
+            // Assert
+            double specificHeat = _gasWater.GetSpecificHeatCapacity( temperature, currentState.Pressure );
+            double expectedTempChange = (heatInput * deltaTime) / (mass * specificHeat);
+            double expectedFinalTemp = temperature + expectedTempChange;
+
+            Assert.That( newState.Temperature, Is.EqualTo( expectedFinalTemp ).Within( 1e-6 ), "Gas temperature should rise." );
+            Assert.That( updatedContents.Contains( _lqWater ), Is.False, "No condensation should occur." );
+            Assert.That( updatedContents[_gasWater], Is.EqualTo( mass ).Within( 1e-9 ), "Gas mass should remain constant." );
+        }
+
+        [Test]
+        public void ComputeFlash_Stable_CoolingGas_LowersTemperature_NoPhaseChange()
+        {
+            // Arrange
+            double temperature = 400.0; // Well above dew point for this pressure.
+            double mass = 1.0;
+            double tankVolume = 1.0;
+            var contents = new SubstanceStateCollection { { _gasWater, mass } };
+            var currentState = new FluidState( contents.GetPressureInVolume( tankVolume, new FluidState( 0, temperature, 0 ) ), temperature, 0 );
+            double heatInput = -1000.0; // Cooling
+            double deltaTime = 1.0;
+
+            // Act
+            (var updatedContents, var newState) = VaporLiquidEquilibrium.ComputeFlash_Stable( contents, currentState, tankVolume, heatInput, deltaTime );
+
+            // Assert
+            double specificHeat = _gasWater.GetSpecificHeatCapacity( temperature, currentState.Pressure );
+            double expectedTempChange = (heatInput * deltaTime) / (mass * specificHeat);
+            double expectedFinalTemp = temperature + expectedTempChange;
+
+            Assert.That( newState.Temperature, Is.EqualTo( expectedFinalTemp ).Within( 1e-6 ), "Gas temperature should fall." );
+            Assert.That( updatedContents.Contains( _lqWater ), Is.False, "No condensation should occur." );
+            Assert.That( updatedContents[_gasWater], Is.EqualTo( mass ).Within( 1e-9 ), "Gas mass should remain constant." );
+        }
+
+        [Test]
+        public void ComputeFlash_Stable_LowHeatInput_UsesEarlyExitPathForSensibleHeat()
+        {
+            // Arrange
+            double temperature = 200.0;
+            double tankVolume = 1.0;
+            // A full tank of subcooled liquid is not near a phase boundary and has no VLE imbalance.
+            // This state should take the early exit path for a small heat input.
+            double liquidMass = _lqWater.GetDensity( temperature, 101325 ) * tankVolume;
+            var contents = new SubstanceStateCollection { { _lqWater, liquidMass } };
+            var currentState = new FluidState( 101325, temperature, 0 );
+            double heatInput = 1.0; // Very low heat
+            double deltaTime = 1.0;
+
+            // Act
+            (var updatedContents, var newState) = VaporLiquidEquilibrium.ComputeFlash_Stable( contents, currentState, tankVolume, heatInput, deltaTime );
+
+            // Assert
+            // The early exit path should be taken.
+            double totalHeatCapacity = liquidMass * _lqWater.GetSpecificHeatCapacity( temperature, currentState.Pressure );
+            double expectedTempChange = (heatInput * deltaTime) / totalHeatCapacity;
+            double expectedFinalTemp = temperature + expectedTempChange;
+
+            Assert.That( newState.Temperature, Is.EqualTo( expectedFinalTemp ).Within( 1e-6 ), "Temperature should change correctly via early exit path." );
+            // In the early exit path, no mass transfer occurs.
+            Assert.That( updatedContents.Contains( _gasWater ), Is.False, "No phase change should occur on early exit." );
+            Assert.That( updatedContents[_lqWater], Is.EqualTo( liquidMass ).Within( 1e-9 ), "Liquid mass should be constant on early exit." );
+        }
+
+        #endregion
     }
 }

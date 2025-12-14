@@ -90,11 +90,14 @@ namespace HSP.ResourceFlow
 
         // --- Coefficients ---
         public double[] ViscosityCoeffs { get; set; } = new double[] { 0.001 };
-        public double[] ConductivityCoeffs { get; set; } = new double[] { 0.6 };
+        public double[] ThermalConductivityCoeffs { get; set; } = new double[] { 0.6 };
         public double[] SpecificHeatCoeffs { get; set; } = new double[] { 4184 };
         public double[] AntoineCoeffs { get; set; } = new double[] { 10.196, 1730.63, -39.724 };
-        public double LatentHeatVap { get; set; } = 2.26e6;
+        public double LatentHeatVaporization { get; set; } = 2.26e6;
         public double LatentHeatFusion { get; set; } = 3.34e5;
+
+        public double MeltingPointSTP { get; set; } = double.NaN;
+        public double MeltingPointPressureCoefficient { get; set; } = 0.0; // K/Pa
 
         public Substance( string id )
         {
@@ -182,7 +185,7 @@ namespace HSP.ResourceFlow
 
         public double GetThermalConductivity( double temperature, double pressure )
         {
-            double k = EvaluatePolynomialHorner( temperature, ConductivityCoeffs );
+            double k = EvaluatePolynomialHorner( temperature, ThermalConductivityCoeffs );
             return k < 0 ? 0 : k;
         }
 
@@ -256,8 +259,20 @@ namespace HSP.ResourceFlow
             return (AntoineCoeffs[1] / denominator) - AntoineCoeffs[2];
         }
 
-        public double GetLatentHeatOfVaporization() => LatentHeatVap;
+        public double GetLatentHeatOfVaporization() => LatentHeatVaporization;
         public double GetLatentHeatOfFusion() => LatentHeatFusion;
+
+        public double GetMeltingPoint( double pressure )
+        {
+            if( double.IsNaN( MeltingPointSTP ) )
+            {
+                return double.NaN;
+            }
+            // Using a linear approximation from Clapeyron equation. dP/dT = L / (T * dV) -> dT = (T*dV/L) * dP
+            // For simplicity, we use a constant coefficient: dT/dP.
+            // T_melt(P) = T_melt_STP + (P - P_STP) * (dT/dP)
+            return MeltingPointSTP + (pressure - ReferencePressure) * MeltingPointPressureCoefficient;
+        }
 
         /// <summary>
         /// Evaluates polynomial using Horner's Method.
@@ -298,11 +313,13 @@ namespace HSP.ResourceFlow
                 .WithMember( "reference_density", o => o.ReferenceDensity )
                 .WithMember( "reference_pressure", o => o.ReferencePressure )
                 .WithMember( "viscosity_coeffs", o => o.ViscosityCoeffs )
-                .WithMember( "conductivity_coeffs", o => o.ConductivityCoeffs )
+                .WithMember( "conductivity_coeffs", o => o.ThermalConductivityCoeffs )
                 .WithMember( "specific_heat_coeffs", o => o.SpecificHeatCoeffs )
                 .WithMember( "antoine_coeffs", o => o.AntoineCoeffs )
-                .WithMember( "latent_heat_vap", o => o.LatentHeatVap )
-                .WithMember( "latent_heat_fus", o => o.LatentHeatFusion );
+                .WithMember( "latent_heat_vap", o => o.LatentHeatVaporization )
+                .WithMember( "latent_heat_fus", o => o.LatentHeatFusion )
+                .WithMember( "melting_point_stp", o => o.MeltingPointSTP )
+                .WithMember( "melting_point_pressure_coeff", o => o.MeltingPointPressureCoefficient );
         }
     }
 }

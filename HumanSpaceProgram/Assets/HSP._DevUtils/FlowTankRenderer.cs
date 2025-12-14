@@ -126,7 +126,7 @@ namespace HSP._DevUtils
                 { sub, 250 }
             };
             TargetTank.FluidState = new FluidState( pressure: 101325, temperature: 293, velocity: 0 );
-            TargetTank.FluidState = new FluidState( pressure: VaporLiquidEquilibrium.ComputePressureOnly( TargetTank.Contents, TargetTank.FluidState, TargetTank.Volume ), temperature: 293, velocity: 0 );
+            TargetTank.FluidState = new FluidState( pressure: TargetTank.Contents.GetPressureInVolume( TargetTank.Volume, TargetTank.FluidState ), temperature: 293, velocity: 0 );
             TargetTank.ForceRecalculateCache();
             Debug.Log( TargetTank.FluidState );
 

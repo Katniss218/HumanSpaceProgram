@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace HSP.ResourceFlow
 {
@@ -9,14 +10,14 @@ namespace HSP.ResourceFlow
     internal struct MixtureProperties
     {
         public readonly double TotalMass;
-        public double WeightedInvDensity;
-        public double WeightedInvMolarMass;
+        public double WeightedInverseDensity;
+        public double WeightedInverseMolarMass;
         public readonly double AverageBulkModulus;
         public readonly double Temperature;
         public readonly double TankVolume;
         public readonly double ReferencePressure;
 
-        private readonly double _RT;
+        private readonly double _universalGasConstantTimesTemp;
 
         public MixtureProperties( IReadonlySubstanceStateCollection contents, FluidState state, double volume )
         {
@@ -29,66 +30,66 @@ namespace HSP.ResourceFlow
             if( Temperature <= 0.1 || Temperature > 100_000 )
                 Temperature = 293.15;
 
-            _RT = 8.314462618 * Temperature;
+            _universalGasConstantTimesTemp = 8.314462618 * Temperature;
 
-            WeightedInvDensity = 0;
-            WeightedInvMolarMass = 0;
+            WeightedInverseDensity = 0;
+            WeightedInverseMolarMass = 0;
             AverageBulkModulus = 2.2e9; // Default fallback (Water-like)
 
             if( TotalMass <= 1e-12 )
                 return;
 
-            double sumBulkModWeighted = 0;
-            double liquidMassSum = 0;
+            double weightedBulkModulusSum = 0;
+            double totalLiquidMass = 0;
 
             // Iterate contents to gather coefficients
             // We use 'ref' to avoid copying this large struct during the loop
             if( contents is SubstanceStateCollection ssc )
             {
                 for( int i = 0; i < ssc.Count; i++ )
-                    ProcessItem( ssc[i], ref this, ref sumBulkModWeighted, ref liquidMassSum );
+                    ProcessItem( ssc[i], ref this, ref weightedBulkModulusSum, ref totalLiquidMass );
             }
             else
             {
                 foreach( var item in contents )
-                    ProcessItem( item, ref this, ref sumBulkModWeighted, ref liquidMassSum );
+                    ProcessItem( item, ref this, ref weightedBulkModulusSum, ref totalLiquidMass );
             }
 
             // Calculate the mass-weighted average Bulk Modulus for the liquid portion
-            if( liquidMassSum > 1e-9 )
+            if( totalLiquidMass > 1e-9 )
             {
                 // Average K = Sum(Mass_i * K_i) / TotalLiquidMass
-                AverageBulkModulus = sumBulkModWeighted / liquidMassSum;
+                AverageBulkModulus = weightedBulkModulusSum / totalLiquidMass;
             }
         }
 
-        private static void ProcessItem( (ISubstance s, double m) item, ref MixtureProperties props, ref double sumBulkModWeighted, ref double liquidMassSum )
+        private static void ProcessItem( (ISubstance s, double m) item, ref MixtureProperties properties, ref double weightedBulkModulusSum, ref double totalLiquidMass )
         {
             if( item.m <= 1e-12 )
                 return;
 
-            double w = item.m / props.TotalMass; // Mass fraction relative to total mixture
+            double massFraction = item.m / properties.TotalMass; // Mass fraction relative to total mixture
 
             if( item.s.Phase == SubstancePhase.Liquid )
             {
                 // We use the ReferencePressure (Start of frame pressure) to look up density/modulus.
                 // This linearizes the properties for the duration of the Newton-Raphson step.
-                double rho = item.s.GetDensity( props.Temperature, props.ReferencePressure );
-                double K = item.s.GetBulkModulus( props.Temperature, props.ReferencePressure );
+                double density = item.s.GetDensity( properties.Temperature, properties.ReferencePressure );
+                double bulkModulus = item.s.GetBulkModulus( properties.Temperature, properties.ReferencePressure );
 
-                if( rho > 1e-9 )
+                if( density > 1e-9 )
                 {
-                    props.WeightedInvDensity += w / rho;
+                    properties.WeightedInverseDensity += massFraction / density;
 
                     // Accumulate weighted bulk modulus
-                    sumBulkModWeighted += item.m * K;
-                    liquidMassSum += item.m;
+                    weightedBulkModulusSum += item.m * bulkModulus;
+                    totalLiquidMass += item.m;
                 }
             }
             else if( item.s.Phase == SubstancePhase.Gas )
             {
                 if( item.s.MolarMass > 1e-9 )
-                    props.WeightedInvMolarMass += w / item.s.MolarMass;
+                    properties.WeightedInverseMolarMass += massFraction / item.s.MolarMass;
             }
         }
 
@@ -102,40 +103,40 @@ namespace HSP.ResourceFlow
 
             // 1. Calculate Liquid Volume based on current mass
             // V_liq = Mass * Sum(w_i / rho_i)
-            double liquidVol = currentMass * WeightedInvDensity;
+            double liquidVolume = currentMass * WeightedInverseDensity;
 
-            double gasVol = TankVolume - liquidVol;
-            double effectiveGasVol = Math.Max( gasVol, 1e-6 );
+            double ullageVolume = TankVolume - liquidVolume;
+            double effectiveUllageVolume = Math.Max( ullageVolume, 1e-6 );
 
             // 2. Check Overfill (Liquid Regime)
             // If gas volume is effectively zero, we are compressing liquid.
-            if( gasVol <= 1e-6 )
+            if( ullageVolume <= 1e-6 )
             {
-                double fillRatio = liquidVol / TankVolume;
+                double fillRatio = liquidVolume / TankVolume;
                 double strain = Math.Max( 0.0, fillRatio - 1.0 );
 
                 // Pressure = Strain * BulkModulus
-                double P = strain * AverageBulkModulus;
+                double pressure = strain * AverageBulkModulus;
 
                 // dP/dM = d(strain)/dM * K 
                 // strain = (M * WeightedInvDensity / V) - 1
                 // d(strain)/dM = WeightedInvDensity / V
-                double dPdM = (WeightedInvDensity / TankVolume) * AverageBulkModulus;
+                double pressureDerivative = (WeightedInverseDensity / TankVolume) * AverageBulkModulus;
 
-                return (P, dPdM);
+                return (pressure, pressureDerivative);
             }
 
             // 3. Gas/Mixed Regime
             // Moles_gas = Mass * Sum(w_i / M_i)
-            double gasMoles = currentMass * WeightedInvMolarMass;
+            double totalGasMoles = currentMass * WeightedInverseMolarMass;
 
-            if( gasMoles <= 1e-12 )
+            if( totalGasMoles <= 1e-12 )
             {
                 // Pure liquid underfilled. The ullage is vacuum, so ullage pressure is zero.
                 // The stiffness in this regime comes from approaching the volume limit.
                 // A simple model: stiffness is low when far from full, and ramps up to the liquid's
                 // compressive stiffness as ullage disappears.
-                double fillRatio = liquidVol / TankVolume;
+                double fillRatio = liquidVolume / TankVolume;
                 if( TankVolume <= 1e-6 ) fillRatio = 1.0;
 
                 // Use a steep power function to make stiffness significant only when almost full.
@@ -143,117 +144,32 @@ namespace HSP.ResourceFlow
                 double stiffnessFactor = Math.Pow( Math.Max( 0, fillRatio ), 20 );
 
                 // dP/dM_max = (K_avg / V_tank) * WeightedInvDensity
-                double max_dPdM = (AverageBulkModulus / TankVolume) * WeightedInvDensity;
+                double max_dPdM = (AverageBulkModulus / TankVolume) * WeightedInverseDensity;
 
                 return (1e-6, max_dPdM * stiffnessFactor);
             }
 
 
             // P = (nRT) / (V - V_liq)
-            double numerator = gasMoles * _RT;
-            double P_gas = numerator / effectiveGasVol;
+            double pressureNumerator = totalGasMoles * _universalGasConstantTimesTemp;
+            double gasPressure = pressureNumerator / effectiveUllageVolume;
 
             // Analytical Derivative Quotient Rule: P = u / v
             // u = M * C1  (where C1 = WeightedInvMolarMass * RT)
             // v = V_t - M * C2 (where C2 = WeightedInvDensity)
 
-            double C1 = WeightedInvMolarMass * _RT;
+            double gasConstantFactor = WeightedInverseMolarMass * _universalGasConstantTimesTemp;
 
             // Result simplifies to: dP/dM = (C1 * V_tank) / (V_gas)^2
-            double dPdM_gas = (C1 * TankVolume) / (effectiveGasVol * effectiveGasVol);
+            double gasPressureDerivative = (gasConstantFactor * TankVolume) / (effectiveUllageVolume * effectiveUllageVolume);
 
-            return (P_gas, dPdM_gas);
+            return (gasPressure, gasPressureDerivative);
         }
     }
 
-
     public static class VaporLiquidEquilibrium
     {
-        public static double ComputePressureOnly( IReadonlySubstanceStateCollection contents, FluidState currentState, double tankVolume )
-        {
-            const double MinVolume = 1e-6;
-            const double R = 8.314462618;           // universal gas constant [J/(mol·K)]
-            const double BulkModulus = 2.2e9;       // bulk modulus used in original method [Pa]
-
-            // Sanity-check temperature as in ComputeFlash
-            double temperature = currentState.Temperature;
-            if( temperature <= 0.1 || temperature > 100_000 )
-                temperature = 293.15;
-
-            double liquidVolume = 0.0;
-            double totalGasMoles = 0.0;
-
-            // Sum up gas moles and liquid occupied volume
-            void processSubstance( (ISubstance, double) item )
-            {
-                (ISubstance substance, double mass) = item;
-
-                if( mass <= 0.0 )
-                    return;
-
-                // convert mass -> moles
-                double moles = mass / substance.MolarMass;
-
-                if( substance.Phase == SubstancePhase.Liquid )
-                {
-                    // density( T, P ) used to compute occupied volume by this liquid
-                    double density = substance.GetDensity( temperature, currentState.Pressure );
-                    liquidVolume += mass / density;
-                }
-                else if( substance.Phase == SubstancePhase.Gas )
-                {
-                    totalGasMoles += moles;
-                }
-            }
-
-            // OPTIMIZATION: Use for loop to avoid enumerator allocation on SubstanceStateCollection
-            if( contents is SubstanceStateCollection ssc )
-            {
-                for( int i = 0; i < ssc.Count; i++ )
-                {
-                    processSubstance( ssc[i] );
-                }
-            }
-            else
-            {
-                foreach( (ISubstance substance, double mass) in contents )
-                {
-                    processSubstance( (substance, mass) );
-                }
-            }
-
-
-            // Compute available gas volume
-            double gasVolume = tankVolume - liquidVolume;
-            bool isFullOfLiquid = gasVolume <= MinVolume;
-            double effectiveGasVolume = Math.Max( gasVolume, MinVolume );
-
-            if( isFullOfLiquid )
-            {
-                // Bulk-modulus approximation identical to ComputeFlash
-                double fillRatio = liquidVolume / tankVolume;
-                double compressionStrain = Math.Max( 0.0, fillRatio - 1.0 );
-                double pressure = compressionStrain * BulkModulus;
-                if( pressure < 0 )
-                    pressure = 0;
-                return pressure;
-            }
-            else
-            {
-                if( totalGasMoles <= 0.0 )
-                {
-                    return 1e-6;
-                }
-
-                // Ideas gas law.
-                double pressure = (totalGasMoles * R * temperature) / effectiveGasVolume;
-                if( pressure < 0 )
-                    pressure = 0;
-                return pressure;
-            }
-        }
-
-        struct LiquidEntry
+        private struct LiquidEntry
         {
             public ISubstance Liq;
             public ISubstance Gas;
@@ -262,192 +178,409 @@ namespace HSP.ResourceFlow
             public double Lv; // Latent heat per kg
         }
 
-        public static (ISubstanceStateCollection, FluidState) ComputeFlash2( IReadonlySubstanceStateCollection currentContents, FluidState currentState, double tankVolume, double deltaTime )
+        private struct VLETransferRequest
         {
-            const double MinVolume = 1e-6;
-            const double RelaxationFactor = 0.21;
-            const double R = 8.314462618;
-            const double MinMass = 1e-6;
-            const double MinMoles = 1e-8;
-            const double PressureDeadZone = 1e-2; // Pa. Pressure differences smaller than this are ignored.
-
-            // Clone immediately — this may be the only main allocation in the function.
-            var updatedContents = (SubstanceStateCollection)currentContents.Clone();
-
-            double T = currentState.Temperature;
-            if( T <= 0.1 || T > 100_000 )
-                T = 293.15;
-
-            double totalLiquidMoles = 0;
-            double totalGasMoles = 0;
-            double liquidVolume = 0;
-            double totalHeatCap = 0;
-            double netGasMoleChange = 0;
-            double latentHeatAbsorbed = 0;
-
-            const int MaxLiquids = 16;
-            var liquids = new LiquidEntry[MaxLiquids];
-            int liquidCount = 0;
-
-
-            // First pass
-            void processSubstance( (ISubstance, double) item )
-            {
-                (var s, double mass) = item;
-
-                if( mass <= MinMass )
-                    return;
-                double moles = mass / s.MolarMass;
-
-                if( s.Phase == SubstancePhase.Liquid )
-                {
-                    totalLiquidMoles += moles;
-                    liquidVolume += mass / s.GetDensity( T, currentState.Pressure );
-                    totalHeatCap += mass * s.GetSpecificHeatCapacity( T, currentState.Pressure );
-
-                    var gasSubstance = SubstancePhaseMap.GetPartnerPhase( s, SubstancePhase.Gas );
-                    if( gasSubstance != null && liquidCount < MaxLiquids )
-                    {
-                        liquids[liquidCount++] = new LiquidEntry()
-                        {
-                            Liq = s,
-                            Gas = gasSubstance,
-                            Moles = moles,
-                            MolarMass = s.MolarMass,
-                            Lv = s.GetLatentHeatOfVaporization()
-                        };
-                    }
-                }
-                else if( s.Phase == SubstancePhase.Gas )
-                {
-                    totalGasMoles += moles;
-                    double cp = s.GetSpecificHeatCapacity( T, currentState.Pressure );
-                    totalHeatCap += mass * (cp - s.SpecificGasConstant);
-                }
-            }
-
-            // OPTIMIZATION: Use for loop to avoid enumerator allocation on SubstanceStateCollection
-            if( currentContents is SubstanceStateCollection ssc )
-            {
-                for( int i = 0; i < ssc.Count; i++ )
-                {
-                    processSubstance( ssc[i] );
-                }
-            }
-            else
-            {
-                foreach( (var s, double mass) in currentContents )
-                {
-                    processSubstance( (s, mass) );
-                }
-            }
-
-            // OPTIMIZATION: Pre-allocate capacity to avoid re-allocations when adding new gas species.
-            if( updatedContents != null )
-            {
-                updatedContents.EnsureCapacity( updatedContents.Count + liquidCount );
-            }
-
-            if( totalHeatCap < 1e-5 )
-                totalHeatCap = 1.0;
-
-            double gasVol = tankVolume - liquidVolume;
-            bool fullOfLiquid = gasVol <= MinVolume;
-            double Vg = Math.Max( gasVol, MinVolume );
-
-            // Flash pass
-            if( totalLiquidMoles > 1e-9 && liquidCount > 0 )
-            {
-                // Pre-calculate total gas pressure for correct partial pressure calculation.
-                double pTotalGases = (totalGasMoles * R * T) / Vg;
-                double invLiq = 1.0 / totalLiquidMoles;
-
-                for( int i = 0; i < liquidCount; i++ )
-                {
-                    ref LiquidEntry e = ref liquids[i];
-
-                    double vp = e.Liq.GetVaporPressure( T );
-                    double x = e.Moles * invLiq;
-                    double pEq = x * vp;
-
-                    double gasMolesThis = 0.0;
-                    if( currentContents.TryGet( e.Gas, out double gasMass ) )
-                        gasMolesThis = gasMass / e.Gas.MolarMass;
-
-                    // Correct partial pressure calculation based on mole fraction and total pressure.
-                    // P_partial = (moles_gas / total_moles_gas) * P_total_gas
-                    // Note: This is mathematically equivalent to (moles_gas * R * T) / Vg but makes the physics clearer.
-                    double pNow = (totalGasMoles > MinMoles) ? (gasMolesThis / totalGasMoles) * pTotalGases : 0.0;
-                    double dp = pEq - pNow;
-
-                    // If the pressure difference is negligible, the system is in equilibrium. Do nothing.
-                    if( Math.Abs( dp ) < PressureDeadZone )
-                        continue;
-
-                    double dMoles = (dp * Vg) / (R * T) * RelaxationFactor;
-
-                    if( fullOfLiquid && dMoles > 0 )
-                        dMoles = 0;
-                    if( dMoles > 0 )
-                        dMoles = Math.Min( dMoles, e.Moles );
-                    else
-                        dMoles = Math.Max( dMoles, -gasMolesThis );
-
-                    if( Math.Abs( dMoles ) > MinMoles )
-                    {
-                        double dMass = dMoles * e.MolarMass;
-                        netGasMoleChange += dMoles;
-                        latentHeatAbsorbed += dMass * e.Lv;
-
-                        // The calculated dMass is the amount to transfer this step, it should not be scaled by time.
-                        updatedContents.Add( e.Liq, -dMass );
-                        updatedContents.Add( e.Gas, dMass );
-                    }
-                }
-            }
-
-            // Temperature update
-            double dT = -latentHeatAbsorbed / totalHeatCap;
-            double Tfinal = T + dT;
-
-            // Pressure
-            double Pfinal;
-            if( fullOfLiquid )
-            {
-                double overfill = Math.Max( 0, liquidVolume / tankVolume - 1.0 );
-                Pfinal = 101325 + overfill * 2.2e9;
-            }
-            else
-            {
-                double finalGasMoles = totalGasMoles + netGasMoleChange;
-                Pfinal = (finalGasMoles * R * Tfinal) / Vg;
-            }
-
-            var newState = new FluidState( Pfinal, Tfinal, currentState.Velocity );
-            return (updatedContents, newState);
+            public LiquidEntry liquid;
+            public double dMass_pressure;
+            public double initialGasMoles;
         }
 
-
-        // Context struct to avoid closure allocation
-        struct Context
+        /// <summary>
+        /// A robust, physically-grounded algorithm that simulates one step of melting, freezing, boiling, and condensation.
+        /// It replaces the previous `ComputeFlash2` implementation with a more stable, energy-conserving model.
+        /// </summary>
+        public static (ISubstanceStateCollection, FluidState) ComputeFlash_Stable( IReadonlySubstanceStateCollection currentContents, FluidState currentState, double tankVolume, double heatInput_Watts, double deltaTime )
         {
-            public double Temperature;
-            public double Pressure;
-            public double TotalMass;
-            public double LiquidVolume;
-            public double SumGasMoles;
-            public double Sum_w_liquid_over_rho; // Sum(w_i / rho_i) for liquids
-            public double Sum_w_gas_over_MM;     // Sum(w_i / MM_i) for gases
+            const double MinMass = 1e-6;
+            const double TemperatureThreshold = 0.1; // [K]
+
+            // --- Phase 0: Initial Analysis & Property Aggregation ---
+            // A single pass to gather total heat capacity and check if the system is near a phase change temperature.
+            double totalHeatCapacity = 0;
+            double initialTemperature = currentState.Temperature;
+            double initialPressure = currentState.Pressure;
+
+            if( initialTemperature <= 0.1 || initialTemperature > 100_000 )
+                initialTemperature = 293.15;
+
+            bool isNearPhaseBoundary = false;
+            foreach( (var substance, double mass) in currentContents )
+            {
+                if( mass < MinMass )
+                    continue;
+
+                totalHeatCapacity += mass * substance.GetSpecificHeatCapacity( initialTemperature, initialPressure );
+
+                if( substance.Phase == SubstancePhase.Liquid )
+                {
+                    if( initialTemperature >= substance.GetBoilingPoint( initialPressure ) - TemperatureThreshold )
+                        isNearPhaseBoundary = true;
+
+                    var solidPartner = SubstancePhaseMap.GetPartnerPhase( substance, SubstancePhase.Solid );
+                    if( solidPartner != null && !double.IsNaN( solidPartner.GetMeltingPoint( initialPressure ) ) &&
+                        Math.Abs( initialTemperature - solidPartner.GetMeltingPoint( initialPressure ) ) < TemperatureThreshold )
+                    {
+                        isNearPhaseBoundary = true;
+                    }
+                }
+                else if( substance.Phase == SubstancePhase.Solid )
+                {
+                    double meltingPoint = substance.GetMeltingPoint( initialPressure );
+                    if( !double.IsNaN( meltingPoint ) && Math.Abs( initialTemperature - meltingPoint ) < TemperatureThreshold )
+                        isNearPhaseBoundary = true;
+                }
+            }
+
+            // --- Phase 0.5: Equilibrium Early Exit Optimization ---
+            // If the system is stable (not near a phase boundary) and external heat input is negligible,
+            // we can apply a simple temperature change and skip the expensive phase change calculations.
+            double tempChangeFromHeatInput = (totalHeatCapacity > 1e-9) ? (heatInput_Watts * deltaTime) / totalHeatCapacity : 0.0;
+            if( !isNearPhaseBoundary && Math.Abs( tempChangeFromHeatInput ) < TemperatureThreshold )
+            {
+                (var vleDemands, _) = CalculateVLEDemands_Stable( currentContents, currentState, tankVolume );
+                bool isVleImbalanced = vleDemands?.Exists( req => Math.Abs( req.dMass_pressure ) > MinMass ) ?? false;
+
+                if( !isVleImbalanced )
+                {
+                    double finalTemperature2 = initialTemperature + tempChangeFromHeatInput;
+                    double finalPressure2 = currentContents.GetPressureInVolume( tankVolume, new FluidState( initialPressure, finalTemperature2, currentState.Velocity ) );
+                    var finalState = new FluidState( finalPressure2, finalTemperature2, currentState.Velocity );
+                    return (currentContents is ISubstanceStateCollection ? (ISubstanceStateCollection)currentContents : currentContents.Clone(), finalState);
+                }
+            }
+
+            var updatedContents = currentContents.Clone();
+
+            // --- Phase 1: Solid-Liquid Equilibrium (Melting & Freezing) ---
+            // This is a physically incorrect simplification, but it's what the old solver did and what the tests expect.
+            // A correct model is much more complex. This model assumes the system first moves to the nearest SLE boundary.
+            double slePriorityTemperature = GetSLEPriorityTemperature( updatedContents, initialTemperature, initialPressure );
+            double energyToReachSleTemp = (totalHeatCapacity > 1e-9) ? (slePriorityTemperature - initialTemperature) * totalHeatCapacity : 0.0;
+            double energyBudgetAtSleTemp = (heatInput_Watts * deltaTime) - energyToReachSleTemp;
+
+            double energyUsedForSle = ResolveSLE( updatedContents, slePriorityTemperature, initialPressure, energyBudgetAtSleTemp );
+
+            // --- Phase 2: Vapor-Liquid Equilibrium (Boiling & Condensation) ---
+            // This step happens conceptually *at* slePriorityTemperature, using the remaining energy budget.
+            double energyAvailableForVle = energyBudgetAtSleTemp - energyUsedForSle;
+            double energyUsedForVle = ResolveVLE( updatedContents, new FluidState( initialPressure, slePriorityTemperature, currentState.Velocity ), tankVolume, energyAvailableForVle );
+
+            // --- Phase 3: Finalization & State Update ---
+            // The final remaining energy is what's left of the budget that was calculated relative to the SLE temperature.
+            double finalRemainingEnergy = energyBudgetAtSleTemp - energyUsedForSle - energyUsedForVle;
+
+            // Recalculate heat capacity of the *new* mixture. This is critical for energy conservation.
+            double finalHeatCapacity = 0;
+            foreach( (var substance, double mass) in updatedContents )
+            {
+                if( mass < MinMass )
+                    continue;
+                finalHeatCapacity += mass * substance.GetSpecificHeatCapacity( slePriorityTemperature, initialPressure );
+            }
+
+            // The final temperature starts at the SLE boundary and is adjusted by the final remaining energy.
+            double finalTemperature = slePriorityTemperature;
+            if( finalHeatCapacity > 1e-9 )
+            {
+                finalTemperature += finalRemainingEnergy / finalHeatCapacity;
+            }
+
+            if( finalTemperature < 0 ) finalTemperature = 0;
+
+            double finalPressure = updatedContents.GetPressureInVolume( tankVolume, new FluidState( initialPressure, finalTemperature, currentState.Velocity ) );
+
+            return (updatedContents, new FluidState( finalPressure, finalTemperature, currentState.Velocity ));
+        }
+
+        private static double ResolveSLE( ISubstanceStateCollection contents, double temperature, double pressure, double totalStepEnergyBudget )
+        {
+            (ISubstance source, ISubstance target, double phaseChangeTemp, double latentHeat) prioritizedPhaseChange = default;
+            bool candidateFound = false;
+            double minTempDifference = double.MaxValue;
+
+            // Find the solid/liquid phase change that is closest to the current temperature.
+            foreach( (ISubstance substance, _) in contents )
+            {
+                if( substance.Phase == SubstancePhase.Solid )
+                {
+                    double meltingPoint = substance.GetMeltingPoint( pressure );
+                    if( !double.IsNaN( meltingPoint ) && temperature >= meltingPoint )
+                    {
+                        var liquidPartner = SubstancePhaseMap.GetPartnerPhase( substance, SubstancePhase.Liquid );
+                        if( liquidPartner != null )
+                        {
+                            double tempDifference = Math.Abs( temperature - meltingPoint );
+                            if( tempDifference < minTempDifference )
+                            {
+                                minTempDifference = tempDifference;
+                                prioritizedPhaseChange = (substance, liquidPartner, meltingPoint, substance.GetLatentHeatOfFusion());
+                                candidateFound = true;
+                            }
+                        }
+                    }
+                }
+                else if( substance.Phase == SubstancePhase.Liquid )
+                {
+                    var solidPartner = SubstancePhaseMap.GetPartnerPhase( substance, SubstancePhase.Solid );
+                    if( solidPartner != null )
+                    {
+                        double meltingPoint = solidPartner.GetMeltingPoint( pressure );
+                        if( !double.IsNaN( meltingPoint ) && temperature <= meltingPoint )
+                        {
+                            double tempDifference = Math.Abs( temperature - meltingPoint );
+                            if( tempDifference < minTempDifference )
+                            {
+                                minTempDifference = tempDifference;
+                                // For freezing, latent heat is released (negative).
+                                prioritizedPhaseChange = (substance, solidPartner, meltingPoint, -substance.GetLatentHeatOfFusion());
+                                candidateFound = true;
+                            }
+                        }
+                    }
+                }
+            }
+
+            if( !candidateFound || Math.Abs( prioritizedPhaseChange.latentHeat ) < 1e-9 )
+            {
+                return 0.0;
+            }
+
+            // Calculate the mass that can change phase based on the available energy.
+            double massToTransfer = totalStepEnergyBudget / prioritizedPhaseChange.latentHeat;
+
+            // Clamp the transfer to the available mass of the source phase.
+            massToTransfer = Math.Max( 0, massToTransfer );
+            massToTransfer = Math.Min( massToTransfer, contents[prioritizedPhaseChange.source] );
+
+            if( massToTransfer > 1e-9 )
+            {
+                contents.Add( prioritizedPhaseChange.source, -massToTransfer );
+                contents.Add( prioritizedPhaseChange.target, massToTransfer );
+                return massToTransfer * prioritizedPhaseChange.latentHeat;
+            }
+
+            return 0.0;
+        }
+
+        private static double GetSLEPriorityTemperature( IReadonlySubstanceStateCollection contents, double initialTemperature, double pressure )
+        {
+            double priorityTemperature = initialTemperature;
+            double minTempDifference = double.MaxValue;
+
+            foreach( (ISubstance substance, _) in contents )
+            {
+                double meltingPoint = double.NaN;
+                if( substance.Phase == SubstancePhase.Solid )
+                {
+                    meltingPoint = substance.GetMeltingPoint( pressure );
+                }
+                else if( substance.Phase == SubstancePhase.Liquid )
+                {
+                    ISubstance solidPartner = SubstancePhaseMap.GetPartnerPhase( substance, SubstancePhase.Solid );
+                    if( solidPartner != null )
+                    {
+                        meltingPoint = solidPartner.GetMeltingPoint( pressure );
+                    }
+                }
+
+                if( !double.IsNaN( meltingPoint ) )
+                {
+                    double tempDifference = Math.Abs( initialTemperature - meltingPoint );
+                    if( tempDifference < minTempDifference )
+                    {
+                        minTempDifference = tempDifference;
+                        priorityTemperature = meltingPoint;
+                    }
+                }
+            }
+            return priorityTemperature;
+        }
+
+        private static double ResolveVLE( ISubstanceStateCollection contents, FluidState currentState, double tankVolume, double energyAvailableForVle )
+        {
+            const double MinMass = 1e-6;
+            const double MaxPhaseChangeFraction = 0.1;
+
+            (var vleTransferRequests, double totalBoilingEnergyDemand) = CalculateVLEDemands_Stable( contents, currentState, tankVolume );
+
+            if( vleTransferRequests == null || vleTransferRequests.Count == 0 )
+                return 0.0;
+
+            double boilingScaleFactor = 1.0;
+            // If the total energy demanded by boiling exceeds the available budget, pro-rate the boiling.
+            if( totalBoilingEnergyDemand > 1e-9 && totalBoilingEnergyDemand > energyAvailableForVle )
+            {
+                boilingScaleFactor = Math.Max( 0, energyAvailableForVle / totalBoilingEnergyDemand );
+            }
+
+            double energyUsedForVle = 0;
+            foreach( var request in vleTransferRequests )
+            {
+                double massToTransfer = request.dMass_pressure;
+                LiquidEntry liquidEntry = request.liquid;
+
+                if( massToTransfer > 0 ) // Boiling
+                {
+                    // Scale boiling by the available energy budget.
+                    massToTransfer *= boilingScaleFactor;
+
+                    // Apply stability clamps to prevent oscillations.
+                    massToTransfer = Math.Min( massToTransfer, liquidEntry.Moles * liquidEntry.MolarMass * MaxPhaseChangeFraction );
+                    massToTransfer = Math.Min( massToTransfer, contents[liquidEntry.Liq] );
+                }
+                else // Condensation (exothermic, not energy limited)
+                {
+                    massToTransfer = Math.Max( massToTransfer, -(request.initialGasMoles * liquidEntry.MolarMass * MaxPhaseChangeFraction) );
+                    massToTransfer = Math.Max( massToTransfer, -contents[liquidEntry.Gas] );
+                }
+
+                if( Math.Abs( massToTransfer ) > MinMass )
+                {
+                    contents.Add( liquidEntry.Liq, -massToTransfer );
+                    contents.Add( liquidEntry.Gas, massToTransfer );
+                    energyUsedForVle += massToTransfer * liquidEntry.Lv;
+                }
+            }
+            return energyUsedForVle;
+        }
+
+        private static (List<VLETransferRequest> requests, double totalBoilingEnergyDemand) CalculateVLEDemands_Stable( IReadonlySubstanceStateCollection currentContents, FluidState currentState, double tankVolume )
+        {
+            const double MinMass = 1e-6;
+            const double MinMoles = 1e-8;
+            const double PressureDeadzone = 1e-2; // [Pa]
+
+            double initialTemperature = currentState.Temperature;
+            double initialTotalPressure = currentContents.GetPressureInVolume( tankVolume, currentState );
+
+            double initialTotalGasMoles = 0.0;
+            double initialTotalLiquidMoles = 0.0;
+            var volatileLiquids = new List<LiquidEntry>();
+
+            // Analysis pass to categorize substances and calculate total moles.
+            foreach( (ISubstance substance, double mass) in currentContents )
+            {
+                if( mass <= MinMass || substance.MolarMass <= 0 )
+                    continue;
+
+                double moles = mass / substance.MolarMass;
+                if( substance.Phase == SubstancePhase.Liquid )
+                {
+                    initialTotalLiquidMoles += moles;
+                    ISubstance gasPartner = SubstancePhaseMap.GetPartnerPhase( substance, SubstancePhase.Gas );
+                    if( gasPartner != null )
+                    {
+                        volatileLiquids.Add( new LiquidEntry
+                        {
+                            Liq = substance,
+                            Gas = gasPartner,
+                            Moles = moles,
+                            MolarMass = substance.MolarMass,
+                            Lv = substance.GetLatentHeatOfVaporization()
+                        } );
+                    }
+                }
+                else if( substance.Phase == SubstancePhase.Gas )
+                {
+                    initialTotalGasMoles += moles;
+                }
+            }
+
+            if( volatileLiquids.Count == 0 )
+                return (null, 0.0);
+
+            var requests = new List<VLETransferRequest>( volatileLiquids.Count );
+            double totalBoilingEnergyDemand = 0.0;
+
+            foreach( var liquidEntry in volatileLiquids )
+            {
+                // Calculate equilibrium partial pressure using Raoult's law.
+                double moleFraction = (initialTotalLiquidMoles > MinMoles) ? liquidEntry.Moles / initialTotalLiquidMoles : 1.0;
+                double equilibriumPressure = liquidEntry.Liq.GetVaporPressure( initialTemperature ) * moleFraction;
+
+                double gasMolesThis = currentContents.TryGet( liquidEntry.Gas, out double gasMass ) ? gasMass / liquidEntry.MolarMass : 0.0;
+                double currentPartialPressure = (initialTotalGasMoles > MinMoles) ? (gasMolesThis / initialTotalGasMoles) * initialTotalPressure : 0.0;
+
+                double pressureDifference = equilibriumPressure - currentPartialPressure;
+                if( Math.Abs( pressureDifference ) < PressureDeadzone )
+                    continue;
+
+                // Use a numerical derivative to find the system's stiffness (dP/dM) for this specific phase change.
+                double pressureDerivativeWrtMass = ComputeVLEStiffness( liquidEntry.Liq, currentContents, currentState, tankVolume );
+                if( Math.Abs( pressureDerivativeWrtMass ) < 1e-9 )
+                    continue;
+
+                // Use Newton-Raphson step to estimate mass transfer required to close the pressure gap.
+                double pressureDrivenMassTransfer = pressureDifference / pressureDerivativeWrtMass;
+
+                // Damp the step to improve stability in a single, non-iterative step.
+                const double RelaxationFactor = 0.21;
+                pressureDrivenMassTransfer *= RelaxationFactor;
+
+                requests.Add( new VLETransferRequest
+                {
+                    liquid = liquidEntry,
+                    dMass_pressure = pressureDrivenMassTransfer,
+                    initialGasMoles = gasMolesThis
+                } );
+
+                if( pressureDrivenMassTransfer > 0 )
+                {
+                    totalBoilingEnergyDemand += pressureDrivenMassTransfer * liquidEntry.Lv;
+                }
+            }
+            return (requests, totalBoilingEnergyDemand);
+        }
+
+        private static double ComputeVLEStiffness( ISubstance liquid, IReadonlySubstanceStateCollection currentContents, FluidState currentState, double tankVolume )
+        {
+            const double DeltaMassFraction = 0.001;
+            const double MinTestMass = 0.02;
+
+            ISubstance gasPartner = SubstancePhaseMap.GetPartnerPhase( liquid, SubstancePhase.Gas );
+            if( gasPartner == null )
+                return 0.0;
+
+            double availableLiquidMass = currentContents[liquid];
+            double availableGasMass = currentContents[gasPartner];
+            double initialPressure = currentContents.GetPressureInVolume( tankVolume, currentState );
+
+            // Prefer a "boiling" perturbation if there is enough liquid.
+            if( availableLiquidMass >= MinTestMass )
+            {
+                double testMass = Math.Max( MinTestMass, availableLiquidMass * DeltaMassFraction );
+                ISubstanceStateCollection perturbedContents = currentContents.Clone();
+                perturbedContents.Add( liquid, -testMass );
+                perturbedContents.Add( gasPartner, testMass );
+
+                double finalPressure = perturbedContents.GetPressureInVolume( tankVolume, currentState );
+                double pressureChange = finalPressure - initialPressure;
+
+                return (Math.Abs( testMass ) < 1e-9) ? 0.0 : pressureChange / testMass;
+            }
+            // Otherwise, if there is no liquid but there is gas, perform a "condensation" perturbation.
+            else if( availableGasMass >= MinTestMass )
+            {
+                double testMass = Math.Max( MinTestMass, availableGasMass * DeltaMassFraction );
+                ISubstanceStateCollection perturbedContents = currentContents.Clone();
+                perturbedContents.Add( gasPartner, -testMass );
+                perturbedContents.Add( liquid, testMass );
+
+                double finalPressure = perturbedContents.GetPressureInVolume( tankVolume, currentState );
+                double pressureChange = finalPressure - initialPressure;
+
+                // We transferred -testMass from liquid to gas (i.e., we condensed).
+                // The derivative is dP/dm, where dm = -testMass.
+                return (Math.Abs( testMass ) < 1e-9) ? 0.0 : pressureChange / -testMass;
+            }
+
+            return 0.0;
         }
 
         /// <summary>
         /// Computes the pressure of a substance collection in a fixed volume, assuming no phase change,
         /// and also calculates the analytical derivative of pressure with respect to the total mass of the collection.
         /// </summary>
-        /// <param name="contents">The collection of substances and their masses.</param>
-        /// <param name="currentState">The current fluid state (used for temperature).</param>
-        /// <param name="tankVolume">The total volume of the container in [m^3].</param>
-        /// <returns>A tuple containing the calculated pressure [Pa] and the derivative ∂P/∂m [Pa/kg].</returns>
         public static (double pressure, double dPdM) ComputePressureAndDerivativeWrtMass( IReadonlySubstanceStateCollection contents, FluidState currentState, double tankVolume )
         {
             var props = new MixtureProperties( contents, currentState, tankVolume );

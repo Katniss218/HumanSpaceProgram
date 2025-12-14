@@ -86,7 +86,7 @@ namespace HSP.ResourceFlow
                 return 0.0;
             }
             // Calculate pressure based on current contents, not stale FluidState property, to get correct gas density.
-            double currentPressure = VaporLiquidEquilibrium.ComputePressureOnly( Contents, FluidState, Volume );
+            double currentPressure = Contents.GetPressureInVolume( Volume, FluidState );
             return Contents.GetVolume( FluidState.Temperature, currentPressure );
         }
 
@@ -96,7 +96,7 @@ namespace HSP.ResourceFlow
             if( Contents != null )
             {
                 // Use current pressure for density, as it's more accurate than stale state pressure
-                double currentPressure = VaporLiquidEquilibrium.ComputePressureOnly( Contents, FluidState, Volume );
+                double currentPressure = Contents.GetPressureInVolume( Volume, FluidState );
                 foreach( var (s, m) in Contents )
                 {
                     if( s.Phase == SubstancePhase.Liquid || s.Phase == SubstancePhase.Solid )
@@ -388,7 +388,7 @@ namespace HSP.ResourceFlow
             }
 
             // Recalculate pressure based on new contents.
-            double newPressure = VaporLiquidEquilibrium.ComputePressureOnly( this.Contents, this.FluidState, this.Volume );
+            double newPressure = Contents.GetPressureInVolume( Volume, FluidState );
             this.FluidState = new FluidState( newPressure, this.FluidState.Temperature, this.FluidState.Velocity );
 
             InvalidateFluids();
@@ -414,7 +414,7 @@ namespace HSP.ResourceFlow
             {
                 return;
             }
-            (ISubstanceStateCollection newContents, FluidState newState) = VaporLiquidEquilibrium.ComputeFlash2( Contents, FluidState, Volume, deltaTime );
+            (ISubstanceStateCollection newContents, FluidState newState) = VaporLiquidEquilibrium.ComputeFlash_Stable( Contents, FluidState, Volume, 0, deltaTime );
             if( newContents != null )
             {
                 Contents = newContents;

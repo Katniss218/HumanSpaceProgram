@@ -125,5 +125,11 @@ namespace HSP.ResourceFlow
         /// Computes the boiling point, in [K], for a given pressure.
         /// </summary>
         double GetBoilingPoint( double pressure );
+
+        /// <summary>
+        /// Computes the melting point, in [K], for a given pressure.
+        /// Returns double.NaN if the substance does not have a defined melting point (e.g., it sublimates or is a gas).
+        /// </summary>
+        double GetMeltingPoint( double pressure );
     }
 }

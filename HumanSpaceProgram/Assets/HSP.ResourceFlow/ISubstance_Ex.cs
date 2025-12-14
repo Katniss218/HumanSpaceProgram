@@ -60,6 +60,24 @@ namespace HSP.ResourceFlow
             return substance.GetPressure( temperature, density );
         }
 
+        /// <summary>
+        /// Calculates the mass of a given gas required to pressurize a given volume to a target pressure, based on the ideal gas law.
+        /// </summary>
+        /// <param name="gas">The substance, which must be a gas.</param>
+        /// <param name="targetPressure">The desired pressure in [Pa].</param>
+        /// <param name="ullageVolume">The volume to be filled in [m³].</param>
+        /// <param name="temperature">The temperature of the gas in [K].</param>
+        /// <returns>The required mass in [kg].</returns>
+        public static double GetMassForPressureInVolume( this ISubstance gas, double targetPressure, double ullageVolume, double temperature )
+        {
+            if( gas == null ) throw new ArgumentNullException( nameof( gas ) );
+            if( gas.Phase != SubstancePhase.Gas ) throw new ArgumentException( "Substance must be a gas.", nameof( gas ) );
+            if( gas.SpecificGasConstant <= 1e-9 || temperature <= 0.0 || ullageVolume <= 0.0 || targetPressure < 0.0 ) return 0.0;
+
+            // From ideal gas law: PV = m * R_s * T  =>  m = PV / (R_s * T)
+            return (targetPressure * ullageVolume) / (gas.SpecificGasConstant * temperature);
+        }
+
         public static double GetDensityAtSTP( this ISubstance self )
         {
             const double temperature = 273.15; // K

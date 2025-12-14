@@ -60,8 +60,6 @@ namespace HSP.Vanilla.Components
     [Serializable]
     public class FRocketEngine : MonoBehaviour, IPropulsion, IBuildsFlowNetwork
     {
-        const float g = 9.80665f;
-
         // Heuristic constants for back-calculating physics properties from gameplay stats.
         private const double NominalFullThrottleChamberPressure = 50e5;  // 50 bar
 
@@ -105,7 +103,7 @@ namespace HSP.Vanilla.Components
         /// <summary>
         /// The maximum mass flow (when thrust = max thrust), in [kg/s].
         /// </summary>
-        public float MaxMassFlow => (Propellant?.NominalIsp > 0) ? MaxThrust / (Propellant.NominalIsp * g) : 0f;
+        public float MaxMassFlow => (float)FlowUtils.GetMassFlowFromThrust( MaxThrust, Propellant?.NominalIsp ?? 0 );
 
         /// <summary>
         /// The ratio of chamber pressure to mass flow rate under nominal conditions. [Pa / (kg/s)]
@@ -164,7 +162,7 @@ namespace HSP.Vanilla.Components
         /// This determines the "suction" power of the engine. A higher value means the engine needs more upstream pressure.
         /// </summary>
         [field: SerializeField]
-        public float RequiredInletPressure { get; set; } = 1e5f;
+        public float RequiredInletPressure { get; set; } = 10e5f; // 10 bar
 
         private IPropulsion.EngineState _currentState = IPropulsion.EngineState.Off;
         public IPropulsion.EngineState CurrentState => _currentState;
@@ -304,8 +302,7 @@ namespace HSP.Vanilla.Components
                 {
                     foreach( var fs in _feedSystems )
                     {
-                        if( fs != null )
-                            fs.TargetPressure = 0;
+                        if( fs != null ) fs.TargetPressure = 0;
                     }
                 }
                 return;
@@ -313,10 +310,7 @@ namespace HSP.Vanilla.Components
 
             bool isIgniting = _currentState == EngineState.Igniting;
             bool isRunning = _currentState == EngineState.Running;
-            if( isIgniting )
-            {
 
-            }
             // During ignition, request a higher pressure to prime manifolds.
             double throttleTarget = isIgniting ? 1.5 : (isRunning ? Throttle : 0);
             double targetPressure = RequiredInletPressure * throttleTarget;
@@ -359,7 +353,6 @@ namespace HSP.Vanilla.Components
             {
                 for( int i = 0; i < _feedSystems.Length; i++ )
                 {
-#warning TODO - why is there lox in both feed systems and no RP-1?
                     var feedSystem = _feedSystems[i];
                     if( feedSystem == null ) 
                         continue;
@@ -411,7 +404,6 @@ namespace HSP.Vanilla.Components
                         {
                             _isPrimed = true;
                         }
-                        Debug.Log( "PERFSCALAR " + CalculatePerformanceScalar( actualMixtureConsumed ) );
 
                         if( _isPrimed && Throttle > 0f )
                         {
@@ -430,7 +422,6 @@ namespace HSP.Vanilla.Components
                         float performanceScalar = CalculatePerformanceScalar( actualMixtureConsumed );
                         float actualMassFlow = (float)totalActualMassFlow;
 
-                        Debug.Log( "PERFSCALAR " + performanceScalar );
                         if( actualMassFlow <= 1e-6 || performanceScalar <= 0.1f )
                         {
                             Debug.LogWarning( $"[{gameObject.name}] Engine Flameout! Flow: {actualMassFlow:F4} kg/s, Mixture Perf: {performanceScalar:P1}" );
@@ -444,14 +435,14 @@ namespace HSP.Vanilla.Components
                         if( currentChamberPressure > MaxChamberPressure )
                         {
                             Debug.LogError( $"[{gameObject.name}] Engine Overpressure! Chamber pressure reached {currentChamberPressure / 1e5f:F1} bar, exceeding limit of {MaxChamberPressure / 1e5f:F1} bar. Engine destroyed." );
-                           // ShutdownListener();
-                           // this.Thrust = 0f;
+                            //ShutdownListener();
+                            //this.Thrust = 0f;
                             // TODO: Add part failure logic here
-                           // break;
+                            //break;
                         }
 
                         float effectiveIsp = Propellant.NominalIsp * performanceScalar;
-                        this.Thrust = effectiveIsp * g * actualMassFlow;
+                        this.Thrust = (float)FlowUtils.GetThrustFromMassFlow( actualMassFlow, effectiveIsp );
                         break;
 
                     case EngineState.ShuttingDown:

@@ -12,7 +12,7 @@ namespace HSP.ResourceFlow
     [Serializable]
     public sealed class SubstanceStateCollection : ISubstanceStateCollection
     {
-        const float EPSILON = 1e-3f;
+        const double NO_MASS_EPSILON = 1e-6;
 
         ISubstance[] _species;
         double[] _masses;
@@ -48,7 +48,7 @@ namespace HSP.ResourceFlow
                         delta -= _masses[i];
                         double newMass = value;
                         // Remove element i, compact by moving last into i.
-                        if( newMass <= EPSILON )
+                        if( newMass <= NO_MASS_EPSILON )
                         {
                             _totalMass -= _masses[i];
                             int last = _count - 1;
@@ -69,7 +69,7 @@ namespace HSP.ResourceFlow
                     }
                 }
 
-                if( delta <= EPSILON )
+                if( delta <= NO_MASS_EPSILON )
                     return;
                 // Add new substance
                 i = IndexOfEmpty();
@@ -140,7 +140,7 @@ namespace HSP.ResourceFlow
             {
                 _masses[i] *= scaleFactor;
 
-                if( _masses[i] <= EPSILON )
+                if( _masses[i] <= NO_MASS_EPSILON )
                 {
                     // Remove entry i by replacing with last entry.
                     int last = _count - 1;
@@ -235,7 +235,7 @@ namespace HSP.ResourceFlow
                 return;
 
             double delta = mass * scale;
-            if( Math.Abs( delta ) <= EPSILON )
+            if( Math.Abs( delta ) <= NO_MASS_EPSILON )
                 return;
 
             int i = IndexOf( substance );
@@ -243,7 +243,7 @@ namespace HSP.ResourceFlow
             {
                 double newMass = _masses[i] + delta;
                 // Remove element i, compact by moving last into i.
-                if( newMass <= EPSILON )
+                if( newMass <= NO_MASS_EPSILON )
                 {
                     _totalMass -= _masses[i];
                     int last = _count - 1;
@@ -263,7 +263,7 @@ namespace HSP.ResourceFlow
             }
             else
             {
-                if( delta <= EPSILON )
+                if( delta <= NO_MASS_EPSILON )
                     return;
                 // Add new substance
                 i = IndexOfEmpty();
@@ -326,7 +326,11 @@ namespace HSP.ResourceFlow
 
         public void Scale( double scale )
         {
-            if( Math.Abs( scale ) <= EPSILON )
+            if( scale < 0 )
+                throw new ArgumentOutOfRangeException( nameof( scale ), "Scale cannot be negative." );
+
+#warning TODO - handle the case where individual substances get scaled below NO_MASS_EPSILON (can happen with multiple scaling operations).
+            if( Math.Abs( scale ) <= NO_MASS_EPSILON )
             {
                 Clear();
                 return;
@@ -432,7 +436,7 @@ namespace HSP.ResourceFlow
             for( int i = 0; i < substances.Length; i++ )
             {
                 SubstanceState s = substances[i];
-                if( s.Substance != null && s.Mass > EPSILON )
+                if( s.Substance != null && s.Mass > NO_MASS_EPSILON )
                 {
                     _species[validCount] = s.Substance;
                     _masses[validCount] = s.Mass;

@@ -295,7 +295,7 @@ namespace HSP_Tests_EditMode.ResourceFlow
             _tank.FluidAcceleration = new Vector3( 0, -10, 0 );
             _tank.Contents.Add( TestSubstances.Air, 1.2 ); // approx 1 atm in 1m^3 at 300K
             _tank.FluidState = new FluidState( 0, 300, 0 );
-            _tank.FluidState = new FluidState( VaporLiquidEquilibrium.ComputePressureOnly( _tank.Contents, _tank.FluidState, _tank.Volume ), 300, 0 );
+            _tank.FluidState = new FluidState( _tank.Contents.GetPressureInVolume( _tank.Volume, _tank.FluidState ), 300, 0 );
 
             double dPdM = (_tank as IStiffnessProvider).GetPotentialDerivativeWrtVolume();
 
@@ -312,7 +312,7 @@ namespace HSP_Tests_EditMode.ResourceFlow
             double density = TestSubstances.Water.GetDensity( 300, 101325 );
             _tank.Contents.Add( TestSubstances.Water, density * 1.1 ); // 10% overfill
             _tank.FluidState = new FluidState( 0, 300, 0 );
-            _tank.FluidState = new FluidState( VaporLiquidEquilibrium.ComputePressureOnly( _tank.Contents, _tank.FluidState, _tank.Volume ), 300, 0 );
+            _tank.FluidState = new FluidState( _tank.Contents.GetPressureInVolume( _tank.Volume, _tank.FluidState ), 300, 0 );
 
             double dPdM = (_tank as IStiffnessProvider).GetPotentialDerivativeWrtVolume();
 
@@ -339,7 +339,7 @@ namespace HSP_Tests_EditMode.ResourceFlow
             _tank.Contents.Add( TestSubstances.Water, 500 ); // 50% liquid
             _tank.Contents.Add( TestSubstances.Air, 0.6 );   // 50% gas ullage
             _tank.FluidState = new FluidState( 0, 300, 0 );
-            _tank.FluidState = new FluidState( VaporLiquidEquilibrium.ComputePressureOnly( _tank.Contents, _tank.FluidState, _tank.Volume ), 300, 0 );
+            _tank.FluidState = new FluidState( _tank.Contents.GetPressureInVolume( _tank.Volume, _tank.FluidState ), 300, 0 );
 
             double dPdM_mixed = (_tank as IStiffnessProvider).GetPotentialDerivativeWrtVolume();
 
