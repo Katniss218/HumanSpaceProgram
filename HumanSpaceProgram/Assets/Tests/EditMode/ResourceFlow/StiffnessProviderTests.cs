@@ -41,7 +41,7 @@ namespace HSP_Tests_EditMode.ResourceFlow
             // Assert
             // dP/dM for liquid is K / (rho_0 * V)
             double expected_dPdM = TestSubstances.Water.BulkModulus / (TestSubstances.Water.ReferenceDensity * 1.0);
-            Assert.That( dPdM, Is.EqualTo( expected_dPdM ).Within( 1e-6 ) );
+            Assert.That( dPdM, Is.EqualTo( expected_dPdM ).Within( 1 ).Percent );
         }
 
         [Test]

@@ -67,7 +67,7 @@ namespace HSP_Tests_EditMode.ResourceFlow
             var tankA = FlowNetworkTestHelper.CreateTestTank( tankVolume, GRAVITY, new Vector3( 0, 10, 0 ), _lqO2, initialLiquidMass );
             // Initialize tank state and let it reach equilibrium before the test.
             tankA.FluidState = new FluidState( 101325, initialTemp, 0 );
-            (var initialContents, var initialFState) = VaporLiquidEquilibrium.ComputeFlash_Stable( tankA.Contents, tankA.FluidState, tankA.Volume, 1.0, 1 );
+            (var initialContents, var initialFState) = VaporLiquidEquilibrium.ComputeFlash( tankA.Contents, tankA.FluidState, tankA.Volume, 1.0, 1 );
             tankA.Contents = initialContents;
             tankA.FluidState = initialFState;
 

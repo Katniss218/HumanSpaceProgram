@@ -21,7 +21,7 @@ namespace HSP.ResourceFlow
 
         public double GetAvailableInflowVolume( double dt )
         {
-            return Demand * dt;
+            return IsEnabled ? Demand * dt : 0.0;
         }
 
         public void ApplySolveResults( double deltaTime )

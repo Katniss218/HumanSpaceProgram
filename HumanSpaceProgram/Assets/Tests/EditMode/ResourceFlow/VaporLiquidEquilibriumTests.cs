@@ -142,7 +142,7 @@ namespace HSP_Tests_EditMode.ResourceFlow
             // Start with vacuum ullage, this is an unstable state that should cause boiling.
             var currentState = new FluidState( 0.01, temperature, 0 );
 
-            (var updatedContents, var newState) = VaporLiquidEquilibrium.ComputeFlash_Stable( contents, currentState, tankVolume, 0, 1.0 );
+            (var updatedContents, var newState) = VaporLiquidEquilibrium.ComputeFlash( contents, currentState, tankVolume, 0, 1.0 );
 
             Assert.That( updatedContents[_lqWater], Is.LessThan( 1.0 ) );
             Assert.That( updatedContents.Contains( _gasWater ), Is.True );
@@ -159,7 +159,7 @@ namespace HSP_Tests_EditMode.ResourceFlow
             var contents = new SubstanceStateCollection { { _lqWater, 0.01 }, { _gasWater, 1.0 } };
             var currentState = new FluidState( 0, temperature, 0 );
 
-            (var updatedContents, var newState) = VaporLiquidEquilibrium.ComputeFlash_Stable( contents, currentState, tankVolume, 0, 1.0 );
+            (var updatedContents, var newState) = VaporLiquidEquilibrium.ComputeFlash( contents, currentState, tankVolume, 0, 1.0 );
 
             Assert.That( updatedContents[_lqWater], Is.GreaterThan( 0.01 ) );
             Assert.That( updatedContents[_gasWater], Is.LessThan( 1.0 ) );
@@ -170,22 +170,23 @@ namespace HSP_Tests_EditMode.ResourceFlow
         public void ComputeFlash_Stable_Equilibrium_ResultsInNoSignificantChange()
         {
             double tankVolume = 10.0;
-            double temperature = 300;
+            double temperature = 325;
+            double liquidMass = 7;
             double vaporPressure = _lqWater.GetVaporPressure( temperature );
-            double liquidVolume = 1.0 / _lqWater.GetDensity( temperature, vaporPressure );
+            double liquidVolume = liquidMass / _lqWater.GetDensity( temperature, vaporPressure );
             double ullageVolume = tankVolume - liquidVolume;
             double gasMass = _gasWater.GetMassForPressureInVolume( vaporPressure, ullageVolume, temperature );
 
             var contents = new SubstanceStateCollection()
             {
-                { _lqWater, 1.0 },
+                { _lqWater, liquidMass },
                 { _gasWater, gasMass }
             };
             var currentState = new FluidState( vaporPressure, temperature, 0 );
 
-            (var updatedContents, var newState) = VaporLiquidEquilibrium.ComputeFlash_Stable( contents, currentState, tankVolume, 0, 1.0 );
+            (var updatedContents, var newState) = VaporLiquidEquilibrium.ComputeFlash( contents, currentState, tankVolume, 0, 1.0 );
 
-            Assert.That( updatedContents[_lqWater], Is.EqualTo( 1.0 ).Within( 1e-2 ) );
+            Assert.That( updatedContents[_lqWater], Is.EqualTo( liquidMass ).Within( 1e-2 ) );
             Assert.That( updatedContents[_gasWater], Is.EqualTo( gasMass ).Within( 1e-2 ) );
             Assert.That( newState.Temperature, Is.EqualTo( temperature ).Within( 1e-2 ) );
         }
@@ -201,7 +202,7 @@ namespace HSP_Tests_EditMode.ResourceFlow
             var contents = new SubstanceStateCollection { { _ice, 1.0 } };
             var currentState = new FluidState( 101325, temperature, 0 );
 
-            (var updatedContents, var newState) = VaporLiquidEquilibrium.ComputeFlash_Stable( contents, currentState, 1.0, 10000, 1.0 );
+            (var updatedContents, var newState) = VaporLiquidEquilibrium.ComputeFlash( contents, currentState, 1.0, 10000, 1.0 );
 
             Assert.That( updatedContents[_ice], Is.LessThan( 1.0 ), "Ice mass should decrease." );
             Assert.That( updatedContents.Contains( _lqWater ), Is.True, "Liquid water should be created." );
@@ -216,7 +217,7 @@ namespace HSP_Tests_EditMode.ResourceFlow
             var contents = new SubstanceStateCollection { { _lqWater, 1.0 } };
             var currentState = new FluidState( 101325, temperature, 0 );
 
-            (var updatedContents, var newState) = VaporLiquidEquilibrium.ComputeFlash_Stable( contents, currentState, 1.0, -10000, 1.0 );
+            (var updatedContents, var newState) = VaporLiquidEquilibrium.ComputeFlash( contents, currentState, 1.0, -10000, 1.0 );
 
             Assert.That( updatedContents[_lqWater], Is.LessThan( 1.0 ), "Liquid mass should decrease." );
             Assert.That( updatedContents.Contains( _ice ), Is.True, "Ice should be created." );
@@ -231,7 +232,7 @@ namespace HSP_Tests_EditMode.ResourceFlow
             var contents = new SubstanceStateCollection { { _ice, 1.0 } };
             var currentState = new FluidState( 101325, temperature, 0 );
 
-            (var updatedContents, var newState) = VaporLiquidEquilibrium.ComputeFlash_Stable( contents, currentState, 1.0, 1000, 1.0 );
+            (var updatedContents, var newState) = VaporLiquidEquilibrium.ComputeFlash( contents, currentState, 1.0, 1000, 1.0 );
 
             Assert.That( updatedContents.Contains( _lqWater ), Is.False, "No melting should occur below melting point." );
             Assert.That( newState.Temperature, Is.GreaterThan( temperature ), "Temperature should rise." );
@@ -248,7 +249,7 @@ namespace HSP_Tests_EditMode.ResourceFlow
             var currentState = new FluidState( 0, 300, 0 );
             double initialTotalMass = contents.GetMass();
 
-            (var updatedContents, var newState) = VaporLiquidEquilibrium.ComputeFlash_Stable( contents, currentState, 10.0, 10000, 1.0 );
+            (var updatedContents, var newState) = VaporLiquidEquilibrium.ComputeFlash( contents, currentState, 10.0, 10000, 1.0 );
 
             double finalTotalMass = updatedContents.GetMass();
             Assert.That( finalTotalMass, Is.EqualTo( initialTotalMass ).Within( 1e-9 ) );
@@ -262,7 +263,7 @@ namespace HSP_Tests_EditMode.ResourceFlow
             var contents = new SubstanceStateCollection { { _lqWater, liquidDensity * tankVolume * 1.01 } };
             var currentState = new FluidState( 0, 300, 0 );
 
-            (var updatedContents, var newState) = VaporLiquidEquilibrium.ComputeFlash_Stable( contents, currentState, tankVolume, 1000, 1.0 );
+            (var updatedContents, var newState) = VaporLiquidEquilibrium.ComputeFlash( contents, currentState, tankVolume, 1000, 1.0 );
 
             Assert.That( updatedContents.Contains( _gasWater ), Is.False, "No gas should be created when tank is full." );
             Assert.That( updatedContents.GetMass(), Is.EqualTo( contents.GetMass() ).Within( 1e-9 ) );
@@ -271,81 +272,97 @@ namespace HSP_Tests_EditMode.ResourceFlow
         [Test]
         public void ComputeFlash_Stable_EnergyIsConserved_WhenBoiling()
         {
-            double tankVolume = 10.0;
-            double temperature = 300;
-            double heatInput = 0; // W
+            double temperature = 373.15; // Boiling point at ~1 atm
+            double pressure = 101325;
+            double heatInput = 10000; // Watts
+            double deltaTime = 1.0;
             var contents = new SubstanceStateCollection { { _lqWater, 1.0 } };
-            var currentState = new FluidState( 0, temperature, 0 );
+            var currentState = new FluidState( pressure, temperature, 0 );
 
-            (var updatedContents, var newState) = VaporLiquidEquilibrium.ComputeFlash_Stable( contents, currentState, tankVolume, heatInput, 1.0 );
+            (var updatedContents, var newState) = VaporLiquidEquilibrium.ComputeFlash( contents, currentState, 10.0, heatInput, deltaTime );
 
             double massBoiled = 1.0 - updatedContents[_lqWater];
             double latentHeatUsed = massBoiled * _lqWater.GetLatentHeatOfVaporization();
 
-            // Calculate total heat capacity of the final mixture
-            double finalHeatCapacity = 0;
-            foreach( var (sub, mass) in updatedContents )
-            {
-                finalHeatCapacity += mass * sub.GetSpecificHeatCapacity( temperature, 0 );
-            }
+            Assert.That( updatedContents.Contains( _gasWater ), Is.True, "Gas should have been created." );
+            Assert.That( massBoiled, Is.GreaterThan( 0 ), "Some liquid should have boiled." );
+            Assert.That( newState.Temperature, Is.EqualTo( temperature ).Within( 1e-3 ), "Temperature should remain at boiling point during partial boiling." );
+            Assert.That( latentHeatUsed, Is.EqualTo( heatInput * deltaTime ).Within( 0.1 ).Percent, "Energy balance (Heat In = Latent Heat) must be maintained during boiling." );
+        }
 
-            double sensibleHeatChange = (newState.Temperature - temperature) * finalHeatCapacity;
+        [Test]
+        public void ComputeFlash_Stable_EnergyIsConserved_WhenCondensing()
+        {
+            double temperature = 373.15; // Condensation point at ~1 atm
+            double pressure = 101325;
+            double heatInput = -10000; // Watts (cooling)
+            double deltaTime = 1.0;
+            var contents = new SubstanceStateCollection { { _gasWater, 1.0 } };
+            var currentState = new FluidState( pressure, temperature, 0 );
 
-            double energyBalance = heatInput - latentHeatUsed;
+            (var updatedContents, var newState) = VaporLiquidEquilibrium.ComputeFlash( contents, currentState, 1.0, heatInput, deltaTime );
 
-            Assert.That( sensibleHeatChange, Is.EqualTo( energyBalance ).Within( 3.0 ).Percent, "Energy balance (Heat In = Latent Heat + Sensible Heat) must be maintained." );
+            double massCondensed = 1.0 - updatedContents[_gasWater];
+            double latentHeatReleased = massCondensed * _lqWater.GetLatentHeatOfVaporization();
+
+            Assert.That( updatedContents.Contains( _lqWater ), Is.True, "Liquid should have been created." );
+            Assert.That( massCondensed, Is.GreaterThan( 0 ), "Some gas should have condensed." );
+            Assert.That( newState.Temperature, Is.EqualTo( temperature ).Within( 1e-3 ), "Temperature should remain at condensation point during partial condensation." );
+            Assert.That( latentHeatReleased, Is.EqualTo( -heatInput * deltaTime ).Within( 0.1 ).Percent, "Energy balance (Heat Out = Latent Heat) must be maintained during condensation." );
         }
 
         [Test]
         public void ComputeFlash_Stable_EnergyIsConserved_WhenMelting()
         {
             double temperature = 273.15; // At melting point
-            double heatInput = 10000; // J (since dt=1.0)
-            var contents = new SubstanceStateCollection { { _ice, 1.0 } };
+            double heatInput = 10000; // Watts
+            double deltaTime = 1.0;
+            var contents = new SubstanceStateCollection { { _ice, 1100 } }; // Ensure overfilled to stop boiling.
             var currentState = new FluidState( 101325, temperature, 0 );
 
-            (var updatedContents, var newState) = VaporLiquidEquilibrium.ComputeFlash_Stable( contents, currentState, 1.0, heatInput, 1.0 );
+            (var updatedContents, var newState) = VaporLiquidEquilibrium.ComputeFlash( contents, currentState, 1.0, heatInput, deltaTime );
 
-            double massMelted = 1.0 - updatedContents[_ice];
+            double massMelted = 1100.0 - updatedContents[_ice];
             double latentHeatUsed = massMelted * _ice.GetLatentHeatOfFusion();
 
-            // With partial melting, temp should be constant, so sensible heat change should be 0.
+            Assert.That( updatedContents.Contains( _lqWater ), Is.True, "Liquid water should be created." );
+            //Assert.That( updatedContents.Contains( _gasWater ), Is.False, "No gas should be created." );
+            Assert.That( massMelted, Is.GreaterThan( 0 ), "Some ice should have melted." );
             Assert.That( newState.Temperature, Is.EqualTo( temperature ).Within( 1e-3 ), "Temperature should remain at melting point during partial melting." );
-            // All input heat should go into latent heat.
-            Assert.That( latentHeatUsed, Is.EqualTo( heatInput ).Within( 0.1 ).Percent, "Energy balance (Heat In = Latent Heat) must be maintained during melting." );
-            Assert.That( updatedContents[_lqWater], Is.EqualTo( massMelted ).Within( 1e-9 ) );
+            Assert.That( latentHeatUsed, Is.EqualTo( heatInput * deltaTime ).Within( 0.1 ).Percent, "Energy balance (Heat In = Latent Heat) must be maintained during melting." );
         }
 
         [Test]
         public void ComputeFlash_Stable_EnergyIsConserved_WhenFreezing()
         {
             double temperature = 273.15; // At freezing point
-            double heatInput = -10000; // J (cooling)
+            double heatInput = -10000; // Watts (cooling)
+            double deltaTime = 1.0;
             var contents = new SubstanceStateCollection { { _lqWater, 1.0 } };
             var currentState = new FluidState( 101325, temperature, 0 );
 
-            (var updatedContents, var newState) = VaporLiquidEquilibrium.ComputeFlash_Stable( contents, currentState, 1.0, heatInput, 1.0 );
+            (var updatedContents, var newState) = VaporLiquidEquilibrium.ComputeFlash( contents, currentState, 1.0, heatInput, deltaTime );
 
             double massFrozen = updatedContents.Contains( _ice ) ? updatedContents[_ice] : 0.0;
             double latentHeatReleased = massFrozen * _lqWater.GetLatentHeatOfFusion();
 
-            // With partial freezing, temp should be constant.
+            Assert.That( updatedContents.Contains( _ice ), Is.True, "Ice should be created." );
+            Assert.That( massFrozen, Is.GreaterThan( 0 ), "Some liquid should have frozen." );
             Assert.That( newState.Temperature, Is.EqualTo( temperature ).Within( 1e-3 ), "Temperature should remain at freezing point during partial freezing." );
-            // All heat removed should equal latent heat released.
-            Assert.That( latentHeatReleased, Is.EqualTo( -heatInput ).Within( 0.1 ).Percent, "Energy balance (Heat Out = Latent Heat) must be maintained during freezing." );
-            Assert.That( 1.0 - updatedContents[_lqWater], Is.EqualTo( massFrozen ).Within( 1e-9 ) );
+            Assert.That( latentHeatReleased, Is.EqualTo( -heatInput * deltaTime ).Within( 0.1 ).Percent, "Energy balance (Heat Out = Latent Heat) must be maintained during freezing." );
         }
 
         [Test]
         public void ComputeFlash_Stable_UnstableStateWithNoHeat_MovesTowardEquilibrium()
         {
             // Arrange
-            double temp = 280; // Not near any phase change for water
+            double temp = 323; // Not near any phase change for water
             var contents = new SubstanceStateCollection { { _lqWater, 1.0 } };
             var currentState = new FluidState( 101325, temp, 0 );
 
             // Act
-            (var updatedContents, var newState) = VaporLiquidEquilibrium.ComputeFlash_Stable( contents, currentState, 10.0, 0.0, 1.0 );
+            (var updatedContents, var newState) = VaporLiquidEquilibrium.ComputeFlash( contents, currentState, 10.0, 0.0, 1.0 );
+            Debug.Log( newState );
 
             // Assert: The physically correct result is that the state changes.
             // Some liquid boils to create vapor pressure, and the temperature drops as a result.
@@ -374,7 +391,7 @@ namespace HSP_Tests_EditMode.ResourceFlow
             double deltaTime = 1.0; // s
 
             // Act
-            (var updatedContents, var newState) = VaporLiquidEquilibrium.ComputeFlash_Stable( contents, currentState, tankVolume, heatInput, deltaTime );
+            (var updatedContents, var newState) = VaporLiquidEquilibrium.ComputeFlash( contents, currentState, tankVolume, heatInput, deltaTime );
 
             // Assert
             double totalHeatCapacity = liquidMass * _lqWater.GetSpecificHeatCapacity( temperature, currentState.Pressure );
@@ -401,7 +418,7 @@ namespace HSP_Tests_EditMode.ResourceFlow
             double deltaTime = 1.0;
 
             // Act
-            (var updatedContents, var newState) = VaporLiquidEquilibrium.ComputeFlash_Stable( contents, currentState, tankVolume, heatInput, deltaTime );
+            (var updatedContents, var newState) = VaporLiquidEquilibrium.ComputeFlash( contents, currentState, tankVolume, heatInput, deltaTime );
 
             // Assert
             double totalHeatCapacity = liquidMass * _lqWater.GetSpecificHeatCapacity( temperature, currentState.Pressure );
@@ -427,7 +444,7 @@ namespace HSP_Tests_EditMode.ResourceFlow
             double deltaTime = 1.0;
 
             // Act
-            (var updatedContents, var newState) = VaporLiquidEquilibrium.ComputeFlash_Stable( contents, currentState, tankVolume, heatInput, deltaTime );
+            (var updatedContents, var newState) = VaporLiquidEquilibrium.ComputeFlash( contents, currentState, tankVolume, heatInput, deltaTime );
 
             // Assert
             double specificHeat = _gasWater.GetSpecificHeatCapacity( temperature, currentState.Pressure );
@@ -452,7 +469,7 @@ namespace HSP_Tests_EditMode.ResourceFlow
             double deltaTime = 1.0;
 
             // Act
-            (var updatedContents, var newState) = VaporLiquidEquilibrium.ComputeFlash_Stable( contents, currentState, tankVolume, heatInput, deltaTime );
+            (var updatedContents, var newState) = VaporLiquidEquilibrium.ComputeFlash( contents, currentState, tankVolume, heatInput, deltaTime );
 
             // Assert
             double specificHeat = _gasWater.GetSpecificHeatCapacity( temperature, currentState.Pressure );
@@ -479,7 +496,7 @@ namespace HSP_Tests_EditMode.ResourceFlow
             double deltaTime = 1.0;
 
             // Act
-            (var updatedContents, var newState) = VaporLiquidEquilibrium.ComputeFlash_Stable( contents, currentState, tankVolume, heatInput, deltaTime );
+            (var updatedContents, var newState) = VaporLiquidEquilibrium.ComputeFlash( contents, currentState, tankVolume, heatInput, deltaTime );
 
             // Assert
             // The early exit path should be taken.

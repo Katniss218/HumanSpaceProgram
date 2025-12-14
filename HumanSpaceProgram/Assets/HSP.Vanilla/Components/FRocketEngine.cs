@@ -244,6 +244,7 @@ namespace HSP.Vanilla.Components
                 for( int i = 0; i < Inlets.Length; i++ )
                 {
                     _feedSystems[i] = new EngineFeedSystem();
+                    _feedSystems[i].Reset(); // TODO - handle the "current state" (engine might've been ignited).
                 }
             }
         }

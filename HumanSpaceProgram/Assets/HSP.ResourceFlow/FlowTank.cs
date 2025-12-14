@@ -414,7 +414,7 @@ namespace HSP.ResourceFlow
             {
                 return;
             }
-            (ISubstanceStateCollection newContents, FluidState newState) = VaporLiquidEquilibrium.ComputeFlash_Stable( Contents, FluidState, Volume, 0, deltaTime );
+            (ISubstanceStateCollection newContents, FluidState newState) = VaporLiquidEquilibrium.ComputeFlash( Contents, FluidState, Volume, 0, deltaTime );
             if( newContents != null )
             {
                 Contents = newContents;

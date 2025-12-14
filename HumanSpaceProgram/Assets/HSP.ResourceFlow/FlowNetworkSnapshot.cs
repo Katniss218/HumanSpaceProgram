@@ -493,12 +493,26 @@ namespace HSP.ResourceFlow
                     if( ReferenceEquals( pipe.FromInlet.Consumer, consumer ) )
                     {
                         double p = consumer.Sample( pipe.FromInlet.pos, pipe.FromInlet.area ).FluidSurfacePotential;
-                        _currentPotentials[pipeIdx].Item1 = p;
+                        if( double.IsFinite( p ) )
+                        {
+                            _currentPotentials[pipeIdx].Item1 = p;
+                        }
+                        else
+                        {
+                            _currentPotentials[pipeIdx].Item1 = _currentPotentials[pipeIdx].Item2;
+                        }
                     }
                     else if( ReferenceEquals( pipe.ToInlet.Consumer, consumer ) )
                     {
                         double p = consumer.Sample( pipe.ToInlet.pos, pipe.FromInlet.area ).FluidSurfacePotential;
-                        _currentPotentials[pipeIdx].Item2 = p;
+                        if( double.IsFinite( p ) )
+                        {
+                            _currentPotentials[pipeIdx].Item2 = p;
+                        }
+                        else
+                        {
+                            _currentPotentials[pipeIdx].Item2 = _currentPotentials[pipeIdx].Item1;
+                        }
                     }
                 }
             }
