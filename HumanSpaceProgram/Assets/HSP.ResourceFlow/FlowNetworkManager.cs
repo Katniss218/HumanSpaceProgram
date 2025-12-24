@@ -39,10 +39,7 @@ namespace HSP.ResourceFlow
                     continue;
                 }
 
-                // --- PHASE 1: Synchronize (Unity -> Sim) ---
-                network.SynchronizeStateWithComponents();
-
-                // --- PHASE 2: Detect and Apply Structural Changes ---
+                // Detect and Apply Structural Changes
                 _invalidComponentsCache.Clear();
                 network.GetInvalidComponents( _invalidComponentsCache );
 
@@ -57,11 +54,11 @@ namespace HSP.ResourceFlow
                     network.ApplyTransaction( transaction );
                 }
 
-                // --- PHASE 3: Step Simulation ---
-                network.Step( TimeManager.FixedDeltaTime );
+                // Step Simulation (Unity -> Sim)
+                network.PrepareAndSolve( TimeManager.FixedDeltaTime );
 
-                // --- PHASE 4: Apply (Sim -> Unity) ---
-                network.ApplySnapshotToComponents();
+                // Apply (Sim -> Unity)
+                network.ApplyResults( TimeManager.FixedDeltaTime );
             }
         }
     }

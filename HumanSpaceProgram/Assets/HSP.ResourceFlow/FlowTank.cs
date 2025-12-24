@@ -44,6 +44,9 @@ namespace HSP.ResourceFlow
         public double CalculatedVolume { get; private set; }
         public double Volume { get; private set; }
 
+        // Stability tracking for optimization
+        private bool _isEquilibrium = false;
+
         public Vector3 FluidAcceleration
         {
             get => _fluidAcceleration;
@@ -366,9 +369,23 @@ namespace HSP.ResourceFlow
         }
 
 
-        public void InvalidateGeometryAndFluids() => _cache.InvalidateGeometryAndFluids();
-        public void InvalidateFluids() => _cache.InvalidateFluids();
-        public void ForceRecalculateCache() => _cache.RecalculateCache( true );
+        public void InvalidateGeometryAndFluids()
+        {
+            _cache.InvalidateGeometryAndFluids();
+            _isEquilibrium = false; // Geometry change (accel) means potential field changed, must recalc fluids.
+        }
+
+        public void InvalidateFluids()
+        {
+            _cache.InvalidateFluids();
+            // _isEquilibrium = false; // Not necessarily! Only if mass/energy state changed significantly.
+        }
+
+        public void ForceRecalculateCache()
+        {
+            _cache.RecalculateCache( true );
+            _isEquilibrium = false;
+        }
 
         public void PreSolveUpdate( double deltaTime )
         {
@@ -377,21 +394,39 @@ namespace HSP.ResourceFlow
 
         public void ApplySolveResults( double deltaTime )
         {
+            bool hasFlow = false;
+            double massDelta = 0;
+
             if( Outflow != null && !Outflow.IsEmpty() )
             {
+                double massBefore = Contents.GetMass();
                 Contents.Add( Outflow, -1.0 );
+                massDelta += Math.Abs( Contents.GetMass() - massBefore );
+                hasFlow = true;
             }
 
             if( Inflow != null && !Inflow.IsEmpty() )
             {
+                double massBefore = Contents.GetMass();
                 Contents.Add( Inflow, 1.0 );
+                massDelta += Math.Abs( Contents.GetMass() - massBefore );
+                hasFlow = true;
             }
 
-            // Recalculate pressure based on new contents.
-            double newPressure = Contents.GetPressureInVolume( Volume, FluidState );
-            this.FluidState = new FluidState( newPressure, this.FluidState.Temperature, this.FluidState.Velocity );
+            // Optimization: Only invalidate fluids (triggering geometric recalc in Marshalling) if significant change occurred.
+            if( hasFlow )
+            {
+                double oldPressure = FluidState.Pressure;
+                double newPressure = Contents.GetPressureInVolume( Volume, FluidState );
 
-            InvalidateFluids();
+                // If mass changed significantly OR pressure changed significantly, we need to rebuild the slice cache.
+                if( massDelta > 1e-9 || Math.Abs( newPressure - oldPressure ) > 1e-3 )
+                {
+                    this.FluidState = new FluidState( newPressure, this.FluidState.Temperature, this.FluidState.Velocity );
+                    InvalidateFluids();
+                    _isEquilibrium = false; // Flow breaks static equilibrium
+                }
+            }
         }
 
         /// <summary>
@@ -414,11 +449,30 @@ namespace HSP.ResourceFlow
             {
                 return;
             }
+
+            // OPTIMIZATION: Skip expensive thermodynamic solver if tank is in equilibrium and not being heated.
+            if( _isEquilibrium )
+            {
+                // TODO: If we add external heat sources later, check heatInput here.
+                return;
+            }
+
+            FluidState oldState = FluidState;
             (ISubstanceStateCollection newContents, FluidState newState) = VaporLiquidEquilibrium.ComputeFlash( Contents, FluidState, Volume, 0, deltaTime );
+
             if( newContents != null )
             {
                 Contents = newContents;
                 FluidState = newState;
+
+                // Check if we have reached equilibrium
+                // Criteria: Temp change is negligible AND Pressure change is negligible
+                if( Math.Abs( newState.Temperature - oldState.Temperature ) < 1e-4 &&
+                     Math.Abs( newState.Pressure - oldState.Pressure ) < 1.0 )
+                {
+                    _isEquilibrium = true;
+                }
+
                 InvalidateFluids();
             }
         }

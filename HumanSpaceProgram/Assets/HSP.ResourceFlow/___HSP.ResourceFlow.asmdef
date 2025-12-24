@@ -2,6 +2,7 @@
     "name": "HSP.ResourceFlow",
     "rootNamespace": "",
     "references": [
+        "GUID:2665a8d13d1b3f18800f46e256720795",
         "GUID:27d62e6e15e3fa24eabddedaa74a2424",
         "GUID:d728809217af3ae4db3ac3c77dc1c871",
         "GUID:3f85132a81c90724483587ec215e1407",

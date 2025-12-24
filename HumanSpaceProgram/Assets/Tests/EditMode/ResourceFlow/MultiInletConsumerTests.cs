@@ -2,6 +2,7 @@
 using HSP_Tests;
 using NUnit.Framework;
 using System;
+using System.CodeDom;
 using UnityEngine;
 
 namespace HSP_Tests_EditMode.ResourceFlow
@@ -42,16 +43,23 @@ namespace HSP_Tests_EditMode.ResourceFlow
 
             var (snapshot, pipe) = SetupConductanceTest( substance, length, diameter, lastMassFlow );
             pipe.ConductanceLastStep = 0; // Ensure no smoothing for the first step
+            try
+            {
+                // Act
+                snapshot.PrepareAndSolve( (float)DT );
+                snapshot.ApplyResults( (float)DT );
 
-            // Act
-            snapshot.Step( (float)DT ); // This triggers UpdateConductances internally
+                // Assert
+                double density = substance.GetDensityAtSTP();
+                double viscosity = substance.GetViscosity( 293, 101325 ); // Assume STP for test substances
+                double expectedConductance = FlowEquations.GetLaminarMassConductance( density, area, length, viscosity );
 
-            // Assert
-            double density = substance.GetDensityAtSTP();
-            double viscosity = substance.GetViscosity( 293, 101325 ); // Assume STP for test substances
-            double expectedConductance = FlowEquations.GetLaminarMassConductance( density, area, length, viscosity );
-
-            Assert.That( pipe.MassFlowConductance, Is.EqualTo( expectedConductance ).Within( 1.0 ).Percent );
+                Assert.That( pipe.MassFlowConductance, Is.EqualTo( expectedConductance ).Within( 1.0 ).Percent );
+            }
+            finally
+            {
+                snapshot.Dispose();
+            }
         }
 
         [Test, Description( "Verifies that the solver calculates the correct mass conductance for turbulent flow." )]
@@ -66,19 +74,26 @@ namespace HSP_Tests_EditMode.ResourceFlow
 
             var (snapshot, pipe) = SetupConductanceTest( substance, length, diameter, lastMassFlow );
             pipe.ConductanceLastStep = 0; // Ensure no smoothing for the first step
+            try
+            {
+                // Act
+                snapshot.PrepareAndSolve( (float)DT );
+                snapshot.ApplyResults( (float)DT );
 
-            // Act
-            snapshot.Step( (float)DT );
+                // Assert
+                double density = substance.GetDensityAtSTP();
+                double viscosity = substance.GetViscosity( 293, 101325 );
+                double reynolds = FlowEquations.GetReynoldsNumber( lastMassFlow, diameter, viscosity );
+                double frictionFactor = FlowEquations.GetDarcyFrictionFactor( reynolds );
+                double expectedConductance = FlowEquations.GetTurbulentMassConductance( density, area, diameter, length, frictionFactor, lastMassFlow );
 
-            // Assert
-            double density = substance.GetDensityAtSTP();
-            double viscosity = substance.GetViscosity( 293, 101325 );
-            double reynolds = FlowEquations.GetReynoldsNumber( lastMassFlow, diameter, viscosity );
-            double frictionFactor = FlowEquations.GetDarcyFrictionFactor( reynolds );
-            double expectedConductance = FlowEquations.GetTurbulentMassConductance( density, area, diameter, length, frictionFactor, lastMassFlow );
-
-            // Note: The solver smooths conductance. We test against the first-step value.
-            Assert.That( pipe.MassFlowConductance, Is.EqualTo( expectedConductance ).Within( 1.0 ).Percent );
+                // Note: The solver smooths conductance. We test against the first-step value.
+                Assert.That( pipe.MassFlowConductance, Is.EqualTo( expectedConductance ).Within( 1.0 ).Percent );
+            }
+            finally
+            {
+                snapshot.Dispose();
+            }
         }
 
         [Test, Description( "Verifies that the solver correctly caps conductance at the sonic limit for choked gas flow." )]
@@ -103,10 +118,11 @@ namespace HSP_Tests_EditMode.ResourceFlow
             pipe.MassFlowRateLastStep = lastMassFlow;
             pipe.ConductanceLastStep = 0;
 
-            var snapshot = builder.BuildSnapshot();
+            using var snapshot = builder.BuildSnapshot();
 
             // Act
-            snapshot.Step( (float)DT );
+            snapshot.PrepareAndSolve( (float)DT );
+            snapshot.ApplyResults( (float)DT );
 
             // Assert
             double density = substance.GetDensityAtSTP();

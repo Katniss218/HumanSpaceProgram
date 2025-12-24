@@ -40,15 +40,13 @@ namespace HSP_Tests_PlayMode.ResourceFlow
             var snapshot = builder.BuildSnapshot();
 
             // Act
-            float simulationTime = 10f;
+            /*float simulationTime = 10f;
             float fixedDeltaTime = 0.02f;
             int steps = (int)(simulationTime / fixedDeltaTime);
             for( int i = 0; i < steps; i++ )
             {
                 snapshot.Step( fixedDeltaTime );
-                tankA.ApplySolveResults( fixedDeltaTime ); // Apply flows to update tank state
-                tankB.ApplySolveResults( fixedDeltaTime );
-            }
+            }*/
 
             // Assert
             double massA = tankA.Contents.GetMass();

@@ -67,12 +67,13 @@ namespace HSP_Tests_EditMode.ResourceFlow
             builder.TryAddFlowObj( new object(), tankA );
             builder.TryAddFlowObj( new object(), tankB );
 
-            var snapshot = builder.BuildSnapshot();
+            using var snapshot = builder.BuildSnapshot();
 
             // Act: Run for a bit without a pipe
             for( int i = 0; i < 50; i++ )
             {
-                snapshot.Step( (float)DT );
+                snapshot.PrepareAndSolve( (float)DT );
+                snapshot.ApplyResults( (float)DT );
             }
 
             // Assert: No flow occurred
@@ -86,7 +87,8 @@ namespace HSP_Tests_EditMode.ResourceFlow
             // Act: Run for more steps with the pipe
             for( int i = 0; i < 100; i++ )
             {
-                snapshot.Step( (float)DT );
+                snapshot.PrepareAndSolve( (float)DT );
+                snapshot.ApplyResults( (float)DT );
             }
 
             // Assert: Flow has started
@@ -106,12 +108,13 @@ namespace HSP_Tests_EditMode.ResourceFlow
             builder.TryAddFlowObj( new object(), tankB );
             var pipe = FlowNetworkTestHelper.CreateAndAddPipe( builder, tankA, new Vector3( 0, 9, 0 ), tankB, new Vector3( 0, 1, 0 ), 1.0f );
 
-            var snapshot = builder.BuildSnapshot();
+            using var snapshot = builder.BuildSnapshot();
 
             // Act: Run for a bit with the pipe
             for( int i = 0; i < 50; i++ )
             {
-                snapshot.Step( (float)DT );
+                snapshot.PrepareAndSolve( (float)DT );
+                snapshot.ApplyResults( (float)DT );
             }
 
             // Assert: Flow occurred
@@ -126,7 +129,8 @@ namespace HSP_Tests_EditMode.ResourceFlow
             // Act: Run for more steps without the pipe
             for( int i = 0; i < 100; i++ )
             {
-                snapshot.Step( (float)DT );
+                snapshot.PrepareAndSolve( (float)DT );
+                snapshot.ApplyResults( (float)DT );
             }
 
             // Assert: Flow has stopped
@@ -147,12 +151,13 @@ namespace HSP_Tests_EditMode.ResourceFlow
             builder.TryAddFlowObj( new object(), tankA );
             builder.TryAddFlowObj( new object(), tankB );
             mockPipeProvider.BuildFlowNetwork( builder );
-            var snapshot = builder.BuildSnapshot();
+            using var snapshot = builder.BuildSnapshot();
 
             // Act: Run for a bit with the pipe enabled
             for( int i = 0; i < 50; i++ )
             {
-                snapshot.Step( (float)DT );
+                snapshot.PrepareAndSolve( (float)DT );
+                snapshot.ApplyResults( (float)DT );
             }
 
             // Assert: Flow occurred
@@ -176,7 +181,8 @@ namespace HSP_Tests_EditMode.ResourceFlow
             // Act: Run for more steps
             for( int i = 0; i < 100; i++ )
             {
-                snapshot.Step( (float)DT );
+                snapshot.PrepareAndSolve( (float)DT );
+                snapshot.ApplyResults( (float)DT );
             }
 
             // Assert: Flow has stopped

@@ -78,7 +78,7 @@ namespace HSP_Tests_EditMode.ResourceFlow
             builder.TryAddFlowObj( new object(), tankB );
             var pipe = FlowNetworkTestHelper.CreateAndAddPipe( builder, tankA, new Vector3( 0, 9, 0 ), tankB, new Vector3( 0, 1, 0 ), 1.0f, 0.01f );
 
-            var snapshot = builder.BuildSnapshot();
+            using var snapshot = builder.BuildSnapshot();
 
             var pressureHistory = new List<double>();
             var temperatureHistory = new List<double>();
@@ -89,7 +89,8 @@ namespace HSP_Tests_EditMode.ResourceFlow
             for( int i = 0; i < steps; i++ )
             {
                 // Run the full simulation step
-                snapshot.Step( (float)DT );
+                snapshot.PrepareAndSolve( (float)DT );
+                snapshot.ApplyResults( (float)DT );
 
                 // Record state for analysis
                 pressureHistory.Add( tankA.FluidState.Pressure );

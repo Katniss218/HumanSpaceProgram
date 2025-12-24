@@ -1,14 +1,15 @@
 ﻿using HSP.ResourceFlow;
-using NUnit.Framework;
-using System;
-using UnityEngine;
 using HSP_Tests;
+using NUnit.Framework;
+using UnityEngine;
 
 namespace HSP_Tests_EditMode.ResourceFlow
 {
     [TestFixture]
     public class FlowTankThermodynamicsTests
     {
+        private const double DT = 0.02;
+
         private ISubstance _lqWater;
         private ISubstance _gasWater;
 
@@ -70,13 +71,14 @@ namespace HSP_Tests_EditMode.ResourceFlow
             builder.TryAddFlowObj( new object(), tankB_vacuum );
             FlowNetworkTestHelper.CreateAndAddPipe( builder, tankA, Vector3.right, tankB_vacuum, new Vector3( 4, 0, 0 ), 1.0f );
 
-            var snapshot = builder.BuildSnapshot();
+            using var snapshot = builder.BuildSnapshot();
 
             // Act
             // Simulate for a few steps to allow phase change and flow to start
             for( int i = 0; i < 20; i++ )
             {
-                snapshot.Step( 0.02f );
+                snapshot.PrepareAndSolve( (float)DT );
+                snapshot.ApplyResults( (float)DT );
             }
 
             // Assert
@@ -132,7 +134,7 @@ namespace HSP_Tests_EditMode.ResourceFlow
             builder.TryAddFlowObj( new object(), tankA );
             builder.TryAddFlowObj( new object(), tankB );
             FlowNetworkTestHelper.CreateAndAddPipe( builder, tankA, new Vector3( 0, 1, 0 ), tankB, new Vector3( 0, 1, 0 ), 1.0f, 0.03f );
-            var snapshot = builder.BuildSnapshot();
+            using var snapshot = builder.BuildSnapshot();
 
             // Act & Assert
             double temp_t0 = tankA.FluidState.Temperature;
@@ -141,7 +143,8 @@ namespace HSP_Tests_EditMode.ResourceFlow
             for( int i = 0; i < 20; i++ )
             {
                 Debug.Log( tankA.Contents.GetMass() + " : " + tankA.FluidState );
-                snapshot.Step( 0.02f );
+                snapshot.PrepareAndSolve( (float)DT );
+                snapshot.ApplyResults( (float)DT );
             }
             double temp_t1 = tankA.FluidState.Temperature;
 
@@ -149,7 +152,8 @@ namespace HSP_Tests_EditMode.ResourceFlow
             for( int i = 0; i < 20; i++ )
             {
                 Debug.Log( tankA.Contents.GetMass() + " : " + tankA.FluidState );
-                snapshot.Step( 0.02f );
+                snapshot.PrepareAndSolve( (float)DT );
+                snapshot.ApplyResults( (float)DT );
             }
             double temp_t2 = tankA.FluidState.Temperature;
 
