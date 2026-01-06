@@ -12,7 +12,8 @@ namespace HSP_Tests
             ReferenceDensity = 1000f,
             ReferencePressure = 101325f,
             BulkModulus = 2.2e9f,
-            DisplayColor = Color.blue
+            DisplayColor = Color.blue,
+            ViscosityCoeffs = new double[] { 0.001 } // 1 mPa*s
         };
 
         public static readonly Substance Air = new Substance( "air" )
@@ -20,7 +21,10 @@ namespace HSP_Tests
             DisplayName = "Air",
             Phase = SubstancePhase.Gas,
             MolarMass = 0.0289647,
-            DisplayColor = Color.clear
+            DisplayColor = Color.clear,
+            ViscosityCoeffs = new double[] { 1.81e-5 },
+            SpecificHeatCoeffs = new double[] { 1005 },
+            AdiabaticIndex = 1.4
         };
 
         public static readonly Substance Oil = new Substance( "oil" )
@@ -30,7 +34,8 @@ namespace HSP_Tests
             ReferenceDensity = 800f,
             ReferencePressure = 101325f,
             BulkModulus = 1.5e9f,
-            DisplayColor = Color.yellow
+            DisplayColor = Color.yellow,
+            ViscosityCoeffs = new double[] { 1.0 } // 1000 mPa*s (High viscosity for laminar tests)
         };
 
         public static readonly Substance Kerosene = new Substance( "fuel" )
@@ -40,7 +45,8 @@ namespace HSP_Tests
             ReferenceDensity = 800f,
             ReferencePressure = 101325f,
             BulkModulus = 1.5e9f,
-            DisplayColor = Color.yellow
+            DisplayColor = Color.yellow,
+            ViscosityCoeffs = new double[] { 0.002 }
         };
 
         public static readonly Substance Lox = new Substance( "lox" )
@@ -51,7 +57,8 @@ namespace HSP_Tests
             ReferenceDensity = 1141f,
             ReferencePressure = 101325f,
             BulkModulus = 0.95e9f,
-            DisplayColor = Color.cyan
+            DisplayColor = Color.cyan,
+            ViscosityCoeffs = new double[] { 0.00019 } // Very low viscosity
         };
 
         public static readonly Substance Mercury = new Substance( "mercury" )
@@ -61,7 +68,8 @@ namespace HSP_Tests
             ReferenceDensity = 13500f,
             ReferencePressure = 101325f,
             BulkModulus = 2.85e9f,
-            DisplayColor = Color.gray
+            DisplayColor = Color.gray,
+            ViscosityCoeffs = new double[] { 0.0015 }
         };
     }
 }

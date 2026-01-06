@@ -437,6 +437,8 @@ namespace HSP.ResourceFlow
             FluidState result = _owner.FluidState;
 
             double geoPotential = GetPotentialAt( localPosition );
+            result.GeometricPotential = geoPotential; // STORE THIS FOR SOLVER
+
             double localPressure = _internalGasPressure;
 
             double liquidSurfacePot = (_fluidInSlices != null && _fluidInSlices.Length > 0)
@@ -449,6 +451,14 @@ namespace HSP.ResourceFlow
             {
                 double hydrostaticPressure = 0;
                 double liquidDensityAtPort = 0;
+
+                // Try to find the density of the layer we are in.
+                // If we are below the lowest layer, we default to the density of the lowest layer 
+                // to correctly calculate the pressure contribution of the ullage.
+                if( _fluidInSlices != null && _fluidInSlices.Length > 0 )
+                {
+                    liquidDensityAtPort = _fluidInSlices[0].Density;
+                }
 
                 for( int i = _fluidInSlices.Length - 1; i >= 0; i-- )
                 {
@@ -487,15 +497,18 @@ namespace HSP.ResourceFlow
                     }
                 }
 
-                double pressurePotential = 0;
+                const double P_REF = 101325.0;
+                double averageRs = 287.0; // Default to Air if empty
+                double temperature = _owner.FluidState.Temperature;
+
                 if( totalGasMass > 1e-9 )
                 {
-                    double averageRs = weightedRsSum / totalGasMass;
-                    double temperature = _owner.FluidState.Temperature;
-                    const double P_REF = 101325.0;
-                    double pressureClamped = Math.Max( localPressure, 1e-5 );
-                    pressurePotential = averageRs * temperature * Math.Log( pressureClamped / P_REF );
+                    averageRs = weightedRsSum / totalGasMass;
                 }
+
+                // Ensure pressure is clamped to a small positive value to avoid log(0) and represent vacuum suction
+                double pressureClamped = Math.Max( localPressure, 1e-6 );
+                double pressurePotential = averageRs * temperature * Math.Log( pressureClamped / P_REF );
 
                 result.FluidSurfacePotential = geoPotential + pressurePotential;
             }
@@ -515,7 +528,6 @@ namespace HSP.ResourceFlow
 
             double p = GetPotentialAt( localPosition );
 
-#warning TODO - _fluidInSlices[^1].PotentialEnd was NaN if there is only 1 slice, leading to no flow ever.
             double liquidSurfacePot = (_fluidInSlices != null && _fluidInSlices.Length > 0)
                 ? _fluidInSlices[^1].PotentialEnd
                 : double.MinValue;
@@ -561,14 +573,17 @@ namespace HSP.ResourceFlow
 
             int idx = (sortedList is List<double> list) ? list.BinarySearch( value ) : -1;
 
-            if( idx >= 0 ) return idx;
+            if( idx >= 0 ) 
+                return idx;
             int nextIdx = ~idx;
 
             double diffNext = (nextIdx < sortedList.Count) ? Math.Abs( sortedList[nextIdx] - value ) : double.MaxValue;
             double diffPrev = (nextIdx > 0) ? Math.Abs( sortedList[nextIdx - 1] - value ) : double.MaxValue;
 
-            if( diffNext < diffPrev && diffNext <= TOLERANCE ) return nextIdx;
-            if( diffPrev <= diffNext && diffPrev <= TOLERANCE ) return nextIdx - 1;
+            if( diffNext < diffPrev && diffNext <= TOLERANCE )
+                return nextIdx;
+            if( diffPrev <= diffNext && diffPrev <= TOLERANCE )
+                return nextIdx - 1;
 
             return -1;
         }

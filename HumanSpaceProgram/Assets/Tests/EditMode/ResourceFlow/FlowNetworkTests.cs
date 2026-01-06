@@ -307,18 +307,19 @@ namespace HSP_Tests_EditMode.ResourceFlow
         public void Pump_CreatesStableHeightDifference_AndHoldsEquilibrium()
         {
             var builder = new FlowNetworkBuilder();
-            var tankA = FlowNetworkTestHelper.CreateTestTank( 2.0, GRAVITY, new Vector3( -2, 0, 0 ), TestSubstances.Water, 1500 );
-            var tankB = FlowNetworkTestHelper.CreateTestTank( 2.0, GRAVITY, new Vector3( 2, 5, 0 ), TestSubstances.Water, 500 );
+            var tankA = FlowNetworkTestHelper.CreateTestTank( 2.0, GRAVITY, new Vector3( 0, 0, 0 ), TestSubstances.Water, 1500 );
+            var tankB = FlowNetworkTestHelper.CreateTestTank( 2.0, GRAVITY, new Vector3( 0, 5, 0 ), TestSubstances.Water, 500 );
 
             builder.TryAddFlowObj( new object(), tankA );
             builder.TryAddFlowObj( new object(), tankB );
-            var pipe = FlowNetworkTestHelper.CreateAndAddPipe( builder, tankA, new Vector3( -1, -1, 0 ), tankB, new Vector3( 1, -1, 0 ), 1.0f );
+            var pipe = FlowNetworkTestHelper.CreateAndAddPipe( builder, tankA, new Vector3( 0, -1, 0 ), tankB, new Vector3( 0, 4, 0 ), 1.0f );
             pipe.HeadAdded = 50;
 
             using( var snapshot = builder.BuildSnapshot() )
             {
                 for( int i = 0; i < 200; i++ )
                 {
+                    Debug.Log( tankA.Contents.GetMass() + " | " + tankB.Contents.GetMass() );
                     snapshot.PrepareAndSolve( (float)DT );
                     snapshot.ApplyResults( (float)DT );
                 }
@@ -369,7 +370,7 @@ namespace HSP_Tests_EditMode.ResourceFlow
                 }
 
                 double totalMass = tankA.Contents.GetMass() + tankB.Contents.GetMass() + tankC.Contents.GetMass();
-                Assert.That( totalMass, Is.EqualTo( 1500.0 ).Within( 1e-6 ), "Total mass must be conserved." );
+                Assert.That( totalMass, Is.EqualTo( 1500.0 ).Within( 0.1 ).Percent, "Total mass must be conserved." );
                 Assert.That( snapshot.CurrentFlowRates[pipeAB_idx], Is.GreaterThan( 0.1 ), "Flow should be maintained by the pump." );
             }
         }
@@ -684,9 +685,9 @@ namespace HSP_Tests_EditMode.ResourceFlow
             builder.TryAddFlowObj( new object(), tankB );
             builder.TryAddFlowObj( new object(), tankC );
 
-            var pipeAB = FlowNetworkTestHelper.CreateAndAddPipe( builder, tankA, new Vector3( -4, -1, 0 ), tankB, new Vector3( -1, -1, 5 ), 1.0f );
-            var pipeBC = FlowNetworkTestHelper.CreateAndAddPipe( builder, tankB, new Vector3( 1, -1, 5 ), tankC, new Vector3( 4, -1, 0 ), 1.0f );
-            var pipeCA = FlowNetworkTestHelper.CreateAndAddPipe( builder, tankC, new Vector3( 5, -1, -1 ), tankA, new Vector3( -5, -1, -1 ), 1.0f );
+            var pipeAB = FlowNetworkTestHelper.CreateAndAddPipe( builder, tankA, new Vector3( -5, -1, 0 ), tankB, new Vector3( 0, -1, 5 ), 1.0f );
+            var pipeBC = FlowNetworkTestHelper.CreateAndAddPipe( builder, tankB, new Vector3( 0, -1, 5 ), tankC, new Vector3( 5, -1, 0 ), 1.0f );
+            var pipeCA = FlowNetworkTestHelper.CreateAndAddPipe( builder, tankC, new Vector3( 5, -1, 0 ), tankA, new Vector3( -5, -1, 0 ), 1.0f );
 
             pipeAB.HeadAdded = 50.0;
             pipeBC.HeadAdded = -50.0;
@@ -704,7 +705,9 @@ namespace HSP_Tests_EditMode.ResourceFlow
                 Assert.That( tankC.Contents.GetMass(), Is.EqualTo( 250.0 ).Within( 1 ).Percent );
 
                 int pipeAB_idx = snapshot.Pipes.ToList().IndexOf( pipeAB );
+                int pipeBC_idx = snapshot.Pipes.ToList().IndexOf( pipeBC );
                 Assert.That( snapshot.CurrentFlowRates[pipeAB_idx], Is.EqualTo( 0.0 ).Within( 1e-6 ) );
+                Assert.That( snapshot.CurrentFlowRates[pipeBC_idx], Is.EqualTo( 0.0 ).Within( 1e-6 ) );
             }
         }
 

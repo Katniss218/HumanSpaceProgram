@@ -27,6 +27,14 @@ namespace HSP.ResourceFlow
             }
         }
 
+        private void OnDestroy()
+        {
+            foreach( var network in _networks.ToList() )
+            {
+                network.Dispose();
+            }
+        }
+
         void FixedUpdate()
         {
             // Iterate backwards over the list for safe removal if a network becomes invalid or is destroyed during the loop.

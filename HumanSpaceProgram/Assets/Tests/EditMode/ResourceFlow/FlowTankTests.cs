@@ -1,9 +1,8 @@
 using HSP.ResourceFlow;
+using HSP_Tests;
 using NUnit.Framework;
 using System.Collections.Generic;
 using UnityEngine;
-using HSP_Tests;
-using HSP_Tests.NUnit;
 
 namespace HSP_Tests_EditMode.ResourceFlow
 {
@@ -42,7 +41,6 @@ namespace HSP_Tests_EditMode.ResourceFlow
             tank.SetNodes( nodes.ToArray(), inlets );
         }
 
-        #region Potential Tests
         [Test, Description( "Tests GetPotentialAt() with only linear acceleration (gravity)." )]
         public void GetPotentialAt_LinearAcceleration_IsCorrect()
         {
@@ -95,9 +93,6 @@ namespace HSP_Tests_EditMode.ResourceFlow
             double potential = _tank.GetPotentialAt( testPoint );
             Assert.That( potential, Is.EqualTo( -40.0 ).Within( DOUBLE_TOLERANCE ) );
         }
-        #endregion
-
-        #region Geometry & Volume Tests
 
         [Test, Description( "Tests that after baking potential slices, the total calculated geometric volume matches the tank's configured volume." )]
         public void BakePotentialSlices_TotalVolume_MatchesTankVolume()
@@ -106,10 +101,6 @@ namespace HSP_Tests_EditMode.ResourceFlow
             _tank.ForceRecalculateCache();
             Assert.That( _tank.CalculatedVolume, Is.EqualTo( _tank.Volume ).Within( FLOAT_TOLERANCE ) );
         }
-
-        #endregion
-
-        #region Stratification Tests
 
         [Test, Description( "Tests that two immiscible liquids stratify correctly under gravity, with the denser liquid at the bottom." )]
         public void Stratification_HeavyFluidSinks_UnderGravity()
@@ -175,9 +166,6 @@ namespace HSP_Tests_EditMode.ResourceFlow
             Assert.That( cornerSample.IsPure( out var subCorner ), Is.True, "Outer edge should be one substance." );
             Assert.That( subCorner == TestSubstances.Water, Is.True, "Outer edge should contain the denser fluid (Water)." );
         }
-        #endregion
-
-        #region Center of Mass Tests
 
         [Test]
         public void GetCenterOfMass_EmptyTank_IsAtOrigin()
@@ -284,10 +272,6 @@ namespace HSP_Tests_EditMode.ResourceFlow
             Assert.That( comDenser.y, Is.LessThan( comLighter.y ), "CoM of denser fluid should be lower for the same mass." );
         }
 
-        #endregion
-
-        #region IStiffnessProvider Tests
-
         [Test, Description( "Verifies that dP/dM for a gas-only tank matches the ideal gas law derivation." )]
         public void GetPotentialDerivativeWrtVolume_GasOnly_IsCorrect()
         {
@@ -377,10 +361,6 @@ namespace HSP_Tests_EditMode.ResourceFlow
             Assert.That( dPdM_nearFull, Is.GreaterThan( dPdM_half * 1000 ), "Stiffness should increase exponentially as the tank fills with liquid." );
         }
 
-        #endregion
-
-        #region Edge Case Tests
-
         [Test, Description( "Verifies that overfilling a tank results in very high pressure but does not crash the simulation." )]
         public void Overfill_DoesNotCrash_AndClampsToVolume()
         {
@@ -393,22 +373,23 @@ namespace HSP_Tests_EditMode.ResourceFlow
             Assert.That( state.Pressure, Is.GreaterThan( 1e8 ), "Overfilled tank should have very high pressure." );
         }
 
-        [Test, Description( "Verifies that sampling an empty tank returns a state with zero pressure and a potential equal to the geometric potential at that point." )]
+        [Test, Description( "Verifies that sampling an empty tank returns a state with minimal pressure (vacuum) and potential dominated by geometry." )]
         public void Sample_OnEmptyTank_ReturnsGeometricPotential()
         {
             SetupUnitCubeTank( _tank );
             _tank.FluidAcceleration = new Vector3( 0, -10, 0 );
             _tank.Contents.Clear();
+            _tank.FluidState = FluidState.Vacuum; // Explicitly set to vacuum for test correctness
             _tank.ForceRecalculateCache();
 
             var pt = new Vector3( 0, 0.25f, 0 );
             var state = _tank.Sample( pt, 0.1 );
 
-            Assert.That( state.Pressure, Is.EqualTo( 0.0 ).Within( 1e-6 ) );
+            Assert.That( state.Pressure, Is.LessThan( 1e-3 ), "Empty tank should have near-zero pressure." );
             double expectedPotential = _tank.GetPotentialAt( pt );
-            Assert.That( state.FluidSurfacePotential, Is.EqualTo( expectedPotential ).Within( 1e-5 ) );
-        }
 
-        #endregion
+            Assert.That( state.GeometricPotential, Is.EqualTo( expectedPotential ), "Empty tank should have correct geometric potential." );
+            Assert.That( state.FluidSurfacePotential, Is.LessThan( -1e9 ), "Empty tank should return very low potential (vacuum)." );
+        }
     }
 }

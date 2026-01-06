@@ -201,8 +201,8 @@ namespace HSP.ResourceFlow
             for( int i = 0; i < count; i++ )
             {
                 if( _pipes[i] == null )
-                                    continue;
-                
+                    continue;
+
                 double flowRate = savedRates[i];
 
                 // Set main thread buffers for immediate use and for the next iteration.
@@ -370,8 +370,8 @@ namespace HSP.ResourceFlow
                 // Rebuild the cached topology indices. 
                 // This array must resize if the pipe list grows.
                 if( _cachedPipeTopology.Length < _pipes.Count * 4 )
-                                    Array.Resize( ref _cachedPipeTopology, _pipes.Count * 4 );
-                
+                    Array.Resize( ref _cachedPipeTopology, _pipes.Count * 4 );
+
                 RebuildCachedTopology();
 
                 // Resize NativeArrays if capacity has increased.
@@ -553,59 +553,21 @@ namespace HSP.ResourceFlow
                 if( flowPipe == null )
                     continue;
 
-                // Calculate potentials (FIXES HYDROSTATICS).
-                // Consumer potential overrides producer potential (if the two disagree, which they shouldn't but mods I guess).
-                // Position needs to be the actual pipe end position for hydrostatics to work correctly.
-                double potentialEnd1 = 0.0;
-                double potentialEnd2 = 0.0;
-
-                IResourceConsumer consumerEnd1 = flowPipe.FromInlet.Consumer;
-                IResourceProducer producerEnd1 = flowPipe.FromInlet.Producer;
-                if( consumerEnd1 != null )
-                    potentialEnd1 = consumerEnd1.Sample( flowPipe.FromInlet.pos, flowPipe.FromInlet.area ).FluidSurfacePotential;
-                else if( producerEnd1 != null )
-                    potentialEnd1 = producerEnd1.Sample( flowPipe.FromInlet.pos, flowPipe.FromInlet.area ).FluidSurfacePotential;
-
-                IResourceConsumer consumerEnd2 = flowPipe.ToInlet.Consumer;
-                IResourceProducer producerEnd2 = flowPipe.ToInlet.Producer;
-                if( consumerEnd2 != null )
-                    potentialEnd2 = consumerEnd2.Sample( flowPipe.ToInlet.pos, flowPipe.ToInlet.area ).FluidSurfacePotential;
-                else if( producerEnd2 != null )
-                    potentialEnd2 = producerEnd2.Sample( flowPipe.ToInlet.pos, flowPipe.ToInlet.area ).FluidSurfacePotential;
-
-                // Fallback for invalid potentials to prevent NaN propagation
-                bool isPotential1Valid = !double.IsInfinity( potentialEnd1 ) && !double.IsNaN( potentialEnd1 );
-                bool isPotential2Valid = !double.IsInfinity( potentialEnd2 ) && !double.IsNaN( potentialEnd2 );
-
-                if( !isPotential1Valid && isPotential2Valid )
-                {
-                    potentialEnd1 = potentialEnd2;
-                }
-                else if( !isPotential2Valid && isPotential1Valid )
-                {
-                    potentialEnd2 = potentialEnd1;
-                }
-                else if( !isPotential1Valid && !isPotential2Valid )
-                {
-                    potentialEnd1 = 0;
-                    potentialEnd2 = 0;
-                }
-
-                // Calculate properties for physical conductance (FIXES PROBE MASS).
-                // Physical conductance depends on the actual fluid in the pipe (density/viscosity).
-                // Flows will usually be stable(-ish), so just look at the stored flow direction from the previous frame.
+                // --- Calculate properties for physical conductance and potential normalization ---
+                // We calculate these FIRST because we need the density to normalize the pressure potential.
+                // Flow physics depend on the fluid actually IN the pipe.
+                // If flow is zero or reversing, we might need to blend or guess.
                 double density = 0;
                 double viscosity = 0;
                 double speedOfSound = 1500;
                 bool isGas = false;
 
-                bool flowFromEnd1 = flowPipe.MassFlowRateLastStep >= 0; // if true then flow: End1 -> End2
-                if( Math.Abs( flowPipe.MassFlowRateLastStep ) < 1e-9 )
-                {
-                    // If no previous flow, guess based on potential gradient.
-                    flowFromEnd1 = (potentialEnd1 - potentialEnd2) >= 0;
-                }
+                // Determine likely flow direction to pick the source fluid.
+                bool flowFromEnd1 = flowPipe.MassFlowRateLastStep >= 0;
 
+                // If no previous flow, we can't trust flow direction yet. Use End1 (arbitrary but consistent)
+                // or try to peek at potential difference (but we haven't calc'd it yet!).
+                // Let's grab Source fluid based on last step.
                 FlowPipe.Port sourcePort = flowFromEnd1 ? flowPipe.FromInlet : flowPipe.ToInlet;
                 FlowPipe.Port sinkPort = flowFromEnd1 ? flowPipe.ToInlet : flowPipe.FromInlet;
                 IResourceProducer sourceProducer = sourcePort.Producer;
@@ -613,13 +575,8 @@ namespace HSP.ResourceFlow
                 if( sourceProducer != null )
                 {
                     FluidState sourceState = sourceProducer.Sample( sourcePort.pos, sourcePort.area );
-
-                    // Check what substances will flow *in this step* based on the last known flow rate.
                     double sampleMass = Math.Abs( flowPipe.MassFlowRateLastStep * deltaTime );
-                    // Use a reasonable fallback mass flowrate if the last step was zero (on init).
-                    // This can result in differences in actual flow contents in stratified tanks, but it's close enough.
-                    if( sampleMass < 1e-5 )
-                        sampleMass = 1.0;
+                    if( sampleMass < 1e-5 ) sampleMass = 1.0;
 
                     using ISampledSubstanceStateCollection substances = sourceProducer.SampleSubstances( sourcePort.pos, sampleMass );
                     if( !substances.IsEmpty() )
@@ -631,29 +588,81 @@ namespace HSP.ResourceFlow
                     }
                 }
 
-                // Fallbacks if sampling failed or returned nothing.
+                // Fallbacks if sampling failed
                 if( density <= 1e-9 )
                     density = flowPipe.DensityLastStep > 1e-9 ? flowPipe.DensityLastStep : 1000.0;
                 if( viscosity <= 1e-9 )
                     viscosity = flowPipe.ViscosityLastStep > 1e-9 ? flowPipe.ViscosityLastStep : 0.001;
 
-                // Property blending for near-zero flow to smooth transitions during reversal.
-                if( Math.Abs( flowPipe.MassFlowRateLastStep ) < (0.01 * flowPipe.Diameter) && sinkPort.Producer != null )
+                // Property blending for near-zero flow
+                if( sinkPort.Producer != null && Math.Abs( flowPipe.MassFlowRateLastStep ) < (0.01 * flowPipe.Diameter) )
                 {
-                    FluidState sinkState = sinkPort.Producer.Sample( sinkPort.pos, sinkPort.area );
-                    double sampleMass = Math.Abs( flowPipe.MassFlowRateLastStep * deltaTime ) > 1e-9 ? Math.Abs( flowPipe.MassFlowRateLastStep * deltaTime ) : 1.0;
+                    double sampleMass = Math.Abs( flowPipe.MassFlowRateLastStep * deltaTime ) > 1e-9
+                        ? Math.Abs( flowPipe.MassFlowRateLastStep * deltaTime )
+                        : 1.0;
 
                     using ISampledSubstanceStateCollection sinkSubstances = sinkPort.Producer.SampleSubstances( sinkPort.pos, sampleMass );
                     if( !sinkSubstances.IsEmpty() )
                     {
                         const double blendFactor = 0.5;
+
+                        FluidState sinkState = sinkPort.Producer.Sample( sinkPort.pos, sinkPort.area );
                         density = (1 - blendFactor) * density + blendFactor * sinkSubstances.GetAverageDensity( sinkState.Temperature, sinkState.Pressure );
                         viscosity = (1 - blendFactor) * viscosity + blendFactor * sinkSubstances.GetAverageViscosity( sinkState.Temperature, sinkState.Pressure );
                     }
                 }
 
+                // --- Calculate Potentials ---
+                // CRITICAL FIX: Normalize potential using the PIPE density.
+                // Standard Formula: Potential = GeometricPotential + Pressure / Density
+                // By using the pipe fluid's density, we convert the tank's pressure into an equivalent head
+                // relative to the fluid trying to move. 
+                // e.g. If pushing Liquid into Gas, Gas Pressure P creates a head of P/rho_liquid (small).
+                //      If pushing Gas into Liquid, Liquid Pressure P creates a head of P/rho_gas (huge).
+                // This ensures gravity (geometric potential) is weighted correctly against pressure forces.
+
+                double potentialEnd1;
+                double potentialEnd2;
+
+                // Helper local function to get potential from a port
+                double GetNormalizedPotential( FlowPipe.Port port, double fluidDensity )
+                {
+                    if( port.Consumer == null || port.Producer == null )
+                        return 0;
+
+                    // Prefer Consumer (e.g. Engine suction) over Producer
+                    FluidState state = (port.Consumer != null)
+                        ? port.Consumer.Sample( port.pos, port.area )
+                        : port.Producer.Sample( port.pos, port.area );
+
+                    // If the node provides a Forced Potential (e.g. Engine Suction or Vacuum), use it directly.
+                    // We detect this by checking if FluidSurfacePotential is very different from Geometric.
+                    // TODO - This is a bit hacky; ideally FluidState would have a flag or separate field.
+                    // For now, if FluidSurfacePotential is set to a "special" value (like Vacuum's -1e12), respect it.
+                    if( state.FluidSurfacePotential < -1e10 || state.FluidSurfacePotential > 1e10 )
+                        return state.FluidSurfacePotential;
+
+                    return state.GeometricPotential + (state.Pressure / fluidDensity);
+                }
+
+                potentialEnd1 = GetNormalizedPotential( flowPipe.FromInlet, density );
+                potentialEnd2 = GetNormalizedPotential( flowPipe.ToInlet, density );
+
+                // Fallback for invalid potentials
+                bool isPotential1Valid = !double.IsInfinity( potentialEnd1 ) && !double.IsNaN( potentialEnd1 );
+                bool isPotential2Valid = !double.IsInfinity( potentialEnd2 ) && !double.IsNaN( potentialEnd2 );
+
+                if( !isPotential1Valid && isPotential2Valid )
+                    potentialEnd1 = potentialEnd2;
+                else if( !isPotential2Valid && isPotential1Valid )
+                    potentialEnd2 = potentialEnd1;
+                else if( !isPotential1Valid && !isPotential2Valid )
+                {
+                    potentialEnd1 = 0;
+                    potentialEnd2 = 0;
+                }
+
                 // Populate PipeJobData
-                // Use cached indices instead of dictionary lookups
                 int baseIndex = i * 4;
                 int producerIndexEnd1 = _cachedPipeTopology[baseIndex];
                 int consumerIndexEnd1 = _cachedPipeTopology[baseIndex + 1];
@@ -686,6 +695,7 @@ namespace HSP.ResourceFlow
                 };
             }
         }
+
 
         private void FinishAndDeMarshall( bool converged )
         {
@@ -875,6 +885,9 @@ namespace HSP.ResourceFlow
                     // Also de-marshall the last used conductance for smoothing.
                     _pipes[i].ConductanceLastStep = pipeData.MassFlowConductance;
 
+                    // Also sync to the pipe object for inspection/debugging/testing.
+                    _pipes[i].MassFlowConductance = pipeData.MassFlowConductance;
+
                     // Persist the physical properties used in this frame's calculation
                     _pipes[i].DensityLastStep = pipeData.Density;
                     _pipes[i].ViscosityLastStep = pipeData.Viscosity;
@@ -956,19 +969,16 @@ namespace HSP.ResourceFlow
                 double area = Math.PI * (pipe.Diameter / 2.0) * (pipe.Diameter / 2.0);
                 double reynoldsNumber;
 
-                // Determine Reynolds number.
-                // If flow was zero last step, we use the potential difference to estimate an initial velocity.
-                if( Math.Abs( pipe.MassFlowRateLastStep ) < ZERO_FLOW_TOLERANCE )
+                double potentialMassFlow = pipe.MassFlowRateLastStep;
+                if( Math.Abs( potentialMassFlow ) < ZERO_FLOW_TOLERANCE )
                 {
-                    // Frame 0 guess
+                    // If flow was zero last step, we use the potential difference to estimate an initial velocity.
                     double potentialVelocity = Math.Sqrt( 2 * Math.Abs( deltaPotential ) );
-                    double potentialMassFlow = area * density * potentialVelocity;
-                    reynoldsNumber = FlowEquations.GetReynoldsNumber( potentialMassFlow, pipe.Diameter, viscosity );
+                    potentialMassFlow = area * density * potentialVelocity;
                 }
-                else
-                {
-                    reynoldsNumber = FlowEquations.GetReynoldsNumber( pipe.MassFlowRateLastStep, pipe.Diameter, viscosity );
-                }
+
+                // Determine Reynolds number.
+                reynoldsNumber = FlowEquations.GetReynoldsNumber( potentialMassFlow, pipe.Diameter, viscosity );
 
                 double massConductance;
                 if( reynoldsNumber < 2300 ) // Laminar
@@ -978,12 +988,13 @@ namespace HSP.ResourceFlow
                 else if( reynoldsNumber > 4000 ) // Turbulent
                 {
                     double frictionFactor = FlowEquations.GetDarcyFrictionFactor( reynoldsNumber );
-                    massConductance = FlowEquations.GetTurbulentMassConductance( density, area, pipe.Diameter, pipe.Length, frictionFactor, pipe.MassFlowRateLastStep );
+                    massConductance = FlowEquations.GetTurbulentMassConductance( density, area, pipe.Diameter, pipe.Length, frictionFactor, potentialMassFlow );
                 }
                 else // Transitional
                 {
-                    double laminarConductance = FlowEquations.GetLaminarMassConductance( density, area, pipe.Length, viscosity );
                     const double reTurbulentThreshold = 4000.01;
+
+                    double laminarConductance = FlowEquations.GetLaminarMassConductance( density, area, pipe.Length, viscosity );
                     double frictionFactorTurbulent = FlowEquations.GetDarcyFrictionFactor( reTurbulentThreshold );
                     double turbulentMassFlow = reTurbulentThreshold * Math.PI * pipe.Diameter * viscosity / 4.0;
                     double turbulentConductance = FlowEquations.GetTurbulentMassConductance( density, area, pipe.Diameter, pipe.Length, frictionFactorTurbulent, turbulentMassFlow );

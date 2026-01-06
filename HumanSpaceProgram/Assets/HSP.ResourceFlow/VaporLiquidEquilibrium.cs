@@ -45,11 +45,11 @@ namespace HSP.ResourceFlow
             double finalTemperature;
             ISubstanceStateCollection finalContents;
 
-#warning TODO - Handle case where the temperature would drop below absolute 0 due to requiring too much energy than what is available.
+            double heatCapacity = CalculateTotalHeatCapacity( currentContents, currentState.Temperature, currentState.Pressure );
+
             // Case 1: System is already in equilibrium. Any heat input just changes temperature.
             if( Math.Abs( requiredHeat_Joules ) < 1e-6 )
             {
-                double heatCapacity = CalculateTotalHeatCapacity( currentContents, currentState.Temperature, currentState.Pressure );
                 double delta_T = (heatCapacity > 1e-9) ? externalEnergy_Joules / heatCapacity : 0.0;
                 finalTemperature = currentState.Temperature + delta_T;
                 finalContents = currentContents.Clone();
@@ -59,7 +59,6 @@ namespace HSP.ResourceFlow
             else if( Math.Sign( externalEnergy_Joules ) != 0 && Math.Sign( requiredHeat_Joules ) != 0 && Math.Sign( externalEnergy_Joules ) != Math.Sign( requiredHeat_Joules ) )
             {
                 finalContents = currentContents.Clone();
-                double heatCapacity = CalculateTotalHeatCapacity( currentContents, currentState.Temperature, currentState.Pressure );
                 double delta_T = (heatCapacity > 1e-9) ? externalEnergy_Joules / heatCapacity : 0.0;
                 finalTemperature = currentState.Temperature + delta_T;
             }
@@ -78,9 +77,18 @@ namespace HSP.ResourceFlow
                 finalContents = equilibriumContents;
                 double sensibleHeatBudget = externalEnergy_Joules - requiredHeat_Joules;
                 double finalHeatCapacity = CalculateTotalHeatCapacity( finalContents, currentState.Temperature, currentState.Pressure );
-                double delta_T = (finalHeatCapacity > 1e-9) ? sensibleHeatBudget / finalHeatCapacity : 0.0;
+
+                // If final mass is near zero, capacity is near zero. This can cause massive temp spikes.
+                // We clamp the delta_T to a percentage of the current temp to prevent numerical explosions in empty tanks.
+                double raw_delta_T = (finalHeatCapacity > 1e-9) ? sensibleHeatBudget / finalHeatCapacity : 0.0;
+                double max_delta_T = currentState.Temperature * 0.5; // Max 50% change per tick
+                double delta_T = Math.Clamp( raw_delta_T, -max_delta_T, max_delta_T );
+
                 finalTemperature = currentState.Temperature + delta_T;
             }
+
+            // Prevent absolute zero or negative temperatures
+            finalTemperature = Math.Max( 1e-6, finalTemperature );
 
             double finalPressure = finalContents.GetPressureInVolume( tankVolume, new FluidState( 0, finalTemperature, 0 ) );
             var finalState = new FluidState( finalPressure, finalTemperature, currentState.Velocity );
@@ -153,6 +161,7 @@ namespace HSP.ResourceFlow
 
             double initialTemperature = currentState.Temperature;
             double initialTotalPressure = contents.GetPressureInVolume( tankVolume, currentState );
+            double totalHeatCapacity = CalculateTotalHeatCapacity( contents, initialTemperature, initialTotalPressure );
 
             var volatilePairs = new Dictionary<string, LiquidEntry>();
 
@@ -195,6 +204,9 @@ namespace HSP.ResourceFlow
             {
                 double liquidMoles = contents.TryGet( liquidEntry.Liq, out var liqMass ) ? liqMass / liquidEntry.MolarMass : 0.0;
                 double moleFraction = (initialTotalLiquidMoles > MinMoles) ? liquidMoles / initialTotalLiquidMoles : 1.0;
+
+                // If liquid is entirely absent, we might still want to condense gas, but boiling is impossible.
+                // Mole fraction logic handles partial pressures of mixtures.
                 double equilibriumPressure = liquidEntry.Liq.GetVaporPressure( initialTemperature ) * moleFraction;
 
                 double gasMolesThis = contents.TryGet( liquidEntry.Gas, out double gasMass ) ? gasMass / liquidEntry.MolarMass : 0.0;
@@ -204,7 +216,7 @@ namespace HSP.ResourceFlow
                 if( Math.Abs( pressureDifference ) < PressureDeadzone )
                     continue;
 
-                double pressureDerivativeWrtMass = ComputeVLEStiffness( liquidEntry.Liq, contents, currentState, tankVolume, ullageVolume );
+                double pressureDerivativeWrtMass = ComputeVLEStiffness( liquidEntry.Liq, contents, currentState, tankVolume, ullageVolume, totalHeatCapacity );
                 if( Math.Abs( pressureDerivativeWrtMass ) < 1e-9 )
                     continue;
 
@@ -238,30 +250,69 @@ namespace HSP.ResourceFlow
             return heatForVLE;
         }
 
-        private static double ComputeVLEStiffness( ISubstance liquid, IReadonlySubstanceStateCollection currentContents, FluidState currentState, double tankVolume, double ullageVolume )
+        private static double ComputeVLEStiffness( ISubstance liquid, IReadonlySubstanceStateCollection currentContents, FluidState currentState, double tankVolume, double ullageVolume, double totalHeatCapacity )
         {
             double temperature = currentState.Temperature;
+            double stiffness_pressure = 0.0;
 
+            // 1. Calculate Mechanical Stiffness (dP_gas / dm)
             // If there is significant ullage, use the faster, more stable analytic derivative.
             if( ullageVolume > 1e-6 )
             {
                 ISubstance gasPartner = SubstancePhaseMap.GetPartnerPhase( liquid, SubstancePhase.Gas );
-                if( gasPartner == null ) return 0.0;
-
-                // We need the current pressure for the formula. GetPressureInVolume is the source of truth.
-                double currentPressure = currentContents.GetPressureInVolume( tankVolume, currentState );
-
-                double R_s_i = gasPartner.SpecificGasConstant;
-                double rho_li = liquid.GetDensity( temperature, currentPressure );
-
-                if( rho_li > 1e-9 )
+                if( gasPartner != null )
                 {
-                    // dP/dm = (1 / V_ullage) * ( R_s_i * T - P / rho_li )
-                    return (1 / ullageVolume) * (R_s_i * temperature - currentPressure / rho_li);
+                    // We need the current pressure for the formula. GetPressureInVolume is the source of truth.
+                    double currentPressure = currentContents.GetPressureInVolume( tankVolume, currentState );
+
+                    double R_s_i = gasPartner.SpecificGasConstant;
+                    double rho_li = liquid.GetDensity( temperature, currentPressure );
+
+                    if( rho_li > 1e-9 )
+                    {
+                        // dP/dm = (1 / V_ullage) * ( R_s_i * T - P / rho_li )
+                        stiffness_pressure = (1 / ullageVolume) * (R_s_i * temperature - currentPressure / rho_li);
+                    }
                 }
             }
+            else
+            {
+                // Fallback to numerical derivative for liquid-full or edge cases
+                stiffness_pressure = ComputeNumericalStiffness( liquid, currentContents, currentState, tankVolume );
+            }
 
-            // --- Fallback to numerical derivative for liquid-full or edge cases ---
+            // 2. Calculate Thermal Stiffness (d(P_vap) / dm)
+            // Phase change causes temperature change (via Latent Heat), which changes Vapor Pressure.
+            // This acts as a feedback loop.
+            // d(P_vap)/dm = d(P_vap)/dT * dT/dm
+            // dT/dm = -Lv / Cp
+            // d(P_vap)/dT (Numerical approx) = (VP(T+e) - VP(T)) / e
+            // This term is negative (boiling -> cooling -> lower VP), effectively increasing stiffness and preventing overshoot.
+
+            double stiffness_thermal = 0.0;
+            if( totalHeatCapacity > 1e-9 )
+            {
+                double Lv = liquid.GetLatentHeatOfVaporization();
+                double dT_dm = -Lv / totalHeatCapacity; // Temp change per unit mass boiled
+
+                double deltaT = 0.1;
+                double dPvap_dT = (liquid.GetVaporPressure( temperature + deltaT ) - liquid.GetVaporPressure( temperature )) / deltaT;
+
+                double dPvap_dm = dPvap_dT * dT_dm; // Change in Target VP per unit mass boiled
+
+                // The net driving force is (P_vap - P_gas).
+                // d(P_vap - P_gas)/dm = dP_vap/dm - dP_gas/dm.
+                // We want to divide the error by the magnitude of this slope.
+                // Since dP_vap/dm is negative and dP_gas/dm is positive, the magnitude is |dP_vap/dm| + |dP_gas/dm|.
+                // We return this combined positive stiffness.
+                stiffness_thermal = Math.Abs( dPvap_dm );
+            }
+
+            return Math.Abs( stiffness_pressure ) + stiffness_thermal;
+        }
+
+        private static double ComputeNumericalStiffness( ISubstance liquid, IReadonlySubstanceStateCollection currentContents, FluidState currentState, double tankVolume )
+        {
             const double DeltaMassFraction = 0.001;
             const double MinTestMass = 0.001;
 

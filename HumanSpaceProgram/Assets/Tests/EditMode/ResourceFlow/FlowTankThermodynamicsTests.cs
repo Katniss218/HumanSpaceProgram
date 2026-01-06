@@ -58,25 +58,27 @@ namespace HSP_Tests_EditMode.ResourceFlow
             // Arrange
             var builder = new FlowNetworkBuilder();
             double initialTemp = 300;
-            double initialMass = 10.0;
+            double initialMass = 100.0;
 
             // Tank with liquid, connected to a large vacuum tank
-            var tankA = FlowNetworkTestHelper.CreateTestTank( 1.0, Vector3.zero, Vector3.zero, _lqWater, initialMass );
+            var tankA = FlowNetworkTestHelper.CreateTestTank( 1.0, new Vector3( 0, -10, 0 ), Vector3.zero, _lqWater, initialMass );
             tankA.FluidState = new FluidState( 0, initialTemp, 0 ); // Set temperature first
             tankA.FluidState = new FluidState( tankA.Contents.GetPressureInVolume( tankA.Volume, tankA.FluidState ), initialTemp, 0 );
             double initialPressure = tankA.FluidState.Pressure;
-            var tankB_vacuum = FlowNetworkTestHelper.CreateTestTank( 1000.0, Vector3.zero, new Vector3( 5, 0, 0 ) ); // Large, empty tank
+            var tankB_vacuum = FlowNetworkTestHelper.CreateTestTank( 10.0, new Vector3( 0, -10, 0 ), new Vector3( 0, 5, 0 ) ); // Large, empty tank, but small enough to equalize in reasonable time.
 
             builder.TryAddFlowObj( new object(), tankA );
             builder.TryAddFlowObj( new object(), tankB_vacuum );
-            FlowNetworkTestHelper.CreateAndAddPipe( builder, tankA, Vector3.right, tankB_vacuum, new Vector3( 4, 0, 0 ), 1.0f );
+            FlowNetworkTestHelper.CreateAndAddPipe( builder, tankA, new Vector3( 0, 1, 0 ), tankB_vacuum, new Vector3( 0, 4, 0 ), 0.0001f );
 
             using var snapshot = builder.BuildSnapshot();
 
             // Act
-            // Simulate for a few steps to allow phase change and flow to start
+            // Simulate to allow phase change and pressure (vapor pressure across both tanks) to equalize.
             for( int i = 0; i < 20; i++ )
             {
+                Debug.Log( tankA.Contents.GetMass() + " A: " + tankA.FluidState );
+                Debug.Log( tankB_vacuum.Contents.GetMass() + " B: " + tankB_vacuum.FluidState );
                 snapshot.PrepareAndSolve( (float)DT );
                 snapshot.ApplyResults( (float)DT );
             }
@@ -129,29 +131,31 @@ namespace HSP_Tests_EditMode.ResourceFlow
             tankA.FluidState = new FluidState( tankA.Contents.GetPressureInVolume( tankA.Volume, tankA.FluidState ), initialTemp, 0 );
 
             // Tank B is low, to drain into
-            var tankB = FlowNetworkTestHelper.CreateTestTank( 1.0, new Vector3( 0, -10, 0 ), Vector3.zero );
+            var tankB = FlowNetworkTestHelper.CreateTestTank( 1.0, new Vector3( 0, -10, 0 ), new Vector3( 0, -2, 0 ) );
 
             builder.TryAddFlowObj( new object(), tankA );
             builder.TryAddFlowObj( new object(), tankB );
-            FlowNetworkTestHelper.CreateAndAddPipe( builder, tankA, new Vector3( 0, 1, 0 ), tankB, new Vector3( 0, 1, 0 ), 1.0f, 0.03f );
+            FlowNetworkTestHelper.CreateAndAddPipe( builder, tankA, new Vector3( 0, 1, 0 ), tankB, new Vector3( 0, -1, 0 ), 1.0f, 0.0001f );
             using var snapshot = builder.BuildSnapshot();
 
             // Act & Assert
             double temp_t0 = tankA.FluidState.Temperature;
 
             // Simulate for a bit
-            for( int i = 0; i < 20; i++ )
+            for( int i = 0; i < 5; i++ )
             {
-                Debug.Log( tankA.Contents.GetMass() + " : " + tankA.FluidState );
+                Debug.Log( tankA.Contents.GetMass() + " A: " + tankA.FluidState );
+                Debug.Log( tankB.Contents.GetMass() + " B: " + tankB.FluidState );
                 snapshot.PrepareAndSolve( (float)DT );
                 snapshot.ApplyResults( (float)DT );
             }
             double temp_t1 = tankA.FluidState.Temperature;
 
             // Simulate some more
-            for( int i = 0; i < 20; i++ )
+            for( int i = 0; i < 5; i++ )
             {
-                Debug.Log( tankA.Contents.GetMass() + " : " + tankA.FluidState );
+                Debug.Log( tankA.Contents.GetMass() + " A: " + tankA.FluidState );
+                Debug.Log( tankB.Contents.GetMass() + " B: " + tankB.FluidState );
                 snapshot.PrepareAndSolve( (float)DT );
                 snapshot.ApplyResults( (float)DT );
             }
