@@ -189,6 +189,26 @@ namespace HSP.ResourceFlow
         }
 
         /// <summary>
+        /// Calculates the partial pressure of a specific vapor within the mixture.
+        /// </summary>
+        public static double GetPartialPressure( this IReadonlySubstanceStateCollection collection, ISubstance vapor, double totalPressure )
+        {
+            if( vapor.Phase != SubstancePhase.Gas )
+                return 0.0;
+
+            double totalGasMoles = collection.GetTotalMolesOfPhases( SubstancePhase.Gas );
+            if( totalGasMoles <= 1e-9 )
+                return 0.0;
+
+            if( collection.TryGet( vapor, out double mass ) )
+            {
+                double moles = mass / vapor.MolarMass;
+                return totalPressure * (moles / totalGasMoles);
+            }
+            return 0.0;
+        }
+
+        /// <summary>
         /// Calculates the average density of the liquid components in a substance collection.
         /// </summary>
         /// <param name="collection">The substance collection.</param>

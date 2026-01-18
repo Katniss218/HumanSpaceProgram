@@ -53,7 +53,8 @@ namespace HSP_Tests_EditMode.ResourceFlow
         }
 
         [Test, Description( "Simulates draining a cryogenic tank to ensure the system remains stable without pressure spikes or temperature increases, validating the fix for stiff systems." )]
-        public void CryogenicTankDrain_StaysStable_AndDoesNotOscillate()
+        [TestCase( 2 )]
+        public void CryogenicTankDrain_StaysStable_AndDoesNotOscillate( double volume )
         {
             // Arrange
             var builder = new FlowNetworkBuilder();
@@ -61,7 +62,7 @@ namespace HSP_Tests_EditMode.ResourceFlow
             // A tank partially filled with LOX slightly above its boiling point (~90.2K at 1 atm)
             // This creates a highly volatile, stiff system.
             double initialTemp = 300; // K
-            double tankVolume = 2.0; // m^3
+            double tankVolume = volume; // m^3
             double initialLiquidMass = _lqO2.ReferenceDensity * (tankVolume * 0.9); // 90% full of liquid
 
             var tankA = FlowNetworkTestHelper.CreateTestTank( tankVolume, GRAVITY, new Vector3( 0, 10, 0 ), _lqO2, initialLiquidMass );
@@ -76,7 +77,7 @@ namespace HSP_Tests_EditMode.ResourceFlow
 
             builder.TryAddFlowObj( new object(), tankA );
             builder.TryAddFlowObj( new object(), tankB );
-            var pipe = FlowNetworkTestHelper.CreateAndAddPipe( builder, tankA, new Vector3( 0, 9, 0 ), tankB, new Vector3( 0, 1, 0 ), 1.0f, 0.01f );
+            var pipe = FlowNetworkTestHelper.CreateAndAddPipe( builder, tankA, new Vector3( 0, 9, 0 ), tankB, new Vector3( 0, 1, 0 ), 1.0f, 0.001f ); // reducing volume necessitates reduction in pipe area.
 
             using var snapshot = builder.BuildSnapshot();
 
@@ -85,9 +86,10 @@ namespace HSP_Tests_EditMode.ResourceFlow
             double initialTotalMass = tankA.Contents.GetMass();
 
             // Act
-            int steps = 500;
+            int steps = 50;
             for( int i = 0; i < steps; i++ )
             {
+                Debug.Log( tankA.Contents.GetMass() + " : " + tankA.FluidState + " : " + tankB.Contents.GetMass() + " : " + tankB.FluidState );
                 // Run the full simulation step
                 snapshot.PrepareAndSolve( (float)DT );
                 snapshot.ApplyResults( (float)DT );

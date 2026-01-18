@@ -627,7 +627,7 @@ namespace HSP.ResourceFlow
                 // Helper local function to get potential from a port
                 double GetNormalizedPotential( FlowPipe.Port port, double fluidDensity )
                 {
-                    if( port.Consumer == null || port.Producer == null )
+                    if( port.Consumer == null && port.Producer == null )
                         return 0;
 
                     // Prefer Consumer (e.g. Engine suction) over Producer
@@ -635,12 +635,14 @@ namespace HSP.ResourceFlow
                         ? port.Consumer.Sample( port.pos, port.area )
                         : port.Producer.Sample( port.pos, port.area );
 
-                    // If the node provides a Forced Potential (e.g. Engine Suction or Vacuum), use it directly.
-                    // We detect this by checking if FluidSurfacePotential is very different from Geometric.
-                    // TODO - This is a bit hacky; ideally FluidState would have a flag or separate field.
-                    // For now, if FluidSurfacePotential is set to a "special" value (like Vacuum's -1e12), respect it.
+                    // If the node provides a Forced Potential (e.g. Vacuum), use it directly.
+                    // Or, if the node provides 0 pressure (e.g. Engine Suction), use FluidSurfacePotential.
+                    // This is critical for engines where Suction Potential is stored in FluidSurfacePotential
+                    // but Pressure is 0. Normalizing 0 pressure by density yields 0, destroying the suction signal.
                     if( state.FluidSurfacePotential < -1e10 || state.FluidSurfacePotential > 1e10 )
+                    {
                         return state.FluidSurfacePotential;
+                    }
 
                     return state.GeometricPotential + (state.Pressure / fluidDensity);
                 }

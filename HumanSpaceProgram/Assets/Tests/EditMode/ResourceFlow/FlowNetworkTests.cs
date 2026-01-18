@@ -123,6 +123,31 @@ namespace HSP_Tests_EditMode.ResourceFlow
         }
 
         [Test]
+        public void LiquidFlow___FullTankToEmptyLowerTank_ReversedPipe___TransfersCompletely()
+        {
+            var builder = new FlowNetworkBuilder();
+            var tankA = FlowNetworkTestHelper.CreateTestTank( 1.0, GRAVITY, new Vector3( 0, 10, 0 ), TestSubstances.Water, 1000 ); // High tank, full
+            var tankB = FlowNetworkTestHelper.CreateTestTank( 1.0, GRAVITY, Vector3.zero ); // Low tank, empty
+
+            builder.TryAddFlowObj( new object(), tankA );
+            builder.TryAddFlowObj( new object(), tankB );
+            FlowNetworkTestHelper.CreateAndAddPipe( builder, tankB, new Vector3( 0, 1, 0 ), tankA, new Vector3( 0, 9, 0 ), 1.0f );
+
+            using( var snapshot = builder.BuildSnapshot() )
+            {
+                for( int i = 0; i < 500; i++ )
+                {
+                    snapshot.PrepareAndSolve( (float)DT );
+                    snapshot.ApplyResults( (float)DT );
+                }
+
+                Assert.That( tankA.Contents.GetMass(), Is.EqualTo( 0.0 ).Within( 0.1 ), "Source tank should be empty." );
+                Assert.That( tankB.Contents.GetMass(), Is.EqualTo( 1000.0 ).Within( 0.1 ), "Destination tank should be full." );
+                Assert.That( tankA.Contents.GetMass() + tankB.Contents.GetMass(), Is.EqualTo( 1000.0 ).Within( 1e-6 ), "Mass must be conserved." );
+            }
+        }
+
+        [Test]
         public void LiquidFlow_PumpUphill_TransfersFluid()
         {
             var builder = new FlowNetworkBuilder();
@@ -319,7 +344,7 @@ namespace HSP_Tests_EditMode.ResourceFlow
             {
                 for( int i = 0; i < 200; i++ )
                 {
-                    Debug.Log( tankA.Contents.GetMass() + " | " + tankB.Contents.GetMass() );
+                    //Debug.Log( tankA.Contents.GetMass() + " | " + tankB.Contents.GetMass() );
                     snapshot.PrepareAndSolve( (float)DT );
                     snapshot.ApplyResults( (float)DT );
                 }

@@ -168,7 +168,8 @@ namespace HSP.ResourceFlow
             // Populate pairs from both liquids and gases present to handle boiling and condensation.
             foreach( (var substance, _) in contents )
             {
-                if( substance.MolarMass <= 0 ) continue;
+                if( substance.MolarMass <= 0 )
+                    continue;
 
                 if( substance.Phase == SubstancePhase.Liquid )
                 {
