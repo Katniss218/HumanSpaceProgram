@@ -3,7 +3,7 @@ using HSP.Time;
 using HSP.Vanilla;
 using HSP.Vanilla.ReferenceFrames;
 using HSP.Vanilla.Scenes.GameplayScene;
-using HSP_Tests_PlayMode.NUnit;
+using HSP_Tests.NUnit;
 using NUnit.Framework;
 using System;
 using System.Collections;

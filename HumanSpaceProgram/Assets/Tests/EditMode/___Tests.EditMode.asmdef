@@ -4,6 +4,7 @@
     "references": [
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
+        "HSP.Tests.TestUtils",
         "_UnityEngine",
         "_UnityPlus",
         "_UnityPlus.OverridableEvents",

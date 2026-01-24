@@ -1,5 +1,5 @@
 ﻿using HSP.ReferenceFrames;
-using HSP_Tests_EditMode.NUnit;
+using HSP_Tests.NUnit;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;

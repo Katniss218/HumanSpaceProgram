@@ -11,6 +11,7 @@ namespace HSP.Vanilla.Components
     /// <summary>
     /// An object that connects two containers and calculates the resource flow between them.
     /// </summary>
+    [Obsolete("Use FResourceConnection_FlowPipe instead.")]
     public class FBulkConnection : MonoBehaviour
     {
         /// <summary>
@@ -121,7 +122,7 @@ namespace HSP.Vanilla.Components
 
             var oldFlow = _cacheFlow;
 
-            if( !SubstanceStateCollection.IsNullOrEmpty( oldFlow ) )
+            if( oldFlow != null && !oldFlow.IsEmpty() )
             {
                 (_, var inletP) = GetEnd( _cacheInlet ).ConnectedTo();
                 (var outletC, _) = GetEnd( _cacheOutlet ).ConnectedTo();
@@ -141,7 +142,7 @@ namespace HSP.Vanilla.Components
             _cacheInlet = inlet;
             _cacheOutlet = outlet;
 
-            if( !SubstanceStateCollection.IsNullOrEmpty( newFlow ) )
+            if( newFlow != null && !newFlow.IsEmpty() )
             {
                 (_, var inletP) = GetEnd( inlet ).ConnectedTo();
                 (var outletC, _) = GetEnd( outlet ).ConnectedTo();
@@ -150,7 +151,7 @@ namespace HSP.Vanilla.Components
             }
         }
 
-        public static (int inlet, int outlet) GetInletAndOutletIndices( float sign )
+        public static (int inlet, int outlet) GetInletAndOutletIndices( double sign )
         {
             int inlet = sign < 0 ? 1 : 0;
             int outlet = sign < 0 ? 0 : 1;
@@ -197,25 +198,25 @@ namespace HSP.Vanilla.Components
 
             if( endC[0] != null )
             {
-                endSamples[0] = endC[0].Sample( End1.Position, endC[0].transform.InverseTransformVector( fluidAccelerationSceneSpace ), CrossSectionArea );
+           //     endSamples[0] = endC[0].Sample( End1.Position, endC[0].transform.InverseTransformVector( fluidAccelerationSceneSpace ), CrossSectionArea );
             }
             else if( endP[0] != null )
             {
-                endSamples[0] = endP[0].Sample( End1.Position, endP[0].transform.InverseTransformVector( fluidAccelerationSceneSpace ), CrossSectionArea );
+           //     endSamples[0] = endP[0].Sample( End1.Position, endP[0].transform.InverseTransformVector( fluidAccelerationSceneSpace ), CrossSectionArea );
             }
 
             if( endC[1] != null )
             {
-                endSamples[1] = endC[1].Sample( End2.Position, endC[1].transform.InverseTransformVector( fluidAccelerationSceneSpace ), CrossSectionArea );
+           //     endSamples[1] = endC[1].Sample( End2.Position, endC[1].transform.InverseTransformVector( fluidAccelerationSceneSpace ), CrossSectionArea );
             }
             else if( endP[1] != null )
             {
-                endSamples[1] = endP[1].Sample( End2.Position, endP[1].transform.InverseTransformVector( fluidAccelerationSceneSpace ), CrossSectionArea );
+           //     endSamples[1] = endP[1].Sample( End2.Position, endP[1].transform.InverseTransformVector( fluidAccelerationSceneSpace ), CrossSectionArea );
             }
 
-            float signedRelativePressure_Pa = endSamples[0].Pressure - endSamples[1].Pressure;
+            double signedRelativePressure_Pa = endSamples[0].Pressure - endSamples[1].Pressure;
 
-            if( Mathf.Abs( signedRelativePressure_Pa ) < MIN_PRESSURE_DIFFERENCE )
+            if( Math.Abs( signedRelativePressure_Pa ) < MIN_PRESSURE_DIFFERENCE )
             {
                 return;
             }
@@ -231,11 +232,11 @@ namespace HSP.Vanilla.Components
                 return;
             }
 
-            (SubstanceStateCollection flow, _) = inletProducer.SampleFlow( inletEnd.Position, inletProducer.transform.InverseTransformVector( fluidAccelerationSceneSpace ), CrossSectionArea, TimeManager.FixedDeltaTime, endSamples[outlet] );
+           // (SubstanceStateCollection flow, _) = inletProducer.SampleFlow( inletEnd.Position, inletProducer.transform.InverseTransformVector( fluidAccelerationSceneSpace ), CrossSectionArea, TimeManager.FixedDeltaTime, endSamples[outlet] );
 
-            outletConsumer.ClampIn( flow, TimeManager.FixedDeltaTime );
+           // outletConsumer.ClampIn( flow, TimeManager.FixedDeltaTime );
 
-            SetFlowAcrossConnection( flow, inlet, outlet );
+           // SetFlowAcrossConnection( flow, inlet, outlet );
         }
 
         Vector3 oldSceneAcceleration;

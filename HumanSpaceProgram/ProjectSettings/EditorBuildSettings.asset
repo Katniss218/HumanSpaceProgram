@@ -6,6 +6,9 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/___Scenes/Scratchpad.unity
+    guid: 02f62321ab0c6d946bff3cf7ea0fa59d
+  - enabled: 1
     path: Assets/___Scenes/_AlwaysLoaded_.unity
     guid: c7a3cb11faa75aa4caf1c4baa7da50ab
   - enabled: 1

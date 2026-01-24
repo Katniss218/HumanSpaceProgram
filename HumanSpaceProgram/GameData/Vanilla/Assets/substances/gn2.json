@@ -1,0 +1,24 @@
+{
+    "$type": "HSP.ResourceFlow.Substance, HSP.ResourceFlow, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+    "id": "gn2",
+    "display_name": "Nitrogen Gas",
+    "display_color": {
+        "r": 0.9,
+        "g": 0.9,
+        "b": 0.95,
+        "a": 0.5
+    },
+    "tags": { "value": [ "inert", "gas" ] },
+    "phase": "Gas",
+
+    "molar_mass": 0.02801,
+    "specific_gas_constant": 296.8,
+    "adiabatic_index": 1.4,
+
+    "reference_density": 1.165,
+    "reference_pressure": 101325.0,
+
+    "viscosity_coeffs": { "value": [ 0.0000178 ] }, 
+    "conductivity_coeffs": { "value": [ 0.026 ] },
+    "specific_heat_coeffs": { "value": [ 1040.0 ] }
+}

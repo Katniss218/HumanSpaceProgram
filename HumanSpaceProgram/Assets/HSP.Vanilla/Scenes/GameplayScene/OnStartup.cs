@@ -1,4 +1,5 @@
 using HSP.CelestialBodies;
+using HSP.ResourceFlow;
 using HSP.Time;
 using HSP.Timelines;
 using HSP.Trajectories;
@@ -30,6 +31,7 @@ namespace HSP.Vanilla.Scenes.GameplayScene
         public const string REMOVE_ESCAPE_INPUT_CONTROLLER = HSPEvent.NAMESPACE_HSP + ".remove_escape_icontroller";
         public const string ADD_TRAJECTORY_MANAGER = HSPEvent.NAMESPACE_HSP + ".add_trajectory_manager";
         public const string ADD_ATMOSPHERE_RENDERER = HSPEvent.NAMESPACE_HSP + ".add_atmosphere_renderer";
+        public const string ADD_FLOW_NETWORK_MANAGER = "af07153f-7463-4a81-b8e9-fb3d53691fe7";
 
         [HSPEventListener( HSPEvent_GAMEPLAY_SCENE_LOAD.ID, ADD_TIMESCALE_INPUT_CONTROLLER )]
         private static void AddTimescaleInputController()
@@ -85,6 +87,12 @@ namespace HSP.Vanilla.Scenes.GameplayScene
         private static void AddEscapeInputController()
         {
             GameplaySceneM.Instance.gameObject.AddComponent<GameplaySceneEscapeInputController>();
+        }
+
+        [HSPEventListener( HSPEvent_GAMEPLAY_SCENE_LOAD.ID, ADD_FLOW_NETWORK_MANAGER )]
+        private static void AddFlowNetworkManager()
+        {
+            GameplaySceneM.Instance.gameObject.AddComponent<FlowNetworkManager>();
         }
 
         [HSPEventListener( HSPEvent_GAMEPLAY_SCENE_DEACTIVATE.ID, REMOVE_ESCAPE_INPUT_CONTROLLER )]

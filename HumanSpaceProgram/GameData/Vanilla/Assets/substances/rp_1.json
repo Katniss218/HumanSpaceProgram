@@ -1,0 +1,27 @@
+{
+    "$type": "HSP.ResourceFlow.Substance, HSP.ResourceFlow, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+    "id": "rp_1",
+    "display_name": "RP-1 Kerosene",
+    "display_color": {
+        "r": 0.85,
+        "g": 0.25,
+        "b": 0.1,
+        "a": 1.0
+    },
+    "tags": { "value": [ "fuel", "hydrocarbon" ] },
+    "phase": "Liquid",
+
+    "molar_mass": 0.167,
+    "flash_point": 316.15,
+
+    "reference_density": 810.0,
+    "reference_pressure": 101325.0,
+    "bulk_modulus": 1.3e+9,
+
+    "viscosity_coeffs": { "value": [ 0.0024, -0.000005 ] }, 
+    "conductivity_coeffs": { "value": [ 0.115 ] },
+    "specific_heat_coeffs": { "value": [ 2010.0 ] },
+
+    "latent_heat_vap": 255000.0,
+    "antoine_coeffs": { "value": [ 9.1, 1900.0, -60.0 ] }
+}

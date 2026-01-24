@@ -136,35 +136,51 @@ namespace HSP._DevUtils
             Transform engineP2 = DontInstantiateLocal( PartRegistry.Load( (NamespacedID)"Vanilla::engine" ), tankP, new Vector3( -2, -3.45533f, 0 ), Quaternion.identity ).transform;
             v.RootPart = root;
 
-            FBulkConnection conn = tankP.gameObject.AddComponent<FBulkConnection>();
-            conn.End1.ConnectTo( tankL1.GetComponent<FBulkContainer_Sphere>() );
-            conn.End1.Position = new Vector3( 0.0f, -2.5f, 0.0f );
-            conn.End2.ConnectTo( tankP.GetComponent<FBulkContainer_Sphere>() );
-            conn.End2.Position = new Vector3( 0.0f, 1.5f, 0.0f );
-            conn.CrossSectionArea = 0.1f;
+            Substance sbsF = AssetRegistry.Get<Substance>( "Vanilla::Assets/substances/rp_1" );
+            Substance sbsOX = AssetRegistry.Get<Substance>( "Vanilla::Assets/substances/lox" );
 
-            Substance sbsF = AssetRegistry.Get<Substance>( "Vanilla::Assets/substances/fuel" );
-            Substance sbsOX = AssetRegistry.Get<Substance>( "Vanilla::Assets/substances/oxidizer" );
+            var tankSmallTank = tankP.GetComponent<FResourceContainer_FlowTank>();
+            tankSmallTank.Contents = new SubstanceStateCollection() 
+            {
+                { sbsF, tankSmallTank.MaxVolume * sbsF.GetDensityAtSTP() * 0.95f }
+            };
+            var tankLargeTank = tankL1.GetComponent<FResourceContainer_FlowTank>();
+            tankLargeTank.Contents = new SubstanceStateCollection() 
+            {
+                { sbsOX, tankLargeTank.MaxVolume * sbsOX.GetDensityAtSTP() * 0.95f }
+            };
 
-            var tankSmallTank = tankP.GetComponent<FBulkContainer_Sphere>();
-            tankSmallTank.Contents = new SubstanceStateCollection(
-                new SubstanceState[] {
-                    new SubstanceState( tankSmallTank.MaxVolume * ((sbsF.Density + sbsOX.Density) / 2f) / 2f, sbsF ),
-                    new SubstanceState( tankSmallTank.MaxVolume * ((sbsF.Density + sbsOX.Density) / 2f) / 2f, sbsOX )} );
+            FRocketEngine eng1 = engineP1.GetComponent<FRocketEngine>();
+            FRocketEngine eng2 = engineP2.GetComponent<FRocketEngine>();
 
-            FBulkConnection conn21 = engineP1.gameObject.AddComponent<FBulkConnection>();
-            conn21.End1.ConnectTo( tankP.GetComponent<FBulkContainer_Sphere>() );
-            conn21.End1.Position = new Vector3( 0.0f, -1.5f, 0.0f );
-            conn21.End2.ConnectTo( engineP1.GetComponent<FRocketEngine>() );
-            conn21.End2.Position = new Vector3( 0.0f, 0.0f, 0.0f );
-            conn21.CrossSectionArea = 60f;
+            FResourceConnection_FlowPipe conn21 = engineP1.gameObject.AddComponent<FResourceConnection_FlowPipe>();
+            conn21.ConductivityFactor = 1.0;
+            conn21.FromInlet = tankSmallTank.Inlets[1];
+            conn21.ToInlet = eng1.Inlets[0];
+            conn21.FromInlet.NominalArea = 0.004f;
+            conn21.ToInlet.NominalArea = 0.004f;
 
-            FBulkConnection conn22 = engineP2.gameObject.AddComponent<FBulkConnection>();
-            conn22.End1.ConnectTo( tankP.GetComponent<FBulkContainer_Sphere>() );
-            conn22.End1.Position = new Vector3( 0.0f, -1.5f, 0.0f );
-            conn22.End2.ConnectTo( engineP2.GetComponent<FRocketEngine>() );
-            conn22.End2.Position = new Vector3( 0.0f, 0.0f, 0.0f );
-            conn22.CrossSectionArea = 60f;
+            FResourceConnection_FlowPipe conn21o = engineP1.gameObject.AddComponent<FResourceConnection_FlowPipe>();
+            conn21o.ConductivityFactor = 1.0;
+            conn21o.FromInlet = tankLargeTank.Inlets[1];
+            conn21o.ToInlet = eng1.Inlets[1];
+            conn21o.FromInlet.NominalArea = 0.004f;
+            conn21o.ToInlet.NominalArea = 0.004f;
+
+            FResourceConnection_FlowPipe conn22 = engineP2.gameObject.AddComponent<FResourceConnection_FlowPipe>();
+            conn22.ConductivityFactor = 1.0;
+            conn22.FromInlet = tankSmallTank.Inlets[1];
+            conn22.ToInlet = eng2.Inlets[0];
+            conn22.FromInlet.NominalArea = 0.004f;
+            conn22.ToInlet.NominalArea = 0.004f;
+
+            FResourceConnection_FlowPipe conn22o = engineP2.gameObject.AddComponent<FResourceConnection_FlowPipe>();
+            conn22o.ConductivityFactor = 1.0;
+            conn22o.FromInlet = tankLargeTank.Inlets[1];
+            conn22o.ToInlet = eng2.Inlets[1];
+            conn22o.FromInlet.NominalArea = 0.004f;
+            conn22o.ToInlet.NominalArea = 0.004f;
+
 
             FVesselSeparator t1Sep = t1.gameObject.AddComponent<FVesselSeparator>();
             FVesselSeparator t2Sep = t2.gameObject.AddComponent<FVesselSeparator>();
@@ -183,16 +199,23 @@ namespace HSP._DevUtils
             FPlayerInputAvionics av = capsule.GetComponent<FPlayerInputAvionics>();
             FAttitudeAvionics atv = capsule.GetComponent<FAttitudeAvionics>();
             FGimbalActuatorController gc = capsule.GetComponent<FGimbalActuatorController>();
-            FRocketEngine eng1 = engineP1.GetComponent<FRocketEngine>();
+            eng1.Propellant = new EnginePropellant()
+            {
+                PropellantMixture = new SubstanceStateCollection() { { sbsF, 0.9 }, { sbsOX, 1.1 } },
+                NominalIsp = 311
+            };
             F2AxisActuator ac1 = engineP1.GetComponent<F2AxisActuator>();
-            FRocketEngine eng2 = engineP2.GetComponent<FRocketEngine>();
+            eng2.Propellant = new EnginePropellant()
+            {
+                PropellantMixture = new SubstanceStateCollection() { { sbsF, 0.9 }, { sbsOX, 1.1 } },
+                NominalIsp = 311
+            };
             F2AxisActuator ac2 = engineP2.GetComponent<F2AxisActuator>();
+
             av.OnSetThrottle.TryConnect( eng1.SetThrottle );
-            // av.OnSetThrottle.TryConnect( eng2.SetThrottle );
-            // only 1 output is allowed. This is annoying.
+            av.OnSetThrottle.TryConnect( eng2.SetThrottle );
 
             av.OnSetAttitude.TryConnect( gc.SetAttitude );
-            //atv.OnSetAttitude.TryConnect( gc.SetAttitude );
 
             gc.Actuators2D[0] = new FGimbalActuatorController.Actuator2DGroup();
             gc.Actuators2D[0].GetReferenceTransform.TryConnect( ac1.GetReferenceTransform );
@@ -203,49 +226,41 @@ namespace HSP._DevUtils
 
             FSequencer seq = capsule.GetComponent<FSequencer>();
 
+            var igniteAction1 = new SequenceAction() { OnInvokeTyped = new HSP.ControlSystems.Controls.ControllerOutput() };
+            igniteAction1.OnInvokeTyped.TryConnect( eng1.Ignite );
+            var igniteAction2 = new SequenceAction() { OnInvokeTyped = new HSP.ControlSystems.Controls.ControllerOutput() };
+            igniteAction2.OnInvokeTyped.TryConnect( eng2.Ignite );
+
+            var throttleAction1 = new SequenceAction<float>() { OnInvokeTyped = new HSP.ControlSystems.Controls.ControllerOutput<float>(), SignalValue = 1f };
+            throttleAction1.OnInvokeTyped.TryConnect( eng1.SetThrottle );
+            var throttleAction2 = new SequenceAction<float>() { OnInvokeTyped = new HSP.ControlSystems.Controls.ControllerOutput<float>(), SignalValue = 1f };
+            throttleAction2.OnInvokeTyped.TryConnect( eng2.SetThrottle );
+
+            var sepAction1 = new SequenceAction() { OnInvokeTyped = new HSP.ControlSystems.Controls.ControllerOutput() };
+            sepAction1.OnInvokeTyped.TryConnect( t1Sep.Separate );
+            var sepAction2 = new SequenceAction() { OnInvokeTyped = new HSP.ControlSystems.Controls.ControllerOutput() };
+            sepAction2.OnInvokeTyped.TryConnect( t2Sep.Separate );
+
             seq.Sequence = new()
             {
                 Elements = new List<SequenceElement>()
                 {
                     new KeyboardSequenceElement()
                     {
-                        Actions = new List<SequenceActionBase>()
-                        {
-                            new SequenceAction<float>()
-                            {
-                                OnInvokeTyped = new ControlSystems.Controls.ControllerOutput<float>(),
-                                SignalValue = 1f
-                            },
-                            new SequenceAction<float>()
-                            {
-                                OnInvokeTyped = new ControlSystems.Controls.ControllerOutput<float>(),
-                                SignalValue = 1f
-                            }
-                        }//,
-                        //Key = KeyCode.Space
+                        Actions = new List<SequenceActionBase>() { igniteAction1, igniteAction2 }
                     },
                     new TimedSequenceElement()
                     {
-                        Actions = new List<SequenceActionBase>()
-                        {
-                            new SequenceAction()
-                            {
-                                OnInvokeTyped = new ControlSystems.Controls.ControllerOutput()
-                            },
-                            new SequenceAction()
-                            {
-                                OnInvokeTyped = new ControlSystems.Controls.ControllerOutput()
-                            }
-                        },
+                        Actions = new List<SequenceActionBase>() { throttleAction1, throttleAction2 },
+                        Delay = 0.1f
+                    },
+                    new TimedSequenceElement()
+                    {
+                        Actions = new List<SequenceActionBase>() { sepAction1, sepAction2 },
                         Delay = 5f
                     }
                 }
             };
-
-            ((SequenceAction<float>)seq.Sequence.Elements[0].Actions[0]).OnInvoke.TryConnect( eng1.SetThrottle );
-            ((SequenceAction<float>)seq.Sequence.Elements[0].Actions[1]).OnInvoke.TryConnect( eng2.SetThrottle );
-            ((SequenceAction)seq.Sequence.Elements[1].Actions[0]).OnInvoke.TryConnect( t1Sep.Separate );
-            ((SequenceAction)seq.Sequence.Elements[1].Actions[1]).OnInvoke.TryConnect( t2Sep.Separate );
 
             FControlFrame fc = capsule.gameObject.GetComponent<FControlFrame>();
             SelectedControlFrameManager.ControlFrame = fc;

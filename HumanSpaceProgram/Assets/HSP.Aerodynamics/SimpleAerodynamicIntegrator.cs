@@ -14,22 +14,45 @@ namespace HSP.Aerodynamics
 
         public double ReferenceArea { get; set; }
 
-        IReferenceFrameTransform referenceFrameTransform;
-        IPhysicsTransform physicsTransform;
-
-        void Awake()
+        private IPhysicsTransform _physicsTransform;
+        /// <summary>
+        /// Gets the physics transform associated with this game object.
+        /// </summary>
+        public IPhysicsTransform PhysicsTransform
         {
-            referenceFrameTransform = this.GetComponent<IReferenceFrameTransform>();
-            physicsTransform = this.GetComponent<IPhysicsTransform>();
+            get
+            {
+                if( _physicsTransform.IsUnityNull() )
+                {
+                    _physicsTransform = this.GetComponent<IPhysicsTransform>();
+                }
+                return _physicsTransform;
+            }
+        }
+
+        private IReferenceFrameTransform _referenceFrameTransform;
+        /// <summary>
+        /// Gets the reference frame transform associated with this game object.
+        /// </summary>
+        public IReferenceFrameTransform ReferenceFrameTransform
+        {
+            get
+            {
+                if( _referenceFrameTransform.IsUnityNull() )
+                {
+                    _referenceFrameTransform = this.GetComponent<IReferenceFrameTransform>();
+                }
+                return _referenceFrameTransform;
+            }
         }
 
         void FixedUpdate()
         {
-            bool inAtmosphere = HSP.Spatial.SpatialAtmosphere.EvaluatePoint( referenceFrameTransform.Position, out HSP.Spatial.AtmosphereData atmosphereData );
+            bool inAtmosphere = HSP.Spatial.SpatialAtmosphere.EvaluatePoint( ReferenceFrameTransform.Position, out HSP.Spatial.AtmosphereData atmosphereData );
             if( inAtmosphere )
             {
                 Vector3 sceneForce = CalculateNetAerodynamicForce( atmosphereData );
-                physicsTransform.AddForce( sceneForce );
+                PhysicsTransform.AddForce( sceneForce );
                 if( this.gameObject.name == "a" )
                 {
                     Debug.Log( TimeManager.UT + " : " + atmosphereData.Pressure + " : " + atmosphereData.Density + " : " + this.gameObject.name );
@@ -39,7 +62,7 @@ namespace HSP.Aerodynamics
 
         Vector3 CalculateNetAerodynamicForce( HSP.Spatial.AtmosphereData atmosphereData )
         {
-            Vector3 velocity = referenceFrameTransform.Velocity;
+            Vector3 velocity = ReferenceFrameTransform.Velocity;
             Vector3 relativeWind = velocity - atmosphereData.WindVelocity;
             float speed = relativeWind.magnitude;
             if( speed < 0.01 )

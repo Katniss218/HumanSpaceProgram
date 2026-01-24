@@ -4,6 +4,7 @@
     "references": [
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
+        "HSP.Tests.TestUtils",
         "_UnityEngine",
         "_UnityPlus",
         "_UnityPlus.AssetManagement",
@@ -15,6 +16,7 @@
         "HSP",
         "HSP.CelestialBodies",
         "HSP.ReferenceFrames",
+        "HSP.ResourceFlow",
         "HSP.Trajectories",
         "HSP.UI",
         "HSP.Vanilla",

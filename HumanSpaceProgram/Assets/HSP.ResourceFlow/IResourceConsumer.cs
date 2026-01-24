@@ -3,29 +3,52 @@
 namespace HSP.ResourceFlow
 {
     /// <summary>
-    /// Anything that can consume resources. E.g. rocket engine, lightbulb (elec), vent, etc.
+    /// Anything that can consume resources. E.g. rocket engine, lightbulb (electricity), vent, etc.
     /// </summary>
-    public interface IResourceConsumer : IComponent
+    public interface IResourceConsumer
     {
+        /// <summary>
+        /// Get or set the acceleration of the fluid contents (if any) relative to the container, in container-space, in [m/s^2].
+        /// </summary>
+        Vector3 FluidAcceleration { get; set; }
+
+        /// <summary>
+        /// Get or set the angular velocity of the fluid contents (if any) relative to the container, in container-space, in [rad/s].
+        /// </summary>
+        Vector3 FluidAngularVelocity { get; set; }
+
         /// <summary>
         /// Get or set the total inflow per 1 [s].
         /// </summary>
-        SubstanceStateCollection Inflow { get; }
+        ISubstanceStateCollection Inflow { get; set; }
 
         /// <summary>
-        /// Clamps the flow based on how much fluid can actually flow into the consumer object in 1 [s].
+        /// Called before the main solver step to run any internal simulation logic.
         /// </summary>
-        void ClampIn( SubstanceStateCollection inflow, float dt );
+        void PreSolveUpdate( double deltaTime );
 
         /// <summary>
-        /// Calculates the pressure acting at any given point inside the container, as well as what species will want to `flow` out of the container.
+        /// Gets the available volumetric capacity for inflow into this consumer for the given timestep, in [m^3].
+        /// This is used by the solver to prevent overfilling capacity-limited objects (like tanks) and to respect
+        /// the demand rate of rate-limited consumers (like engines).
+        /// </summary>
+        /// <param name="dt">The duration of the timestep, in [s].</param>
+        /// <returns>The available capacity in [m^3]. Can be PositiveInfinity for unlimited-demand consumers.</returns>
+        double GetAvailableInflowVolume( double dt );
+
+        /// <summary>
+        /// Applies the results of the network solve (inflows/outflows) to the internal state of the object.
+        /// </summary>
+        void ApplySolveResults( double deltaTime );
+
+        /// <summary>
+        /// Calculates the pressure acting at any given point inside the container.
         /// </summary>
         /// <remarks>
-        /// If possible, the pressure should be extrapolated, if the position falls out of bounds.
+        /// Takes the Inflow into account, if a tank.
         /// </remarks>
         /// <param name="localPosition">The local position of the point to sample, in [m].</param>
-        /// <param name="localAcceleration">The local acceleration vector, in [m/s^2].</param>
         /// <param name="holeArea">The area of the hole, in [m^2].</param>
-        FluidState Sample( Vector3 localPosition, Vector3 localAcceleration, float holeArea );
+        FluidState Sample( Vector3 localPosition, double holeArea );
     }
 }
