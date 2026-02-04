@@ -1,23 +1,92 @@
 ﻿using HSP.Content;
 using HSP.Vanilla.Content.AssetLoaders.Metadata;
 using System.IO;
+using System.Threading.Tasks;
+using System.Threading;
 using UnityEngine;
 using UnityEngine.Experimental.Rendering;
 using UnityPlus.AssetManagement;
 using UnityPlus.Serialization;
 using UnityPlus.Serialization.DataHandlers;
+using UnityPlus.Serialization.Json;
+using System;
 
 namespace HSP.Vanilla.Content.AssetLoaders
 {
-    public static class GameDataTextureLoader
+    public class TextureLoader : IAssetLoader
     {
         public const string RELOAD_TEXTURES = HSPEvent.NAMESPACE_HSP + ".gdtl.reload_textures";
-
         [HSPEventListener( HSPEvent_STARTUP_IMMEDIATELY.ID, RELOAD_TEXTURES )]
-        public static void ReloadTextures2()
+        private static void RegisterTextureLoader()
         {
-            GameDataTextureLoader.ReloadTextures();
+            AssetRegistry.RegisterLoader( new TextureLoader() );
         }
+
+        public Type OutputType => typeof( Texture2D );
+
+        public bool CanLoad( AssetDataHandle handle )
+        {
+            string ext = handle.FormatHint;
+            return ext == ".png" || ext == ".jpg" || ext == ".jpeg" || ext == ".tga" || ext == ".dds";
+        }
+
+        public async Task<object> LoadAsync( AssetDataHandle handle, CancellationToken ct )
+        {
+            // 1. Load Metadata
+            Texture2DMetadata meta = new Texture2DMetadata();
+            if( await handle.TryOpenSidecarAsync( ".json", out Stream metaStream, ct ) )
+            {
+                using( metaStream )
+                using( StreamReader sr = new StreamReader( metaStream ) )
+                {
+                    string json = await sr.ReadToEndAsync();
+
+                    SerializedData data = new JsonStringReader( json ).Read();
+
+                    meta = SerializationUnit.Deserialize<Texture2DMetadata>( data );
+                }
+            }
+
+            // 2. Load Data
+            string ext = handle.FormatHint;
+
+            // DDS
+            if( ext == ".dds" )
+            {
+                using Stream stream = await handle.OpenMainStreamAsync( ct );
+
+                byte[] rawBytes = await ReadAllBytes( stream, ct );
+
+                using MemoryStream ms = new MemoryStream( rawBytes );
+                return Importer.LoadDDS( ms, meta, "DDS_Asset" );
+            }
+            else
+            {
+#warning TODO - check extension/datatype
+                // PNG/JPG/TGA
+                using Stream stream = await handle.OpenMainStreamAsync( ct );
+                byte[] rawBytes = await ReadAllBytes( stream, ct );
+
+                Texture2D tex = new Texture2D( 2, 2, meta.GraphicsFormat, meta.MipMapCount, TextureCreationFlags.MipChain );
+                tex.wrapMode = meta.WrapMode;
+                tex.filterMode = meta.FilterMode;
+                tex.anisoLevel = meta.AnisoLevel;
+                tex.LoadImage( rawBytes, !meta.Readable );
+                return tex;
+            }
+        }
+
+        private async Task<byte[]> ReadAllBytes( Stream stream, CancellationToken ct )
+        {
+            using MemoryStream ms = new MemoryStream();
+            await stream.CopyToAsync( ms, 81920, ct );
+            return ms.ToArray();
+        }
+    }
+
+    public static class GameDataTextureLoader
+    {
+
 
         private static string ReplaceEnd( this string source, string oldSuffix, string newSuffix )
         {

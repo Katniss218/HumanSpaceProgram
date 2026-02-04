@@ -10,6 +10,35 @@ namespace UnityPlus
         /// Sorts the specified values in topological order. <br/>
         /// This sort is stable.
         /// </summary>
+        public static List<TOriginal> SortDependencies<TOriginal, TId>( this IEnumerable<TOriginal> values ) where TOriginal : ITopologicallySortable<TId>
+        {
+            return SortDependencies(
+                values,
+                node => node.ID,
+                node => node.Before,
+                node => node.After,
+                out _ );
+        }
+
+        /// <summary>
+        /// Sorts the specified values in topological order. <br/>
+        /// Returns an enumerable that can enumerate over any circular dependencies found. <br/>
+        /// This sort is stable.
+        /// </summary>
+        public static List<TOriginal> SortDependencies<TOriginal, TId>( this IEnumerable<TOriginal> values, out IEnumerable<TOriginal> circularDependencies ) where TOriginal : ITopologicallySortable<TId>
+        {
+            return SortDependencies(
+                values,
+                node => node.ID,
+                node => node.Before,
+                node => node.After,
+                out circularDependencies );
+        }
+
+        /// <summary>
+        /// Sorts the specified values in topological order. <br/>
+        /// This sort is stable.
+        /// </summary>
         public static List<ITopologicallySortable<TId>> SortDependencies<TId>( this IEnumerable<ITopologicallySortable<TId>> values )
         {
             return values.SortDependencies(

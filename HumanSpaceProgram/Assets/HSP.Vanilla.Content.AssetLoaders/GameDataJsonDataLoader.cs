@@ -1,40 +1,39 @@
-﻿using HSP.Content;
+﻿using System;
 using System.IO;
-using UnityEngine;
+using System.Threading;
+using System.Threading.Tasks;
 using UnityPlus.AssetManagement;
 using UnityPlus.Serialization;
-using UnityPlus.Serialization.DataHandlers;
+using UnityPlus.Serialization.Json;
 
 namespace HSP.Vanilla.Content.AssetLoaders
 {
-    internal class GameDataJsonDataLoader
+    public class JsonLoader : IAssetLoader
     {
         public const string RELOAD_JSON_DATA = HSPEvent.NAMESPACE_HSP + ".gdml.reload_json_data";
 
         [HSPEventListener( HSPEvent_STARTUP_IMMEDIATELY.ID, RELOAD_JSON_DATA )]
-        public static void ReloadJsonData()
+        private static void RegisterJsonLoader()
         {
-            foreach( var modPath in HumanSpaceProgramContent.GetAllModDirectories() )
-            {
-                string modId = HumanSpaceProgramContent.GetModID( modPath );
+            AssetRegistry.RegisterLoader( new JsonLoader() );
+        }
 
-                string[] files = Directory.GetFiles( modPath, "*.json", SearchOption.AllDirectories );
-                foreach( var file in files )
-                {
-                    string assetID = HumanSpaceProgramContent.GetAssetID( file );
+        public Type OutputType => typeof( object );
 
-                    if( AssetRegistry.IsRegisteredLazy( assetID ) ) // Don't overwrite potentially more important assets if anything else also reads plain JSON files.
-                        continue;
+        public bool CanLoad( AssetDataHandle handle )
+        {
+            return handle.FormatHint == ".json";
+        }
 
-                    AssetRegistry.RegisterLazy( assetID, () =>
-                    {
-                        var data = new JsonSerializedDataHandler( file )
-                            .Read();
+        public async Task<object> LoadAsync( AssetDataHandle handle, CancellationToken ct )
+        {
+            using Stream stream = await handle.OpenMainStreamAsync( ct );
+            using StreamReader sr = new StreamReader( stream );
+            string json = await sr.ReadToEndAsync();
 
-                        return SerializationUnit.Deserialize<object>( data ); // Will create the real instance according to the "$type" property.
-                    }, true );
-                }
-            }
+            SerializedData data = new JsonStringReader( json ).Read();
+
+            return SerializationUnit.Deserialize<object>( data ); // Will create the real instance according to the "$type" property.
         }
     }
 }
