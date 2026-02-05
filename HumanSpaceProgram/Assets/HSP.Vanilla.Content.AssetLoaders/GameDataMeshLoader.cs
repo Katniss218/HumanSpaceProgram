@@ -1,10 +1,10 @@
-﻿using HSP.Content;
+﻿using System;
 using System.IO;
-using System.Threading.Tasks;
 using System.Threading;
+using System.Threading.Tasks;
 using UnityEngine;
+using UnityPlus;
 using UnityPlus.AssetManagement;
-using System;
 
 namespace HSP.Vanilla.Content.AssetLoaders
 {
@@ -28,16 +28,41 @@ namespace HSP.Vanilla.Content.AssetLoaders
         public async Task<object> LoadAsync( AssetDataHandle handle, CancellationToken ct )
         {
             string ext = handle.FormatHint;
-            using Stream stream = await handle.OpenMainStreamAsync( ct );
-
+            
             if( ext == ".obj" )
             {
-                using StreamReader reader = new StreamReader( stream );
-                return OBJ.Importer.LoadOBJ( reader, "OBJ_Asset" );
+                // Read text in background
+                string objText;
+                using( Stream stream = await handle.OpenMainStreamAsync( ct ).ConfigureAwait(false) )
+                using( StreamReader reader = new StreamReader( stream ) )
+                {
+                    objText = await reader.ReadToEndAsync().ConfigureAwait(false);
+                }
+
+                // Parse on Main Thread (Importer constructs Mesh directly)
+                return await MainThreadDispatcher.RunAsync( () =>
+                {
+                    using StringReader sr = new StringReader(objText);
+                    return OBJ.Importer.LoadOBJ( sr, "OBJ_Asset" );
+                } ).ConfigureAwait(false);
             }
             else // .hspm
             {
-                return HSPM.Importer.Load( stream, "HSPM_Asset" );
+                // Read binary in background
+                byte[] bytes;
+                using( Stream stream = await handle.OpenMainStreamAsync( ct ).ConfigureAwait(false) )
+                using( MemoryStream ms = new MemoryStream() )
+                {
+                    await stream.CopyToAsync( ms, 81920, ct ).ConfigureAwait(false);
+                    bytes = ms.ToArray();
+                }
+
+                // Parse on Main Thread
+                return await MainThreadDispatcher.RunAsync( () =>
+                {
+                    using MemoryStream ms = new MemoryStream(bytes);
+                    return HSPM.Importer.Load( ms, "HSPM_Asset" );
+                } ).ConfigureAwait(false);
             }
         }
     }

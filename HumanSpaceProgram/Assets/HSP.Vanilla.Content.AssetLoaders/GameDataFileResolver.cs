@@ -11,6 +11,15 @@ namespace HSP.Vanilla.Content.AssetLoaders
 {
     public class GameDataFileResolver : IAssetResolver
     {
+        public const string REGISTER_FILE_RESOLVER = HSPEvent.NAMESPACE_HSP + ".gdas.register_file_resolver";
+        [HSPEventListener( HSPEvent_STARTUP_IMMEDIATELY.ID, REGISTER_FILE_RESOLVER )]
+        private static void RegisterFileResolver()
+        {
+            GameDataFileResolver fileResolver = new GameDataFileResolver();
+            fileResolver.IndexGameData();
+            AssetRegistry.RegisterResolver( fileResolver );
+        }
+
         public const string TOPOLOGICAL_ID = "hsp.gamedatafileresolver";
 
         private readonly ConcurrentDictionary<string, string> _idToPath = new ConcurrentDictionary<string, string>();

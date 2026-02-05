@@ -8,6 +8,14 @@ namespace HSP.Vanilla.Content.AssetLoaders
 {
     public class TextureProcessingResolver : IAssetResolver
     {
+        public const string REGISTER_TEX_PROC_RESOLVER = HSPEvent.NAMESPACE_HSP + ".gdas.register_tex_proc_resolver";
+
+        [HSPEventListener( HSPEvent_STARTUP_IMMEDIATELY.ID, REGISTER_TEX_PROC_RESOLVER )]
+        private static void RegisterTextureProcessingResolver()
+        {
+            AssetRegistry.RegisterResolver( new TextureProcessingResolver() );
+        }
+
         public const string TOPOLOGICAL_ID = "hsp.textureresizeresolver";
 
         public string ID => TOPOLOGICAL_ID;

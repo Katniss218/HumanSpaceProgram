@@ -9,28 +9,13 @@ namespace UnityPlus.AssetManagement
 {
     /// <summary>
     /// A static registry for assets.
-    /// Handles retrieval via cache, lazy-loading, or the async Resolver-Loader pipeline.
+    /// Handles retrieval via cache or the async Resolver-Loader pipeline.
     /// </summary>
     public static class AssetRegistry
     {
-        private struct LazyAsset
-        {
-            public Func<object> loader;
-            public bool isCacheable;
-
-            public LazyAsset( Func<object> loader, bool isCacheable )
-            {
-                this.loader = loader;
-                this.isCacheable = isCacheable;
-            }
-        }
-
         // Cache
         private static readonly Dictionary<string, object> _loaded = new Dictionary<string, object>();
         private static readonly Dictionary<object, string> _inverseLoaded = new Dictionary<object, string>();
-
-        // Lazy Loaders (Legacy/Synchronous)
-        private static readonly Dictionary<string, LazyAsset> _lazyRegistry = new Dictionary<string, LazyAsset>();
 
         // Resolver-Loader Pipeline
         private static List<IAssetResolver> _resolvers = new List<IAssetResolver>();
@@ -42,20 +27,26 @@ namespace UnityPlus.AssetManagement
         // Thread synchronization for the dictionaries
         private static readonly object _lock = new object();
 
+        // Cycle Detection / Re-entrancy Context
+        private class LoadNode
+        {
+            public string AssetID;
+            public LoadNode Parent;
+        }
+        private static readonly AsyncLocal<LoadNode> _reentrancyStack = new AsyncLocal<LoadNode>();
+
+        /// <summary>
+        /// The maximum time (in milliseconds) a synchronous Get<T> call will wait before giving up.
+        /// Default: 30 seconds.
+        /// </summary>
+        public static int SynchronousLoadTimeoutMs = 30000;
+
         /// <summary>
         /// The number of cached (loaded) assets in the registry.
         /// </summary>
         public static int LoadedCount
         {
             get { lock( _lock ) return _loaded.Count; }
-        }
-
-        /// <summary>
-        /// The number of lazy loaders in the registry.
-        /// </summary>
-        public static int LazyCount
-        {
-            get { lock( _lock ) return _lazyRegistry.Count; }
         }
 
         /// <summary>
@@ -112,26 +103,22 @@ namespace UnityPlus.AssetManagement
             return false;
         }
 
-        public static void RegisterLazy( string assetID, Func<object> loader, bool isCacheable )
+        /// <summary>
+        /// Retrieves the ID of a registered asset object.
+        /// </summary>
+        /// <param name="assetRef">The asset object instance.</param>
+        /// <returns>The Asset ID, or null if not found.</returns>
+        public static string GetAssetID( object assetRef )
         {
-            if( assetID == null )
-                throw new ArgumentNullException( nameof( assetID ) );
-            if( loader == null )
-                throw new ArgumentNullException( nameof( loader ) );
+            if( assetRef == null )
+                return null;
 
             lock( _lock )
             {
-                _lazyRegistry[assetID] = new LazyAsset( loader, isCacheable );
+                if( _inverseLoaded.TryGetValue( assetRef, out string id ) )
+                    return id;
             }
-        }
-
-        public static bool UnregisterLazy( string assetID )
-        {
-            if( assetID == null )
-                throw new ArgumentNullException( nameof( assetID ) );
-
-            lock( _lock )
-                return _lazyRegistry.Remove( assetID );
+            return null;
         }
 
         public static void RegisterResolver( IAssetResolver resolver )
@@ -182,7 +169,7 @@ namespace UnityPlus.AssetManagement
         {
             lock( _lock )
             {
-                return _loaded.ContainsKey( assetID ) || _lazyRegistry.ContainsKey( assetID );
+                return _loaded.ContainsKey( assetID );
             }
         }
 
@@ -192,23 +179,21 @@ namespace UnityPlus.AssetManagement
                 return _loaded.ContainsKey( assetID );
         }
 
-        public static bool IsRegisteredLazy( string assetID )
-        {
-            lock( _lock )
-                return _lazyRegistry.ContainsKey( assetID );
-        }
-
         public static IEnumerable<string> GetRegisteredIDs()
         {
             lock( _lock )
             {
-                return _loaded.Keys.Concat( _lazyRegistry.Keys ).Distinct().ToList();
+                return _loaded.Keys.ToList();
             }
         }
 
         /// <summary>
         /// Retrieves a registered asset synchronously.
-        /// NOTE: This only checks Cache and Lazy Loaders. It DOES NOT trigger the async Resolver pipeline.
+        /// <para>
+        /// If the asset is not in the cache, this method will attempt to load it via the Resolver pipeline synchronously.
+        /// <b>WARNING:</b> This uses the <see cref="MainThreadDispatcher"/> to cooperatively wait for the loading task.
+        /// This prevents deadlocks but stalls the main thread until the asset is loaded.
+        /// </para>
         /// </summary>
         public static T Get<T>( string assetID ) where T : class
         {
@@ -222,42 +207,50 @@ namespace UnityPlus.AssetManagement
                     return val as T;
             }
 
-            // 2. Check Lazy
-            LazyAsset lazy;
-            bool hasLazy;
-            lock( _lock )
+            // 2. Trigger Async Pipeline Synchronously with Pump Guard
+            try
             {
-                hasLazy = _lazyRegistry.TryGetValue( assetID, out lazy );
-            }
+                using( var cts = new CancellationTokenSource( SynchronousLoadTimeoutMs ) )
+                {
+                    Task<T> task = GetAsync<T>( assetID, cts.Token );
 
-            if( hasLazy )
-            {
-                object asset = null;
-                try
-                {
-                    asset = lazy.loader.Invoke();
-                }
-                catch( Exception ex )
-                {
-                    Debug.LogError( $"Failed to load asset '{assetID}' via lazy loader: {ex}" );
-                }
-
-                if( asset != null )
-                {
-                    if( lazy.isCacheable )
+                    // Cooperative Wait Loop
+                    // We must keep the MainThreadDispatcher pumping, otherwise any loader waiting 
+                    // for the main thread (via RunAsync) will never finish, causing a deadlock.
+                    while( !task.IsCompleted )
                     {
-                        Register( assetID, asset );
+                        MainThreadDispatcher.Pump();
+
+                        // Avoid burning 100% CPU if possible, though in a single-threaded game loop, 
+                        // blocking usually means freezing. Thread.Yield() helps OS scheduling.
+                        // However, we want to return as soon as possible.
+                        if( !task.IsCompleted )
+                        {
+                            // Optional: Small sleep/spin. 
+                            // Thread.Sleep(0) yields the rest of time slice.
+                            Thread.Sleep( 0 );
+                        }
                     }
-                    return asset as T;
+
+                    return task.GetAwaiter().GetResult();
                 }
             }
-
-            return default;
+            catch( AggregateException ae )
+            {
+                Exception inner = ae.Flatten().InnerException;
+                Debug.LogError( $"AssetRegistry.Get<{typeof( T ).Name}>('{assetID}') failed: {inner}" );
+                return null;
+            }
+            catch( Exception ex )
+            {
+                Debug.LogError( $"AssetRegistry.Get<{typeof( T ).Name}>('{assetID}') failed: {ex}" );
+                return null;
+            }
         }
 
         /// <summary>
         /// Asynchronously retrieves an asset. 
-        /// Checks Cache, Lazy Loaders (wrapped), and the Resolver-Loader pipeline.
+        /// Checks Cache and the Resolver-Loader pipeline.
         /// </summary>
         public static async Task<T> GetAsync<T>( string assetID, CancellationToken ct = default ) where T : class
         {
@@ -271,11 +264,14 @@ namespace UnityPlus.AssetManagement
                     return val as T;
             }
 
-            // 2. Deduplication / Join existing task
+            // 2. Cycle Detection
+            bool isReentrant = IsLoadingRecursive( assetID );
+
+            // 3. Deduplication / Join existing task
             Task<object> task;
             lock( _lock )
             {
-                if( _loadingTasks.TryGetValue( assetID, out task ) )
+                if( !isReentrant && _loadingTasks.TryGetValue( assetID, out task ) )
                 {
                     // Task exists, wait for it
                 }
@@ -283,13 +279,17 @@ namespace UnityPlus.AssetManagement
                 {
                     // Create new task
                     task = GetAsyncInternal<T>( assetID, ct );
-                    _loadingTasks[assetID] = task;
+
+                    if( !isReentrant )
+                    {
+                        _loadingTasks[assetID] = task;
+                    }
                 }
             }
 
             try
             {
-                object result = await task;
+                object result = await task.ConfigureAwait( false ); // Stay on background thread if possible
                 return result as T;
             }
             finally
@@ -305,128 +305,122 @@ namespace UnityPlus.AssetManagement
             }
         }
 
-        /// <summary>
-        /// Retrieves the ID of a registered asset object.
-        /// </summary>
-        /// <param name="assetRef">The asset object instance.</param>
-        /// <returns>The Asset ID, or null if not found.</returns>
-        public static string GetAssetID( object assetRef )
+        private static bool IsLoadingRecursive( string assetID )
         {
-            if( assetRef == null )
-                return null;
-
-            lock( _lock )
+            LoadNode current = _reentrancyStack.Value;
+            while( current != null )
             {
-                if( _inverseLoaded.TryGetValue( assetRef, out string id ) )
-                    return id;
+                if( current.AssetID == assetID )
+                    return true;
+                current = current.Parent;
             }
-            return null;
+            return false;
         }
 
         private static async Task<object> GetAsyncInternal<T>( string assetID, CancellationToken ct ) where T : class
         {
-            // Re-check cache inside task in case it populated while waiting for lock
-            lock( _lock )
-            {
-                if( _loaded.TryGetValue( assetID, out object val ) )
-                    return val;
-            }
-
-            // Check Lazy (Legacy Sync Fallback)
-            if( IsRegisteredLazy( assetID ) )
-            {
-                // Warning: Running sync lazy loader on thread pool might be dangerous if it uses Unity API.
-                // Ideally lazy loaders should be migrated. For now, we yield to main thread if possible or just run it.
-                // Since this is GetAsync, we assume the caller can handle async.
-                // To be safe, we wrap Get<T> logic.
-                // Note: Get<T> is sync. We should probably just call it.
-                T legacyResult = Get<T>( assetID );
-                if( legacyResult != null ) return legacyResult;
-            }
-
-            // Resolver Pipeline
-            if( !AssetUri.TryParse( assetID, out AssetUri uri ) )
-            {
-                return null;
-            }
-
-            // Snapshot resolvers to avoid locking during async ops
-            List<IAssetResolver> activeResolvers;
-            lock( _lock )
-            {
-                activeResolvers = new List<IAssetResolver>( _resolvers );
-            }
-
-            AssetDataHandle handle = null;
-
-            // 1. Resolve
-            Type targetType = typeof( T );
-            foreach( var resolver in activeResolvers )
-            {
-                ct.ThrowIfCancellationRequested();
-                if( resolver.CanResolve( uri, targetType ) )
-                {
-                    try
-                    {
-                        handle = await resolver.ResolveAsync( uri, targetType, ct );
-                        if( handle != null )
-                            break;
-                    }
-                    catch( Exception ex )
-                    {
-                        Debug.LogError( $"Resolver {resolver.ID} failed for {assetID}: {ex}" );
-                    }
-                }
-            }
-
-            if( handle == null )
-                return null;
+            // Push Context
+            LoadNode parentNode = _reentrancyStack.Value;
+            _reentrancyStack.Value = new LoadNode { AssetID = assetID, Parent = parentNode };
 
             try
             {
-                // Snapshot loaders
-                List<IAssetLoader> activeLoaders;
+                // Re-check cache inside task
                 lock( _lock )
                 {
-                    activeLoaders = new List<IAssetLoader>( _loaders );
+                    if( _loaded.TryGetValue( assetID, out object val ) )
+                        return val;
                 }
 
-                // 2. Load
-                foreach( var loader in activeLoaders )
+                // Resolver Pipeline
+                if( !AssetUri.TryParse( assetID, out AssetUri uri ) )
+                {
+                    return null;
+                }
+
+                List<IAssetResolver> activeResolvers;
+                lock( _lock )
+                {
+                    activeResolvers = new List<IAssetResolver>( _resolvers );
+                }
+
+                AssetDataHandle handle = null;
+
+                Type targetType = typeof( T );
+                foreach( var resolver in activeResolvers )
                 {
                     ct.ThrowIfCancellationRequested();
-                    // Filter by requested type compatibility if possible, or leave it to loader?
-                    // The loader should check if it can produce the OutputType requested or compatible.
-                    // Simple check: if T is Texture2D, loader.OutputType should be Texture2D or subclass.
-                    if( !typeof( T ).IsAssignableFrom( loader.OutputType ) )
-                        continue;
-
-                    if( loader.CanLoad( handle ) )
+                    // Resolvers run on thread pool naturally, but we ensure await doesn't capture context unnecessarily
+                    if( resolver.CanResolve( uri, targetType ) )
                     {
-                        object result = await loader.LoadAsync( handle, ct );
-                        if( result != null )
+                        try
                         {
-                            // Cache result
-                            Register( assetID, result );
-                            return result;
+                            handle = await resolver.ResolveAsync( uri, targetType, ct ).ConfigureAwait( false );
+                            if( handle != null )
+                                break;
+                        }
+                        catch( Exception ex )
+                        {
+                            Debug.LogError( $"Resolver {resolver.ID} failed for {assetID}: {ex}" );
                         }
                     }
                 }
+
+                if( handle == null )
+                    return null;
+
+                try
+                {
+                    List<IAssetLoader> activeLoaders;
+                    lock( _lock )
+                    {
+                        activeLoaders = new List<IAssetLoader>( _loaders );
+                    }
+
+                    foreach( var loader in activeLoaders )
+                    {
+                        ct.ThrowIfCancellationRequested();
+                        if( !typeof( T ).IsAssignableFrom( loader.OutputType ) )
+                            continue;
+
+                        if( loader.CanLoad( handle ) )
+                        {
+                            // CRITICAL: We explicitly wrap the loader execution in Task.Run.
+                            // This ensures the loader starts on the ThreadPool, breaking any implicit 
+                            // dependence on the Unity Main Thread SynchronizationContext.
+                            // The Loader must use MainThreadDispatcher to get back to the main thread.
+
+                            object result = await Task.Run( async () =>
+                            {
+                                return await loader.LoadAsync( handle, ct ).ConfigureAwait( false );
+                            }, ct ).ConfigureAwait( false );
+
+                            if( result != null )
+                            {
+                                Register( assetID, result );
+                                return result;
+                            }
+                        }
+                    }
+                }
+                finally
+                {
+                    try
+                    {
+                        handle.Dispose();
+                    }
+                    catch( Exception ex )
+                    {
+                        Debug.LogError( $"Error disposing handle for {assetID}: {ex}" );
+                    }
+                }
+
+                return null;
             }
             finally
             {
-                // 3. Cleanup
-                try
-                {
-                    handle.Dispose();
-                }
-                catch( Exception ex )
-                {
-                    Debug.LogError( $"Error disposing handle for {assetID}: {ex}" );
-                }
+                _reentrancyStack.Value = parentNode;
             }
-
-            return null;
         }
     }
 }

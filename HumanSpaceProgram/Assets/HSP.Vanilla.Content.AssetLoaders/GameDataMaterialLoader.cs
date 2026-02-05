@@ -1,12 +1,11 @@
-﻿using HSP.Content;
-using System;
+﻿using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityPlus;
 using UnityPlus.AssetManagement;
 using UnityPlus.Serialization;
-using UnityPlus.Serialization.DataHandlers;
 using UnityPlus.Serialization.Json;
 
 namespace HSP.Vanilla.Content.AssetLoaders
@@ -26,13 +25,31 @@ namespace HSP.Vanilla.Content.AssetLoaders
 
         public async Task<object> LoadAsync( AssetDataHandle handle, CancellationToken ct )
         {
-            using Stream stream = await handle.OpenMainStreamAsync( ct );
-            using StreamReader sr = new StreamReader( stream );
-            string json = await sr.ReadToEndAsync();
+            // PHASE 1: Heavy lifting on the background thread.
+            // Note: AssetRegistry has already offloaded this method to Task.Run, 
+            // but we use ConfigureAwait(false) to be explicit about staying off the context.
 
-            SerializedData data = new JsonStringReader( json ).Read();
+            SerializedData data;
 
-            return SerializationUnit.Deserialize<Material>( data );
+            // Open stream (background safe)
+            using( Stream stream = await handle.OpenMainStreamAsync( ct ).ConfigureAwait( false ) )
+            using( StreamReader sr = new StreamReader( stream ) )
+            {
+                // Read text (background safe)
+                string json = await sr.ReadToEndAsync().ConfigureAwait( false );
+
+                // Parse JSON (background safe)
+                data = new JsonStringReader( json ).Read();
+            }
+
+            // PHASE 2: Unity Object creation on Main Thread.
+            // We use the Dispatcher to queue this work. 
+            // If called via AssetRegistry.Get<T>, the main thread is pumping this queue.
+
+            return await MainThreadDispatcher.RunAsync( () =>
+            {
+                return SerializationUnit.Deserialize<Material>( data );
+            } ).ConfigureAwait( false );
         }
     }
 }
