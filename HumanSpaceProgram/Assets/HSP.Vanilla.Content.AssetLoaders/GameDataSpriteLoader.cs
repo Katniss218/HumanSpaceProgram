@@ -26,9 +26,9 @@ namespace HSP.Vanilla.Content.AssetLoaders
 
         public Type OutputType => typeof( Sprite );
 
-        public bool CanLoad( AssetDataHandle handle )
+        public bool CanLoad( AssetDataHandle handle, Type targetType )
         {
-            if( handle.FormatHint != ".json" )
+            if( handle.Format != CoreFormats.Json )
                 return false;
 
             if( handle.TryGetLocalFilePath( out string path ) )
@@ -40,7 +40,7 @@ namespace HSP.Vanilla.Content.AssetLoaders
             return false;
         }
 
-        public async Task<object> LoadAsync( AssetDataHandle handle, CancellationToken ct )
+        public async Task<object> LoadAsync( AssetDataHandle handle, Type targetType, CancellationToken ct )
         {
             // 1. Deserialize Metadata (Background)
             SpriteMetadata meta;
@@ -82,8 +82,9 @@ namespace HSP.Vanilla.Content.AssetLoaders
                         string textureId = HumanSpaceProgramContent.GetAssetID( texturePath );
                         if( !string.IsNullOrEmpty( textureId ) )
                         {
+#warning TODO - there exists both a scenario.json (metadata for scenario itself), and a scenario.png (icon) files, leading to bad discovery.
                             // AssetRegistry.GetAsync handles its own threading, we await it here.
-                            texture = await AssetRegistry.GetAsync<Texture2D>( textureId, ct ).ConfigureAwait( false );
+                            texture = await AssetRegistry.GetAsync<Texture2D>( textureId ).ConfigureAwait( false );
                         }
                     }
                 }

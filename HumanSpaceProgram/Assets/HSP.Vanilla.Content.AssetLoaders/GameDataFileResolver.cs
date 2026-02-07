@@ -1,13 +1,15 @@
 ﻿using HSP.Content;
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityPlus.AssetManagement;
 
-namespace HSP.Vanilla.Content.AssetLoaders
+namespace HSP.Vanilla.Content
 {
     public class GameDataFileResolver : IAssetResolver
     {
@@ -22,70 +24,97 @@ namespace HSP.Vanilla.Content.AssetLoaders
 
         public const string TOPOLOGICAL_ID = "hsp.gamedatafileresolver";
 
-        private readonly ConcurrentDictionary<string, string> _idToPath = new ConcurrentDictionary<string, string>();
+        // Maps ID -> List of Paths (e.g. "Mod::Item" -> [".../Item.png", ".../Item.json"])
+        private readonly ConcurrentDictionary<string, List<string>> _idToPaths = new ConcurrentDictionary<string, List<string>>();
 
         public string ID => TOPOLOGICAL_ID;
         public string[] Before => null;
         public string[] After => null;
         public string[] Blacklist => null;
 
-        public static bool ShouldIgnoreFile( string filePath )
-        {
-            string name = Path.GetFileName( filePath );
-            return name.StartsWith( "." ) || name == ModMetadata.MOD_MANIFEST_FILENAME;
-        }
-
         public void IndexGameData()
         {
             string root = HumanSpaceProgramContent.GetContentDirectoryPath();
-            // Get all files recursively
+            if( !Directory.Exists( root ) ) 
+                return;
+
             string[] files = Directory.GetFiles( root, "*", SearchOption.AllDirectories );
+
+            // Create a HashSet for fast lookups to check if a "Parent" file exists.
+            // This is used to skip sidecars (e.g. if 'A.png' exists, 'A.png.json' is skipped).
+            HashSet<string> fileSet = new( files );
 
             foreach( string file in files )
             {
-                // Skip manifests and other 'ignored' files.
-                if( ShouldIgnoreFile( file ) )
+                string name = Path.GetFileName( file );
+
+                // 1. Skip system files and specific metadata files
+                if( name.StartsWith( "." ) || name == "ModManifest.json" || name == "_mod.json" || name.EndsWith( ".meta" ) )
                     continue;
 
-                // Generate ID: ModID::RelativePath
-                // Index the base ID (without extension) if unique
-                 string id = HumanSpaceProgramContent.GetAssetID( file );
-                if( !_idToPath.TryAdd( id, file ) )
+                // 2. Skip sidecars
+                // If this file is "Image.png.json", check if "Image.png" exists.
+                // We use Path.ChangeExtension(..., null) to strip the last extension.
+                string potentialParent = Path.ChangeExtension( file, null );
+
+                // If the parent file exists in our set, we treat the current file as a sidecar and do NOT index it as a standalone asset.
+                if( fileSet.Contains( potentialParent ) )
+                    continue;
+
+                void AddToIndex( string assetId, string filePath )
                 {
-                    // If ID collision (e.g. tex.png vs tex.json), we might want logic here.
-                    // For now, first wins for the base ID.
+                    _idToPaths.AddOrUpdate( assetId,
+                        ( k ) => new List<string> { filePath },
+                        ( k, list ) => {
+                            lock( list )
+                            {
+                                if( !list.Contains( filePath ) ) list.Add( filePath );
+                            }
+                            return list;
+                        } );
                 }
 
+                // 3. Register Base ID (ModID::RelativePath without extension)
+                string baseId = HumanSpaceProgramContent.GetAssetID( file );
+                AddToIndex( baseId, file );
+
+                // 4. Register Explicit ID (ModID::RelativePath with extension)
                 if( HumanSpaceProgramContent.GetModDirectoryFromAssetPath( file, out string modId ) != null )
                 {
-                    // RelPath relative to mod folder
                     string relPath = Path.GetRelativePath( HumanSpaceProgramContent.GetModDirectory( modId ), file ).Replace( "\\", "/" );
                     string idWithExt = $"{modId}::{relPath}";
-                    _idToPath.TryAdd( idWithExt, file );
+
+                    if( idWithExt != baseId )
+                    {
+                        AddToIndex( idWithExt, file );
+                    }
                 }
             }
 
-            Debug.Log( $"[GameDataFileResolver] Indexed {_idToPath.Count} asset IDs." );
+            Debug.Log( $"[GameDataFileResolver] Indexed {_idToPaths.Count} asset IDs." );
         }
 
         public bool CanResolve( AssetUri uri, Type targetType )
         {
-            // We resolve against the BaseId (ModId::Path).
-            // This ignores any query parameters (e.g. ?size=4), allowing this resolver to find the file even if the user appended params for a loader down the line.
-
-            // Do not check targetType here, because this resolver just maps ID -> FilePath.
-            // The validity of the file content vs requested type is checked by the Loaders.
-
-            return _idToPath.ContainsKey( uri.BaseID );
+            return _idToPaths.ContainsKey( uri.BaseID );
         }
 
-        public Task<AssetDataHandle> ResolveAsync( AssetUri uri, Type targetType, CancellationToken ct )
+        public Task<IEnumerable<AssetDataHandle>> ResolveAsync( AssetUri uri, CancellationToken ct )
         {
-            if( _idToPath.TryGetValue( uri.BaseID, out string path ) )
+            if( _idToPaths.TryGetValue( uri.BaseID, out List<string> paths ) )
             {
-                return Task.FromResult<AssetDataHandle>( new FileAssetDataHandle( path ) );
+                // Return handles for ALL files associated with this ID.
+                // The Registry will check which one works with the requested Type via Loaders.
+                // We lock the list copy to be thread safe.
+                List<string> pathCopy;
+                lock( paths ) 
+                    pathCopy = new List<string>( paths );
+
+                IEnumerable<AssetDataHandle> handles = pathCopy.Select( p => (AssetDataHandle)new FileAssetDataHandle( p ) );
+                return Task.FromResult( handles );
             }
-            return Task.FromResult<AssetDataHandle>( null );
+
+            return Task.FromResult<IEnumerable<AssetDataHandle>>( null );
         }
     }
 }

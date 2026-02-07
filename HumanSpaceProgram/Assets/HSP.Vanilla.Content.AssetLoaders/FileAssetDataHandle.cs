@@ -3,20 +3,20 @@ using System.Threading;
 using System.Threading.Tasks;
 using UnityPlus.AssetManagement;
 
-namespace HSP.Vanilla.Content.AssetLoaders
+namespace HSP.Vanilla.Content
 {
     public class FileAssetDataHandle : AssetDataHandle
     {
         private readonly string _filePath;
-        private readonly string _formatHint;
+        private readonly AssetFormat _format;
 
         public FileAssetDataHandle( string filePath )
         {
             _filePath = filePath;
-            _formatHint = Path.GetExtension( filePath ).ToLowerInvariant();
+            _format = AssetFormat.FromExtension( Path.GetExtension( filePath ) );
         }
 
-        public override string FormatHint => _formatHint;
+        public override AssetFormat Format => _format;
 
         public override bool TryGetLocalFilePath( out string val )
         {
@@ -32,10 +32,10 @@ namespace HSP.Vanilla.Content.AssetLoaders
                 byte[] buffer = new byte[count];
                 using( FileStream fs = new FileStream( _filePath, FileMode.Open, FileAccess.Read, FileShare.Read ) )
                 {
-                    await fs.ReadAsync( buffer, 0, count, ct ).ConfigureAwait(false);
+                    await fs.ReadAsync( buffer, 0, count, ct ).ConfigureAwait( false );
                 }
                 return buffer;
-            }, ct ).ConfigureAwait(false);
+            }, ct ).ConfigureAwait( false );
         }
 
         public override Task<Stream> OpenMainStreamAsync( CancellationToken ct )
@@ -52,9 +52,11 @@ namespace HSP.Vanilla.Content.AssetLoaders
         {
             // Synchronous file check is unavoidable here unless we want to wrap everything.
             // File.Exists is generally fast enough, but technically blocking.
-            // For rigorous safety:
-            string sidecarPath = Path.ChangeExtension( _filePath, sidecarExtension );
-            
+
+            // New Logic: Append extension (e.g. "file.png" + ".json" -> "file.png.json")
+            // Assuming sidecarExtension contains the dot.
+            string sidecarPath = _filePath + sidecarExtension;
+
             if( File.Exists( sidecarPath ) )
             {
                 stream = new FileStream( sidecarPath, FileMode.Open, FileAccess.Read, FileShare.Read );

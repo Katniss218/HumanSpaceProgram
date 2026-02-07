@@ -20,12 +20,12 @@ namespace HSP.Vanilla.Content.AssetLoaders
 
         public Type OutputType => typeof( object );
 
-        public bool CanLoad( AssetDataHandle handle )
+        public bool CanLoad( AssetDataHandle handle, Type targetType )
         {
-            return handle.FormatHint == ".json";
+            return handle.Format == CoreFormats.Json;
         }
 
-        public async Task<object> LoadAsync( AssetDataHandle handle, CancellationToken ct )
+        public async Task<object> LoadAsync( AssetDataHandle handle, Type targetType, CancellationToken ct )
         {
             using Stream stream = await handle.OpenMainStreamAsync( ct );
             using StreamReader sr = new StreamReader( stream );

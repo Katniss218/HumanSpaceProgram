@@ -19,17 +19,14 @@ namespace HSP.Vanilla.Content.AssetLoaders
 
         public Type OutputType => typeof( Mesh );
 
-        public bool CanLoad( AssetDataHandle handle )
+        public bool CanLoad( AssetDataHandle handle, Type targetType )
         {
-            string ext = handle.FormatHint;
-            return ext == ".obj" || ext == ".hspm";
+            return handle.Format == CoreFormats.Obj;// || ext == ".hspm";
         }
 
-        public async Task<object> LoadAsync( AssetDataHandle handle, CancellationToken ct )
-        {
-            string ext = handle.FormatHint;
-            
-            if( ext == ".obj" )
+        public async Task<object> LoadAsync( AssetDataHandle handle, Type targetType, CancellationToken ct )
+        {            
+            if( handle.Format == CoreFormats.Obj )
             {
                 // Read text in background
                 string objText;
@@ -46,7 +43,8 @@ namespace HSP.Vanilla.Content.AssetLoaders
                     return OBJ.Importer.LoadOBJ( sr, "OBJ_Asset" );
                 } ).ConfigureAwait(false);
             }
-            else // .hspm
+            throw new Exception( $"Unsupported mesh format: {handle.Format}" );
+            /*else // .hspm
             {
                 // Read binary in background
                 byte[] bytes;
@@ -63,7 +61,7 @@ namespace HSP.Vanilla.Content.AssetLoaders
                     using MemoryStream ms = new MemoryStream(bytes);
                     return HSPM.Importer.Load( ms, "HSPM_Asset" );
                 } ).ConfigureAwait(false);
-            }
+            }*/
         }
     }
 }

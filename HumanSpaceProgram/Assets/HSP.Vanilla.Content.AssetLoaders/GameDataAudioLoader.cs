@@ -19,17 +19,14 @@ namespace HSP.Vanilla.Content.AssetLoaders
 
         public Type OutputType => typeof( AudioClip );
 
-        public bool CanLoad( AssetDataHandle handle )
+        public bool CanLoad( AssetDataHandle handle, Type targetType )
         {
-            string ext = handle.FormatHint;
-            return ext == ".wav";// || ext == ".ogg";
+            return handle.Format == CoreFormats.Wav;// || ext == ".ogg";
         }
 
-        public async Task<object> LoadAsync( AssetDataHandle handle, CancellationToken ct )
+        public async Task<object> LoadAsync( AssetDataHandle handle, Type targetType, CancellationToken ct )
         {
-            string ext = handle.FormatHint;
-
-            if( ext == ".wav" )
+            if( handle.Format == CoreFormats.Wav )
             {
                 // Read bytes in background
                 byte[] bytes;
@@ -46,6 +43,7 @@ namespace HSP.Vanilla.Content.AssetLoaders
                     return WAV.Importer.LoadWAV( bytes, "WAV_Asset" );
                 } ).ConfigureAwait( false );
             }
+            throw new Exception( RELOAD_AUDIO + ": Unsupported audio format: " + handle.Format );
             /*else if( ext == ".ogg" )
             {
                 if( handle.TryGetLocalFilePath( out string path ) )
@@ -63,7 +61,6 @@ namespace HSP.Vanilla.Content.AssetLoaders
                 }
             }*/
 
-            return null;
         }
     }
 }

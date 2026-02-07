@@ -50,7 +50,7 @@ namespace HSP.Timelines.Serialization
         /// <summary>
         /// Gets the thumbnail icon of this scenario.
         /// </summary>
-        public Sprite Icon => AssetRegistry.Get<Sprite>( $"{ScenarioID.ModID}::Scenarios/{ScenarioID.ContentID}/_scenario" );
+        public Sprite Icon => AssetRegistry.Get<Sprite>( $"{ScenarioID.ModID}::Scenarios/{ScenarioID.ContentID}/_scenario_sprite" );
 
         /// <summary>
         /// The version of the scenario file.

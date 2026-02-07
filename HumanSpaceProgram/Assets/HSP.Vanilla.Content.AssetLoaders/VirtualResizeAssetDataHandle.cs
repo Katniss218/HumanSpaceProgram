@@ -19,7 +19,7 @@ namespace HSP.Vanilla.Content.AssetLoaders
         }
 
         // We use a custom extension to ensure only the TextureResizingLoader picks this up.
-        public override string FormatHint => ".virtual_resize_op";
+        public override AssetFormat Format => (AssetFormat)".virtual_resize_op";
 
         public override Task<byte[]> PeekBytesAsync( int count, CancellationToken ct )
         {

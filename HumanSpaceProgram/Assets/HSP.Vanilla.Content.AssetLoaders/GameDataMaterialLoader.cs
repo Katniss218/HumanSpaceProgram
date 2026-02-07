@@ -21,9 +21,12 @@ namespace HSP.Vanilla.Content.AssetLoaders
 
         public Type OutputType => typeof( Material );
 
-        public bool CanLoad( AssetDataHandle handle ) => handle.FormatHint == ".jsonmat";
+        public bool CanLoad( AssetDataHandle handle, Type targetType )
+        {
+            return handle.Format == HSPFormats.JsonMat;
+        }
 
-        public async Task<object> LoadAsync( AssetDataHandle handle, CancellationToken ct )
+        public async Task<object> LoadAsync( AssetDataHandle handle, Type targetType, CancellationToken ct )
         {
             // PHASE 1: Heavy lifting on the background thread.
             // Note: AssetRegistry has already offloaded this method to Task.Run, 

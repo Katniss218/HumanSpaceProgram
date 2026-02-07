@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -39,24 +40,18 @@ namespace HSP.Vanilla.Content.AssetLoaders
             return uri.QueryParams != null && uri.QueryParams.ContainsKey( "resize" );
         }
 
-        public Task<AssetDataHandle> ResolveAsync( AssetUri uri, Type targetType, CancellationToken ct )
+        public Task<IEnumerable<AssetDataHandle>> ResolveAsync( AssetUri uri, CancellationToken ct )
         {
             if( uri.QueryParams.TryGetValue( "resize", out string sizeStr ) && int.TryParse( sizeStr, out int size ) )
             {
-                // Construct the ID for the base asset (stripping the resize param).
-                // TODO - Keep any other params in case the base loader needs them.
-
-                string baseId = uri.BaseID;
-
-                // Simple parser for "resize=128x64" could go here if needed.
                 int width = size;
                 int height = size;
 
-
-                return Task.FromResult<AssetDataHandle>( new VirtualResizeAssetDataHandle( baseId, width, height ) );
+                var handle = new VirtualResizeAssetDataHandle( uri.BaseID, width, height );
+                return Task.FromResult<IEnumerable<AssetDataHandle>>( new[] { handle } );
             }
 
-            return Task.FromResult<AssetDataHandle>( null );
+            return Task.FromResult<IEnumerable<AssetDataHandle>>( null );
         }
     }
 }

@@ -12,9 +12,9 @@ namespace UnityPlus.AssetManagement
     public abstract class AssetDataHandle : IDisposable
     {
         /// <summary>
-        /// The "hint" for the file type (Extension or MIME type). Can be null.
+        /// The format of the data, derived from file extension or MIME type.
         /// </summary>
-        public abstract string FormatHint { get; }
+        public abstract AssetFormat Format { get; }
 
         /// <summary>
         /// Reads the first <paramref name="count"/> bytes from the beginning of the stream.

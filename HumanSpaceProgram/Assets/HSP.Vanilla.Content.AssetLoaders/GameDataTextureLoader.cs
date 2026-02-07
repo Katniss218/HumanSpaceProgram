@@ -24,13 +24,13 @@ namespace HSP.Vanilla.Content.AssetLoaders
 
         public Type OutputType => typeof( Texture2D );
 
-        public bool CanLoad( AssetDataHandle handle )
+        public bool CanLoad( AssetDataHandle handle, Type targetType )
         {
-            string ext = handle.FormatHint;
-            return ext == ".png" || ext == ".jpg" || ext == ".jpeg" || ext == ".tga" || ext == ".dds";
+            AssetFormat fmt = handle.Format;
+            return fmt == CoreFormats.Png || fmt == CoreFormats.Jpg || fmt == CoreFormats.Tga || fmt == CoreFormats.Dds;
         }
 
-        public async Task<object> LoadAsync( AssetDataHandle handle, CancellationToken ct )
+        public async Task<object> LoadAsync( AssetDataHandle handle, Type targetType, CancellationToken ct )
         {
             // 1. Load Metadata (Background)
             Texture2DMetadata meta = new Texture2DMetadata();
@@ -39,7 +39,7 @@ namespace HSP.Vanilla.Content.AssetLoaders
                 using( metaStream )
                 using( StreamReader sr = new StreamReader( metaStream ) )
                 {
-                    string json = await sr.ReadToEndAsync().ConfigureAwait(false);
+                    string json = await sr.ReadToEndAsync().ConfigureAwait( false );
                     SerializedData data = new JsonStringReader( json ).Read();
                     meta = SerializationUnit.Deserialize<Texture2DMetadata>( data );
                 }
@@ -48,17 +48,15 @@ namespace HSP.Vanilla.Content.AssetLoaders
             // 2. Read Data (Background)
             // We read to memory first to avoid blocking the main thread with I/O during the creation phase.
             byte[] rawBytes;
-            using( Stream stream = await handle.OpenMainStreamAsync( ct ).ConfigureAwait(false) )
+            using( Stream stream = await handle.OpenMainStreamAsync( ct ).ConfigureAwait( false ) )
             {
-                rawBytes = await ReadAllBytes( stream, ct ).ConfigureAwait(false);
+                rawBytes = await ReadAllBytes( stream, ct ).ConfigureAwait( false );
             }
-
-            string ext = handle.FormatHint;
 
             // 3. Create Unity Object (Main Thread)
             return await MainThreadDispatcher.RunAsync( () =>
             {
-                if( ext == ".dds" )
+                if( handle.Format == CoreFormats.Dds )
                 {
                     using MemoryStream ms = new MemoryStream( rawBytes );
                     return Importer.LoadDDS( ms, meta, "DDS_Asset" );
@@ -73,13 +71,13 @@ namespace HSP.Vanilla.Content.AssetLoaders
                     tex.LoadImage( rawBytes, !meta.Readable );
                     return tex;
                 }
-            } ).ConfigureAwait(false);
+            } ).ConfigureAwait( false );
         }
 
         private async Task<byte[]> ReadAllBytes( Stream stream, CancellationToken ct )
         {
             using MemoryStream ms = new MemoryStream();
-            await stream.CopyToAsync( ms, 81920, ct ).ConfigureAwait(false);
+            await stream.CopyToAsync( ms, 81920, ct ).ConfigureAwait( false );
             return ms.ToArray();
         }
     }

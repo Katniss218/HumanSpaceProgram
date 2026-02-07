@@ -83,12 +83,14 @@ namespace HSP.Content.Mods
 
                 if( !IsModLoaded( modId ) )
                 {
+                    Debug.Log( modId );
                     return false;
                 }
 
                 ModMetadata loadedMod = GetLoadedMod( modId );
                 if( loadedMod == null || !Version.AreCompatible( loadedMod.Version, requiredVersion ) )
                 {
+                    Debug.Log( modId );
                     return false;
                 }
             }
