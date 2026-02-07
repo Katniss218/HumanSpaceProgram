@@ -502,6 +502,7 @@ namespace HSP.Timelines
             try
             {
                 loadedScenario = ScenarioMetadata.LoadFromDisk( timeline.ScenarioID );
+#warning TODO - system needs to be modified to now throw but to display a meaningful error to the user. and to not get stuck at the partly-loaded empty gameplay scene
             }
             catch( Exception ex )
             {

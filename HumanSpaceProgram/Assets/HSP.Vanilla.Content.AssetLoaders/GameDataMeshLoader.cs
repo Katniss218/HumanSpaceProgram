@@ -1,26 +1,67 @@
-﻿using HSP.Content;
+﻿using System;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
+using UnityEngine;
+using UnityPlus;
 using UnityPlus.AssetManagement;
 
 namespace HSP.Vanilla.Content.AssetLoaders
 {
-    internal class GameDataMeshLoader
+    public class MeshLoader : IAssetLoader
     {
         public const string RELOAD_MESHES = HSPEvent.NAMESPACE_HSP + ".gdmsl.reload_meshes";
-
         [HSPEventListener( HSPEvent_STARTUP_IMMEDIATELY.ID, RELOAD_MESHES )]
-        public static void ReloadMeshes()
+        private static void RegisterMeshLoader()
         {
-            foreach( var modPath in HumanSpaceProgramContent.GetAllModDirectories() )
-            {
-                string modId = HumanSpaceProgramContent.GetModID( modPath );
+            AssetRegistry.RegisterLoader( new MeshLoader() );
+        }
 
-                string[] files = Directory.GetFiles( modPath, "*.obj", SearchOption.AllDirectories );
-                foreach( var file in files )
+        public Type OutputType => typeof( Mesh );
+
+        public bool CanLoad( AssetDataHandle handle, Type targetType )
+        {
+            return handle.Format == CoreFormats.Obj;// || ext == ".hspm";
+        }
+
+        public async Task<object> LoadAsync( AssetDataHandle handle, Type targetType, CancellationToken ct )
+        {            
+            if( handle.Format == CoreFormats.Obj )
+            {
+                // Read text in background
+                string objText;
+                using( Stream stream = await handle.OpenMainStreamAsync( ct ).ConfigureAwait(false) )
+                using( StreamReader reader = new StreamReader( stream ) )
                 {
-                    AssetRegistry.RegisterLazy( HumanSpaceProgramContent.GetAssetID( file ), () => OBJ.Importer.LoadOBJ( file ), true );
+                    objText = await reader.ReadToEndAsync().ConfigureAwait(false);
                 }
+
+                // Parse on Main Thread (Importer constructs Mesh directly)
+                return await MainThreadDispatcher.RunAsync( () =>
+                {
+                    using StringReader sr = new StringReader(objText);
+                    return OBJ.Importer.LoadOBJ( sr, "OBJ_Asset" );
+                } ).ConfigureAwait(false);
             }
+            throw new Exception( $"Unsupported mesh format: {handle.Format}" );
+            /*else // .hspm
+            {
+                // Read binary in background
+                byte[] bytes;
+                using( Stream stream = await handle.OpenMainStreamAsync( ct ).ConfigureAwait(false) )
+                using( MemoryStream ms = new MemoryStream() )
+                {
+                    await stream.CopyToAsync( ms, 81920, ct ).ConfigureAwait(false);
+                    bytes = ms.ToArray();
+                }
+
+                // Parse on Main Thread
+                return await MainThreadDispatcher.RunAsync( () =>
+                {
+                    using MemoryStream ms = new MemoryStream(bytes);
+                    return HSPM.Importer.Load( ms, "HSPM_Asset" );
+                } ).ConfigureAwait(false);
+            }*/
         }
     }
 }

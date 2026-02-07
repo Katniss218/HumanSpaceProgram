@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityPlus.AssetManagement;
 
 namespace HSP.SceneManagement
 {
@@ -58,6 +59,8 @@ namespace HSP.SceneManagement
         void Start()
         {
             HSPEvent.EventManager.TryInvoke( HSPEvent_STARTUP_EARLY.ID );
+
+            var tex = AssetRegistry.Get<Texture2D>( "Vanilla::Scenarios/default - kopia/_scenario" );
         }
     }
 }

@@ -3,7 +3,7 @@
     /// <summary>
     /// Holds a (v,vt,vn) triplet.
     /// </summary>
-    internal struct OBJVertex
+    public struct OBJVertex
     {
         /// <summary>
         /// The index into the vertex position array.

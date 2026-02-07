@@ -1,324 +1,536 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace UnityPlus.AssetManagement
 {
     /// <summary>
-    /// A static registry for assets. <br/>
-    /// Register assets at startup. Request them after registering.
+    /// A static registry for assets.
+    /// Handles retrieval via cache or the async Resolver-Loader pipeline.
+    /// Supports multiple assets sharing the same ID, differentiated by their System.Type.
     /// </summary>
-    /// <remarks>
-    /// The assets are associated 1-to-1 with string IDs.
-    /// </remarks>
     public static class AssetRegistry
     {
-        private struct LazyAsset
+        // Cache: Maps ID -> List of loaded objects (to support collision/overloading by type)
+        private static readonly Dictionary<string, List<object>> _loaded = new Dictionary<string, List<object>>();
+        private static readonly Dictionary<object, string> _inverseLoaded = new Dictionary<object, string>();
+
+        private static List<IAssetResolver> _resolvers = new List<IAssetResolver>();
+        private static List<IAssetLoader> _loaders = new List<IAssetLoader>();
+
+        // Async deduplication
+        private static readonly Dictionary<(string id, Type reqType), Task<object>> _loadingTasks = new Dictionary<(string, Type), Task<object>>();
+
+        private static readonly object _lock = new object();
+
+        // Cycle Detection / Re-entrancy Context
+        private class LoadNode
         {
-            public Func<object> loader;
-            public bool isCacheable;
-
-            public LazyAsset( Func<object> loader, bool isCacheable )
-            {
-                this.loader = loader;
-                this.isCacheable = isCacheable;
-            }
+            public string AssetID;
+            public LoadNode Parent;
         }
+        private static readonly AsyncLocal<LoadNode> _reentrancyStack = new AsyncLocal<LoadNode>();
 
-        // Registry is a class used to manage 2 types of `assets`:
-        // - cacheable      - shared (singleton), often immutable, owned by the registry.
-        // - non-cacheable  - unique (transient), often mutable, owned by the caller.
-
-        // An `asset` in this context is more broad than just Unity asset, since it can be an arbitrary class (reference type).
-
-        private static Dictionary<string, object> _loaded = new Dictionary<string, object>();
-        private static Dictionary<object, string> _inverseLoaded = new Dictionary<object, string>();
-
-        // Assets don't have to all be loaded and cached immediately at startup.
-        // An asset can be `lazy-loaded` if a loader method is provided.
-        // With this an asset loading and caching can be deferred to when the asset is requested.
-
-        private static Dictionary<string, LazyAsset> _lazyRegistry = new Dictionary<string, LazyAsset>();
+        /// <summary>
+        /// The maximum time (in milliseconds) a synchronous Get<T> call will wait before giving up.
+        /// Default: 30 seconds.
+        /// </summary>
+        public static int SynchronousLoadTimeoutMs = 30000;
 
         /// <summary>
         /// The number of cached (loaded) assets in the registry.
         /// </summary>
-        public static int LoadedCount => _loaded.Count;
-
-        /// <summary>
-        /// The number of lazy loaders in the registry.
-        /// </summary>
-        public static int LazyCount => _lazyRegistry.Count;
-
-        /// <summary>
-        /// Checks if any asset is registered under the specified asset ID.
-        /// </summary>
-        public static bool IsRegistered( string assetID )
+        public static int LoadedCount
         {
-            return _loaded.ContainsKey( assetID ) || _lazyRegistry.ContainsKey( assetID );
+            get { lock( _lock ) return _inverseLoaded.Count; }
+        }
+
+        public static void RegisterResolver( IAssetResolver resolver )
+        {
+            if( resolver == null )
+                throw new ArgumentNullException( nameof( resolver ) );
+
+            lock( _lock )
+            {
+                if( !_resolvers.Contains( resolver ) )
+                {
+                    _resolvers.Add( resolver );
+                    _resolvers = _resolvers.SortDependencies<IAssetResolver, string>()
+                        .ToList();
+                }
+            }
+        }
+
+        public static void UnregisterResolver( IAssetResolver resolver )
+        {
+            if( resolver == null )
+                throw new ArgumentNullException( nameof( resolver ) );
+
+            lock( _lock )
+            {
+                _resolvers.Remove( resolver );
+                _resolvers = _resolvers.SortDependencies<IAssetResolver, string>()
+                    .ToList();
+            }
+        }
+
+        public static void RegisterLoader( IAssetLoader loader )
+        {
+            if( loader == null )
+                throw new ArgumentNullException( nameof( loader ) );
+
+            lock( _lock )
+            {
+                if( !_loaders.Contains( loader ) )
+                    _loaders.Add( loader );
+            }
+        }
+
+        public static void UnregisterLoader( IAssetLoader loader )
+        {
+            if( loader == null )
+                throw new ArgumentNullException( nameof( loader ) );
+
+            lock( _lock )
+                _loaders.Remove( loader );
         }
 
         /// <summary>
-        /// Checks if a lazy loader is registered under the specified asset ID.
+        /// Registers the given (loaded) object as an asset.
+        /// If an asset with the same ID and Type exists, it will NOT be overwritten unless it is the exact same reference.
         /// </summary>
-        public static bool IsRegisteredLazy( string assetID )
-        {
-            return _lazyRegistry.ContainsKey( assetID );
-        }
-
-        /// <summary>
-        /// Checks if an asset is cached (has been loaded) under the specified asset ID.
-        /// </summary>
-        public static bool IsLoaded( string assetID )
-        {
-            return _loaded.ContainsKey( assetID );
-        }
-
-        /// <summary>
-        /// Retrieves a registered asset, performs graceful type conversion on the asset to the requested type.
-        /// </summary>
-        /// <remarks>
-        /// If no asset has been registered (loaded) for the specified <paramref name="assetID"/>, and there exists a lazy loader for the asset, it will be invoked to load the asset. <br/>
-        /// Lazy-loaded assets that are marked as 'cacheable' will be cached after loading, and a cached instance will be returned.
-        /// </remarks>
-        /// <typeparam name="T">The requested type.</typeparam>
-        /// <param name="assetID">The asset ID under which the asset is registered.</param>
-        /// <returns>The registered asset, converted to the specified type <typeparamref name="T"/>. <br/>
-        /// <see cref="default"/>, if no asset can be found. <br/>
-        /// <see cref="default"/>, if the type of the registered asset doesn't match the requested type.</returns>
-        public static T Get<T>( string assetID ) where T : class
+        public static void Register( string assetID, object asset )
         {
             if( assetID == null )
-            {
-                throw new ArgumentNullException( nameof( assetID ), $"Asset ID of an asset to get can't be null." );
-            }
+                throw new ArgumentNullException( nameof( assetID ) );
+            if( asset == null )
+                throw new ArgumentNullException( nameof( asset ) );
 
-            // Try to get an already loaded asset.
-            if( _loaded.TryGetValue( assetID, out object val ) )
+            lock( _lock )
             {
-                return val as T;
-            }
-
-            // Try to load a lazy asset.
-            if( _lazyRegistry.TryGetValue( assetID, out LazyAsset lazy ) )
-            {
-                object asset = null;
-                try
+                if( !_loaded.TryGetValue( assetID, out List<object> assets ) )
                 {
-                    asset = lazy.loader.Invoke();
-                }
-                catch( Exception ex )
-                {
-                    Debug.LogError( $"Failed to load an asset with ID '{assetID}' using its lazy loader." );
-                    Debug.LogException( ex );
+                    assets = new List<object>();
+                    _loaded[assetID] = assets;
                 }
 
-                if( asset != null )
+                // Check for duplicate reference
+                if( !assets.Contains( asset ) )
                 {
-                    if( lazy.isCacheable )
-                    {
-                        Register( assetID, asset );
-                    }
-                    return asset as T;
+                    assets.Add( asset );
+                    _inverseLoaded[asset] = assetID;
                 }
             }
-
-            return default;
         }
 
         /// <summary>
-        /// Returns the asset ID of a registered asset.
+        /// Unregisters and unloads an asset.
         /// </summary>
-        /// <param name="assetRef">A reference to an asset retrieved from this registry.</param>
-        /// <returns>The asset ID of the specified asset, <see cref="null"/> if it doesn't exist in the registry.</returns>
+        public static bool Unregister( string assetID )
+        {
+            if( assetID == null )
+                throw new ArgumentNullException( nameof( assetID ) );
+
+            lock( _lock )
+            {
+                if( _loaded.TryGetValue( assetID, out List<object> assets ) )
+                {
+                    foreach( var asset in assets )
+                    {
+                        _inverseLoaded.Remove( asset );
+                    }
+                    _loaded.Remove( assetID );
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Unregisters and unloads an asset by Reference.
+        /// </summary>
+        public static bool Unregister( object assetRef )
+        {
+            if( assetRef == null )
+                throw new ArgumentNullException( nameof( assetRef ) );
+
+            lock( _lock )
+            {
+                if( _inverseLoaded.TryGetValue( assetRef, out string assetID ) )
+                {
+                    _inverseLoaded.Remove( assetRef );
+
+                    if( _loaded.TryGetValue( assetID, out List<object> assets ) )
+                    {
+                        assets.Remove( assetRef );
+                        if( assets.Count == 0 )
+                            _loaded.Remove( assetID );
+                    }
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Clears all registered assets, resolvers, loaders, and pending tasks.
+        /// </summary>
+        public static void Clear()
+        {
+            lock( _lock )
+            {
+                _loaded.Clear();
+                _inverseLoaded.Clear();
+                _resolvers.Clear();
+                _loaders.Clear();
+                _loadingTasks.Clear();
+            }
+        }
+
+        /// <summary>
+        /// Scans the registry for UnityEngine.Objects that have been destroyed (== null) and unregisters them.
+        /// </summary>
+        public static void PruneDestroyedAssets()
+        {
+            lock( _lock )
+            {
+                var toRemove = new List<object>();
+
+                foreach( var kvp in _inverseLoaded )
+                {
+                    // Check if it is a Unity Object and if it is destroyed
+                    if( kvp.Key is UnityEngine.Object uObj && uObj == null )
+                    {
+                        toRemove.Add( kvp.Key );
+                    }
+                }
+
+                foreach( var obj in toRemove )
+                {
+                    // Reuse internal unregister logic manually to avoid deadlocks (we already hold lock)
+                    if( _inverseLoaded.TryGetValue( obj, out string assetID ) )
+                    {
+                        _inverseLoaded.Remove( obj );
+                        if( _loaded.TryGetValue( assetID, out List<object> assets ) )
+                        {
+                            assets.Remove( obj );
+                            if( assets.Count == 0 )
+                                _loaded.Remove( assetID );
+                        }
+                    }
+                }
+
+                if( toRemove.Count > 0 )
+                {
+                    Debug.Log( $"[AssetRegistry] Pruned {toRemove.Count} destroyed assets." );
+                }
+            }
+        }
+
+        /// <summary>
+        /// Retrieves the ID of a registered asset object.
+        /// </summary>
         public static string GetAssetID( object assetRef )
         {
             if( assetRef == null )
-            {
-                throw new ArgumentNullException( nameof( assetRef ), $"Asset to get the asset ID of can't be null." );
-            }
+                return null;
 
-            if( _inverseLoaded.TryGetValue( assetRef, out string assetID ) )
+            lock( _lock )
             {
-                return assetID;
+                if( _inverseLoaded.TryGetValue( assetRef, out string id ) )
+                    return id;
             }
 
             return null;
         }
 
-        /// <summary>
-        /// Returns all loaded assets, optionally filtered to those whose asset IDs start with the given prefix.
-        /// </summary>
-        /// <remarks>
-        /// This method doesn't include lazy-loaded assets, unless already cached.
-        /// </remarks>
-        /// <param name="path">The optional prefix that all the returned asset IDs must start with.</param>
-        public static (string assetID, T asset)[] GetAll<T>( string path = null ) where T : class
+        public static List<string> GetLoadingAssets()
         {
-            List<(string, T)> assets = new List<(string, T)>();
-
-            foreach( var kvp in _loaded )
+            lock( _lock )
             {
-                if( kvp.Value is not T )
+                return _loadingTasks.Keys
+                    .Select( k => $"{k.id} ({k.reqType.Name})" )
+                    .ToList();
+            }
+        }
+
+        public static bool IsLoaded( string assetID )
+        {
+            lock( _lock )
+                return _loaded.ContainsKey( assetID );
+        }
+
+        /// <summary>
+        /// Retrieves a registered asset synchronously.
+        /// </summary>
+        public static T Get<T>( string assetID ) where T : class
+        {
+            if( assetID == null )
+                throw new ArgumentNullException( nameof( assetID ) );
+
+            // 1. Check Cache
+            if( TryGetFromCache( assetID, out T cached ) )
+                return cached;
+
+            // 2. Trigger Async Pipeline Synchronously
+            try
+            {
+                using( var cts = new CancellationTokenSource( SynchronousLoadTimeoutMs ) )
+                using( cts.Token.Register( () => Debug.LogWarning( $"[AssetRegistry] Synchronous load of '{assetID}' timed out after {SynchronousLoadTimeoutMs}ms." ) ) )
+                {
+                    Task<T> task = GetAsync<T>( assetID, cts.Token );
+
+                    // Busy-wait pump to prevent deadlocks if the loading task requires the main thread
+                    while( !task.IsCompleted )
+                    {
+                        MainThreadDispatcher.Pump();
+                        if( !task.IsCompleted )
+                            Thread.Sleep( 0 );
+                    }
+
+                    return task.GetAwaiter().GetResult();
+                }
+            }
+            catch( AggregateException ae )
+            {
+                Exception inner = ae.Flatten().InnerException;
+                Debug.LogError( $"AssetRegistry.Get<{typeof( T ).Name}>('{assetID}') failed: {inner}" );
+                return null;
+            }
+            catch( Exception ex )
+            {
+                Debug.LogError( $"AssetRegistry.Get<{typeof( T ).Name}>('{assetID}') failed: {ex}" );
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Retrieves an asset asynchronously. 
+        /// </summary>
+        public static async Task<T> GetAsync<T>( string assetID, CancellationToken ct = default ) where T : class
+        {
+            if( string.IsNullOrEmpty( assetID ) )
+                return null;
+
+            // 1. Fast Cache Check
+            if( TryGetFromCache( assetID, out T cached ) )
+                return cached;
+
+            // 2. Cycle Detection
+            bool isReentrant = IsLoadingRecursive( assetID );
+
+            // 3. Deduplication
+            Task<object> task;
+            var loadKey = (assetID, typeof( T ));
+
+            lock( _lock )
+            {
+                // We use a composite key (ID, Type) to prevent race conditions 
+                // where loading 'Foo' as Texture would otherwise block loading 'Foo' as JSON.
+                if( _loadingTasks.TryGetValue( loadKey, out task ) )
+                {
+                    // Task exists, simply await it.
+                }
+                else
+                {
+                    task = GetAsyncInternal<T>( assetID, ct );
+                    if( !isReentrant )
+                        _loadingTasks[loadKey] = task;
+                }
+            }
+
+            try
+            {
+                object result = await task.ConfigureAwait( false );
+
+                if( result is T typedResult )
+                    return typedResult;
+
+                // Fallback: If deduplication logic failed us or another thread finished 
+                // just before we started, check cache one last time.
+                if( TryGetFromCache( assetID, out T finalCheck ) )
+                    return finalCheck;
+
+                return null;
+            }
+            finally
+            {
+                lock( _lock )
+                {
+                    // Only remove if it's the exact task we added/found
+                    if( _loadingTasks.TryGetValue( loadKey, out var t ) && t == task )
+                    {
+                        _loadingTasks.Remove( loadKey );
+                    }
+                }
+            }
+        }
+
+        private static async Task<object> GetAsyncInternal<T>( string assetID, CancellationToken ct ) where T : class
+        {
+            LoadNode parentNode = _reentrancyStack.Value;
+            _reentrancyStack.Value = new LoadNode()
+            {
+                AssetID = assetID,
+                Parent = parentNode
+            };
+
+            try
+            {
+                // Double-check cache inside the reentrancy context
+                if( TryGetFromCache( assetID, out T cached ) )
+                    return cached;
+
+                if( !AssetUri.TryParse( assetID, out AssetUri uri ) )
+                    return null;
+
+                // 1. RESOLUTION PHASE
+                List<AssetDataHandle> candidates = await ResolveHandlesAsync<T>( uri, assetID, ct ).ConfigureAwait( false );
+
+                if( candidates == null || candidates.Count == 0 )
+                    return null;
+
+                // 2. LOADING PHASE
+                try
+                {
+                    return await TryLoadFromHandlesAsync<T>( assetID, candidates, ct ).ConfigureAwait( false );
+                }
+                finally
+                {
+                    DisposeHandles( candidates, assetID );
+                }
+            }
+            finally
+            {
+                _reentrancyStack.Value = parentNode;
+            }
+        }
+
+        private static async Task<List<AssetDataHandle>> ResolveHandlesAsync<T>( AssetUri uri, string assetID, CancellationToken ct )
+        {
+            List<IAssetResolver> activeResolvers;
+            lock( _lock )
+            {
+                activeResolvers = new List<IAssetResolver>( _resolvers );
+            }
+
+            List<AssetDataHandle> candidates = new List<AssetDataHandle>();
+
+            foreach( var resolver in activeResolvers )
+            {
+                if( resolver.CanResolve( uri, typeof( T ) ) )
+                {
+                    try
+                    {
+                        IEnumerable<AssetDataHandle> handles = await resolver.ResolveAsync( uri, ct ).ConfigureAwait( false );
+                        if( handles != null )
+                        {
+                            candidates.AddRange( handles );
+                        }
+                    }
+                    catch( Exception ex )
+                    {
+                        Debug.LogError( $"Resolver {((IOverridable<string>)resolver).ID} failed for {assetID}: {ex}" );
+                    }
+                }
+            }
+
+            return candidates;
+        }
+
+        private static async Task<object> TryLoadFromHandlesAsync<T>( string assetID, List<AssetDataHandle> handles, CancellationToken ct )
+        {
+            List<IAssetLoader> activeLoaders;
+            lock( _lock )
+            {
+                activeLoaders = new List<IAssetLoader>( _loaders );
+            }
+
+            foreach( var handle in handles )
+            {
+                if( handle == null )
                     continue;
 
-                if( path == null || kvp.Key.StartsWith( path ) )
+                foreach( var loader in activeLoaders )
                 {
-                    assets.Add( (kvp.Key, (T)kvp.Value) );
+                    // 1. Type Check: Does this loader produce the type we want?
+                    if( !typeof( T ).IsAssignableFrom( loader.OutputType ) )
+                        continue;
+
+                    // 2. Format Check: Can the loader handle this data?
+                    if( loader.CanLoad( handle, typeof( T ) ) )
+                    {
+                        // MATCH FOUND
+                        // Run loader on ThreadPool to avoid blocking main thread with heavy parsing logic.
+                        object result = await Task.Run( async () =>
+                        {
+                            return await loader.LoadAsync( handle, typeof( T ), ct ).ConfigureAwait( false );
+                        }, ct ).ConfigureAwait( false );
+
+                        if( result != null )
+                        {
+                            Register( assetID, result );
+                            return result;
+                        }
+                    }
                 }
             }
 
-            return assets.ToArray();
+            return null;
         }
 
-        /// <summary>
-        /// Registers the given (loaded) object as an asset.
-        /// </summary>
-        /// <remarks>
-        /// Replaces the previous entry, if any is registered.
-        /// </remarks>
-        /// <param name="assetID">The asset ID to register the object under.</param>
-        /// <param name="asset">The asset object to register.</param>
-        public static void Register( string assetID, object asset )
+        private static bool TryGetFromCache<T>( string assetID, out T result ) where T : class
         {
-            if( assetID == null )
+            lock( _lock )
             {
-                throw new ArgumentNullException( nameof( assetID ), $"Asset ID of an asset to register can't be null." );
-            }
-            if( asset == null )
-            {
-                throw new ArgumentNullException( nameof( asset ), $"Asset to register can't be null." );
-            }
-
-            // Dispose previous when the support for that is added.
-            _loaded[assetID] = asset;
-            _inverseLoaded[asset] = assetID;
-        }
-
-        /// <summary>
-        /// Unregisters and unloads an asset.
-        /// </summary>
-        /// <param name="assetID">The asset ID that the asset is registered under.</param>
-        /// <returns>True if the asset existed in the registry, otherwise false.</returns>
-        public static bool Unregister( string assetID )
-        {
-            if( assetID == null )
-            {
-                throw new ArgumentNullException( nameof( assetID ), $"Asset ID of an asset to unregister can't be null." );
-            }
-
-            if( _loaded.TryGetValue( assetID, out object asset ) )
-            {
-                _inverseLoaded.Remove( asset );
-                _loaded.Remove( assetID );
-                return true;
-            }
-
-            return false;
-        }
-
-        /// <summary>
-        /// Unregisters and unloads an asset.
-        /// </summary>
-        /// <param name="assetRef">The asset to unregister.</param>
-        /// <returns>True if the asset existed in the registry, otherwise false.</returns>
-        public static bool Unregister( object assetRef )
-        {
-            if( assetRef == null )
-            {
-                throw new ArgumentNullException( nameof( assetRef ), $"Asset to unregister can't be null." );
-            }
-
-            if( _inverseLoaded.TryGetValue( assetRef, out string assetID ) )
-            {
-                _inverseLoaded.Remove( assetRef );
-                _loaded.Remove( assetID );
-                return true;
-            }
-
-            return false;
-        }
-
-        /// <summary>
-        /// Registers a lazy-loaded asset. <br/>
-        /// The lazy loader will be invoked when the asset is requested. <br/>
-        /// </summary>
-        /// <remarks>
-        /// Replaces the previous entry, if any is registered. <br/>
-        /// The asset loaded by the lazy loader will remain cached after the lazy loader itself has been unregistered, and needs to be unloaded separately. <br />
-        /// The lazy-loader itself is never unregistered unless the <see cref="UnregisterLazy"/> function is called.
-        /// </remarks>
-        /// <param name="assetID">The Asset ID to register the object under.</param>
-        /// <param name="loader">The function that will load the asset when requested.</param>
-        /// <param name="isCacheable">Whether or not the loaded value can be cached. <br/> True if the asset is persistent and singleton, otherwise should be false.</param>
-        public static void RegisterLazy( string assetID, Func<object> loader, bool isCacheable )
-        {
-            if( assetID == null )
-            {
-                throw new ArgumentNullException( nameof( assetID ), $"Asset ID of an asset to register can't be null." );
-            }
-            if( loader == null )
-            {
-                throw new ArgumentNullException( nameof( loader ), $"Lazy-loader function can't be null." );
-            }
-
-            // loader example: `() => PNGLoad(imagePathVariable);`
-            _lazyRegistry[assetID] = new LazyAsset( loader, isCacheable );
-        }
-
-        /// <summary>
-        /// Unregisters a lazy loader function for the given asset ID.
-        /// </summary>
-        public static bool UnregisterLazy( string assetID )
-        {
-            if( assetID == null )
-            {
-                throw new ArgumentNullException( nameof( assetID ), $"Asset ID to unregister from can't be null." );
-            }
-
-            return _lazyRegistry.Remove( assetID );
-        }
-
-        /// <summary>
-        /// Unloads the specified lazy-loaded asset from cache.
-        /// </summary>
-        /// <remarks>
-        /// The specified asset will only unload if there is a lazy loader registered for its asset ID.
-        /// </remarks>
-        /// <param name="assetID">The asset to unregister.</param>
-        /// <returns>True if the asset has been unloaded. Otherwise false.</returns>
-        public static bool TryUnloadCachedLazy( string assetID )
-        {
-            if( _lazyRegistry.ContainsKey( assetID ) )
-            {
-                if( _loaded.TryGetValue( assetID, out object asset ) )
-                    _inverseLoaded.Remove( asset );
-                _loaded.Remove( assetID );
-                return true;
-            }
-            return false;
-        }
-
-        /// <summary>
-        /// Unloads the specified lazy-loaded asset from cache.
-        /// </summary>
-        /// <remarks>
-        /// The specified asset will only unload if there is a lazy loader registered for its asset ID.
-        /// </remarks>
-        /// <param name="asset">The asset to unregister.</param>
-        /// <returns>True if the asset has been unloaded. Otherwise false.</returns>
-        public static bool TryUnloadCachedLazy( object asset )
-        {
-            if( _inverseLoaded.TryGetValue( asset, out string assetID ) )
-            {
-                if( _lazyRegistry.ContainsKey( assetID ) )
+                if( _loaded.TryGetValue( assetID, out List<object> assets ) )
                 {
-                    _loaded.Remove( assetID );
-                    _inverseLoaded.Remove( asset );
+                    // Helper to find an asset of type T in a list of mixed-type objects
+                    for( int i = 0; i < assets.Count; i++ )
+                    {
+                        if( assets[i] is T typedAsset )
+                        {
+                            result = typedAsset;
+                            return true;
+                        }
+                    }
+                }
+            }
+            result = null;
+            return false;
+        }
+
+        private static bool IsLoadingRecursive( string assetID )
+        {
+            LoadNode current = _reentrancyStack.Value;
+            while( current != null )
+            {
+                if( current.AssetID == assetID )
                     return true;
-                }
+                current = current.Parent;
             }
             return false;
+        }
+
+        private static void DisposeHandles( List<AssetDataHandle> handles, string assetID )
+        {
+            if( handles == null ) 
+                return;
+
+            foreach( var handle in handles )
+            {
+                try
+                {
+                    handle?.Dispose();
+                }
+                catch( Exception ex )
+                {
+                    Debug.LogError( $"Error disposing handle for {assetID}: {ex}" );
+                }
+            }
         }
     }
 }
