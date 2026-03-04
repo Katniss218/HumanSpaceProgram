@@ -10,9 +10,9 @@ namespace HSP.Effects
 
 
         [MapsInheritingFrom( typeof( EffectValueDriver<> ) )]
-        public static SerializationMapping EffectValueDriverMapping()
+        public static IDescriptor EffectValueDriverMapping()
         {
-            return new MemberwiseSerializationMapping<EffectValueDriver<T>>()
+            return new MemberwiseDescriptor<EffectValueDriver<T>>()
                 .WithMember( "getter", o => o.Getter )
                 .WithMember( "curve", o => o.Curve );
         }

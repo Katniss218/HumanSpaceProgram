@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using UnityPlus.Serialization;
-using UnityPlus.Serialization.DataHandlers;
+using UnityPlus.Serialization.Formats;
 using Version = HSP.Content.Version;
 
 namespace HSP.Timelines.Serialization
@@ -194,9 +194,9 @@ namespace HSP.Timelines.Serialization
         }
 
         [MapsInheritingFrom( typeof( SaveMetadata ) )]
-        public static SerializationMapping SaveMetadataMapping()
+        public static IDescriptor SaveMetadataMapping()
         {
-            return new MemberwiseSerializationMapping<SaveMetadata>()
+            return new MemberwiseDescriptor<SaveMetadata>()
                 .WithMember( "name", o => o.Name )
                 .WithMember( "description", o => o.Description )
                 .WithMember( "file_version", o => o.FileVersion )

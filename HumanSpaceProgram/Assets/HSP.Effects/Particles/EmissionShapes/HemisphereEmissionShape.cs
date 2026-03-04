@@ -44,9 +44,9 @@ namespace HSP.Effects.Particles.EmissionShapes
         }
 
         [MapsInheritingFrom( typeof( HemisphereEmissionShape ) )]
-        public static SerializationMapping HemisphereEmissionShapeMapping()
+        public static IDescriptor HemisphereEmissionShapeMapping()
         {
-            return new MemberwiseSerializationMapping<HemisphereEmissionShape>()
+            return new MemberwiseDescriptor<HemisphereEmissionShape>()
                 .WithMember( "spawn_from", o => o.SpawnFrom )
                 .WithMember( "radius", o => o.Radius )
                 .WithMember( "inner_radius", o => o.InnerRadius );

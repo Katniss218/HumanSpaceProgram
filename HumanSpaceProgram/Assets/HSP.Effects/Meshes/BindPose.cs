@@ -23,9 +23,9 @@ namespace HSP.Effects.Meshes
 
 
         [MapsInheritingFrom( typeof( BindPose ) )]
-        public static SerializationMapping BindPoseMapping()
+        public static IDescriptor BindPoseMapping()
         {
-            return new MemberwiseSerializationMapping<BindPose>()
+            return new MemberwiseDescriptor<BindPose>()
                 .WithMember( "position", o => o.Position )
                 .WithMember( "rotation", o => o.Rotation )
                 .WithMember( "scale", o => o.Scale );

@@ -69,11 +69,11 @@ namespace HSP.ControlSystems.Controls
 	public static class Mappings_ControlParameterOutput_T_
 	{
         [MapsInheritingFrom( typeof( ControlParameterOutput<> ) )]
-        public static SerializationMapping ControlParameterOutputMapping<T>()
+        public static IDescriptor ControlParameterOutputMapping<T>()
         {
-            return new MemberwiseSerializationMapping<ControlParameterOutput<T>>()
+            return new MemberwiseDescriptor<ControlParameterOutput<T>>()
                 .WithReadonlyMember( "getter", o => o.getter )
-                .WithFactory<Func<T>>( onInvoke => new ControlParameterOutput<T>( onInvoke ) )
+                .WithFactory<Func<T>>( onInvoke => new ControlParameterOutput<T>( onInvoke ), "getter" )
                 .WithMember( "connects_to", ArrayContext.Refs, o => o.inputs, ( o, value ) =>
                 {
                     if( value == null )

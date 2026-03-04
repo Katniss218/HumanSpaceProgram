@@ -5,7 +5,7 @@ using System.IO;
 using UnityEngine;
 using UnityPlus.AssetManagement;
 using UnityPlus.Serialization;
-using UnityPlus.Serialization.DataHandlers;
+using UnityPlus.Serialization.Formats;
 using Version = HSP.Content.Version;
 
 namespace HSP.Timelines.Serialization
@@ -166,9 +166,9 @@ namespace HSP.Timelines.Serialization
         }
 
         [MapsInheritingFrom( typeof( ScenarioMetadata ) )]
-        public static SerializationMapping ScenarioMetadataMapping()
+        public static IDescriptor ScenarioMetadataMapping()
         {
-            return new MemberwiseSerializationMapping<ScenarioMetadata>()
+            return new MemberwiseDescriptor<ScenarioMetadata>()
                 .WithMember( "name", o => o.Name )
                 .WithMember( "description", o => o.Description )
                 .WithMember( "author", o => o.Author )

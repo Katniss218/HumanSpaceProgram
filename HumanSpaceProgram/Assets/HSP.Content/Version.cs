@@ -136,13 +136,7 @@ namespace HSP.Content
 
 
         [MapsInheritingFrom( typeof( Version ) )]
-        public static SerializationMapping VersionMapping()
-        {
-            return new PrimitiveSerializationMapping<Version>()
-            {
-                OnSave = ( o, s ) => (SerializedPrimitive)o.ToString(),
-                OnLoad = ( data, l ) => Version.Parse( (string)data )
-            };
-        }
+        public static IDescriptor VersionMapping() => new PrimitiveConfigurableDescriptor<Version>(
+            ( v, w, c ) => w.Data = (SerializedPrimitive)v.ToString(), ( d, c ) => Version.Parse( (string)d ) );
     }
 }

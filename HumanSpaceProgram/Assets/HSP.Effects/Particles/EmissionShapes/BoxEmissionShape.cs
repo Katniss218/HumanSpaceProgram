@@ -55,9 +55,9 @@ namespace HSP.Effects.Particles.EmissionShapes
         }
 
         [MapsInheritingFrom( typeof( BoxEmissionShape ) )]
-        public static SerializationMapping BoxEmissionShapeMapping()
+        public static IDescriptor BoxEmissionShapeMapping()
         {
-            return new MemberwiseSerializationMapping<BoxEmissionShape>()
+            return new MemberwiseDescriptor<BoxEmissionShape>()
                 .WithMember( "spawn_from", o => o.SpawnFrom )
                 .WithMember( "size", o => o.Size );
         }

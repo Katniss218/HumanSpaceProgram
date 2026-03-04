@@ -61,9 +61,9 @@ namespace HSP.Effects.Lights
         }
 
         [MapsInheritingFrom( typeof( LightEffectDefinition ) )]
-        public static SerializationMapping LightEffectDefinitionMapping()
+        public static IDescriptor LightEffectDefinitionMapping()
         {
-            return new MemberwiseSerializationMapping<LightEffectDefinition>()
+            return new MemberwiseDescriptor<LightEffectDefinition>()
                 .WithMember( "shape", o => o.Shape )
                 .WithMember( "position", o => o.Position )
                 .WithMember( "rotation", o => o.Rotation )

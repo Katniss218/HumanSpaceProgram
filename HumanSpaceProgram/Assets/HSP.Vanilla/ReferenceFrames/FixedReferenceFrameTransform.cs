@@ -344,9 +344,9 @@ namespace HSP.Vanilla
 
 
         [MapsInheritingFrom( typeof( FixedReferenceFrameTransform ) )]
-        public static SerializationMapping FixedPhysicsObjectMapping()
+        public static IDescriptor FixedPhysicsObjectMapping()
         {
-            return new MemberwiseSerializationMapping<FixedReferenceFrameTransform>()
+            return new MemberwiseDescriptor<FixedReferenceFrameTransform>()
                 .WithMember( "scene_reference_frame_provider", o => o.SceneReferenceFrameProvider )
                 .WithMember( "mass", o => o.Mass )
                 .WithMember( "local_center_of_mass", o => o.LocalCenterOfMass )

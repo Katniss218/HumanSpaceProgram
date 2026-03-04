@@ -81,11 +81,11 @@ namespace HSP.ControlSystems.Controls
         }
 
         [MapsInheritingFrom( typeof( ControlleeInput ) )]
-        public static SerializationMapping ControlleeInputMapping()
+        public static IDescriptor ControlleeInputMapping()
         {
-            return new MemberwiseSerializationMapping<ControlleeInput>()
+            return new MemberwiseDescriptor<ControlleeInput>()
                 .WithReadonlyMember( "on_invoke", o => o.onInvoke )
-                .WithFactory<Action>( onInvoke => new ControlleeInput( onInvoke ) )
+                .WithFactory<Action>( onInvoke => new ControlleeInput( onInvoke ), "on_invoke" )
                 .WithMember( "connects_to", ArrayContext.Refs, o => o.outputs, ( o, value ) =>
                 {
                     if( value == null )

@@ -78,9 +78,9 @@ namespace HSP.Aerodynamics
 
 
         [MapsInheritingFrom( typeof( SimpleAerodynamicIntegrator ) )]
-        public static SerializationMapping SimpleAerodynamicIntegratorMapping()
+        public static IDescriptor SimpleAerodynamicIntegratorMapping()
         {
-            return new MemberwiseSerializationMapping<SimpleAerodynamicIntegrator>()
+            return new MemberwiseDescriptor<SimpleAerodynamicIntegrator>()
                 .WithMember( "drag_coefficient", o => o.DragCoefficient )
                 .WithMember( "reference_area", o => o.ReferenceArea );
         }

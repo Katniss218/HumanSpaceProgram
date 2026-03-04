@@ -71,9 +71,9 @@ namespace HSP.CelestialBodies.Atmospheres
         }
 
         [MapsInheritingFrom( typeof( AtmosphereRenderer ) )]
-        public static SerializationMapping AtmosphereRendererMapping()
+        public static IDescriptor AtmosphereRendererMapping()
         {
-            return new MemberwiseSerializationMapping<AtmosphereRenderer>()
+            return new MemberwiseDescriptor<AtmosphereRenderer>()
                 .WithMember( "height", o => o.Height )
                 .WithMember( "shared_material", ObjectContext.Asset, o => o.sharedMaterial );
         }

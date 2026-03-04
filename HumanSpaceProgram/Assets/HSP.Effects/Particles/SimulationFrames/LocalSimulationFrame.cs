@@ -19,9 +19,9 @@ namespace HSP.Effects.Particles.SimulationFrames
 
 
         [MapsInheritingFrom( typeof( LocalSimulationFrame ) )]
-        public static SerializationMapping LocalSimulationFrameMapping()
+        public static IDescriptor LocalSimulationFrameMapping()
         {
-            return new MemberwiseSerializationMapping<LocalSimulationFrame>();
+            return new MemberwiseDescriptor<LocalSimulationFrame>();
         }
     }
 }

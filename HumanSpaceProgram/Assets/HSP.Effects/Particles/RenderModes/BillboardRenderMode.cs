@@ -46,9 +46,9 @@ namespace HSP.Effects.Particles.RenderModes
 
 
         [MapsInheritingFrom( typeof( BillboardRenderMode ) )]
-        public static SerializationMapping BillboardRenderModeMapping()
+        public static IDescriptor BillboardRenderModeMapping()
         {
-            return new MemberwiseSerializationMapping<BillboardRenderMode>()
+            return new MemberwiseDescriptor<BillboardRenderMode>()
                 .WithMember( "alignment", o => o.Alignment );
         }
     }

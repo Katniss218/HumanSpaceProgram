@@ -46,9 +46,9 @@ namespace HSP.Effects.Particles.RenderModes
 
 
         [MapsInheritingFrom( typeof( StretchedBillboardRenderMode ) )]
-        public static SerializationMapping StretchedBillboardRenderModeMapping()
+        public static IDescriptor StretchedBillboardRenderModeMapping()
         {
-            return new MemberwiseSerializationMapping<StretchedBillboardRenderMode>()
+            return new MemberwiseDescriptor<StretchedBillboardRenderMode>()
                 .WithMember( "scale", o => o.Scale )
                 .WithMember( "velocity_scale", o => o.VelocityScale );
         }

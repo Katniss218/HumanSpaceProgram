@@ -126,12 +126,13 @@ namespace HSP.ReferenceFrames
         }
 
         [MapsInheritingFrom( typeof( CenteredReferenceFrame ) )]
-        public static SerializationMapping CenteredReferenceFrameMapping()
+        public static IDescriptor CenteredReferenceFrameMapping()
         {
-            return new MemberwiseSerializationMapping<CenteredReferenceFrame>()
+            return new MemberwiseDescriptor<CenteredReferenceFrame>()
                 .WithReadonlyMember( "reference_ut", o => o.ReferenceUT )
                 .WithReadonlyMember( "position", o => o._position )
-                .WithFactory<double, Vector3Dbl>( ( ut, pos ) => new CenteredReferenceFrame( ut, pos ) );
+                .WithFactory<double, Vector3Dbl>( ( ut, pos ) => new CenteredReferenceFrame( ut, pos ),
+                    "reference_ut", "position" );
         }
     }
 }

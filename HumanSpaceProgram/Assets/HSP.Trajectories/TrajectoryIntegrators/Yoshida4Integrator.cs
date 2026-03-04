@@ -53,9 +53,9 @@ namespace HSP.Trajectories.TrajectoryIntegrators
         }
 
         [MapsInheritingFrom( typeof( Yoshida4Integrator ) )]
-        public static SerializationMapping Yoshida4IntegratorMapping()
+        public static IDescriptor Yoshida4IntegratorMapping()
         {
-            return new MemberwiseSerializationMapping<Yoshida4Integrator>();
+            return new MemberwiseDescriptor<Yoshida4Integrator>();
         }
     }
 }

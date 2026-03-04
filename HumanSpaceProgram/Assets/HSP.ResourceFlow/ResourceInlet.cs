@@ -26,9 +26,9 @@ namespace HSP.ResourceFlow
         }
 
         [MapsInheritingFrom( typeof( ResourceInlet ) )]
-        public static SerializationMapping ResourceInletMapping()
+        public static IDescriptor ResourceInletMapping()
         {
-            return new MemberwiseSerializationMapping<ResourceInlet>()
+            return new MemberwiseDescriptor<ResourceInlet>()
                 .WithMember( "nominal_area", o => o.NominalArea )
                 .WithMember( "local_position", o => o.LocalPosition );
         }

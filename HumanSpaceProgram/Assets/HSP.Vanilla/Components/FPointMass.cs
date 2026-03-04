@@ -25,9 +25,9 @@ namespace HSP.Vanilla.Components
 
 
         [MapsInheritingFrom( typeof( FPointMass ) )]
-        public static SerializationMapping FPointMassMapping()
+        public static IDescriptor FPointMassMapping()
         {
-            return new MemberwiseSerializationMapping<FPointMass>()
+            return new MemberwiseDescriptor<FPointMass>()
                 .WithMember( "mass", o => o.Mass )
                 .WithMember( "on_after_mass_changed", o => o.OnAfterMassChanged );
         }

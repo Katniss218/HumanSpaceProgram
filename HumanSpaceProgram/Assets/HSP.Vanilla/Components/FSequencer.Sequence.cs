@@ -76,9 +76,9 @@ namespace HSP.Vanilla.Components
         }
 
         [MapsInheritingFrom( typeof( Sequence ) )]
-        public static SerializationMapping SequenceMapping()
+        public static IDescriptor SequenceMapping()
         {
-            return new MemberwiseSerializationMapping<Sequence>()
+            return new MemberwiseDescriptor<Sequence>()
                 .WithMember( "elements", o => o.Elements )
                 .WithMember( "current", o => o.Current );
         }

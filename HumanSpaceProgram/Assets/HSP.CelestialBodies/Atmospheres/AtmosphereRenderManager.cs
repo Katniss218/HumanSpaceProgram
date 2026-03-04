@@ -102,9 +102,9 @@ namespace HSP.CelestialBodies
         }
 
         [MapsInheritingFrom( typeof( AtmosphereRenderManager ) )]
-        public static SerializationMapping AtmosphereRendererMapping()
+        public static IDescriptor AtmosphereRendererMapping()
         {
-            return new MemberwiseSerializationMapping<AtmosphereRenderManager>();
+            return new MemberwiseDescriptor<AtmosphereRenderManager>();
         }
     }
 }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityPlus.Serialization;
-using UnityPlus.Serialization.DataHandlers;
+using UnityPlus.Serialization.Formats;
 using Version = HSP.Content.Version;
 
 namespace HSP.Content
@@ -144,9 +144,9 @@ namespace HSP.Content
         }
 
         [MapsInheritingFrom( typeof( ModMetadata ) )]
-        public static SerializationMapping ModMetadataMapping()
+        public static IDescriptor ModMetadataMapping()
         {
-            return new MemberwiseSerializationMapping<ModMetadata>()
+            return new MemberwiseDescriptor<ModMetadata>()
                 .WithMember( "mod_id", o => o.ID )
                 .WithMember( "name", o => o.Name )
                 .WithMember( "description", o => o.Description )

@@ -131,13 +131,14 @@ namespace HSP.ReferenceFrames
         }
 
         [MapsInheritingFrom( typeof( OrientedReferenceFrame ) )]
-        public static SerializationMapping OrientedReferenceFrameMapping()
+        public static IDescriptor OrientedReferenceFrameMapping()
         {
-            return new MemberwiseSerializationMapping<OrientedReferenceFrame>()
+            return new MemberwiseDescriptor<OrientedReferenceFrame>()
                 .WithReadonlyMember( "reference_ut", o => o.ReferenceUT )
                 .WithReadonlyMember( "position", o => o._position )
                 .WithReadonlyMember( "rotation", o => o._rotation )
-                .WithFactory<double, Vector3Dbl, QuaternionDbl>( ( ut, pos, rot ) => new OrientedReferenceFrame( ut, pos, rot ) );
+                .WithFactory<double, Vector3Dbl, QuaternionDbl>( ( ut, pos, rot ) => new OrientedReferenceFrame( ut, pos, rot ),
+                    "reference_ut", "position", "rotation" );
         }
     }
 }

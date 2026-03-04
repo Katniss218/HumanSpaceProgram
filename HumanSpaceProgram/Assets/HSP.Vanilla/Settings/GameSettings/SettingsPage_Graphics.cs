@@ -37,9 +37,9 @@ namespace HSP.Vanilla.Settings
 
 
         [MapsInheritingFrom( typeof( SettingsPage_Graphics ) )]
-        public static SerializationMapping SettingsPage_GraphicsMapping()
+        public static IDescriptor SettingsPage_GraphicsMapping()
         {
-            return new MemberwiseSerializationMapping<SettingsPage_Graphics>()
+            return new MemberwiseDescriptor<SettingsPage_Graphics>()
                 .WithMember( "horizontal_resolution", o => o.HorizontalResolution )
                 .WithMember( "vertical_resolution", o => o.VerticalResolution )
                 .WithMember( "full_screen_mode", o => o.FullScreenMode )

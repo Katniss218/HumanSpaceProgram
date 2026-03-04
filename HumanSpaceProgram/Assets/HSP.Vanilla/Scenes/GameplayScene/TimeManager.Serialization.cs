@@ -1,3 +1,5 @@
+using HSP.CelestialBodies;
+using HSP.SceneManagement;
 using HSP.Time;
 using HSP.Timelines;
 using System;
@@ -5,7 +7,7 @@ using System.IO;
 using System.Linq;
 using UnityEngine;
 using UnityPlus.Serialization;
-using UnityPlus.Serialization.DataHandlers;
+using UnityPlus.Serialization.Formats;
 
 namespace HSP.Vanilla.Scenes.GameplayScene
 {
@@ -28,18 +30,19 @@ namespace HSP.Vanilla.Scenes.GameplayScene
 
             Directory.CreateDirectory( savePath );
 
-            JsonSerializedDataHandler dataHandler = new JsonSerializedDataHandler( Path.Combine( savePath, $"{nameof( TimeManager )}.json" ) );
+            var dataHandler = new FileSerializedDataHandler( Path.Combine( savePath, $"{nameof( TimeManager )}.json" ), JsonFormat.Instance );
 
-            var su = SerializationUnit.FromObjects( UnityEngine.Object.FindObjectOfType<TimeManager>() );
-            SerializationResult result = su.Serialize( TimelineManager.RefStore );
-            if( result.HasFlag( SerializationResult.Failed ) || result.HasFlag( SerializationResult.HasFailures ) )
+            try
             {
-                Debug.LogError( $"Failed to serialize TimeManager." );
-                e.AddMessage( LogType.Error, $"Failed to serialize TimeManager." );
-                return;
+                var data = SerializationUnit.Serialize( UnityEngine.Object.FindObjectOfType<TimeManager>(), TimelineManager.RefStore );
+                dataHandler.Write( data );
             }
-            var data = su.GetData().First();
-            dataHandler.Write( data );
+            catch( UPSSerializationException ex )
+            {
+                Debug.LogError( $"Failed to serialize TimeManager: {ex.Message}" );
+                Debug.LogException( ex );
+                e.AddMessage( LogType.Error, $"Failed to serialize TimeManager: {ex.Message}" );
+            }
         }
 
         [HSPEventListener( HSPEvent_AFTER_TIMELINE_NEW.ID, DESERIALIZE_ACTIVE_OBJECT_MANAGER )]
@@ -56,16 +59,18 @@ namespace HSP.Vanilla.Scenes.GameplayScene
 
             Directory.CreateDirectory( savePath );
 
-            JsonSerializedDataHandler dataHandler = new JsonSerializedDataHandler( Path.Combine( savePath, $"{nameof( TimeManager )}.json" ) );
-
+            var dataHandler = new FileSerializedDataHandler( Path.Combine( savePath, $"{nameof( TimeManager )}.json" ), JsonFormat.Instance );
             var data = dataHandler.Read();
-            var su = SerializationUnit.PopulateObject( UnityEngine.Object.FindObjectOfType<TimeManager>(), data );
-            SerializationResult result = su.Populate( TimelineManager.RefStore );
-            if( result.HasFlag( SerializationResult.Failed ) || result.HasFlag( SerializationResult.HasFailures ) )
+
+            try
             {
-                Debug.LogError( $"Failed to deserialize TimeManager." );
-                e.AddMessage( LogType.Error, $"Failed to deserialize TimeManager." );
-                return;
+                SerializationUnit.Populate<TimeManager>( UnityEngine.Object.FindObjectOfType<TimeManager>(), data, TimelineManager.RefStore );
+            }
+            catch( UPSSerializationException ex )
+            {
+                Debug.LogError( $"Failed to deserialize TimeManager: {ex.Message}" );
+                Debug.LogException( ex );
+                e.AddMessage( LogType.Error, $"Failed to deserialize TimeManager: {ex.Message}" );
             }
         }
     }

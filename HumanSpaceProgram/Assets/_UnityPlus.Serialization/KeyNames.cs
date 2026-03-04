@@ -1,4 +1,5 @@
-﻿namespace UnityPlus.Serialization
+﻿
+namespace UnityPlus.Serialization
 {
     /// <summary>
     /// Contains constants for consistent naming of special keys in serialized data.
@@ -36,5 +37,20 @@
         /// Used when serializing a reference to an asset (see <see cref="UnityPlus.AssetManagement.AssetRegistry"/>).
         /// </remarks>
         public const string ASSETREF = "$assetref";
+
+        /// <summary>
+        /// The key used to store the array of items when a Collection is wrapped in an Object (to support circular refs).
+        /// </summary>
+        public const string VALUE = "value";
+
+        /// <summary>
+        /// The key used to store Components on a GameObject.
+        /// </summary>
+        public const string COMPONENTS = "components";
+
+        /// <summary>
+        /// The key used to store Children on a GameObject.
+        /// </summary>
+        public const string CHILDREN = "children";
     }
 }

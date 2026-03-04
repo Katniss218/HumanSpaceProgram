@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace UnityPlus.Serialization
 {
@@ -15,17 +11,35 @@ namespace UnityPlus.Serialization
         public Type MappedType { get; set; }
 
         /// <summary>
-        /// Specifies the context that this mapping will be used in.
+        /// Specifies the integer context that this mapping will be used in.
         /// </summary>
+        [Obsolete( "Use ContextType for new code." )]
         public int Context
         {
-            get => Contexts[0];
+            get => Contexts != null && Contexts.Length > 0 ? Contexts[0] : 0;
             set => Contexts = new int[] { value };
         }
 
         /// <summary>
-        /// Specifies a number of contexts that this mapping will be used in.
+        /// Specifies a number of integer contexts that this mapping will be used in.
         /// </summary>
-        public int[] Contexts { get; set; } = new int[] { 0 }; // By default, use the default context (zero).
+        [Obsolete( "Use ContextTypes for new code." )]
+        public int[] Contexts { get; set; } = new int[] { 0 };
+
+        /// <summary>
+        /// Specifies the context type this mapping applies to.
+        /// Supports Open Generics (e.g. typeof(Ctx.Dict<,>)).
+        /// </summary>
+        public Type ContextType
+        {
+            get => ContextTypes != null && ContextTypes.Length > 0 ? ContextTypes[0] : null;
+            set => ContextTypes = value != null ? new Type[] { value } : Array.Empty<Type>();
+        }
+
+        /// <summary>
+        /// Specifies a number of context types this mapping applies to.
+        /// Supports Open Generics (e.g. typeof(Ctx.Dict<,>)).
+        /// </summary>
+        public Type[] ContextTypes { get; set; }
     }
 }

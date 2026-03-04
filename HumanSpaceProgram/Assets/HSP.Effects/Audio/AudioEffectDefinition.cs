@@ -75,9 +75,9 @@ namespace HSP.Effects.Audio
         }
 
         [MapsInheritingFrom( typeof( AudioEffectDefinition ) )]
-        public static SerializationMapping AudioEffectDefinitionMapping()
+        public static IDescriptor AudioEffectDefinitionMapping()
         {
-            return new MemberwiseSerializationMapping<AudioEffectDefinition>()
+            return new MemberwiseDescriptor<AudioEffectDefinition>()
                 .WithMember( "audio_clip", ObjectContext.Asset, o => o.Clip )
                 .WithMember( "audio_channel", o => o.Channel )
                 .WithMember( "volume", o => o.Volume )

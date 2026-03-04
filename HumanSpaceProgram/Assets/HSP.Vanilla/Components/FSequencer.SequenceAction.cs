@@ -33,9 +33,9 @@ namespace HSP.Vanilla.Components
         }
 
         [MapsInheritingFrom( typeof( SequenceAction ) )]
-        public static SerializationMapping SequenceActionMapping()
+        public static IDescriptor SequenceActionMapping()
         {
-            return new MemberwiseSerializationMapping<SequenceAction>()
+            return new MemberwiseDescriptor<SequenceAction>()
                 .WithMember( "on_invoke", o => o.OnInvokeTyped );
         }
     }
@@ -61,9 +61,9 @@ namespace HSP.Vanilla.Components
     public static class Mappings_SequenceAction_T_
     {
         [MapsInheritingFrom( typeof( SequenceAction<> ) )]
-        public static SerializationMapping SequenceActionMapping<T>()
+        public static IDescriptor SequenceActionMapping<T>()
         {
-            return new MemberwiseSerializationMapping<SequenceAction<T>>()
+            return new MemberwiseDescriptor<SequenceAction<T>>()
                 .WithMember( "on_invoke", o => o.OnInvokeTyped )
                 .WithMember( "signal_value", o => o.SignalValue );
         }

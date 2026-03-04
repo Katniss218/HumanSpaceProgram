@@ -55,9 +55,9 @@ namespace HSP.Settings
         }
 
         [MapsInheritingFrom( typeof( SettingsFile ) )]
-        public static SerializationMapping SettingsFileMapping()
+        public static IDescriptor SettingsFileMapping()
         {
-            return new MemberwiseSerializationMapping<SettingsFile>()
+            return new MemberwiseDescriptor<SettingsFile>()
                 .WithMember( "pages", o => o.Pages );
         }
     }

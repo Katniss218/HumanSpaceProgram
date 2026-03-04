@@ -141,14 +141,15 @@ namespace HSP.ReferenceFrames
         }
 
         [MapsInheritingFrom( typeof( OrientedInertialReferenceFrame ) )]
-        public static SerializationMapping OrientedInertialReferenceFrameMapping()
+        public static IDescriptor OrientedInertialReferenceFrameMapping()
         {
-            return new MemberwiseSerializationMapping<OrientedInertialReferenceFrame>()
+            return new MemberwiseDescriptor<OrientedInertialReferenceFrame>()
                 .WithReadonlyMember( "reference_ut", o => o.ReferenceUT )
                 .WithReadonlyMember( "position", o => o._position )
                 .WithReadonlyMember( "rotation", o => o._rotation )
                 .WithReadonlyMember( "velocity", o => o._velocity )
-                .WithFactory<double, Vector3Dbl, QuaternionDbl, Vector3Dbl>( ( ut, pos, rot, vel ) => new OrientedInertialReferenceFrame( ut, pos, rot, vel ) );
+                .WithFactory<double, Vector3Dbl, QuaternionDbl, Vector3Dbl>( ( ut, pos, rot, vel ) => new OrientedInertialReferenceFrame( ut, pos, rot, vel ),
+                    "reference_ut", "position", "rotation", "velocity" );
         }
     }
 }

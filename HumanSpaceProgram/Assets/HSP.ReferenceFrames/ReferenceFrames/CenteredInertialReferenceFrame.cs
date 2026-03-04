@@ -137,13 +137,14 @@ namespace HSP.ReferenceFrames
         }
 
         [MapsInheritingFrom( typeof( CenteredInertialReferenceFrame ) )]
-        public static SerializationMapping CenteredInertialReferenceFrameMapping()
+        public static IDescriptor CenteredInertialReferenceFrameMapping()
         {
-            return new MemberwiseSerializationMapping<CenteredInertialReferenceFrame>()
+            return new MemberwiseDescriptor<CenteredInertialReferenceFrame>()
                 .WithReadonlyMember( "reference_ut", o => o.ReferenceUT )
                 .WithReadonlyMember( "position", o => o._position )
                 .WithReadonlyMember( "velocity", o => o._velocity )
-                .WithFactory<double, Vector3Dbl, Vector3Dbl>( ( ut, pos, vel ) => new CenteredInertialReferenceFrame( ut, pos, vel ) );
+                .WithFactory<double, Vector3Dbl, Vector3Dbl>( ( ut, pos, vel ) => new CenteredInertialReferenceFrame( ut, pos, vel ),
+                    "reference_ut", "position", "velocity" );
         }
     }
 }

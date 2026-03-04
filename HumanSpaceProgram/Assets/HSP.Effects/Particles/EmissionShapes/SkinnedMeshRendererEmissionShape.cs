@@ -37,9 +37,9 @@ namespace HSP.Effects.Particles.EmissionShapes
         }
 
         [MapsInheritingFrom( typeof( SkinnedMeshRendererEmissionShape ) )]
-        public static SerializationMapping SkinnedMeshRendererEmissionShapeMapping()
+        public static IDescriptor SkinnedMeshRendererEmissionShapeMapping()
         {
-            return new MemberwiseSerializationMapping<SkinnedMeshRendererEmissionShape>()
+            return new MemberwiseDescriptor<SkinnedMeshRendererEmissionShape>()
                 .WithMember( "spawn_from", o => o.SpawnFrom )
                 .WithMember( "skinned_renderer", o => o.SkinnedMeshRenderer );
         }

@@ -34,9 +34,9 @@ namespace HSP.Effects.Lights.LightShapes
 
 
         [MapsInheritingFrom( typeof( SpotLightShape ) )]
-        public static SerializationMapping SpotLightShapeMapping()
+        public static IDescriptor SpotLightShapeMapping()
         {
-            return new MemberwiseSerializationMapping<SpotLightShape>()
+            return new MemberwiseDescriptor<SpotLightShape>()
                 .WithMember( "radius", o => o.Radius )
                 .WithMember( "angle", o => o.Angle );
         }

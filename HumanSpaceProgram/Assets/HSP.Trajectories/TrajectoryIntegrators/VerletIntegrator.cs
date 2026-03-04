@@ -32,9 +32,9 @@ namespace HSP.Trajectories.TrajectoryIntegrators
         }
 
         [MapsInheritingFrom( typeof( VerletIntegrator ) )]
-        public static SerializationMapping VerletIntegratorMapping()
+        public static IDescriptor VerletIntegratorMapping()
         {
-            return new MemberwiseSerializationMapping<VerletIntegrator>();
+            return new MemberwiseDescriptor<VerletIntegrator>();
         }
     }
 }

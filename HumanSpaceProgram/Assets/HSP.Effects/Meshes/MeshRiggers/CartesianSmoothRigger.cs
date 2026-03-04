@@ -154,9 +154,9 @@ namespace HSP.Effects.Meshes.MeshRiggers
 
 
         [MapsInheritingFrom( typeof( CartesianSmoothRigger ) )]
-        public static SerializationMapping ClosestWithFalloffMeshRiggerMapping()
+        public static IDescriptor ClosestWithFalloffMeshRiggerMapping()
         {
-            return new MemberwiseSerializationMapping<CartesianSmoothRigger>()
+            return new MemberwiseDescriptor<CartesianSmoothRigger>()
                 .WithMember( "influence_count", o => o.InfluenceCount )
                 .WithMember( "falloff_start_distance", o => o.FalloffStartDistance )
                 .WithMember( "falloff_end_distance", o => o.FalloffEndDistance );

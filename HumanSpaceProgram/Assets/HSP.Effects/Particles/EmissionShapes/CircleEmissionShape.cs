@@ -47,9 +47,9 @@ namespace HSP.Effects.Particles.EmissionShapes
         }
 
         [MapsInheritingFrom( typeof( CircleEmissionShape ) )]
-        public static SerializationMapping CircleEmissionShapeMapping()
+        public static IDescriptor CircleEmissionShapeMapping()
         {
-            return new MemberwiseSerializationMapping<CircleEmissionShape>()
+            return new MemberwiseDescriptor<CircleEmissionShape>()
                 .WithMember( "spawn_from", o => o.SpawnFrom )
                 .WithMember( "radius", o => o.Radius )
                 .WithMember( "inner_radius", o => o.InnerRadius );

@@ -203,9 +203,9 @@ namespace HSP.Time
 
 
         [MapsInheritingFrom( typeof( TimeManager ) )]
-        public static SerializationMapping TimeStepManagerMapping()
+        public static IDescriptor TimeStepManagerMapping()
         {
-            return new MemberwiseSerializationMapping<TimeManager>()
+            return new MemberwiseDescriptor<TimeManager>()
                 .WithMember( "ut", o => UT, ( o, value ) => { UT = value; OldUT = value; } );
         }
     }

@@ -84,12 +84,12 @@ namespace HSP.Effects
 
 
         [MapsInheritingFrom( typeof( MinMaxEffectValue<> ) )]
-        public static SerializationMapping MinMaxEffectValueMapping()
+        public static IDescriptor MinMaxEffectValueMapping()
         {
-            return new MemberwiseSerializationMapping<MinMaxEffectValue<T>>()
+            return new MemberwiseDescriptor<MinMaxEffectValue<T>>()
                 .WithReadonlyMember( "min", o => o.min )
                 .WithReadonlyMember( "max", o => o.max )
-                .WithFactory<T, T>( ( min, max ) => new MinMaxEffectValue<T>( min, max ) )
+                .WithFactory<T, T>( ( min, max ) => new MinMaxEffectValue<T>( min, max ), "min", "max" )
                 .WithMember( "drivers", o => o.drivers );
         }
     }

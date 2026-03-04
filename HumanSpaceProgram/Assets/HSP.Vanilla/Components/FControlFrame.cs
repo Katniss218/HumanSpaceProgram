@@ -22,9 +22,9 @@ namespace HSP.Vanilla.Components
         }
 
         [MapsInheritingFrom( typeof( FControlFrame ) )]
-        public static SerializationMapping FControlFrameMapping()
+        public static IDescriptor FControlFrameMapping()
         {
-            return new MemberwiseSerializationMapping<FControlFrame>()
+            return new MemberwiseDescriptor<FControlFrame>()
                 .WithMember( "reference_transform", ObjectContext.Ref, o => o._referenceTransform );
         }
     }

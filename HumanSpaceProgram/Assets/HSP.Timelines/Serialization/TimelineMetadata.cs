@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using UnityPlus.Serialization;
-using UnityPlus.Serialization.DataHandlers;
+using UnityPlus.Serialization.Formats;
 
 namespace HSP.Timelines.Serialization
 {
@@ -142,9 +142,9 @@ namespace HSP.Timelines.Serialization
         }
 
         [MapsInheritingFrom( typeof( TimelineMetadata ) )]
-        public static SerializationMapping TimelineMetadataMapping()
+        public static IDescriptor TimelineMetadataMapping()
         {
-            return new MemberwiseSerializationMapping<TimelineMetadata>()
+            return new MemberwiseDescriptor<TimelineMetadata>()
                 .WithMember( "scenario_id", o => o.ScenarioID )
                 .WithMember( "name", o => o.Name )
                 .WithMember( "description", o => o.Description );

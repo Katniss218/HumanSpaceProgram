@@ -25,9 +25,9 @@ namespace HSP.Vanilla.CelestialBodies
 
 
         [MapsInheritingFrom( typeof( AllLoadedVesselsPOIGetter ) )]
-        public static SerializationMapping AllLoadedVesselsPOIGetterMapping()
+        public static IDescriptor AllLoadedVesselsPOIGetterMapping()
         {
-            return new MemberwiseSerializationMapping<AllLoadedVesselsPOIGetter>();
+            return new MemberwiseDescriptor<AllLoadedVesselsPOIGetter>();
         }
     }
 
@@ -51,9 +51,9 @@ namespace HSP.Vanilla.CelestialBodies
 
 
         [MapsInheritingFrom( typeof( GameplaySceneCameraPOIGetter ) )]
-        public static SerializationMapping ActiveCameraPOIGetterMapping()
+        public static IDescriptor ActiveCameraPOIGetterMapping()
         {
-            return new MemberwiseSerializationMapping<GameplaySceneCameraPOIGetter>();
+            return new MemberwiseDescriptor<GameplaySceneCameraPOIGetter>();
         }
     }
 
@@ -76,9 +76,9 @@ namespace HSP.Vanilla.CelestialBodies
 
 
         [MapsInheritingFrom( typeof( MapSceneCameraPOIGetter ) )]
-        public static SerializationMapping MapActiveCameraPOIGetterMapping()
+        public static IDescriptor MapActiveCameraPOIGetterMapping()
         {
-            return new MemberwiseSerializationMapping<MapSceneCameraPOIGetter>();
+            return new MemberwiseDescriptor<MapSceneCameraPOIGetter>();
         }
     }
 }

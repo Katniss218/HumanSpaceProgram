@@ -1,269 +1,183 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+using UnityPlus.Serialization.ReferenceMaps;
 
 namespace UnityPlus.Serialization
 {
+    /// <summary>
+    /// v4 Implementation of the main Serialization API.
+    /// </summary>
     public static partial class SerializationUnit
     {
-        /// <summary>
-        /// Helper method to serialize a single object easily.
-        /// </summary>
+        // --- Serialize ---
+
         public static SerializedData Serialize<T>( T obj )
-        {
-            var su = FromObjects<T>( obj );
-            su.Serialize();
-            return su.GetData().First();
-        }
+            => Serialize( ObjectContext.Default, obj, null, null );
 
-        /// <summary>
-        /// Helper method to serialize a single object easily.
-        /// </summary>
-        public static SerializedData Serialize<T>( int context, T obj )
-        {
-            var su = FromObjects<T>( context, obj );
-            su.Serialize();
-            return su.GetData().First();
-        }
+        public static SerializedData Serialize<T>( T obj, SerializationConfiguration config )
+            => Serialize( ObjectContext.Default, obj, null, config );
 
-        /// <summary>
-        /// Helper method to serialize a single object easily.
-        /// </summary>
+        public static SerializedData Serialize<T>( ContextKey context, T obj )
+            => Serialize( context, obj, null, null );
+
+        public static SerializedData Serialize<T>( ContextKey context, T obj, SerializationConfiguration config )
+            => Serialize( context, obj, null, config );
+
         public static SerializedData Serialize<T>( T obj, IReverseReferenceMap s )
+            => Serialize( ObjectContext.Default, obj, s, null );
+
+        public static SerializedData Serialize<T>( T obj, IReverseReferenceMap s, SerializationConfiguration config )
+            => Serialize( ObjectContext.Default, obj, s, config );
+
+        public static SerializedData Serialize<T>( ContextKey context, T obj, IReverseReferenceMap s )
+            => Serialize( context, obj, s, null );
+
+        public static SerializedData Serialize<T>( ContextKey context, T obj, IReverseReferenceMap s, SerializationConfiguration config )
         {
-            var su = FromObjects<T>( obj );
-            su.Serialize( s );
-            return su.GetData().First();
-        }
-        
-        /// <summary>
-        /// Helper method to serialize a single object easily.
-        /// </summary>
-        public static SerializedData Serialize<T>( int context, T obj, IReverseReferenceMap s )
-        {
-            var su = FromObjects<T>( context, obj );
-            su.Serialize( s );
-            return su.GetData().First();
+            var ctx = new SerializationContext( config ?? new SerializationConfiguration() )
+            {
+                ReverseMap = s ?? new BidirectionalReferenceStore()
+            };
+
+            var driver = new StackMachineDriver( ctx );
+            var descriptor = TypeDescriptorRegistry.GetDescriptor( typeof( T ), context );
+
+            driver.Initialize( obj, descriptor, new SerializationStrategy() );
+
+            while( !driver.IsFinished )
+            {
+                driver.Tick( float.PositiveInfinity );
+            }
+
+            return driver.Result as SerializedData;
         }
 
-        /// <summary>
-        /// Helper method to deserialize a single object easily.
-        /// </summary>
+        // --- Deserialize ---
+
         public static T Deserialize<T>( SerializedData data )
-        {
-            var su = FromData<T>( data );
-            su.Deserialize();
-            return su.GetObjects().First();
-        }
+            => Deserialize<T>( ObjectContext.Default, data, null, null );
 
-        /// <summary>
-        /// Helper method to deserialize a single object easily.
-        /// </summary>
-        public static T Deserialize<T>( int context, SerializedData data )
-        {
-            var su = FromData<T>( context, data );
-            su.Deserialize();
-            return su.GetObjects().First();
-        }
+        public static T Deserialize<T>( SerializedData data, SerializationConfiguration config )
+            => Deserialize<T>( ObjectContext.Default, data, null, config );
 
-        /// <summary>
-        /// Helper method to deserialize a single object easily.
-        /// </summary>
+        public static T Deserialize<T>( ContextKey context, SerializedData data )
+            => Deserialize<T>( context, data, null, null );
+
+        public static T Deserialize<T>( ContextKey context, SerializedData data, SerializationConfiguration config )
+            => Deserialize<T>( context, data, null, config );
+
         public static T Deserialize<T>( SerializedData data, IForwardReferenceMap l )
+            => Deserialize<T>( ObjectContext.Default, data, l, null );
+
+        public static T Deserialize<T>( SerializedData data, IForwardReferenceMap l, SerializationConfiguration config )
+            => Deserialize<T>( ObjectContext.Default, data, l, config );
+
+        public static T Deserialize<T>( ContextKey context, SerializedData data, IForwardReferenceMap l )
+            => Deserialize<T>( context, data, l, null );
+
+        public static T Deserialize<T>( ContextKey context, SerializedData data, IForwardReferenceMap l, SerializationConfiguration config )
         {
-            var su = FromData<T>( data );
-            su.Deserialize( l );
-            return su.GetObjects().First();
+            var ctx = new SerializationContext( config ?? new SerializationConfiguration() )
+            {
+                ForwardMap = l ?? new BidirectionalReferenceStore()
+            };
+
+            var driver = new StackMachineDriver( ctx );
+            var descriptor = TypeDescriptorRegistry.GetDescriptor( typeof( T ), context );
+
+            driver.Initialize( null, descriptor, new DeserializationStrategy(), data );
+
+            while( !driver.IsFinished )
+            {
+                driver.Tick( float.PositiveInfinity );
+            }
+
+            return (T)driver.Result;
         }
 
-        /// <summary>
-        /// Helper method to deserialize a single object easily.
-        /// </summary>
-        public static T Deserialize<T>( int context, SerializedData data, IForwardReferenceMap l )
-        {
-            var su = FromData<T>( context, data );
-            su.Deserialize( l );
-            return su.GetObjects().First();
-        }
+        // --- Populate (Class) ---
 
-        /// <summary>
-        /// Helper method to populate the members of a single object easily.
-        /// </summary>
         public static void Populate<T>( T obj, SerializedData data ) where T : class
-        {
-            var su = PopulateObject<T>( obj, data );
-            su.Populate();
-        }
+            => Populate( ObjectContext.Default, obj, data, null, null );
 
-        /// <summary>
-        /// Helper method to populate the members of a single object easily.
-        /// </summary>
-        public static void Populate<T>( int context, T obj, SerializedData data ) where T : class
-        {
-            var su = PopulateObject<T>( context, obj, data );
-            su.Populate();
-        }
+        public static void Populate<T>( T obj, SerializedData data, SerializationConfiguration config ) where T : class
+            => Populate( ObjectContext.Default, obj, data, null, config );
 
-        /// <summary>
-        /// Helper method to populate the members of a single object easily.
-        /// </summary>
+        public static void Populate<T>( ContextKey context, T obj, SerializedData data ) where T : class
+            => Populate( context, obj, data, null, null );
+
+        public static void Populate<T>( ContextKey context, T obj, SerializedData data, SerializationConfiguration config ) where T : class
+            => Populate( context, obj, data, null, config );
+
         public static void Populate<T>( T obj, SerializedData data, IForwardReferenceMap l ) where T : class
+            => Populate( ObjectContext.Default, obj, data, l, null );
+
+        public static void Populate<T>( T obj, SerializedData data, IForwardReferenceMap l, SerializationConfiguration config ) where T : class
+            => Populate( ObjectContext.Default, obj, data, l, config );
+
+        public static void Populate<T>( ContextKey context, T obj, SerializedData data, IForwardReferenceMap l ) where T : class
+            => Populate( context, obj, data, l, null );
+
+        public static void Populate<T>( ContextKey context, T obj, SerializedData data, IForwardReferenceMap l, SerializationConfiguration config ) where T : class
         {
-            var su = PopulateObject<T>( obj, data );
-            su.Populate( l );
+            if( obj == null ) throw new ArgumentNullException( nameof( obj ) );
+
+            var ctx = new SerializationContext( config ?? new SerializationConfiguration() )
+            {
+                ForwardMap = l ?? new BidirectionalReferenceStore()
+            };
+
+            var driver = new StackMachineDriver( ctx );
+            var descriptor = TypeDescriptorRegistry.GetDescriptor( typeof( T ), context );
+
+            driver.Initialize( obj, descriptor, new DeserializationStrategy(), data );
+
+            while( !driver.IsFinished )
+            {
+                driver.Tick( float.PositiveInfinity );
+            }
         }
 
-        /// <summary>
-        /// Helper method to populate the members of a single object easily.
-        /// </summary>
-        public static void Populate<T>( int context, T obj, SerializedData data, IForwardReferenceMap l ) where T : class
-        {
-            var su = PopulateObject<T>( context, obj, data );
-            su.Populate( l );
-        }
+        // --- Populate (Struct) ---
 
-        /// <summary>
-        /// Helper method to populate the members of a single struct object easily.
-        /// </summary>
         public static void Populate<T>( ref T obj, SerializedData data ) where T : struct
-        {
-            var su = PopulateObject<T>( obj, data );
-            su.Populate();
-            obj = su.GetObjects().First();
-        }
+            => Populate( ObjectContext.Default, ref obj, data, null, null );
 
-        /// <summary>
-        /// Helper method to populate the members of a single struct object easily.
-        /// </summary>
-        public static void Populate<T>( int context, ref T obj, SerializedData data ) where T : struct
-        {
-            var su = PopulateObject<T>( context, obj, data );
-            su.Populate();
-            obj = su.GetObjects().First();
-        }
+        public static void Populate<T>( ref T obj, SerializedData data, SerializationConfiguration config ) where T : struct
+            => Populate( ObjectContext.Default, ref obj, data, null, config );
 
-        /// <summary>
-        /// Helper method to populate the members of a single struct object easily.
-        /// </summary>
+        public static void Populate<T>( ContextKey context, ref T obj, SerializedData data ) where T : struct
+            => Populate( context, ref obj, data, null, null );
+
+        public static void Populate<T>( ContextKey context, ref T obj, SerializedData data, SerializationConfiguration config ) where T : struct
+            => Populate( context, ref obj, data, null, config );
+
         public static void Populate<T>( ref T obj, SerializedData data, IForwardReferenceMap l ) where T : struct
-        {
-            var su = PopulateObject<T>( obj, data );
-            su.Populate( l );
-            obj = su.GetObjects().First();
-        }
+            => Populate( ObjectContext.Default, ref obj, data, l, null );
 
-        /// <summary>
-        /// Helper method to populate the members of a single struct object easily.
-        /// </summary>
-        public static void Populate<T>( int context, ref T obj, SerializedData data, IForwardReferenceMap l ) where T : struct
-        {
-            var su = PopulateObject<T>( context, obj, data );
-            su.Populate( l );
-            obj = su.GetObjects().First();
-        }
+        public static void Populate<T>( ref T obj, SerializedData data, IForwardReferenceMap l, SerializationConfiguration config ) where T : struct
+            => Populate( ObjectContext.Default, ref obj, data, l, config );
 
-        //
-        //  Creation methods (separate create + act + retrieve).
-        //
+        public static void Populate<T>( ContextKey context, ref T obj, SerializedData data, IForwardReferenceMap l ) where T : struct
+            => Populate( context, ref obj, data, l, null );
 
-        /// <summary>
-        /// Creates a serialization unit that will serialize (save) the specified object of type <typeparamref name="T"/>.
-        /// </summary>
-        public static SerializationUnitSaver<T> FromObjects<T>( T obj )
+        public static void Populate<T>( ContextKey context, ref T obj, SerializedData data, IForwardReferenceMap l, SerializationConfiguration config ) where T : struct
         {
-            return new SerializationUnitSaver<T>( new T[] { obj }, ObjectContext.Default );
-        }
+            var ctx = new SerializationContext( config ?? new SerializationConfiguration() )
+            {
+                ForwardMap = l ?? new BidirectionalReferenceStore()
+            };
 
-        public static SerializationUnitSaver<T> FromObjects<T>( int context, T obj )
-        {
-            return new SerializationUnitSaver<T>( new T[] { obj }, context );
-        }
+            var driver = new StackMachineDriver( ctx );
+            var descriptor = TypeDescriptorRegistry.GetDescriptor( typeof( T ), context );
 
-        /// <summary>
-        /// Creates a serialization unit that will serialize (save) the specified collection of objects.
-        /// </summary>
-        public static SerializationUnitSaver<T> FromObjects<T>( IEnumerable<T> objects )
-        {
-            return new SerializationUnitSaver<T>( objects.ToArray(), ObjectContext.Default );
-        }
+            driver.Initialize( obj, descriptor, new DeserializationStrategy(), data );
 
-        public static SerializationUnitSaver<T> FromObjects<T>( int context, IEnumerable<T> objects )
-        {
-            return new SerializationUnitSaver<T>( objects.ToArray(), context );
-        }
+            while( !driver.IsFinished )
+            {
+                driver.Tick( float.PositiveInfinity );
+            }
 
-        /// <summary>
-        /// Creates a serialization unit that will serialize (save) the specified collection of objects.
-        /// </summary>
-        public static SerializationUnitSaver<T> FromObjects<T>( params T[] objects )
-        {
-            return new SerializationUnitSaver<T>( objects, ObjectContext.Default );
-        }
-
-        public static SerializationUnitSaver<T> FromObjects<T>( int context, params T[] objects )
-        {
-            return new SerializationUnitSaver<T>( objects, context );
-        }
-
-        /// <summary>
-        /// Creates a serialization unit that will deserialize (instantiate and load) an object of type <typeparamref name="T"/> from the specified serialized representation.
-        /// </summary>
-        public static SerializationUnitLoader<T> FromData<T>( SerializedData data )
-        {
-            return new SerializationUnitLoader<T>( new SerializedData[] { data }, ObjectContext.Default );
-        }
-        public static SerializationUnitLoader<T> FromData<T>( int context, SerializedData data )
-        {
-            return new SerializationUnitLoader<T>( new SerializedData[] { data }, context );
-        }
-
-        /// <summary>
-        /// Creates a serialization unit that will deserialize (instantiate and load) a collection of objects from the specified serialized representations.
-        /// </summary>
-        public static SerializationUnitLoader<T> FromData<T>( IEnumerable<SerializedData> data )
-        {
-            return new SerializationUnitLoader<T>( data.ToArray(), ObjectContext.Default );
-        }
-        public static SerializationUnitLoader<T> FromData<T>( int context, IEnumerable<SerializedData> data )
-        {
-            return new SerializationUnitLoader<T>( data.ToArray(), context );
-        }
-
-        /// <summary>
-        /// Creates a serialization unit that will deserialize (instantiate and load) a collection of objects from the specified serialized representations.
-        /// </summary>
-        public static SerializationUnitLoader<T> FromData<T>( params SerializedData[] data )
-        {
-            return new SerializationUnitLoader<T>( data, ObjectContext.Default );
-        }
-        public static SerializationUnitLoader<T> FromData<T>( int context, params SerializedData[] data )
-        {
-            return new SerializationUnitLoader<T>( data, context );
-        }
-
-        /// <summary>
-        /// Creates a serialization unit that will populate (load) the members of the specified object of type <typeparamref name="T"/> with the specified serialized representation of the same object.
-        /// </summary>
-        public static SerializationUnitLoader<T> PopulateObject<T>( T obj, SerializedData data )
-        {
-            return new SerializationUnitLoader<T>( new T[] { obj }, new SerializedData[] { data }, ObjectContext.Default );
-        }
-
-        public static SerializationUnitLoader<T> PopulateObject<T>( int context, T obj, SerializedData data )
-        {
-            return new SerializationUnitLoader<T>( new T[] { obj }, new SerializedData[] { data }, context );
-        }
-
-        /// <summary>
-        /// Creates a serialization unit that will populate (load) the members of the specified objects with the corresponding specified serialized representations (objects[i] <![CDATA[<]]>==> data[i]).
-        /// </summary>
-        public static SerializationUnitLoader<T> PopulateObjects<T>( T[] objects, SerializedData[] data )
-        {
-            return new SerializationUnitLoader<T>( objects, data, ObjectContext.Default );
-        }
-        public static SerializationUnitLoader<T> PopulateObjects<T>( int context, T[] objects, SerializedData[] data )
-        {
-            return new SerializationUnitLoader<T>( objects, data, context );
+            obj = (T)driver.Result;
         }
     }
 }

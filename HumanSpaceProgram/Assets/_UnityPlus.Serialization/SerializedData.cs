@@ -37,6 +37,14 @@ namespace UnityPlus.Serialization
         /// <returns>True if the child element exists and is of a specified type.</returns>
         public abstract bool TryGetValue<T>( string name, out T value ) where T : SerializedData;
 
+        /// <summary>
+        /// Dumps the contents of the serialized data to a string for debugging purposes.
+        /// </summary>
+        public abstract string DumpToString();
+
+        internal abstract string DumpToString( int indentLevel );
+
+
         public static implicit operator SerializedData( bool v ) => (SerializedPrimitive)v;
         public static implicit operator SerializedData( sbyte v ) => (SerializedPrimitive)v;
         public static implicit operator SerializedData( byte v ) => (SerializedPrimitive)v;

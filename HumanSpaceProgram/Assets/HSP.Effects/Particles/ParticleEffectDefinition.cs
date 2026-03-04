@@ -54,9 +54,9 @@ namespace HSP.Effects.Particles
 
 
             [MapsInheritingFrom( typeof( Render ) )]
-            public static SerializationMapping RenderMapping()
+            public static IDescriptor RenderMapping()
             {
-                return new MemberwiseSerializationMapping<Render>()
+                return new MemberwiseDescriptor<Render>()
                     .WithMember( "render_mode", o => o.RenderMode )
                     .WithMember( "material", ObjectContext.Asset, o => o.Material )
                     .WithMember( "vertex_streams", o => o.VertexStreams )
@@ -205,9 +205,9 @@ namespace HSP.Effects.Particles
 
 
             [MapsInheritingFrom( typeof( Initial ) )]
-            public static SerializationMapping InitialMapping()
+            public static IDescriptor InitialMapping()
             {
-                return new MemberwiseSerializationMapping<Initial>()
+                return new MemberwiseDescriptor<Initial>()
                     .WithMember( "size", o => o.Size )
                     .WithMember( "speed", o => o.Speed )
                     .WithMember( "angular_speed", o => o.AngularSpeed )
@@ -286,9 +286,9 @@ namespace HSP.Effects.Particles
 
 
             [MapsInheritingFrom( typeof( Emission ) )]
-            public static SerializationMapping EmissionMapping()
+            public static IDescriptor EmissionMapping()
             {
-                return new MemberwiseSerializationMapping<Emission>()
+                return new MemberwiseDescriptor<Emission>()
                     .WithMember( "spawn_shape", o => o.SpawnShape )
                     .WithMember( "spawn_rate", o => o.SpawnRate )
                     .WithMember( "max_particles", o => o.MaxParticles )
@@ -364,9 +364,9 @@ namespace HSP.Effects.Particles
 
 
             [MapsInheritingFrom( typeof( Lifetime ) )]
-            public static SerializationMapping LifetimeMapping()
+            public static IDescriptor LifetimeMapping()
             {
-                return new MemberwiseSerializationMapping<Lifetime>()
+                return new MemberwiseDescriptor<Lifetime>()
                     .WithMember( "force", o => o.Force )
                     .WithMember( "tint", o => o.Tint )
                     .WithMember( "size", o => o.Size );
@@ -478,9 +478,9 @@ namespace HSP.Effects.Particles
 
 
             [MapsInheritingFrom( typeof( Trail ) )]
-            public static SerializationMapping TrailMapping()
+            public static IDescriptor TrailMapping()
             {
-                return new MemberwiseSerializationMapping<Trail>()
+                return new MemberwiseDescriptor<Trail>()
                     .WithMember( "material", ObjectContext.Asset, t => t.Material )
                     .WithMember( "style", t => t.Style )
                     .WithMember( "inherit_tint", t => t.InheritTint )
@@ -596,9 +596,9 @@ namespace HSP.Effects.Particles
 
 
         [MapsInheritingFrom( typeof( ParticleEffectDefinition ) )]
-        public static SerializationMapping ParticleEffectDefinitionMapping()
+        public static IDescriptor ParticleEffectDefinitionMapping()
         {
-            return new MemberwiseSerializationMapping<ParticleEffectDefinition>()
+            return new MemberwiseDescriptor<ParticleEffectDefinition>()
                 .WithMember( "position", o => o.Position )
                 .WithMember( "rotation", o => o.Rotation )
                 .WithMember( "render", o => o.RenderValues )

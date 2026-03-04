@@ -19,9 +19,9 @@ namespace HSP.Vanilla.Content.AssetLoaders.Metadata
         public bool Readable { get; set; } = true;
 
         [MapsInheritingFrom( typeof( Texture2DMetadata ) )]
-        public static SerializationMapping Texture2DMetadataMapping()
+        public static IDescriptor Texture2DMetadataMapping()
         {
-            return new MemberwiseSerializationMapping<Texture2DMetadata>()
+            return new MemberwiseDescriptor<Texture2DMetadata>()
                 .WithMember( "graphics_format", o => o.GraphicsFormat )
                 .WithMember( "filter_mode", o => o.FilterMode )
                 .WithMember( "wrap_mode", o => o.WrapMode )

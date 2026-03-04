@@ -20,9 +20,9 @@ namespace HSP.Vanilla.Components
         // There should be *one* controller active at any given time, or something else to sync them if two are needed.
 
         [MapsInheritingFrom( typeof( FReactionControlController ) )]
-        public static SerializationMapping FReactionControlControllerMapping()
+        public static IDescriptor FReactionControlControllerMapping()
         {
-            return new MemberwiseSerializationMapping<FReactionControlController>()
+            return new MemberwiseDescriptor<FReactionControlController>()
             {
             };
         }

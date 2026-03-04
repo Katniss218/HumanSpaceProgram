@@ -611,9 +611,9 @@
 
 
 //        [MapsInheritingFrom( typeof( KeplerianOrbit ) )]
-//        public static SerializationMapping KeplerianOrbitMapping()
+//        public static IDescriptor KeplerianOrbitMapping()
 //        {
-//            return new MemberwiseSerializationMapping<KeplerianOrbit>()
+//            return new MemberwiseDescriptor<KeplerianOrbit>()
 //                .WithReadonlyMember( "ut", o => o.UT )
 //                .WithReadonlyMember( "mass", o => o.Mass )
 //                .WithReadonlyMember( "parent_body", o => o.ParentBodyID )

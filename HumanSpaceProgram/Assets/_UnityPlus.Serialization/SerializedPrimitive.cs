@@ -1,15 +1,20 @@
 ﻿using System;
+using System.Diagnostics;
+using System.Globalization;
+using System.Linq;
 using System.Runtime.InteropServices;
+using System.Text;
 
 namespace UnityPlus.Serialization
 {
     /// <summary>
     /// An arbitrary supported primitive value stored in the tree structure.
     /// </summary>
+    [DebuggerDisplay( "{ToString()}" )]
     public sealed class SerializedPrimitive : SerializedData, IEquatable<SerializedPrimitive>
     {
         /// <summary>
-        /// Stores the actual value of the primitive.
+        /// Stores the actual value of the primitive. The length is 24 bytes (16 + ref)
         /// </summary>
         [StructLayout( LayoutKind.Explicit )]
         internal struct Value
@@ -26,6 +31,79 @@ namespace UnityPlus.Serialization
             [FieldOffset( 0 )] public double float64;
             [FieldOffset( 0 )] public decimal @decimal;
             [FieldOffset( 16 )] public string str; // Reference types can't be overlapped with value types :(, 16 bytes is the size of decimal.
+
+            public string ToString( DataType type )
+            {
+                var inv = CultureInfo.InvariantCulture;
+
+                return type switch
+                {
+                    DataType.Boolean =>
+                        $"{(boolean ? "true" : "false")} (bool)",
+
+                    DataType.Int64 =>
+                        $"{int64.ToString( inv )} (i64)",
+
+                    DataType.UInt64 =>
+                        $"{uint64.ToString( inv )} (u64)",
+
+                    DataType.Float64 =>
+                        FormatDouble(),
+
+                    DataType.Decimal =>
+                        $"{@decimal.ToString( inv )} (dec)",
+
+                    DataType.String =>
+                        str == null
+                            ? "null (str)"
+                            : $"\"{Escape( str )}\" (str)",
+
+                    _ => "invalid()"
+                };
+            }
+
+            private string FormatDouble()
+            {
+                var inv = CultureInfo.InvariantCulture;
+
+                if( double.IsNaN( float64 ) )
+                    return "NaN (f64)";
+
+                if( double.IsPositiveInfinity( float64 ) )
+                    return "+Infinity (f64)";
+
+                if( double.IsNegativeInfinity( float64 ) )
+                    return "-Infinity (f64)";
+
+                // "R" guarantees round-trip for double
+                return $"{float64.ToString( "R", inv )} (f64)";
+            }
+
+            private static string Escape( string s )
+            {
+                var sb = new StringBuilder( s.Length + 8 );
+
+                foreach( var c in s )
+                {
+                    switch( c )
+                    {
+                        case '\\': sb.Append( "\\\\" ); break;
+                        case '\"': sb.Append( "\\\"" ); break;
+                        case '\n': sb.Append( "\\n" ); break;
+                        case '\r': sb.Append( "\\r" ); break;
+                        case '\t': sb.Append( "\\t" ); break;
+                        case '\0': sb.Append( "\\0" ); break;
+                        default:
+                            if( char.IsControl( c ) )
+                                sb.Append( "\\u" ).Append( ((int)c).ToString( "X4" ) );
+                            else
+                                sb.Append( c );
+                            break;
+                    }
+                }
+
+                return sb.ToString();
+            }
         }
 
         /// <summary>
@@ -74,7 +152,7 @@ namespace UnityPlus.Serialization
         internal readonly Value _value;
         internal readonly DataType _type;
 
-        SerializedPrimitive( Value value, DataType type )
+        private SerializedPrimitive( Value value, DataType type )
         {
             this._value = value;
             this._type = type;
@@ -129,6 +207,21 @@ namespace UnityPlus.Serialization
             return this._value.equalityValue.GetHashCode();
         }
 
+        public override string ToString()
+        {
+            return this._value.ToString( this._type );
+        }
+
+        public override string DumpToString()
+        {
+            return DumpToString( 0 );
+        }
+
+        internal override string DumpToString( int indentLevel )
+        {
+            string indent = string.Concat( Enumerable.Repeat( "- ", indentLevel ) );
+            return $"{indent}{ToString()}";
+        }
 
         public static implicit operator SerializedPrimitive( bool v ) => new SerializedPrimitive( new Value() { boolean = v }, DataType.Boolean );
         public static implicit operator SerializedPrimitive( sbyte v ) => new SerializedPrimitive( new Value() { int64 = v }, DataType.Int64 );

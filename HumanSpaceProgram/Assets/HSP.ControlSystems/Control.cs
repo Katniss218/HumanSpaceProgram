@@ -39,9 +39,9 @@ namespace HSP.ControlSystems
 
 
         [MapsInheritingFrom( typeof( Control ) )]
-        public static SerializationMapping ControlMapping()
+        public static IDescriptor ControlMapping()
         {
-            return new MemberwiseSerializationMapping<Control>()
+            return new MemberwiseDescriptor<Control>()
                 .WithMember( "transform", ObjectContext.Ref, o => o.transform );
         }
     }

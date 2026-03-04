@@ -24,9 +24,9 @@ namespace HSP.Vanilla.Components
 
 
             [MapsInheritingFrom( typeof( Actuator2DGroup ) )]
-            public static SerializationMapping Actuator2DGroupMapping()
+            public static IDescriptor Actuator2DGroupMapping()
             {
-                return new MemberwiseSerializationMapping<Actuator2DGroup>()
+                return new MemberwiseDescriptor<Actuator2DGroup>()
                     .WithMember( "get_reference_transform", o => o.GetReferenceTransform )
                     .WithMember( "on_set_xy", o => o.OnSetXY );
             }
@@ -94,9 +94,9 @@ namespace HSP.Vanilla.Components
         }
 
         [MapsInheritingFrom( typeof( FGimbalActuatorController ) )]
-        public static SerializationMapping FGimbalActuatorControllerMapping()
+        public static IDescriptor FGimbalActuatorControllerMapping()
         {
-            return new MemberwiseSerializationMapping<FGimbalActuatorController>()
+            return new MemberwiseDescriptor<FGimbalActuatorController>()
                 .WithMember( "actuators_2d", o => o.Actuators2D )
                 .WithMember( "set_attitude", o => o.SetAttitude );
         }

@@ -55,9 +55,9 @@ namespace HSP.Effects.Particles.EmissionShapes
         }
 
         [MapsInheritingFrom( typeof( DonutEmissionShape ) )]
-        public static SerializationMapping DonutEmissionShapeMapping()
+        public static IDescriptor DonutEmissionShapeMapping()
         {
-            return new MemberwiseSerializationMapping<DonutEmissionShape>()
+            return new MemberwiseDescriptor<DonutEmissionShape>()
                 .WithMember( "spawn_from", o => o.SpawnFrom )
                 .WithMember( "major_radius", o => o.MajorRadius )
                 .WithMember( "minor_radius", o => o.MinorRadius )

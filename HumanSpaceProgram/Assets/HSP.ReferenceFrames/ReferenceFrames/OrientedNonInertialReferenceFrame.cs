@@ -227,9 +227,9 @@ namespace HSP.ReferenceFrames
         }
 
         [MapsInheritingFrom( typeof( OrientedNonInertialReferenceFrame ) )]
-        public static SerializationMapping OrientedNonInertialReferenceFrameMapping()
+        public static IDescriptor OrientedNonInertialReferenceFrameMapping()
         {
-            return new MemberwiseSerializationMapping<OrientedNonInertialReferenceFrame>()
+            return new MemberwiseDescriptor<OrientedNonInertialReferenceFrame>()
                 .WithReadonlyMember( "reference_ut", o => o.ReferenceUT )
                 .WithReadonlyMember( "position", o => o._position )
                 .WithReadonlyMember( "rotation", o => o._rotation )
@@ -237,7 +237,8 @@ namespace HSP.ReferenceFrames
                 .WithReadonlyMember( "angular_velocity", o => o._angularVelocity )
                 .WithReadonlyMember( "acceleration", o => o._acceleration )
                 .WithReadonlyMember( "angular_acceleration", o => o._angularAcceleration )
-                .WithFactory<double, Vector3Dbl, QuaternionDbl, Vector3Dbl, Vector3Dbl, Vector3Dbl, Vector3Dbl>( ( ut, pos, rot, vel, angVel, acc, angAcc ) => new OrientedNonInertialReferenceFrame( ut, pos, rot, vel, angVel, acc, angAcc ) );
+                .WithFactory<double, Vector3Dbl, QuaternionDbl, Vector3Dbl, Vector3Dbl, Vector3Dbl, Vector3Dbl>( ( ut, pos, rot, vel, angVel, acc, angAcc ) => new OrientedNonInertialReferenceFrame( ut, pos, rot, vel, angVel, acc, angAcc ),
+                    "reference_ut", "position", "rotation", "velocity", "angular_velocity", "accceleration", "angular_acceleration" );
         }
     }
 }

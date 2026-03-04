@@ -417,9 +417,9 @@ namespace HSP.Vanilla
         }
 
         [MapsInheritingFrom( typeof( PinnedReferenceFrameTransform ) )]
-        public static SerializationMapping PinnedPhysicsObjectMapping()
+        public static IDescriptor PinnedPhysicsObjectMapping()
         {
-            return new MemberwiseSerializationMapping<PinnedReferenceFrameTransform>()
+            return new MemberwiseDescriptor<PinnedReferenceFrameTransform>()
                 .WithMember( "scene_reference_frame_provider", o => o.SceneReferenceFrameProvider )
                 .WithMember( "mass", o => o.Mass )
                 .WithMember( "local_center_of_mass", o => o.LocalCenterOfMass )

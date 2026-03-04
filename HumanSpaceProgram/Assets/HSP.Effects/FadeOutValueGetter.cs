@@ -43,11 +43,11 @@ namespace HSP.Effects
 
 
         [MapsInheritingFrom( typeof( FadeOutValueGetter ) )]
-        public static SerializationMapping FadeOutValueGetterMapping()
+        public static IDescriptor FadeOutValueGetterMapping()
         {
-            return new MemberwiseSerializationMapping<FadeOutValueGetter>()
+            return new MemberwiseDescriptor<FadeOutValueGetter>()
                 .WithReadonlyMember( "fade_duration", o => o.FadeDuration )
-                .WithFactory<float>( ( fadeDuration ) => new FadeOutValueGetter( fadeDuration ) )
+                .WithFactory<float>( ( fadeDuration ) => new FadeOutValueGetter( fadeDuration ), "fade_duration" )
                 .WithMember( "loop_fade", o => o.LoopFade );
         }
     }

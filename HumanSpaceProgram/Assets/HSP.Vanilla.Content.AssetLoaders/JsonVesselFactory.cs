@@ -4,7 +4,7 @@ using HSP.Content.Vessels.Serialization;
 using System.IO;
 using UnityEngine;
 using UnityPlus.Serialization;
-using UnityPlus.Serialization.DataHandlers;
+using UnityPlus.Serialization.Formats;
 
 namespace HSP.Vanilla.Content.AssetLoaders
 {

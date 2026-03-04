@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityPlus.Serialization;
-using UnityPlus.Serialization.DataHandlers;
+using UnityPlus.Serialization.Formats;
 
 namespace HSP.Content.Vessels.Serialization
 {
@@ -154,9 +154,9 @@ namespace HSP.Content.Vessels.Serialization
         }
 
         [MapsInheritingFrom( typeof( PartMetadata ) )]
-        public static SerializationMapping PartMetadataMapping()
+        public static IDescriptor PartMetadataMapping()
         {
-            return new MemberwiseSerializationMapping<PartMetadata>()
+            return new MemberwiseDescriptor<PartMetadata>()
                 .WithMember( "name", o => o.Name )
                 .WithMember( "description", o => o.Description )
                 .WithMember( "author", o => o.Author )

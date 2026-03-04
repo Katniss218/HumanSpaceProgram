@@ -125,9 +125,9 @@ namespace HSP.Vanilla.Components
 
 
         [MapsInheritingFrom( typeof( FPlayerInputAvionics ) )]
-        public static SerializationMapping FPlayerInputAvionicsMapping()
+        public static IDescriptor FPlayerInputAvionicsMapping()
         {
-            return new MemberwiseSerializationMapping<FPlayerInputAvionics>()
+            return new MemberwiseDescriptor<FPlayerInputAvionics>()
                 .WithMember( "control_frame", ObjectContext.Ref, o => o.ControlFrame )
                 .WithMember( "on_set_throttle", o => o.OnSetThrottle )
                 .WithMember( "on_set_attitude", o => o.OnSetAttitude )

@@ -1,10 +1,11 @@
+using HSP.Time;
 using HSP.Timelines;
 using System;
 using System.IO;
 using System.Linq;
 using UnityEngine;
 using UnityPlus.Serialization;
-using UnityPlus.Serialization.DataHandlers;
+using UnityPlus.Serialization.Formats;
 
 namespace HSP.Vanilla.Scenes.GameplayScene
 {
@@ -27,19 +28,19 @@ namespace HSP.Vanilla.Scenes.GameplayScene
 
             Directory.CreateDirectory( savePath );
 
-            JsonSerializedDataHandler dataHandler = new JsonSerializedDataHandler( Path.Combine( savePath, $"{nameof( ActiveVesselManager )}.json" ) );
+            var dataHandler = new FileSerializedDataHandler( Path.Combine( savePath, $"{nameof( ActiveVesselManager )}.json" ), JsonFormat.Instance );
 
-            var su = SerializationUnit.FromObjects( UnityEngine.Object.FindObjectOfType<ActiveVesselManager>() );
-            SerializationResult result = su.Serialize( TimelineManager.RefStore );
-#warning TODO - standardize the 'is failure' check in unityplus.
-            if( result.HasFlag( SerializationResult.Failed ) || result.HasFlag( SerializationResult.HasFailures ) )
+            try
             {
-                Debug.LogError( $"Failed to serialize ActiveVesselManager." );
-                e.AddMessage( LogType.Error, $"Failed to serialize ActiveVesselManager." );
-                return;
+                var data = SerializationUnit.Serialize( UnityEngine.Object.FindObjectOfType<ActiveVesselManager>(), TimelineManager.RefStore );
+                dataHandler.Write( data );
             }
-            var data = su.GetData().First();
-            dataHandler.Write( data );
+            catch( UPSSerializationException ex )
+            {
+                Debug.LogError( $"Failed to serialize ActiveVesselManager: {ex.Message}" );
+                Debug.LogException( ex );
+                e.AddMessage( LogType.Error, $"Failed to serialize ActiveVesselManager: {ex.Message}" );
+            }
         }
 
         [HSPEventListener( HSPEvent_AFTER_TIMELINE_NEW.ID, DESERIALIZE_ACTIVE_OBJECT_MANAGER )]
@@ -56,16 +57,18 @@ namespace HSP.Vanilla.Scenes.GameplayScene
 
             Directory.CreateDirectory( savePath );
 
-            JsonSerializedDataHandler dataHandler = new JsonSerializedDataHandler( Path.Combine( savePath, $"{nameof( ActiveVesselManager )}.json" ) );
-
+            var dataHandler = new FileSerializedDataHandler( Path.Combine( savePath, $"{nameof( ActiveVesselManager )}.json" ), JsonFormat.Instance );
             var data = dataHandler.Read();
-            var su = SerializationUnit.PopulateObject( UnityEngine.Object.FindObjectOfType<ActiveVesselManager>(), data );
-            SerializationResult result = su.Populate( TimelineManager.RefStore );
-            if( result.HasFlag( SerializationResult.Failed ) || result.HasFlag( SerializationResult.HasFailures ) )
+
+            try
             {
-                Debug.LogError( $"Failed to deserialize ActiveVesselManager." );
-                e.AddMessage( LogType.Error, $"Failed to deserialize ActiveVesselManager." );
-                return;
+                SerializationUnit.Populate<ActiveVesselManager>( UnityEngine.Object.FindObjectOfType<ActiveVesselManager>(), data, TimelineManager.RefStore );
+            }
+            catch( UPSSerializationException ex )
+            {
+                Debug.LogError( $"Failed to deserialize ActiveVesselManager: {ex.Message}" );
+                Debug.LogException( ex );
+                e.AddMessage( LogType.Error, $"Failed to deserialize ActiveVesselManager: {ex.Message}" );
             }
         }
     }

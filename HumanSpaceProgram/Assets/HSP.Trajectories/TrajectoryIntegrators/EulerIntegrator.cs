@@ -21,9 +21,9 @@ namespace HSP.Trajectories.TrajectoryIntegrators
 
 
         [MapsInheritingFrom( typeof( EulerIntegrator ) )]
-        public static SerializationMapping EulerIntegratorMapping()
+        public static IDescriptor EulerIntegratorMapping()
         {
-            return new MemberwiseSerializationMapping<EulerIntegrator>();
+            return new MemberwiseDescriptor<EulerIntegrator>();
         }
     }
 }

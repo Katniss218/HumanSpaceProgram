@@ -146,9 +146,9 @@ namespace HSP.Vanilla.Effects
 
 
         [MapsInheritingFrom( typeof( FRocketEngineFX ) )]
-        public static SerializationMapping FRocketEngineExhaustFxMapping()
+        public static IDescriptor FRocketEngineExhaustFxMapping()
         {
-            return new MemberwiseSerializationMapping<FRocketEngineFX>()
+            return new MemberwiseDescriptor<FRocketEngineFX>()
                 .WithMember( "engine", ObjectContext.Ref, o => o.Engine )
                 .WithMember( "ignition_system", o => o.OnIgnition )
                 .WithMember( "loop_system", o => o.OnRunning )

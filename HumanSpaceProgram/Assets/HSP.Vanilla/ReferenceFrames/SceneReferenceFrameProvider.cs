@@ -22,9 +22,9 @@ namespace HSP.Vanilla.ReferenceFrames
         }
 
         [MapsInheritingFrom( typeof( GameplaySceneReferenceFrameProvider ) )]
-        public static SerializationMapping GameplaySceneReferenceFrameProviderMapping()
+        public static IDescriptor GameplaySceneReferenceFrameProviderMapping()
         {
-            return new MemberwiseSerializationMapping<GameplaySceneReferenceFrameProvider>();
+            return new MemberwiseDescriptor<GameplaySceneReferenceFrameProvider>();
         }
     }
 
@@ -45,9 +45,9 @@ namespace HSP.Vanilla.ReferenceFrames
         }
 
         [MapsInheritingFrom( typeof( MapSceneReferenceFrameProvider ) )]
-        public static SerializationMapping MapSceneReferenceFrameProviderMapping()
+        public static IDescriptor MapSceneReferenceFrameProviderMapping()
         {
-            return new MemberwiseSerializationMapping<MapSceneReferenceFrameProvider>();
+            return new MemberwiseDescriptor<MapSceneReferenceFrameProvider>();
         }
     }
 }

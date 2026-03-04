@@ -40,9 +40,9 @@ namespace HSP.CelestialBodies.Atmospheres
         public abstract AtmosphereData GetData( Vector3 scenePoint );
 
         [MapsInheritingFrom( typeof( Atmosphere ) )]
-        public static SerializationMapping AtmosphereMapping()
+        public static IDescriptor AtmosphereMapping()
         {
-            return new MemberwiseSerializationMapping<Atmosphere>()
+            return new MemberwiseDescriptor<Atmosphere>()
                 .WithMember( "height", o => o.Height );
         }
     }
@@ -93,9 +93,9 @@ namespace HSP.CelestialBodies.Atmospheres
 
 
         [MapsInheritingFrom( typeof( ExponentialScaleHeightAtmosphere ) )]
-        public static SerializationMapping ExponentialScaleHeightAtmosphereMapping()
+        public static IDescriptor ExponentialScaleHeightAtmosphereMapping()
         {
-            return new MemberwiseSerializationMapping<ExponentialScaleHeightAtmosphere>()
+            return new MemberwiseDescriptor<ExponentialScaleHeightAtmosphere>()
                 .WithMember( "height", o => o.Height )
                 .WithMember( "specific_gas_constant", o => o.SpecificGasConstant )
                 .WithMember( "scale_height", o => o.ScaleHeight )

@@ -417,9 +417,9 @@ namespace HSP.Vanilla
         }
 
         [MapsInheritingFrom( typeof( KinematicReferenceFrameTransform ) )]
-        public static SerializationMapping FreePhysicsObjectMapping()
+        public static IDescriptor FreePhysicsObjectMapping()
         {
-            return new MemberwiseSerializationMapping<KinematicReferenceFrameTransform>()
+            return new MemberwiseDescriptor<KinematicReferenceFrameTransform>()
                 .WithMember( "scene_reference_frame_provider", o => o.SceneReferenceFrameProvider )
                 .WithMember( "mass", o => o.Mass )
                 .WithMember( "local_center_of_mass", o => o.LocalCenterOfMass )

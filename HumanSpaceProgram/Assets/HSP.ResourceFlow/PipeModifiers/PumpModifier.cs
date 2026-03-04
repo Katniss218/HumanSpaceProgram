@@ -13,9 +13,9 @@ namespace HSP.ResourceFlow
         }
 
         [MapsInheritingFrom( typeof( PumpModifier ) )]
-        public static SerializationMapping PumpModifierMapping()
+        public static IDescriptor PumpModifierMapping()
         {
-            return new MemberwiseSerializationMapping<PumpModifier>()
+            return new MemberwiseDescriptor<PumpModifier>()
                 .WithMember( "head_added", o => o.HeadAdded );
         }
     }

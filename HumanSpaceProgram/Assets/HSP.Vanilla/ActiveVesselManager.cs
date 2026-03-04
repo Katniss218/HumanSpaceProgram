@@ -73,9 +73,9 @@ namespace HSP.Vanilla
         }
 
         [MapsInheritingFrom( typeof( ActiveVesselManager ) )]
-        public static SerializationMapping ActiveObjectManagerMapping()
+        public static IDescriptor ActiveObjectManagerMapping()
         {
-            return new MemberwiseSerializationMapping<ActiveVesselManager>()
+            return new MemberwiseDescriptor<ActiveVesselManager>()
                 .WithMember( "active_object", ObjectContext.Ref, o => ActiveVesselManager.ActiveObject, ( o, value ) => ActiveVesselManager.ActiveObject = value );
         }
     }

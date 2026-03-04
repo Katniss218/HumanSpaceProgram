@@ -31,10 +31,10 @@ namespace HSP.Vanilla
 
 
         [MapsInheritingFrom( typeof( PinnedCelestialBodyReferenceFrameTransform ) )]
-        public static SerializationMapping PinnedCelestialBodyReferenceFrameTransformMapping()
+        public static IDescriptor PinnedCelestialBodyReferenceFrameTransformMapping()
         {
-            return new MemberwiseSerializationMapping<PinnedCelestialBodyReferenceFrameTransform>()
-                .ExcludeMember( "reference_transform" ) // removes the base member because we use the celestialbody instead.
+            return new MemberwiseDescriptor<PinnedCelestialBodyReferenceFrameTransform>()
+                .WithoutMember( "reference_transform" ) // removes the base member because we use the celestialbody instead.
                 .WithMember( "reference_body", o => o.ReferenceBody == null ? null : o.ReferenceBody.ID, ( o, value ) => o.ReferenceBody = value == null ? null : CelestialBodyManager.Get( value ) );
         }
     }

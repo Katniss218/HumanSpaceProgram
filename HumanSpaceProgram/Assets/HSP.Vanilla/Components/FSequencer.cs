@@ -29,9 +29,9 @@ namespace HSP.Vanilla.Components
         }
 
         [MapsInheritingFrom( typeof( FSequencer ) )]
-        public static SerializationMapping FSequencerMapping()
+        public static IDescriptor FSequencerMapping()
         {
-            return new MemberwiseSerializationMapping<FSequencer>()
+            return new MemberwiseDescriptor<FSequencer>()
                 .WithMember( "sequence", o => o.Sequence );
         }
     }

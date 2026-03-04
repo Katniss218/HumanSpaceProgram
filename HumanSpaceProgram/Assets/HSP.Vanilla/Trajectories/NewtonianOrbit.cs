@@ -112,14 +112,15 @@ namespace HSP.Vanilla.Trajectories
         }
 
         [MapsInheritingFrom( typeof( NewtonianOrbit ) )]
-        public static SerializationMapping NewtonianOrbitMapping()
+        public static IDescriptor NewtonianOrbitMapping()
         {
-            return new MemberwiseSerializationMapping<NewtonianOrbit>()
+            return new MemberwiseDescriptor<NewtonianOrbit>()
                 .WithReadonlyMember( "ut", o => o.UT )
                 .WithReadonlyMember( "mass", o => o.Mass )
                 .WithReadonlyMember( "position", o => o._currentPosition )
                 .WithReadonlyMember( "velocity", o => o._currentVelocity )
-                .WithFactory<double, double, Vector3Dbl, Vector3Dbl>( ( ut, mass, position, velocity ) => new NewtonianOrbit( ut, position, velocity, Vector3Dbl.zero, mass ) ); ;
+                .WithFactory<double, double, Vector3Dbl, Vector3Dbl>( ( ut, mass, position, velocity ) => new NewtonianOrbit( ut, position, velocity, Vector3Dbl.zero, mass ),
+                    "ut", "mass", "position", "rotation" );
         }
     }
 }

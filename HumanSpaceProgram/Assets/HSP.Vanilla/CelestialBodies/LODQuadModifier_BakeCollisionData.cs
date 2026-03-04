@@ -44,9 +44,9 @@ namespace HSP.Vanilla.CelestialBodies
         }
 
         [MapsInheritingFrom( typeof( LODQuadModifier_BakeCollisionData ) )]
-        public static SerializationMapping LODQuadModifier_BakeCollisionDataMapping()
+        public static IDescriptor LODQuadModifier_BakeCollisionDataMapping()
         {
-            return new MemberwiseSerializationMapping<LODQuadModifier_BakeCollisionData>();
+            return new MemberwiseDescriptor<LODQuadModifier_BakeCollisionData>();
         }
     }
 }

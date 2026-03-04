@@ -337,9 +337,9 @@ namespace HSP.Vanilla.CelestialBodies
         }
 
         [MapsInheritingFrom( typeof( LODQuadModifier_Heightmap ) )]
-        public static SerializationMapping LODQuadModifier_HeightmapMapping()
+        public static IDescriptor LODQuadModifier_HeightmapMapping()
         {
-            return new MemberwiseSerializationMapping<LODQuadModifier_Heightmap>()
+            return new MemberwiseDescriptor<LODQuadModifier_Heightmap>()
                 .WithMember( "heightmap_xn", ObjectContext.Asset, o => o.HeightmapXn )
                 .WithMember( "heightmap_xp", ObjectContext.Asset, o => o.HeightmapXp )
                 .WithMember( "heightmap_yn", ObjectContext.Asset, o => o.HeightmapYn )

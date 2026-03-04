@@ -209,9 +209,9 @@ namespace HSP.Vanilla.Trajectories
         }
 
         [MapsInheritingFrom( typeof( TrajectoryTransform ) )]
-        public static SerializationMapping TrajectoryTransformMapping()
+        public static IDescriptor TrajectoryTransformMapping()
         {
-            return new MemberwiseSerializationMapping<TrajectoryTransform>()
+            return new MemberwiseDescriptor<TrajectoryTransform>()
                 .WithMember( "is_attractor", o => o._isAttractor )
                 .WithMember( "integrator", o => o._integrator )
                 .WithMember( "acceleration_providers", o => o._accelerationProviders );

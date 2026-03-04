@@ -122,9 +122,9 @@ namespace HSP.Vanilla.CelestialBodies
         }
 
         [MapsInheritingFrom( typeof( LODQuadModifier_InitializeMesh ) )]
-        public static SerializationMapping LODQuadModifier_InitializeMeshMapping()
+        public static IDescriptor LODQuadModifier_InitializeMeshMapping()
         {
-            return new MemberwiseSerializationMapping<LODQuadModifier_InitializeMesh>();
+            return new MemberwiseDescriptor<LODQuadModifier_InitializeMesh>();
         }
     }
 }

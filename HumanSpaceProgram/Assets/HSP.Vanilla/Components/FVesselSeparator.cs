@@ -29,9 +29,9 @@ namespace HSP.Vanilla.Components
         }
 
         [MapsInheritingFrom( typeof( FVesselSeparator ) )]
-        public static SerializationMapping FVesselSeparatorMapping()
+        public static IDescriptor FVesselSeparatorMapping()
         {
-            return new MemberwiseSerializationMapping<FVesselSeparator>()
+            return new MemberwiseDescriptor<FVesselSeparator>()
                 .WithMember( "separate", o => o.Separate )
                 .WithMember( "has_separated", o => o._hasSeparated );
         }

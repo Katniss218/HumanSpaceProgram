@@ -65,9 +65,9 @@ namespace HSP.ControlSystems.Controls
         }
 
         [MapsInheritingFrom( typeof( ControllerOutput ) )]
-        public static SerializationMapping ControllerOutputMapping()
+        public static IDescriptor ControllerOutputMapping()
         {
-            return new MemberwiseSerializationMapping<ControllerOutput>(); // empty dummy referencable thing.
+            return new MemberwiseDescriptor<ControllerOutput>(); // empty dummy referencable thing.
         }
     }
 }

@@ -301,9 +301,9 @@ namespace HSP.Vessels
 
 
         [MapsInheritingFrom( typeof( Vessel ) )]
-        public static SerializationMapping VesselMapping()
+        public static IDescriptor VesselMapping()
         {
-            return new MemberwiseSerializationMapping<Vessel>()
+            return new MemberwiseDescriptor<Vessel>()
                 .WithMember( "display_name", o => o.DisplayName )
                 .WithMember( "root_part", ObjectContext.Ref, o => o._rootPart )
                 .WithMember( "on_after_recalculate_parts", o => o.OnAfterRecalculateParts );

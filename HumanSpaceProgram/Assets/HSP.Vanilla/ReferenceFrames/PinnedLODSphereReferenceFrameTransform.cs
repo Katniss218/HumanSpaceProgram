@@ -53,9 +53,9 @@ namespace HSP.Vanilla.ReferenceFrames
         }
 
         [MapsInheritingFrom( typeof( PinnedLODSphereReferenceFrameTransform ) )]
-        public static SerializationMapping PinnedLODSphereReferenceFrameTransformMapping()
+        public static IDescriptor PinnedLODSphereReferenceFrameTransformMapping()
         {
-            return new MemberwiseSerializationMapping<PinnedLODSphereReferenceFrameTransform>()
+            return new MemberwiseDescriptor<PinnedLODSphereReferenceFrameTransform>()
                 .WithMember( "max_position", o => o.MaxPosition );
         }
     }

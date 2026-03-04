@@ -31,9 +31,9 @@ namespace HSP.Vessels.Construction
     public static class CraneBuildCondition_Mapping
     {
         [MapsInheritingFrom( typeof( CraneBuildCondition ) )]
-        public static SerializationMapping CraneBuildConditionMapping()
+        public static IDescriptor CraneBuildConditionMapping()
         {
-            return new MemberwiseSerializationMapping<CraneBuildCondition>()
+            return new MemberwiseDescriptor<CraneBuildCondition>()
                 .WithMember( "min_lift_capacity", o => o.minLiftCapacity );
         }
     }
@@ -161,38 +161,38 @@ namespace HSP.Vessels.Construction
                 _cachedData = new();
 
                 _cachedRefStore.Clear();
-
+#warning TODO - FIXME BEFORE PUSH
                 // this entire thing could be ran once per entire vessel and cached until something is added/removed from it.
-                AncestralMap<FConstructible> partMap = AncestralMap<FConstructible>.Create( transform );
-                if( partMap.TryGetValue( this, out var ourPartsTransforms ) )
-                {
-                    IEnumerable<Component> comps = ourPartsTransforms.SelectMany( t => t.GetComponents() );
+                //AncestralMap<FConstructible> partMap = AncestralMap<FConstructible>.Create( transform );
+                //if( partMap.TryGetValue( this, out var ourPartsTransforms ) )
+                //{
+                //    IEnumerable<Component> comps = ourPartsTransforms.SelectMany( t => t.GetComponents() );
 
-                    var su = SerializationUnit.FromObjects<Component>( GhostableContext.Ghost, comps );
+                //    var su = SerializationUnit.FromObjects<Component>( GhostableContext.Ghost, comps );
 
-                    su.Serialize( _cachedRefStore );
+                //    su.Serialize( _cachedRefStore );
 
-                    foreach( var originalToGhost in su.GetData().Where( d => d != null ) )
-                    {
-                        // Only cache things that are ghostable.
-                        // This should probably be signified differently than by a null, but it works for now.
+                //    foreach( var originalToGhost in su.GetData().Where( d => d != null ) )
+                //    {
+                //        // Only cache things that are ghostable.
+                //        // This should probably be signified differently than by a null, but it works for now.
 
-                        Component comp = (Component)_cachedRefStore.GetObj( originalToGhost[KeyNames.ID].DeserializeGuid() );
-                        su = SerializationUnit.FromObjects<Component>( ObjectContext.Value, comp );
+                //        Component comp = (Component)_cachedRefStore.GetObj( originalToGhost[KeyNames.ID].DeserializeGuid() );
+                //        su = SerializationUnit.FromObjects<Component>( ObjectContext.Value, comp );
 
-                        su.Serialize( _cachedRefStore );
+                //        su.Serialize( _cachedRefStore );
 
-                        var ghostToOriginal = su.GetData().First();
+                //        var ghostToOriginal = su.GetData().First();
 
-                        // TODO - remove keys from revObj, that aren't present in forwardObj.
-                        /*if( originalToGhost is SerializedObject forwardObj && ghostToOriginal is SerializedObject revObj )
-                        {
+                //        // TODO - remove keys from revObj, that aren't present in forwardObj.
+                //        /*if( originalToGhost is SerializedObject forwardObj && ghostToOriginal is SerializedObject revObj )
+                //        {
 
-                        }*/
+                //        }*/
 
-                        _cachedData.Add( comp, (originalToGhost, ghostToOriginal) );
-                    }
-                }
+                //        _cachedData.Add( comp, (originalToGhost, ghostToOriginal) );
+                //    }
+                //}
 
 
             }
@@ -203,9 +203,9 @@ namespace HSP.Vessels.Construction
         //
 
         [MapsInheritingFrom( typeof( FConstructible ) )]
-        public static SerializationMapping FConstructibleMapping()
+        public static IDescriptor FConstructibleMapping()
         {
-            return new MemberwiseSerializationMapping<FConstructible>()
+            return new MemberwiseDescriptor<FConstructible>()
                 .WithMember( "max_build_points", o => o._maxBuildPoints )
                 .WithMember( "build_points", o => o._buildPoints )
                 .WithMember( "cached_data", KeyValueContext.RefToValue, o => o._cachedData );

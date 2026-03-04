@@ -67,9 +67,9 @@ namespace HSP.Vanilla.CelestialBodies
         }
 
         [MapsInheritingFrom( typeof( LODQuadModifier_NoiseDisplace ) )]
-        public static SerializationMapping LODQuadModifier_NoiseDisplaceMapping()
+        public static IDescriptor LODQuadModifier_NoiseDisplaceMapping()
         {
-            return new MemberwiseSerializationMapping<LODQuadModifier_NoiseDisplace>();
+            return new MemberwiseDescriptor<LODQuadModifier_NoiseDisplace>();
         }
     }
 }

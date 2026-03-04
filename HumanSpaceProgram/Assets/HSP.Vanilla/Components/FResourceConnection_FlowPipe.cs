@@ -98,9 +98,9 @@ namespace HSP.Vanilla.Components
 
 
         [MapsInheritingFrom( typeof( FResourceConnection_FlowPipe ) )]
-        public static SerializationMapping FResourceConnection_FlowPipeMapping()
+        public static IDescriptor FResourceConnection_FlowPipeMapping()
         {
-            return new MemberwiseSerializationMapping<FResourceConnection_FlowPipe>()
+            return new MemberwiseDescriptor<FResourceConnection_FlowPipe>()
                 .WithMember( "from_inlet", ObjectContext.Ref, o => o.FromInlet )
                 .WithMember( "to_inlet", ObjectContext.Ref, o => o.ToInlet )
                 .WithMember( "conductivity_factor", o => o.ConductivityFactor )

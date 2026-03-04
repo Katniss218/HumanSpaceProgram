@@ -223,16 +223,17 @@ namespace HSP.ReferenceFrames
 
 
         [MapsInheritingFrom( typeof( CenteredNonInertialReferenceFrame ) )]
-        public static SerializationMapping CenteredNonInertialReferenceFrameMapping()
+        public static IDescriptor CenteredNonInertialReferenceFrameMapping()
         {
-            return new MemberwiseSerializationMapping<CenteredNonInertialReferenceFrame>()
+            return new MemberwiseDescriptor<CenteredNonInertialReferenceFrame>()
                 .WithReadonlyMember( "reference_ut", o => o.ReferenceUT )
                 .WithReadonlyMember( "position", o => o._position )
                 .WithReadonlyMember( "velocity", o => o._velocity )
                 .WithReadonlyMember( "angular_velocity", o => o._angularVelocity )
                 .WithReadonlyMember( "acceleration", o => o._acceleration )
                 .WithReadonlyMember( "angular_acceleration", o => o._angularAcceleration )
-                .WithFactory<double, Vector3Dbl, Vector3Dbl, Vector3Dbl, Vector3Dbl, Vector3Dbl>( ( ut, pos, vel, angVel, acc, angAcc ) => new CenteredNonInertialReferenceFrame( ut, pos, vel, angVel, acc, angAcc ) );
+                .WithFactory<double, Vector3Dbl, Vector3Dbl, Vector3Dbl, Vector3Dbl, Vector3Dbl>( ( ut, pos, vel, angVel, acc, angAcc ) => new CenteredNonInertialReferenceFrame( ut, pos, vel, angVel, acc, angAcc ),
+                    "reference_ut", "position", "velocity", "angular_velocity", "accceleration", "angular_acceleration" );
         }
     }
 }

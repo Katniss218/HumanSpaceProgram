@@ -120,9 +120,9 @@ namespace HSP.Vanilla.Settings
 
 
         [MapsInheritingFrom( typeof( SettingsPage_Keybinds ) )]
-        public static SerializationMapping SettingsPage_KeybindsMapping()
+        public static IDescriptor SettingsPage_KeybindsMapping()
         {
-            return new MemberwiseSerializationMapping<SettingsPage_Keybinds>()
+            return new MemberwiseDescriptor<SettingsPage_Keybinds>()
                 .WithMember( "common_primary_down", o => o.CommonPrimaryDown )
                 .WithMember( "common_primary", o => o.CommonPrimary )
                 .WithMember( "common_primary_up", o => o.CommonPrimaryUp )

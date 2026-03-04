@@ -398,9 +398,9 @@ namespace HSP.ResourceFlow
             }
 
             [MapsInheritingFrom( typeof( SubstanceState ) )]
-            public static SerializationMapping SubstanceStateMapping()
+            public static IDescriptor SubstanceStateMapping()
             {
-                return new MemberwiseSerializationMapping<SubstanceState>()
+                return new MemberwiseDescriptor<SubstanceState>()
                     .WithMember( "substance", ObjectContext.Asset, o => o.Substance )
                     .WithMember( "mass", o => o.Mass );
             }
@@ -450,9 +450,9 @@ namespace HSP.ResourceFlow
         }
 
         [MapsInheritingFrom( typeof( SubstanceStateCollection ) )]
-        public static SerializationMapping SubstanceStateCollectionMapping()
+        public static IDescriptor SubstanceStateCollectionMapping()
         {
-            return new MemberwiseSerializationMapping<SubstanceStateCollection>()
+            return new MemberwiseDescriptor<SubstanceStateCollection>()
                 .WithMember( "substances", o => o.GetSubstances(), ( o, value ) => o.SetSubstances( value ) );
         }
     }

@@ -28,9 +28,9 @@ namespace HSP
 
 
         [MapsInheritingFrom( typeof( TransformRedirect ) )]
-        public static SerializationMapping FClickInteractionRedirectMapping()
+        public static IDescriptor FClickInteractionRedirectMapping()
         {
-            return new MemberwiseSerializationMapping<TransformRedirect>()
+            return new MemberwiseDescriptor<TransformRedirect>()
                 .WithMember( "target", ObjectContext.Ref, o => o.Target );
         }
     }

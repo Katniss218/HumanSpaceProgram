@@ -166,13 +166,7 @@ namespace HSP.Content
         }
 
         [MapsInheritingFrom( typeof( NamespacedID ) )]
-        public static SerializationMapping NamespacedIdentifierMapping()
-        {
-            return new PrimitiveSerializationMapping<NamespacedID>()
-            {
-                OnSave = ( o, s ) => (SerializedPrimitive)o.ToString(),
-                OnLoad = ( data, l ) => NamespacedID.Parse( (string)data )
-            };
-        }
+        public static IDescriptor NamespacedIdentifierMapping() => new PrimitiveConfigurableDescriptor<NamespacedID>(
+            ( v, w, c ) => w.Data = (SerializedPrimitive)v.ToString(), ( d, c ) => NamespacedID.Parse( (string)d ) );
     }
 }

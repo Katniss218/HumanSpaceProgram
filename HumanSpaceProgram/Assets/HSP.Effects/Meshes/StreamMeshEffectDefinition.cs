@@ -74,9 +74,9 @@ namespace HSP.Effects.Meshes.SimulationFrames
 
 
         [MapsInheritingFrom( typeof( StreamMeshEffectDefinition ) )]
-        public static SerializationMapping StreamMeshEffectDefinitionMapping()
+        public static IDescriptor StreamMeshEffectDefinitionMapping()
         {
-            return new MemberwiseSerializationMapping<StreamMeshEffectDefinition>();
+            return new MemberwiseDescriptor<StreamMeshEffectDefinition>();
         }
     }
 }

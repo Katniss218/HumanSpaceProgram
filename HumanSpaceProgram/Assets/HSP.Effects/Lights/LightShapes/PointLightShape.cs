@@ -26,9 +26,9 @@ namespace HSP.Effects.Lights.LightShapes
 
 
         [MapsInheritingFrom( typeof( PointLightShape ) )]
-        public static SerializationMapping PointLightShapeMapping()
+        public static IDescriptor PointLightShapeMapping()
         {
-            return new MemberwiseSerializationMapping<PointLightShape>()
+            return new MemberwiseDescriptor<PointLightShape>()
                 .WithMember( "radius", o => o.Radius );
         }
     }

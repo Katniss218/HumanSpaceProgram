@@ -1,41 +1,33 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace UnityPlus.Serialization
 {
     /// <summary>
-    /// A mapping searcher that searches the inheritance chain of objects. This is the basic searcher used to target specific individual types.
+    /// Searches for a provider registered to a base class of the queried type.
     /// </summary>
     public class MapsInheritingFromSearcher<TContext, T> : IMappingProviderSearcher<TContext, T>
     {
-        private readonly Dictionary<(TContext, Type), T> _map = new();
-
-        public MapsInheritingFromSearcher()
-        {
-
-        }
+        // Key: (Context, BaseType)
+        private readonly Dictionary<(TContext, Type), T> _map = new Dictionary<(TContext, Type), T>();
 
         public bool TryGet( TContext context, Type type, out T value )
         {
             if( type == null )
-            {
                 throw new ArgumentNullException( nameof( type ) );
-            }
-
-            if( _map.Count == 0 )
-            {
-                value = default;
-                return false;
-            }
 
             Type currentTypeToCheck = type;
 
-            while( !_map.TryGetValue( (context, currentTypeToCheck), out value ) )
+            while( currentTypeToCheck != null )
             {
-                if( currentTypeToCheck.IsConstructedGenericType )
+                // 1. Check exact type match
+                if( _map.TryGetValue( (context, currentTypeToCheck), out value ) )
+                {
+                    return true;
+                }
+
+                // 2. Check open generic definition (e.g. List<>)
+                if( currentTypeToCheck.IsGenericType && !currentTypeToCheck.IsGenericTypeDefinition )
                 {
                     if( _map.TryGetValue( (context, currentTypeToCheck.GetGenericTypeDefinition()), out value ) )
                     {
@@ -44,22 +36,24 @@ namespace UnityPlus.Serialization
                 }
 
                 currentTypeToCheck = currentTypeToCheck.BaseType;
-                if( currentTypeToCheck == null )
-                {
-                    return false;
-                }
             }
 
-            return true;
+            value = default;
+            return false;
         }
-        /// <summary>
-        /// Sets the value for the corresponding type.
-        /// </summary>
-        /// <param name="type">The type to set the value for.</param>
-        /// <param name="value">The value to set.</param>
+
         public bool TrySet( TContext context, Type type, T value )
         {
-            return _map.TryAdd( (context, type), value );
+            // type here is the Base Type specified in the Attribute
+            if( type == null ) 
+                throw new ArgumentNullException( nameof( type ) );
+
+            var key = (context, type);
+            if( _map.ContainsKey( key ) )
+                return false;
+
+            _map[key] = value;
+            return true;
         }
 
         public void Clear()

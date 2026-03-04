@@ -44,11 +44,11 @@ namespace HSP.Effects
 
 
         [MapsInheritingFrom( typeof( ConstantEffectValue<> ) )]
-        public static SerializationMapping ConstantEffectValueMapping()
+        public static IDescriptor ConstantEffectValueMapping()
         {
-            return new MemberwiseSerializationMapping<ConstantEffectValue<T>>()
+            return new MemberwiseDescriptor<ConstantEffectValue<T>>()
                 .WithReadonlyMember( "value", o => o.value )
-                .WithFactory<T>( ( value ) => new ConstantEffectValue<T>( value ) )
+                .WithFactory<T>( ( value ) => new ConstantEffectValue<T>( value ), "value" )
                 .WithMember( "drivers", o => o.drivers );
         }
     }

@@ -1,3 +1,4 @@
+using HSP.CelestialBodies;
 using HSP.SceneManagement;
 using HSP.Timelines;
 using HSP.Vessels;
@@ -6,7 +7,7 @@ using System.IO;
 using System.Linq;
 using UnityEngine;
 using UnityPlus.Serialization;
-using UnityPlus.Serialization.DataHandlers;
+using UnityPlus.Serialization.Formats;
 
 namespace HSP.Vanilla.Scenes.GameplayScene
 {
@@ -32,18 +33,19 @@ namespace HSP.Vanilla.Scenes.GameplayScene
             int i = 0;
             foreach( var vessel in VesselManager.LoadedVessels )
             {
-                JsonSerializedDataHandler dataHandler = new JsonSerializedDataHandler( Path.Combine( vesselsPath, $"{i}", "gameobjects.json" ) );
+                var dataHandler = new FileSerializedDataHandler( Path.Combine( vesselsPath, $"{i}", "gameobjects.json" ), JsonFormat.Instance );
 
-                var su = SerializationUnit.FromObjects( vessel.gameObject );
-                SerializationResult result = su.Serialize( TimelineManager.RefStore );
-                if( result.HasFlag( SerializationResult.Failed ) || result.HasFlag( SerializationResult.HasFailures ) )
+                try
                 {
-                    Debug.LogError( $"Failed to serialize vessel '{vessel.name}'." );
-                    e.AddMessage( LogType.Error, $"Failed to serialize vessel '{vessel.name}'." );
-                    continue;
+                    var data = SerializationUnit.Serialize( vessel.gameObject, TimelineManager.RefStore );
+                    dataHandler.Write( data );
                 }
-                var data = su.GetData().First();
-                dataHandler.Write( data );
+                catch( UPSSerializationException ex )
+                {
+                    Debug.LogError( $"Failed to serialize vessel '{vessel.name}': {ex.Message}" );
+                    Debug.LogException( ex );
+                    e.AddMessage( LogType.Error, $"Failed to serialize vessel '{vessel.name}': {ex.Message}" );
+                }
                 i++;
             }
         }
@@ -65,19 +67,20 @@ namespace HSP.Vanilla.Scenes.GameplayScene
 
             foreach( var dir in Directory.GetDirectories( vesselsPath ) )
             {
-                JsonSerializedDataHandler dataHandler = new JsonSerializedDataHandler( Path.Combine( dir, "gameobjects.json" ) );
+                var dataHandler = new FileSerializedDataHandler( Path.Combine( dir, "gameobjects.json" ), JsonFormat.Instance );
+                var data = dataHandler.Read();
 
-                SerializedData data = dataHandler.Read();
-                var su = SerializationUnit.FromData<GameObject>( data );
-                SerializationResult result = su.Deserialize( TimelineManager.RefStore );
-                if( result.HasFlag( SerializationResult.Failed ) || result.HasFlag( SerializationResult.HasFailures ) )
+                try
+                {
+                    GameObject go = SerializationUnit.Deserialize<GameObject>( data, TimelineManager.RefStore );
+                    HSPSceneManager.MoveGameObjectToScene<GameplaySceneM>( go );
+                }
+                catch( UPSSerializationException ex )
                 {
                     Debug.LogError( $"Failed to deserialize vessel from '{dir}'." );
+                    Debug.LogException( ex );
                     e.AddMessage( LogType.Error, $"Failed to deserialize vessel from '{dir}'." );
-                    continue;
                 }
-                GameObject go = su.GetObjects().First();
-                HSPSceneManager.MoveGameObjectToScene<GameplaySceneM>( go );
             }
         }
     }

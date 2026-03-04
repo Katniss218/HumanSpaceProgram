@@ -157,9 +157,9 @@ namespace HSP.Vanilla.Scenes.MapScene
         }
 
         [MapsInheritingFrom( typeof( FollowingDifferentReferenceFrameTransform ) )]
-        public static SerializationMapping FollowingDifferentReferenceFrameTransformMapping()
+        public static IDescriptor FollowingDifferentReferenceFrameTransformMapping()
         {
-            return new MemberwiseSerializationMapping<FollowingDifferentReferenceFrameTransform>()
+            return new MemberwiseDescriptor<FollowingDifferentReferenceFrameTransform>()
                 .WithMember( "scene_reference_frame_provider", o => o.SceneReferenceFrameProvider )
                 .WithMember( "target_transform", o => o.TargetTransform );
         }

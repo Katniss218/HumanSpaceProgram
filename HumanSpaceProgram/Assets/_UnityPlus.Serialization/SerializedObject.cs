@@ -166,5 +166,48 @@ namespace UnityPlus.Serialization
                 }
             );
         }
+
+        public override string ToString()
+        {
+            return $"{nameof( SerializedObject )} ({_children.Count} items)";
+        }
+
+        public override string DumpToString()
+        {
+            return DumpToString( 0 );
+        }
+
+        internal override string DumpToString( int indentLevel )
+        {
+            var sb = new System.Text.StringBuilder();
+            string indent = string.Concat( Enumerable.Repeat( "- ", indentLevel ) );
+            sb.AppendLine( $"{{{{{_children.Count}}}}}" );
+            foreach( var kvp in _children )
+            {
+                sb.Append( $"{indent}- {kvp.Key} = " );
+                if( kvp.Value != null )
+                {
+                    // If it's a primitive, we want it on the same line if possible, or handled by its own DumpToString
+                    // Since DumpToString(int) is now on base, we can just call it.
+                    // But for primitives, we might want to avoid the newline prefix if we are already indented?
+                    // Actually, the previous logic was appending "\n" + obj.DumpToString.
+                    // Let's keep it consistent.
+
+                    if( kvp.Value is SerializedPrimitive )
+                    {
+                        sb.AppendLine( kvp.Value.ToString() );
+                    }
+                    else
+                    {
+                        sb.Append( kvp.Value.DumpToString( indentLevel + 1 ) );
+                    }
+                }
+                else
+                {
+                    sb.AppendLine( "null" );
+                }
+            }
+            return sb.ToString();
+        }
     }
 }

@@ -100,9 +100,9 @@ namespace HSP.CelestialBodies
         }
          
         [MapsInheritingFrom( typeof( CelestialBody ) )]
-        public static SerializationMapping CelestialBodyMapping()
+        public static IDescriptor CelestialBodyMapping()
         {
-            return new MemberwiseSerializationMapping<CelestialBody>()
+            return new MemberwiseDescriptor<CelestialBody>()
                 .WithMember( "id", o => o.ID )
                 .WithMember( "display_name", o => o.DisplayName )
                 .WithMember( "mass", o => o.Mass )

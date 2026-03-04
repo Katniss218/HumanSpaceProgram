@@ -29,9 +29,9 @@ namespace HSP.Vanilla.Components
         public float NominalIsp { get; set; }
 
         [MapsInheritingFrom( typeof( EnginePropellant ) )]
-        public static SerializationMapping EnginePropellantMapping()
+        public static IDescriptor EnginePropellantMapping()
         {
-            return new MemberwiseSerializationMapping<EnginePropellant>()
+            return new MemberwiseDescriptor<EnginePropellant>()
                 .WithMember( "requirements", o => o.PropellantMixture )
                 .WithMember( "ignitor", o => o.Ignitor )
                 .WithMember( "nominal_isp", o => o.NominalIsp );
@@ -521,9 +521,9 @@ namespace HSP.Vanilla.Components
 
 
         [MapsInheritingFrom( typeof( FRocketEngine ) )]
-        public static SerializationMapping FRocketEngineMapping()
+        public static IDescriptor FRocketEngineMapping()
         {
-            return new MemberwiseSerializationMapping<FRocketEngine>()
+            return new MemberwiseDescriptor<FRocketEngine>()
                 .WithMember( "max_thrust", o => o.MaxThrust )
                 .WithMember( "max_chamber_pressure", o => o.MaxChamberPressure )
                 .WithMember( "propellant", o => o.Propellant )

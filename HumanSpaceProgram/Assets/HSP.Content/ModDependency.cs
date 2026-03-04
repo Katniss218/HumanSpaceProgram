@@ -91,9 +91,9 @@ namespace HSP.Content
         }
 
         [MapsInheritingFrom( typeof( ModDependency ) )]
-        public static SerializationMapping ModDependencyMapping()
+        public static IDescriptor ModDependencyMapping()
         {
-            return new MemberwiseSerializationMapping<ModDependency>()
+            return new MemberwiseDescriptor<ModDependency>()
                 .WithMember( "id", o => o.ID )
                 .WithMember( "version", o => o.Version )
                 .WithMember( "type", o => o.DependencyType );

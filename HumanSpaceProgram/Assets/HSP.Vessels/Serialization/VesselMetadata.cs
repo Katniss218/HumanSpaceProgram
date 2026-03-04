@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using UnityPlus.Serialization;
-using UnityPlus.Serialization.DataHandlers;
+using UnityPlus.Serialization.Formats;
 
 namespace HSP.Content.Vessels.Serialization
 {
@@ -97,9 +97,9 @@ namespace HSP.Content.Vessels.Serialization
         }
 
         [MapsInheritingFrom( typeof( VesselMetadata ) )]
-        public static SerializationMapping VesselMetadataMapping()
+        public static IDescriptor VesselMetadataMapping()
         {
-            return new MemberwiseSerializationMapping<VesselMetadata>()
+            return new MemberwiseDescriptor<VesselMetadata>()
                 .WithMember( "name", o => o.Name )
                 .WithMember( "description", o => o.Description )
                 .WithMember( "author", o => o.Author )

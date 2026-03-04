@@ -67,9 +67,9 @@ namespace HSP.Effects.Particles.EmissionShapes
 
 
         [MapsInheritingFrom( typeof( ConeEmissionShape ) )]
-        public static SerializationMapping ConeEmissionShapeMapping()
+        public static IDescriptor ConeEmissionShapeMapping()
         {
-            return new MemberwiseSerializationMapping<ConeEmissionShape>()
+            return new MemberwiseDescriptor<ConeEmissionShape>()
                 .WithMember( "spawn_from", o => o.SpawnFrom )
                 .WithMember( "radius", o => o.Radius )
                 .WithMember( "height", o => o.Height )

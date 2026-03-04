@@ -284,9 +284,9 @@ namespace HSP.Vanilla.Components
         }
 
         [MapsInheritingFrom( typeof( FAttitudeAvionics ) )]
-        public static SerializationMapping FAttitudeAvionicsMapping()
+        public static IDescriptor FAttitudeAvionicsMapping()
         {
-			return new MemberwiseSerializationMapping<FAttitudeAvionics>()
+			return new MemberwiseDescriptor<FAttitudeAvionics>()
                 .WithMember( "on_set_attitude", o => o.OnSetAttitude );
         }
     }

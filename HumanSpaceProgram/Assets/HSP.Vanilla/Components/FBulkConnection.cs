@@ -65,9 +65,9 @@ namespace HSP.Vanilla.Components
 
 
             [MapsInheritingFrom( typeof( Port ) )]
-            public static SerializationMapping PortMapping()
+            public static IDescriptor PortMapping()
             {
-                return new MemberwiseSerializationMapping<Port>()
+                return new MemberwiseDescriptor<Port>()
                     .WithMember<object>( "obj_c", ObjectContext.Ref, o => (object)o._objC, ( o, value ) => o._objC = (IResourceConsumer)value )
                     .WithMember<object>( "obj_p", ObjectContext.Ref, o => (object)o._objP, ( o, value ) => o._objP = (IResourceProducer)value )
                     .WithMember( "position", o => o.Position )
@@ -267,9 +267,9 @@ namespace HSP.Vanilla.Components
         }
 
         [MapsInheritingFrom( typeof( FBulkConnection ) )]
-        public static SerializationMapping FBulkConnectionMapping()
+        public static IDescriptor FBulkConnectionMapping()
         {
-            return new MemberwiseSerializationMapping<FBulkConnection>()
+            return new MemberwiseDescriptor<FBulkConnection>()
                 .WithMember( "end1", o => o.End1 )
                 .WithMember( "end2", o => o.End2 )
                 .WithMember( "cross_section_area", o => o.CrossSectionArea );

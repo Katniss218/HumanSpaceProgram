@@ -96,9 +96,9 @@ namespace HSP.ControlSystems.Controls
     public static class Mappings_ControlParameterInput_T_
     {
         [MapsInheritingFrom( typeof( ControlParameterInput<> ) )]
-        public static SerializationMapping ControlParameterInputMapping<T>()
+        public static IDescriptor ControlParameterInputMapping<T>()
         {
-            return new MemberwiseSerializationMapping<ControlParameterInput<T>>(); // empty dummy referencable thing.
+            return new MemberwiseDescriptor<ControlParameterInput<T>>(); // empty dummy referencable thing.
         }
     }
 }

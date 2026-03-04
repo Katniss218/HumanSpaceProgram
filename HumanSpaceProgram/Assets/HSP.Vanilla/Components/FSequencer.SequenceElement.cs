@@ -41,9 +41,9 @@ namespace HSP.Vanilla.Components
         }
 
         [MapsInheritingFrom( typeof( SequenceElement ) )]
-        public static SerializationMapping SequenceElementMapping()
+        public static IDescriptor SequenceElementMapping()
         {
-            return new MemberwiseSerializationMapping<SequenceElement>()
+            return new MemberwiseDescriptor<SequenceElement>()
                 .WithMember( "actions", o => o.Actions );
         }
     }
@@ -62,9 +62,9 @@ namespace HSP.Vanilla.Components
         }
 
         [MapsInheritingFrom( typeof( KeyboardSequenceElement ) )]
-        public static SerializationMapping KeyboardSequenceElementMapping()
+        public static IDescriptor KeyboardSequenceElementMapping()
         {
-            return new MemberwiseSerializationMapping<KeyboardSequenceElement>()
+            return new MemberwiseDescriptor<KeyboardSequenceElement>()
                 .WithMember( "key", o => o.Key );
         }
     }
@@ -89,9 +89,9 @@ namespace HSP.Vanilla.Components
         }
 
         [MapsInheritingFrom( typeof( TimedSequenceElement ) )]
-        public static SerializationMapping TimedSequenceElementMapping()
+        public static IDescriptor TimedSequenceElementMapping()
         {
-            return new MemberwiseSerializationMapping<TimedSequenceElement>()
+            return new MemberwiseDescriptor<TimedSequenceElement>()
                 .WithMember( "delay", o => o.Delay )
                 .WithMember( "start_ut", o => o._startUT );
         }

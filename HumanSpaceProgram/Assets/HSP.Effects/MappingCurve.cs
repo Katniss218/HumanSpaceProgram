@@ -7,9 +7,9 @@ namespace HSP.Effects
     internal static class MappingCurve_T__Mapping
     {
         [MapsInheritingFrom( typeof( MappingCurve<>.Keyframe ) )]
-        public static SerializationMapping KeyframeMapping<T>()
+        public static IDescriptor KeyframeMapping<T>()
         {
-            return new MemberwiseSerializationMapping<MappingCurve<T>.Keyframe>()
+            return new MemberwiseDescriptor<MappingCurve<T>.Keyframe>()
                 .WithMember( "t", o => o.Time )
                 .WithMember( "v", o => o.Value )
                 .WithMember( "v_in", o => o.InTangent )
@@ -17,20 +17,20 @@ namespace HSP.Effects
         }
 
         [MapsInheritingFrom( typeof( MappingCurve<> ) )]
-        public static SerializationMapping AnimationCurveMapping<T>()
+        public static IDescriptor AnimationCurveMapping<T>()
         {
-            return new MemberwiseSerializationMapping<MappingCurve<T>>()
+            return new MemberwiseDescriptor<MappingCurve<T>>()
                 .WithReadonlyMember( "interpolator", o => o.Interpolator )
-                .WithFactory<IMappingCurveInterpolator<T>>( ( interpolator ) => new MappingCurve<T>( interpolator ) )
+                .WithFactory<IMappingCurveInterpolator<T>>( ( interpolator ) => new MappingCurve<T>( interpolator ), "interpolator" )
                 .WithMember( "keys", o => o.Keyframes );
         }
 
         [MapsInheritingFrom( typeof( LinearMappingCurve<> ) )]
-        public static SerializationMapping LinearMappingCurveMapping<T>()
+        public static IDescriptor LinearMappingCurveMapping<T>()
         {
-            return new MemberwiseSerializationMapping<LinearMappingCurve<T>>()
+            return new MemberwiseDescriptor<LinearMappingCurve<T>>()
                 .WithReadonlyMember( "interpolator", o => o.Interpolator )
-                .WithFactory<IMappingCurveInterpolator<T>>( ( interpolator ) => new LinearMappingCurve<T>( interpolator ) );
+                .WithFactory<IMappingCurveInterpolator<T>>( ( interpolator ) => new LinearMappingCurve<T>( interpolator ), "interpolator" );
         }
     }
 
@@ -183,9 +183,9 @@ namespace HSP.Effects
 
 
         [MapsInheritingFrom( typeof( FloatInterpolator ) )]
-        public static SerializationMapping FloatInterpolatorMapping()
+        public static IDescriptor FloatInterpolatorMapping()
         {
-            return new MemberwiseSerializationMapping<FloatInterpolator>();
+            return new MemberwiseDescriptor<FloatInterpolator>();
         }
     }
     /*

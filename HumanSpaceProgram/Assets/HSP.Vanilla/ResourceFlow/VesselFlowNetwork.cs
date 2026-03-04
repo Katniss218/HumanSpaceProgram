@@ -53,9 +53,9 @@ namespace HSP.Vanilla.ResourceFlow
         }
 
         [MapsInheritingFrom( typeof( VesselFlowNetwork ) )]
-        public static SerializationMapping FVesselFlowNetworkMapping()
+        public static IDescriptor FVesselFlowNetworkMapping()
         {
-            return new MemberwiseSerializationMapping<VesselFlowNetwork>();
+            return new MemberwiseDescriptor<VesselFlowNetwork>();
         }
     }
 }

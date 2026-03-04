@@ -14,9 +14,9 @@ namespace HSP.ResourceFlow
         }
 
         [MapsInheritingFrom( typeof( ValveModifier ) )]
-        public static SerializationMapping ValveModifierMapping()
+        public static IDescriptor ValveModifierMapping()
         {
-            return new MemberwiseSerializationMapping<ValveModifier>()
+            return new MemberwiseDescriptor<ValveModifier>()
                 .WithMember( "percent_open", o => o.PercentOpen );
         }
     }

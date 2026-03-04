@@ -21,9 +21,9 @@ namespace HSP.Effects.Meshes
 
 
             [MapsInheritingFrom( typeof( BoneData ) )]
-            public static SerializationMapping BoneDataMapping()
+            public static IDescriptor BoneDataMapping()
             {
-                return new MemberwiseSerializationMapping<BoneData>()
+                return new MemberwiseDescriptor<BoneData>()
                     .WithMember( "bind_pose", o => o.BindPose )
                     .WithMember( "position", o => o.Position )
                     .WithMember( "rotation", o => o.Rotation )
@@ -191,9 +191,9 @@ namespace HSP.Effects.Meshes
 
 
         [MapsInheritingFrom( typeof( MeshEffectDefinition ) )]
-        public static SerializationMapping MeshEffectDefinitionMapping()
+        public static IDescriptor MeshEffectDefinitionMapping()
         {
-            return new MemberwiseSerializationMapping<MeshEffectDefinition>()
+            return new MemberwiseDescriptor<MeshEffectDefinition>()
                 .WithMember( "mesh", ObjectContext.Asset, o => o.Mesh )
                 .WithMember( "material", ObjectContext.Asset, o => o.Material )
                 .WithMember( "duration", o => o.Duration )

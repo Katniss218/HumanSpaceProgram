@@ -17,7 +17,9 @@ namespace UnityPlus.Serialization.ReferenceMaps
                 case ForwardReferenceStore forwardRefStore:
                     return RemapRandomly( forwardRefStore );
                 default:
-                    throw new ArgumentException( $"Unsupported reference store type: {refStore.GetType()}" );
+                    var newStore = new ForwardReferenceStore();
+                    newStore.AddAll( refStore.GetAll().Select( tuple => (Guid.NewGuid(), tuple.val) ) );
+                    return newStore;
             }
         }
 
@@ -33,7 +35,9 @@ namespace UnityPlus.Serialization.ReferenceMaps
                 case ReverseReferenceStore reverseReferenceStore:
                     return RemapRandomly( reverseReferenceStore );
                 default:
-                    throw new ArgumentException( $"Unsupported reference store type: {refStore.GetType()}" );
+                    var newStore = new ReverseReferenceStore();
+                    newStore.AddAll( refStore.GetAll().Select( tuple => (Guid.NewGuid(), tuple.val) ) );
+                    return newStore;
             }
         }
 

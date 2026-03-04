@@ -6,6 +6,25 @@ namespace UnityPlus.Serialization
     /// <summary>
     /// Represents a structure that has the ability to map IDs to objects.
     /// </summary>
+    public interface IReadonlyForwardReferenceMap
+    {
+        /// <summary>
+        /// Gets all entries in the reference map as a collection of tuples.
+        /// </summary>
+        IEnumerable<(Guid id, object val)> GetAll();
+
+        /// <summary>
+        /// Returns the previously registered object.
+        /// </summary>
+        /// <remarks>
+        /// Should always return <see cref="null"/> for <see cref="Guid.Empty"/>, and for references that are not registered. <br />
+        /// </remarks>
+        object GetObj( Guid id );
+    }
+
+    /// <summary>
+    /// Represents a structure that has the ability to map IDs to objects.
+    /// </summary>
     public interface IForwardReferenceMap
     {
         /// <summary>

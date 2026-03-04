@@ -30,9 +30,9 @@ namespace HSP.Effects.Particles.RenderModes
 
 
         [MapsInheritingFrom( typeof( MeshRenderMode ) )]
-        public static SerializationMapping MeshRenderModeMapping()
+        public static IDescriptor MeshRenderModeMapping()
         {
-            return new MemberwiseSerializationMapping<MeshRenderMode>()
+            return new MemberwiseDescriptor<MeshRenderMode>()
                 .WithMember( "meshes", ArrayContext.Assets, o => o.Meshes );
         }
     }

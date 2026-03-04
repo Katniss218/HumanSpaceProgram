@@ -54,9 +54,9 @@ namespace HSP.Vanilla.Components
         }
 
         [MapsInheritingFrom( typeof( F1AxisActuator ) )]
-        public static SerializationMapping F1AxisActuatorMapping()
+        public static IDescriptor F1AxisActuatorMapping()
         {
-            return new MemberwiseSerializationMapping<F1AxisActuator>()
+            return new MemberwiseDescriptor<F1AxisActuator>()
                 .WithMember( "reference_transform", ObjectContext.Ref, o => o.ReferenceTransform )
                 .WithMember( "x_actuator_transform", ObjectContext.Ref, o => o.XActuatorTransform )
 

@@ -126,9 +126,9 @@ namespace HSP.Vanilla.Components
         }
 
         [MapsInheritingFrom( typeof( FAttachNode ) )]
-        public static SerializationMapping FAttachNodeMapping()
+        public static IDescriptor FAttachNodeMapping()
         {
-            return new MemberwiseSerializationMapping<FAttachNode>()
+            return new MemberwiseDescriptor<FAttachNode>()
                 .WithMember( "range", o => o.Range );
         }
 

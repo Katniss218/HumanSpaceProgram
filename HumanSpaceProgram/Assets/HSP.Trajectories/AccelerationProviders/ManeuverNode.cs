@@ -74,9 +74,9 @@ namespace HSP.Trajectories.AccelerationProviders
 
 
         [MapsInheritingFrom( typeof( TwoBodyAccelerationProvider ) )]
-        public static SerializationMapping TwoBodyAccelerationProviderMapping()
+        public static IDescriptor TwoBodyAccelerationProviderMapping()
         {
-            return new MemberwiseSerializationMapping<TwoBodyAccelerationProvider>();
+            return new MemberwiseDescriptor<TwoBodyAccelerationProvider>();
         }
     }
 
@@ -115,9 +115,9 @@ namespace HSP.Trajectories.AccelerationProviders
 
 
         [MapsInheritingFrom( typeof( NBodyAccelerationProvider ) )]
-        public static SerializationMapping NBodyAccelerationProviderMapping()
+        public static IDescriptor NBodyAccelerationProviderMapping()
         {
-            return new MemberwiseSerializationMapping<NBodyAccelerationProvider>();
+            return new MemberwiseDescriptor<NBodyAccelerationProvider>();
         }
     }
 
@@ -151,9 +151,9 @@ namespace HSP.Trajectories.AccelerationProviders
 
 
         [MapsInheritingFrom( typeof( FMMNBodyAccelerationProvider ) )]
-        public static SerializationMapping FMMNBodyAccelerationProviderMapping()
+        public static IDescriptor FMMNBodyAccelerationProviderMapping()
         {
-            return new MemberwiseSerializationMapping<FMMNBodyAccelerationProvider>();
+            return new MemberwiseDescriptor<FMMNBodyAccelerationProvider>();
         }
     }
 }

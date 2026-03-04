@@ -57,9 +57,9 @@ namespace HSP.Vessels
         }
 
         [MapsInheritingFrom( typeof( SymmetryDataContainer ) )]
-        public static SerializationMapping SymmetryDataContainerMapping()
+        public static IDescriptor SymmetryDataContainerMapping()
         {
-            return new MemberwiseSerializationMapping<SymmetryDataContainer>()
+            return new MemberwiseDescriptor<SymmetryDataContainer>()
             {
             };
         }

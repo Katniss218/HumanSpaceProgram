@@ -161,9 +161,9 @@ namespace HSP.Trajectories.TrajectoryIntegrators
         }
 
         [MapsInheritingFrom( typeof( RK45Integrator ) )]
-        public static SerializationMapping RK45IntegratorMapping()
+        public static IDescriptor RK45IntegratorMapping()
         {
-            return new MemberwiseSerializationMapping<RK45Integrator>();
+            return new MemberwiseDescriptor<RK45Integrator>();
         }
     }
 }

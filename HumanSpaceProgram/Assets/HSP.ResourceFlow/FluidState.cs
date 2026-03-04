@@ -77,9 +77,9 @@ namespace HSP.ResourceFlow
 
 
         [MapsInheritingFrom( typeof( FluidState ) )]
-        public static SerializationMapping FluidStateMapping()
+        public static IDescriptor FluidStateMapping()
         {
-            return new MemberwiseSerializationMapping<FluidState>()
+            return new MemberwiseDescriptor<FluidState>()
                 .WithMember( "pressure", o => o.Pressure )
                 .WithMember( "temperature", o => o.Temperature )
                 .WithMember( "velocity", o => o.Velocity )

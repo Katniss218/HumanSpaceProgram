@@ -296,11 +296,11 @@ namespace HSP.ResourceFlow
         }
 
         [MapsInheritingFrom( typeof( Substance ) )]
-        public static SerializationMapping SubstanceMapping()
+        public static IDescriptor SubstanceMapping()
         {
-            return new MemberwiseSerializationMapping<Substance>()
+            return new MemberwiseDescriptor<Substance>()
                 .WithReadonlyMember( "id", o => o.ID )
-                .WithFactory<string>( id => new Substance( id ) )
+                .WithFactory<string>( id => new Substance( id ), "id" )
                 .WithMember( "display_name", o => o.DisplayName )
                 .WithMember( "display_color", o => o.DisplayColor )
                 .WithMember( "tags", o => o.Tags )

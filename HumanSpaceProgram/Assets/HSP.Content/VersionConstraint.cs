@@ -185,13 +185,7 @@ namespace HSP.Content
         }
 
         [MapsInheritingFrom( typeof( VersionConstraint ) )]
-        public static SerializationMapping VersionConstraintMapping()
-        {
-            return new PrimitiveSerializationMapping<VersionConstraint>()
-            {
-                OnSave = ( o, s ) => (SerializedPrimitive)o.ToString(),
-                OnLoad = ( data, l ) => VersionConstraint.Parse( (string)data )
-            };
-        }
+        public static IDescriptor VersionConstraintMapping() => new PrimitiveConfigurableDescriptor<VersionConstraint>(
+            ( v, w, c ) => w.Data = (SerializedPrimitive)v.ToString(), ( d, c ) => VersionConstraint.Parse( (string)d ) );
     }
 }

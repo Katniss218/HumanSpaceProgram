@@ -314,9 +314,9 @@ namespace HSP.Vessels.Construction
         }
 
         [MapsInheritingFrom( typeof( FConstructionSite ) )]
-        public static SerializationMapping FConstructionSiteMapping()
+        public static IDescriptor FConstructionSiteMapping()
         {
-            return new MemberwiseSerializationMapping<FConstructionSite>()
+            return new MemberwiseDescriptor<FConstructionSite>()
                 .WithMember( "state", o => o.State )
                 .WithMember<object>( "constructibles", o => null, ( o, value ) => o._constructibles = AncestralMap<FConstructible>.Create( o.transform ).Keys.ToArray() )
                 .WithMember( "build_speed", o => o.BuildSpeed );

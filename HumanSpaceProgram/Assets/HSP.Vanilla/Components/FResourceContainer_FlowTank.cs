@@ -132,9 +132,9 @@ namespace HSP.Vanilla.Components
 
 
         [MapsInheritingFrom( typeof( FResourceContainer_FlowTank ) )]
-        public static SerializationMapping FResourceContainer_FlowTankMapping()
+        public static IDescriptor FResourceContainer_FlowTankMapping()
         {
-            return new MemberwiseSerializationMapping<FResourceContainer_FlowTank>()
+            return new MemberwiseDescriptor<FResourceContainer_FlowTank>()
                 .WithMember( "max_volume", o => o.MaxVolume )
                 .WithMember( "triangulation_positions", o => o.TriangulationPositions )
                 .WithMember( "inlets", o => o.Inlets )

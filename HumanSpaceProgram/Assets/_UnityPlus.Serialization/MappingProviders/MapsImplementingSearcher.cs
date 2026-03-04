@@ -1,69 +1,50 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace UnityPlus.Serialization
 {
+    /// <summary>
+    /// Searches for a provider registered to an interface implemented by the queried type.
+    /// </summary>
     public class MapsImplementingSearcher<TContext, T> : IMappingProviderSearcher<TContext, T>
     {
-        private readonly Dictionary<(TContext, Type), T> _map = new();
-
-        public MapsImplementingSearcher()
-        {
-
-        }
+        // Key: (Context, InterfaceType)
+        private readonly Dictionary<(TContext, Type), T> _map = new Dictionary<(TContext, Type), T>();
 
         public bool TryGet( TContext context, Type type, out T value )
         {
             if( type == null )
-            {
                 throw new ArgumentNullException( nameof( type ) );
+
+            // If the type itself is an interface, check it first
+            if( type.IsInterface )
+            {
+                if( CheckInterface( context, type, out value ) )
+                    return true;
             }
 
-            if( _map.Count == 0 )
+            // Iterate all implemented interfaces
+            foreach( Type interfaceType in type.GetInterfaces() )
             {
-                value = default;
-                return false;
+                if( CheckInterface( context, interfaceType, out value ) )
+                    return true;
             }
 
-            // implementing typeof( <interface> ) might be called with either the type of the instance (type that implements the given interface),
-            //   or with the type of the interface (if instance is null).
-            Type currentTypeToCheck = type;
-            if( currentTypeToCheck.IsInterface )
+            value = default;
+            return false;
+        }
+
+        private bool CheckInterface( TContext context, Type interfaceType, out T value )
+        {
+            // 1. Exact Match (e.g. IList<int>)
+            if( _map.TryGetValue( (context, interfaceType), out value ) )
+                return true;
+
+            // 2. Generic Definition Match (e.g. IList<>)
+            if( interfaceType.IsGenericType && !interfaceType.IsGenericTypeDefinition )
             {
-                if( _map.TryGetValue( (context, currentTypeToCheck), out value ) )
-                {
+                if( _map.TryGetValue( (context, interfaceType.GetGenericTypeDefinition()), out value ) )
                     return true;
-                }
-
-                if( currentTypeToCheck.IsConstructedGenericType )
-                    currentTypeToCheck = currentTypeToCheck.GetGenericTypeDefinition();
-
-                if( _map.TryGetValue( (context, currentTypeToCheck), out value ) )
-                {
-                    return true;
-                }
-            }
-
-            foreach( Type interfaceType in currentTypeToCheck.GetInterfaces() )
-            {
-                if( _map.TryGetValue( (context, interfaceType), out value ) )
-                {
-                    return true;
-                }
-            }
-
-            if( currentTypeToCheck.IsConstructedGenericType )
-                currentTypeToCheck = currentTypeToCheck.GetGenericTypeDefinition();
-
-            foreach( Type interfaceType in currentTypeToCheck.GetInterfaces() )
-            {
-                if( _map.TryGetValue( (context, interfaceType), out value ) )
-                {
-                    return true;
-                }
             }
 
             value = default;
@@ -72,7 +53,18 @@ namespace UnityPlus.Serialization
 
         public bool TrySet( TContext context, Type type, T value )
         {
-            return _map.TryAdd( (context, type), value );
+            // type here is the Interface specified in the Attribute
+            if( type == null ) 
+                throw new ArgumentNullException( nameof( type ) );
+            if( !type.IsInterface ) 
+                throw new ArgumentException( "Type must be an interface", nameof( type ) );
+
+            var key = (context, type);
+            if( _map.ContainsKey( key ) )
+                return false;
+
+            _map[key] = value;
+            return true;
         }
 
         public void Clear()

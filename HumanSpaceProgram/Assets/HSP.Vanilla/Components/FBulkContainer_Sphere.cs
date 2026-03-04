@@ -118,9 +118,9 @@
 //        }
 
 //        [MapsInheritingFrom( typeof( FBulkContainer_Sphere ) )]
-//        public static SerializationMapping FBulkContainer_SphereMapping()
+//        public static IDescriptor FBulkContainer_SphereMapping()
 //        {
-//            return new MemberwiseSerializationMapping<FBulkContainer_Sphere>()
+//            return new MemberwiseDescriptor<FBulkContainer_Sphere>()
 //                .WithMember( "volume_transform", ObjectContext.Ref, o => o.VolumeTransform )
 //                .WithMember( "max_volume", o => o.MaxVolume )
 //                .WithMember( "radius",  o => o.Radius )

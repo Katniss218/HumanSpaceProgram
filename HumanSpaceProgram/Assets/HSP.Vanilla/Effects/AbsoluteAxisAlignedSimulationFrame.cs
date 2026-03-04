@@ -20,9 +20,9 @@ namespace HSP.Vanilla.Effects
 
 
         [MapsInheritingFrom( typeof( AbsoluteAxisAlignedSimulationFrame ) )]
-        public static SerializationMapping AbsoluteAxisAlignedSimulationFrameMapping()
+        public static IDescriptor AbsoluteAxisAlignedSimulationFrameMapping()
         {
-            return new MemberwiseSerializationMapping<AbsoluteAxisAlignedSimulationFrame>()
+            return new MemberwiseDescriptor<AbsoluteAxisAlignedSimulationFrame>()
                 .WithMember("scene_reference_Frame_provider", o => o.SceneReferenceFrameProvider );
         }
     }

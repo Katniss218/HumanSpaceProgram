@@ -37,9 +37,9 @@ namespace HSP.Effects.Particles.EmissionShapes
         }
 
         [MapsInheritingFrom( typeof( MeshEmissionShape ) )]
-        public static SerializationMapping MeshEmissionShapeMapping()
+        public static IDescriptor MeshEmissionShapeMapping()
         {
-            return new MemberwiseSerializationMapping<MeshEmissionShape>()
+            return new MemberwiseDescriptor<MeshEmissionShape>()
                 .WithMember( "spawn_from", o => o.SpawnFrom )
                 .WithMember( "mesh", o => o.Mesh );
         }

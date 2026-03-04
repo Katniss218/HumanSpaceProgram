@@ -14,9 +14,9 @@ namespace HSP.Vanilla.Settings
 
 
         [MapsInheritingFrom( typeof( SettingsPage_Scenario ) )]
-        public static SerializationMapping SettingsPage_ScenarioMapping()
+        public static IDescriptor SettingsPage_ScenarioMapping()
         {
-            return new MemberwiseSerializationMapping<SettingsPage_Scenario>()
+            return new MemberwiseDescriptor<SettingsPage_Scenario>()
                 ;//.WithMember( "construction_speed_multiplier", o => o.ConstructionSpeedMultiplier );
         }
     }

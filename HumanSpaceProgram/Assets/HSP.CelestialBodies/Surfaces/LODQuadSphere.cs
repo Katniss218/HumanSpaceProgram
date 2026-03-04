@@ -402,9 +402,9 @@ namespace HSP.CelestialBodies.Surfaces
         }
 
         [MapsInheritingFrom( typeof( LODQuadSphere ) )]
-        public static SerializationMapping LODQuadSphereMapping()
+        public static IDescriptor LODQuadSphereMapping()
         {
-            return new MemberwiseSerializationMapping<LODQuadSphere>()
+            return new MemberwiseDescriptor<LODQuadSphere>()
                 .WithMember( "layer", o => o.Layer )
                 .WithMember( "mode", o => o.Mode )
                 .WithMember( "edge_subdivisions", o => o.EdgeSubdivisions )

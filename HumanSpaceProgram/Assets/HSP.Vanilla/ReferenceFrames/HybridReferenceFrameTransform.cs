@@ -658,9 +658,9 @@ namespace HSP.Vanilla
         }
 
         [MapsInheritingFrom( typeof( HybridReferenceFrameTransform ) )]
-        public static SerializationMapping HybridReferenceFrameTransformMapping()
+        public static IDescriptor HybridReferenceFrameTransformMapping()
         {
-            return new MemberwiseSerializationMapping<HybridReferenceFrameTransform>()
+            return new MemberwiseDescriptor<HybridReferenceFrameTransform>()
                 .WithMember( "scene_reference_frame_provider", o => o.SceneReferenceFrameProvider )
                 .WithMember( "allow_scene_simulation", o => o.AllowSceneSimulation )
                 .WithMember( "position_range", o => o.PositionRange )

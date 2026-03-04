@@ -29,9 +29,9 @@ namespace HSP.Vessels.Components
         }
 
         [MapsInheritingFrom( typeof( FPart ) )]
-        public static SerializationMapping FPartMapping()
+        public static IDescriptor FPartMapping()
         {
-            return new MemberwiseSerializationMapping<FPart>()
+            return new MemberwiseDescriptor<FPart>()
                 .WithMember( "part_id", o => o.PartID );
         }
     }
