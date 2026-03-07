@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Reflection;
 
 namespace UnityPlus.Serialization
 {
@@ -149,6 +150,19 @@ namespace UnityPlus.Serialization
         private static IDescriptor ProvideTimeSpan() => new PrimitiveConfigurableDescriptor<TimeSpan>(
             ( v, w, c ) => w.Data = (SerializedPrimitive)v.ToString( "c", CultureInfo.InvariantCulture ),
             ( d, c ) => TimeSpan.ParseExact( (string)d, "c", CultureInfo.InvariantCulture )
+        );
+
+
+        // --- Inner Types ---
+
+        [MapsInheritingFrom( typeof( Delegate ) )]
+        public static IDescriptor DelegateMapping() => new PrimitiveConfigurableDescriptor<Delegate>(
+            ( v, w, c ) => w.Data = Persistent_Delegate.GetData( v, c.ReverseMap ),
+            ( d, c ) =>
+            {
+                // This is kinda non-standard, but since we need the reference to the `target` to even create the delegate, we can only create it here.
+                return Persistent_Delegate.ToDelegate( d, c.ForwardMap );
+            }
         );
 
         // --- Value Tuples ---

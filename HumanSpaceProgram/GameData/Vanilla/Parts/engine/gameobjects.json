@@ -7,7 +7,7 @@
     "name": "engine",
     "tag": "Untagged",
     "children": {
-        "$type": "UnityEngine.GameObject[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+        
         "$id": "6f9f405a-ce9f-4ab9-8285-ae63c3a4d5ff",
         "value": [
             {
@@ -19,7 +19,7 @@
                 "name": "gimbal",
                 "tag": "Untagged",
                 "children": {
-                    "$type": "UnityEngine.GameObject[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                    
                     "$id": "4254979b-0860-452f-888b-1bb964c287ec",
                     "value": [
                         {
@@ -31,12 +31,12 @@
                             "name": "model",
                             "tag": "Untagged",
                             "children": {
-                                "$type": "UnityEngine.GameObject[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                
                                 "$id": "1120c47b-4cd2-4441-85f6-95bea3bb91d1",
                                 "value": []
                             },
                             "components": {
-                                "$type": "UnityEngine.Component[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                
                                 "$id": "7de3394c-0876-4c18-bbf9-84b3fdf64d50",
                                 "value": [
                                     {
@@ -94,12 +94,12 @@
                             "name": "thrustTransform",
                             "tag": "Untagged",
                             "children": {
-                                "$type": "UnityEngine.GameObject[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                
                                 "$id": "1120c47b-4cd2-4441-85f6-95bea3bb91d1",
                                 "value": []
                             },
                             "components": {
-                                "$type": "UnityEngine.Component[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                
                                 "$id": "10fe6af5-e189-4ab6-b9f6-9c3ff2106bd0",
                                 "value": [
                                     {
@@ -128,7 +128,7 @@
                     ]
                 },
                 "components": {
-                    "$type": "UnityEngine.Component[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                    
                     "$id": "63c03ed0-9e96-4e87-910d-dc4d69c68477",
                     "value": [
                         {
@@ -163,12 +163,12 @@
                 "name": "gimbalReference",
                 "tag": "Untagged",
                 "children": {
-                    "$type": "UnityEngine.GameObject[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                    
                     "$id": "1120c47b-4cd2-4441-85f6-95bea3bb91d1",
                     "value": []
                 },
                 "components": {
-                    "$type": "UnityEngine.Component[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                    
                     "$id": "67265d69-9909-46ba-aab9-ca17928d2b59",
                     "value": [
                         {
@@ -203,12 +203,12 @@
                 "name": "NODE",
                 "tag": "Untagged",
                 "children": {
-                    "$type": "UnityEngine.GameObject[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                    
                     "$id": "1120c47b-4cd2-4441-85f6-95bea3bb91d1",
                     "value": []
                 },
                 "components": {
-                    "$type": "UnityEngine.Component[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                    
                     "$id": "91a73ead-212c-44a3-8c74-45c565d1e408",
                     "value": [
                         {
@@ -249,12 +249,12 @@
                 "name": "NODE",
                 "tag": "Untagged",
                 "children": {
-                    "$type": "UnityEngine.GameObject[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                    
                     "$id": "1120c47b-4cd2-4441-85f6-95bea3bb91d1",
                     "value": []
                 },
                 "components": {
-                    "$type": "UnityEngine.Component[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                    
                     "$id": "c9154765-46e5-4997-8750-abda429f1b3e",
                     "value": [
                         {
@@ -289,7 +289,7 @@
         ]
     },
     "components": {
-        "$type": "UnityEngine.Component[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+        
         "$id": "0a9c4a41-57bf-4213-99e9-e1658aa990f2",
         "value": [
             {

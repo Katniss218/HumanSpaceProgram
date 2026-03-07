@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics;
-using UnityEditor.VersionControl;
 
 namespace UnityPlus.Serialization
 {

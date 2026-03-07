@@ -23,7 +23,7 @@ namespace UnityPlus.Serialization
 
         [MapsInheritingFrom( typeof( Material ) )]
         public static IDescriptor Material() => new MemberwiseDescriptor<Material>()
-            .WithReadonlyMember("shader", typeof( Ctx.Asset ), o => o.shader )
+            .WithReadonlyMember( "shader", typeof( Ctx.Asset ), o => o.shader )
             .WithFactory<Shader>( s => new Material( s ), "shader" )
             .WithMember( "textures",
                 o =>
@@ -47,14 +47,13 @@ namespace UnityPlus.Serialization
                     }
                     return textures;
                 },
-                ( ref Material o, object value ) =>
+                ( ref Material o, Dictionary<string, TextureInfo> value ) =>
                 {
                     var shader = o.shader;
-                    var dict = (Dictionary<string, TextureInfo>)value;
-                    foreach( var kvp in dict )
+                    foreach( var kvp in value )
                     {
                         int id = Shader.PropertyToID( kvp.Key );
-                        if( shader.FindPropertyIndex( kvp.Key ) != -1 ) // Check if property exists
+                        if( o.HasProperty( id ) )
                         {
                             o.SetTexture( id, kvp.Value.texture );
                             o.SetTextureOffset( id, kvp.Value.offset );
@@ -81,14 +80,13 @@ namespace UnityPlus.Serialization
                     }
                     return vectors;
                 },
-                ( ref Material o, object value ) =>
+                ( ref Material o, Dictionary<string, Vector4> value ) =>
                 {
                     var shader = o.shader;
-                    var dict = (Dictionary<string, Vector4>)value;
-                    foreach( var kvp in dict )
+                    foreach( var kvp in value )
                     {
                         int id = Shader.PropertyToID( kvp.Key );
-                        if( shader.FindPropertyIndex( kvp.Key ) != -1 )
+                        if( o.HasProperty( id ) )
                             o.SetVector( id, kvp.Value );
                     }
                 }
@@ -111,14 +109,13 @@ namespace UnityPlus.Serialization
                     }
                     return colors;
                 },
-                ( ref Material o, object value ) =>
+                ( ref Material o, Dictionary<string, Color> value ) =>
                 {
                     var shader = o.shader;
-                    var dict = (Dictionary<string, Color>)value;
-                    foreach( var kvp in dict )
+                    foreach( var kvp in value )
                     {
                         int id = Shader.PropertyToID( kvp.Key );
-                        if( shader.FindPropertyIndex( kvp.Key ) != -1 )
+                        if( o.HasProperty( id ) )
                             o.SetColor( id, kvp.Value );
                     }
                 }
@@ -142,14 +139,13 @@ namespace UnityPlus.Serialization
                     }
                     return floats;
                 },
-                ( ref Material o, object value ) =>
+                ( ref Material o, Dictionary<string, float> value ) =>
                 {
                     var shader = o.shader;
-                    var dict = (Dictionary<string, float>)value;
-                    foreach( var kvp in dict )
+                    foreach( var kvp in value )
                     {
                         int id = Shader.PropertyToID( kvp.Key );
-                        if( shader.FindPropertyIndex( kvp.Key ) != -1 )
+                        if( o.HasProperty( id ) )
                             o.SetFloat( id, kvp.Value );
                     }
                 }
@@ -172,11 +168,10 @@ namespace UnityPlus.Serialization
                     }
                     return ints;
                 },
-                ( ref Material o, object value ) =>
+                ( ref Material o, Dictionary<string, int> value ) =>
                 {
                     var shader = o.shader;
-                    var dict = (Dictionary<string, int>)value;
-                    foreach( var kvp in dict )
+                    foreach( var kvp in value )
                     {
                         int id = Shader.PropertyToID( kvp.Key );
                         if( shader.FindPropertyIndex( kvp.Key ) != -1 )
@@ -190,10 +185,9 @@ namespace UnityPlus.Serialization
                 {
                     return o.enabledKeywords.Select( kw => kw.name ).ToArray();
                 },
-                ( ref Material o, object value ) =>
+                ( ref Material o, string[] value ) =>
                 {
-                    var keywords = (string[])value;
-                    foreach( string keyword in keywords )
+                    foreach( string keyword in value )
                     {
                         o.EnableKeyword( keyword );
                     }

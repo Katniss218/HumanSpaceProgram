@@ -11,8 +11,17 @@ namespace UnityPlus.Serialization
 
         // --- Core Markers ---
 
+        /// <summary>
+        /// The default context for general-purpose serialization. Used when no specific context is specified.
+        /// </summary>
         public interface Value : IContext { }
+        /// <summary>
+        /// Looks up the object in the <see cref="AssetManagement.AssetRegistry"/> via an asset ID. Produces a { "$assetref": "asset_id" } structure.
+        /// </summary>
         public interface Asset : IContext { }
+        /// <summary>
+        /// Serializes the object as a reference to a different instance, rather than by value. Produces a { "$ref": "guid" } structure.
+        /// </summary>
         public interface Ref : IContext { }
 
         // --- Generics ---
@@ -65,82 +74,32 @@ namespace UnityPlus.Serialization
     [Obsolete( "Use the `IContext` marker interface in production environments (with typeof). This class exists for backwards compatibility only." )]
     public static class ObjectContext
     {
-        public const int Default = ContextIDs.Default;
+        public const int Default = ContextIDs.Default; // Use typeof( Ctx.Value ) in new code.
         public const int Value = Default;
-        public const int Ref = ContextIDs.Ref;
-        public const int Asset = ContextIDs.Asset;
-
-        static ObjectContext()
-        {
-            // Map the Types to the Legacy Ints
-            ContextRegistry.Register( typeof( Ctx.Value ), ContextIDs.Default );
-            ContextRegistry.Register( typeof( Ctx.Asset ), ContextIDs.Asset );
-            ContextRegistry.Register( typeof( Ctx.Ref ), ContextIDs.Ref );
-
-            // Register Names
-            ContextRegistry.RegisterName( ContextIDs.Default, "Default" );
-            ContextRegistry.RegisterName( ContextIDs.Ref, "Reference" );
-            ContextRegistry.RegisterName( ContextIDs.Asset, "Asset" );
-        }
+        public const int Ref = ContextIDs.Ref; // Use typeof( Ctx.Ref ) in new code.
+        public const int Asset = ContextIDs.Asset; // Use typeof( Ctx.Asset ) in new code.
     }
 
     [Obsolete( "Use the `IContext` marker interface in production environments (with typeof). This class exists for backwards compatibility only." )]
     public static class ArrayContext
     {
-        public const int Default = ObjectContext.Default;
+        public const int Default = ObjectContext.Default; // Use typeof( Ctx.Array<Ctx.Value> ) in new code.
         public const int Values = Default;
-        public const int Refs = ContextIDs.ArrayRefs;
-        public const int Assets = ContextIDs.ArrayAssets;
-
-        static ArrayContext()
-        {
-            // Map legacy array contexts to the new Unified Collection Context type
-            ContextRegistry.Register( typeof( Ctx.Array<Ctx.Ref> ), ContextIDs.ArrayRefs );
-            ContextRegistry.Register( typeof( Ctx.Array<Ctx.Asset> ), ContextIDs.ArrayAssets );
-
-            // Explicitly register the Rules for these integer IDs
-            ContextRegistry.RegisterContextArguments( new ContextKey( Refs ), ObjectContext.Ref );
-            ContextRegistry.RegisterContextArguments( new ContextKey( Assets ), ObjectContext.Asset );
-
-            ContextRegistry.RegisterName( ContextIDs.ArrayRefs, "Array<Ref>" );
-            ContextRegistry.RegisterName( ContextIDs.ArrayAssets, "Array<Asset>" );
-        }
+        public const int Refs = ContextIDs.ArrayRefs; // Use typeof( Ctx.Array<Ctx.Ref> ) in new code.
+        public const int Assets = ContextIDs.ArrayAssets; // Use typeof( Ctx.Array<Ctx.Asset> ) in new code.
     }
 
     [Obsolete( "Use the `IContext` marker interface in production environments (with typeof). This class exists for backwards compatibility only." )]
     public static class KeyValueContext
     {
         // Legacy constants kept for compatibility, but internally mapped via CtxDict<,> logic if used.
-        public const int Default = ObjectContext.Default;
+        public const int Default = ObjectContext.Default; // Use typeof( Ctx.KeyValue<Ctx.Value, Ctx.Value> ) in new code.
         public const int ValueToValue = Default;
 
-        public const int ValueToRef = ContextIDs.DictValueToRef;
-        public const int RefToValue = ContextIDs.DictRefToValue;
-        public const int RefToRef = ContextIDs.DictRefToRef;
-        public const int ValueToAsset = ContextIDs.DictValueToAsset;
-        public const int RefToAsset = ContextIDs.DictRefToAsset;
-
-        static KeyValueContext()
-        {
-            // We map the legacy combination IDs to the equivalent Generic Type combination.
-            ContextRegistry.Register( typeof( Ctx.KeyValue<Ctx.Value, Ctx.Ref> ), ContextIDs.DictValueToRef );
-            ContextRegistry.Register( typeof( Ctx.KeyValue<Ctx.Ref, Ctx.Value> ), ContextIDs.DictRefToValue );
-            ContextRegistry.Register( typeof( Ctx.KeyValue<Ctx.Ref, Ctx.Ref> ), ContextIDs.DictRefToRef );
-            ContextRegistry.Register( typeof( Ctx.KeyValue<Ctx.Value, Ctx.Asset> ), ContextIDs.DictValueToAsset );
-            ContextRegistry.Register( typeof( Ctx.KeyValue<Ctx.Ref, Ctx.Asset> ), ContextIDs.DictRefToAsset );
-
-            // Explicitly register the Rules for these integer IDs
-            ContextRegistry.RegisterContextArguments( new ContextKey( ValueToRef ), ObjectContext.Default, ObjectContext.Ref );
-            ContextRegistry.RegisterContextArguments( new ContextKey( RefToValue ), ObjectContext.Ref, ObjectContext.Default );
-            ContextRegistry.RegisterContextArguments( new ContextKey( RefToRef ), ObjectContext.Ref, ObjectContext.Ref );
-            ContextRegistry.RegisterContextArguments( new ContextKey( ValueToAsset ), ObjectContext.Default, ObjectContext.Asset );
-            ContextRegistry.RegisterContextArguments( new ContextKey( RefToAsset ), ObjectContext.Ref, ObjectContext.Asset );
-
-            ContextRegistry.RegisterName( ContextIDs.DictValueToRef, "Dict<Default, Ref>" );
-            ContextRegistry.RegisterName( ContextIDs.DictRefToValue, "Dict<Ref, Default>" );
-            ContextRegistry.RegisterName( ContextIDs.DictRefToRef, "Dict<Ref, Ref>" );
-            ContextRegistry.RegisterName( ContextIDs.DictValueToAsset, "Dict<Default, Asset>" );
-            ContextRegistry.RegisterName( ContextIDs.DictRefToAsset, "Dict<Ref, Asset>" );
-        }
+        public const int ValueToRef = ContextIDs.DictValueToRef; // Use typeof( Ctx.KeyValue<Ctx.Value, Ctx.Ref> ) in new code.
+        public const int RefToValue = ContextIDs.DictRefToValue; // Use typeof( Ctx.KeyValue<Ctx.Ref, Ctx.Value> ) in new code.
+        public const int RefToRef = ContextIDs.DictRefToRef; // Use typeof( Ctx.KeyValue<Ctx.Ref, Ctx.Ref> ) in new code.
+        public const int ValueToAsset = ContextIDs.DictValueToAsset; // Use typeof( Ctx.KeyValue<Ctx.Value, Ctx.Asset> ) in new code.
+        public const int RefToAsset = ContextIDs.DictRefToAsset; // Use typeof( Ctx.KeyValue<Ctx.Ref, Ctx.Asset> ) in new code.
     }
 }

@@ -28,6 +28,47 @@ namespace UnityPlus.Serialization
         // Cache for context hierarchies
         private static readonly Dictionary<int, int[]> _hierarchyCache = new Dictionary<int, int[]>();
 
+        static ContextRegistry()
+        {
+            // Register Core Contexts
+            Register( typeof( Ctx.Value ), ContextIDs.Default );
+            Register( typeof( Ctx.Asset ), ContextIDs.Asset );
+            Register( typeof( Ctx.Ref ), ContextIDs.Ref );
+
+            RegisterName( ContextIDs.Default, "Default" );
+            RegisterName( ContextIDs.Ref, "Reference" );
+            RegisterName( ContextIDs.Asset, "Asset" );
+
+            // Register Array Contexts
+            Register( typeof( Ctx.Array<Ctx.Ref> ), ContextIDs.ArrayRefs );
+            Register( typeof( Ctx.Array<Ctx.Asset> ), ContextIDs.ArrayAssets );
+
+            RegisterContextArguments( new ContextKey( ContextIDs.ArrayRefs ), new ContextKey( ContextIDs.Ref ) );
+            RegisterContextArguments( new ContextKey( ContextIDs.ArrayAssets ), new ContextKey( ContextIDs.Asset ) );
+
+            RegisterName( ContextIDs.ArrayRefs, "Array<Ref>" );
+            RegisterName( ContextIDs.ArrayAssets, "Array<Asset>" );
+
+            // Register Dictionary Contexts
+            Register( typeof( Ctx.KeyValue<Ctx.Value, Ctx.Ref> ), ContextIDs.DictValueToRef );
+            Register( typeof( Ctx.KeyValue<Ctx.Ref, Ctx.Value> ), ContextIDs.DictRefToValue );
+            Register( typeof( Ctx.KeyValue<Ctx.Ref, Ctx.Ref> ), ContextIDs.DictRefToRef );
+            Register( typeof( Ctx.KeyValue<Ctx.Value, Ctx.Asset> ), ContextIDs.DictValueToAsset );
+            Register( typeof( Ctx.KeyValue<Ctx.Ref, Ctx.Asset> ), ContextIDs.DictRefToAsset );
+
+            RegisterContextArguments( new ContextKey( ContextIDs.DictValueToRef ), new ContextKey( ContextIDs.Default ), new ContextKey( ContextIDs.Ref ) );
+            RegisterContextArguments( new ContextKey( ContextIDs.DictRefToValue ), new ContextKey( ContextIDs.Ref ), new ContextKey( ContextIDs.Default ) );
+            RegisterContextArguments( new ContextKey( ContextIDs.DictRefToRef ), new ContextKey( ContextIDs.Ref ), new ContextKey( ContextIDs.Ref ) );
+            RegisterContextArguments( new ContextKey( ContextIDs.DictValueToAsset ), new ContextKey( ContextIDs.Default ), new ContextKey( ContextIDs.Asset ) );
+            RegisterContextArguments( new ContextKey( ContextIDs.DictRefToAsset ), new ContextKey( ContextIDs.Ref ), new ContextKey( ContextIDs.Asset ) );
+
+            RegisterName( ContextIDs.DictValueToRef, "Dict<Default, Ref>" );
+            RegisterName( ContextIDs.DictRefToValue, "Dict<Ref, Default>" );
+            RegisterName( ContextIDs.DictRefToRef, "Dict<Ref, Ref>" );
+            RegisterName( ContextIDs.DictValueToAsset, "Dict<Default, Asset>" );
+            RegisterName( ContextIDs.DictRefToAsset, "Dict<Ref, Asset>" );
+        }
+
         /// <summary>
         /// Registers a fixed mapping between a Type and an ID. 
         /// Used for v3 backward compatibility.

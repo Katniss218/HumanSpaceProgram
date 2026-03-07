@@ -19,8 +19,14 @@ namespace UnityPlus.Serialization
     {
         public SerializationConfiguration Config { get; }
 
-        public IForwardReferenceMap ForwardMap { get; set; } // Used for serialization.
-        public IReverseReferenceMap ReverseMap { get; set; } // Used for deserialization.
+        /// <summary>
+        /// Used for deserialization.
+        /// </summary>
+        public IForwardReferenceMap ForwardMap { get; set; }
+        /// <summary>
+        /// Used for serialization.
+        /// </summary>
+        public IReverseReferenceMap ReverseMap { get; set; }
 
         /// <summary>
         /// Collects errors, warnings, and info logs generated during the operation.

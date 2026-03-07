@@ -84,8 +84,6 @@ namespace UnityPlus.Serialization
             return Delegate.Combine( delegates.ToArray() );
         }
 
-        // --- Inner Types ---
-
         public struct DelegateEntry
         {
             public object Target;
@@ -101,51 +99,6 @@ namespace UnityPlus.Serialization
 
             static DelegateEntryMemberInfo()
             {
-                var methodDescriptor = new MemberwiseDescriptor<MethodInfo>()
-                    .WithFactory<Type, string, Type[]>( ( declaringType, name, parameters ) =>
-                    {
-                        if( declaringType == null || name == null )
-                            return null;
-                        try
-                        {
-                            var flags = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
-                            return declaringType.GetMethod( name, flags, null, parameters ?? Type.EmptyTypes, null );
-                        }
-                        catch 
-                        { 
-                            return null;
-                        }
-                    }, "declaringType", "name", "parameters" )
-                    .WithReadonlyMember( "declaringType", m => m.DeclaringType )
-                    .WithReadonlyMember( "name", m => m.Name )
-                    .WithReadonlyMember( "parameters", m => m.GetParameters().Select( p => p.ParameterType ).ToArray() );
-
-                // Register MethodInfo descriptor explicitly to ensure it's used? 
-                // Or just use it in DelegateEntry descriptor?
-                // MemberwiseDescriptor resolves via registry. 
-                // But MethodInfo is abstract, so registry might return something else or fail if not registered.
-                // We can register it or just use it if we could pass it.
-                // But MemberwiseDescriptor uses TypeDescriptorRegistry.
-
-                // Better: Register the MethodInfo descriptor in the registry?
-                // Or just use a custom descriptor for the member?
-                // MemberwiseDescriptor allows specifying context, but not direct descriptor instance for a member easily unless we use a custom member definition?
-                // Actually, MemberwiseDescriptor implementation uses TypeDescriptorRegistry.GetDescriptor( MemberType, Context ).
-
-                // So we should register this descriptor for MethodInfo.
-                // But MethodInfo is System.Reflection.MethodInfo.
-                // If we register it globally, it affects all MethodInfo serialization.
-                // That's probably fine and desirable.
-
-                // However, for this refactor, I'll register it in the static constructor if not present, 
-                // OR I can use a trick.
-
-                // Actually, the previous implementation used a private inner class `MethodInfoDescriptor`.
-                // If I want to keep it private/scoped, I can't easily use MemberwiseDescriptor unless I register it.
-
-                // Let's register it. It's a good descriptor for MethodInfo.
-                TypeDescriptorRegistry.Register( methodDescriptor );
-
                 _entryDescriptor = new MemberwiseDescriptor<DelegateEntry>()
                     .WithMember( "target", ContextRegistry.GetID( typeof( Ctx.Ref ) ), e => e.Target, ( ref DelegateEntry e, object v ) => e.Target = v )
                     .WithMember( "method", e => e.Method, ( ref DelegateEntry e, MethodInfo v ) => e.Method = v )

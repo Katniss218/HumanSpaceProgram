@@ -6,7 +6,7 @@ namespace UnityPlus.Serialization
     {
         [MapsAnyInterface( ContextType = typeof( Ctx.Asset ) )]
         [MapsInheritingFrom( typeof( object ), ContextType = typeof( Ctx.Asset ) )]
-        private static IDescriptor ProvideAsset<T>() where T : class
+        public static IDescriptor ProvideAsset<T>() where T : class
         {
             return new AssetDescriptor<T>();
         }

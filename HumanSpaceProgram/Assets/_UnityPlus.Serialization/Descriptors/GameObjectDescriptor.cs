@@ -28,12 +28,12 @@ namespace UnityPlus.Serialization
                 new PropertyMember( "name", typeof( string ), ( t ) => ((GameObject)t).name, ( ref object t, object v ) => ((GameObject)t).name = (string)v ),
                 new PropertyMember( "layer", typeof( int ), ( t ) => ((GameObject)t).layer, ( ref object t, object v ) => ((GameObject)t).layer = (int)v ),
                 new PropertyMember( "tag", typeof( string ), ( t ) => ((GameObject)t).tag, ( ref object t, object v ) => ((GameObject)t).tag = (string)v ),
-                new PropertyMember( "isStatic", typeof( bool ), ( t ) => ((GameObject)t).isStatic, ( ref object t, object v ) => ((GameObject)t).isStatic = (bool)v ),
+                new PropertyMember( "is_static", typeof( bool ), ( t ) => ((GameObject)t).isStatic, ( ref object t, object v ) => ((GameObject)t).isStatic = (bool)v ),
                 // Virtual Containers
                 new VirtualListMember( KeyNames.COMPONENTS, typeof( ComponentCollection ), new ComponentSequenceDescriptor(), t => new ComponentCollection( (GameObject)t ) ),
                 new VirtualListMember( KeyNames.CHILDREN, typeof( ChildCollection ), new ChildSequenceDescriptor(), t => new ChildCollection( (GameObject)t ) ),
                 // Activation (Must be last)
-                new PropertyMember( "active", typeof( bool ), ( t ) => ((GameObject)t).activeSelf, ( ref object t, object v ) => ((GameObject)t).SetActive( (bool)v ) ),
+                new PropertyMember( "is_active", typeof( bool ), ( t ) => ((GameObject)t).activeSelf, ( ref object t, object v ) => ((GameObject)t).SetActive( (bool)v ) ),
             };
         }
 

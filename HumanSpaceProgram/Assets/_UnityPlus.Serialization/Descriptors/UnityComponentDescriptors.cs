@@ -11,27 +11,27 @@ namespace UnityPlus.Serialization
 
         [MapsInheritingFrom( typeof( Transform ) )]
         public static IDescriptor Transform() => new MemberwiseDescriptor<Transform>()
-            .WithMember( "localPosition", t => t.localPosition )
-            .WithMember( "localRotation", t => t.localRotation )
-            .WithMember( "localScale", t => t.localScale );
+            .WithMember( "local_position", t => t.localPosition )
+            .WithMember( "local_rotation", t => t.localRotation )
+            .WithMember( "local_scale", t => t.localScale );
 
         // --- PHYSICS ---
 
         [MapsInheritingFrom( typeof( BoxCollider ) )]
         public static IDescriptor BoxCollider() => new MemberwiseDescriptor<BoxCollider>()
-            .WithMember( "isTrigger", c => c.isTrigger )
+            .WithMember( "is_trigger", c => c.isTrigger )
             .WithMember( "center", c => c.center )
             .WithMember( "size", c => c.size );
 
         [MapsInheritingFrom( typeof( SphereCollider ) )]
         public static IDescriptor SphereCollider() => new MemberwiseDescriptor<SphereCollider>()
-            .WithMember( "isTrigger", c => c.isTrigger )
+            .WithMember( "is_trigger", c => c.isTrigger )
             .WithMember( "center", c => c.center )
             .WithMember( "radius", c => c.radius );
 
         [MapsInheritingFrom( typeof( CapsuleCollider ) )]
         public static IDescriptor CapsuleCollider() => new MemberwiseDescriptor<CapsuleCollider>()
-            .WithMember( "isTrigger", c => c.isTrigger )
+            .WithMember( "is_trigger", c => c.isTrigger )
             .WithMember( "center", c => c.center )
             .WithMember( "radius", c => c.radius )
             .WithMember( "height", c => c.height )
@@ -39,34 +39,34 @@ namespace UnityPlus.Serialization
 
         [MapsInheritingFrom( typeof( MeshCollider ) )]
         public static IDescriptor MeshCollider() => new MemberwiseDescriptor<MeshCollider>()
-            .WithMember( "isTrigger", c => c.isTrigger )
+            .WithMember( "is_trigger", c => c.isTrigger )
             .WithMember( "convex", c => c.convex )
-            .WithMember( "sharedMesh", typeof( Ctx.Asset ), c => c.sharedMesh );
+            .WithMember( "shared_mesh", typeof( Ctx.Asset ), c => c.sharedMesh );
 
         // --- RENDERING ---
 
         [MapsInheritingFrom( typeof( MeshFilter ) )]
         public static IDescriptor MeshFilter() => new MemberwiseDescriptor<MeshFilter>()
-            .WithMember( "sharedMesh", typeof( Ctx.Asset ), m => m.sharedMesh );
+            .WithMember( "shared_mesh", typeof( Ctx.Asset ), m => m.sharedMesh );
 
         [MapsInheritingFrom( typeof( MeshRenderer ) )]
         public static IDescriptor MeshRenderer() => new MemberwiseDescriptor<MeshRenderer>()
             .WithMember( "enabled", r => r.enabled )
-            .WithMember( "shadowCastingMode", r => r.shadowCastingMode )
-            .WithMember( "receiveShadows", r => r.receiveShadows )
-            .WithMember( "sharedMaterials", typeof( Ctx.Asset ), r => r.sharedMaterials );
+            .WithMember( "shadow_casting_mode", r => r.shadowCastingMode )
+            .WithMember( "receive_shadows", r => r.receiveShadows )
+            .WithMember( "shared_materials", typeof( Ctx.Array<Ctx.Asset> ), r => r.sharedMaterials );
 
         [MapsInheritingFrom( typeof( Camera ) )]
         public static IDescriptor Camera() => new MemberwiseDescriptor<Camera>()
             .WithMember( "enabled", c => c.enabled )
-            .WithMember( "clearFlags", c => c.clearFlags )
-            .WithMember( "backgroundColor", c => c.backgroundColor )
-            .WithMember( "cullingMask", c => c.cullingMask )
+            .WithMember( "clear_flags", c => c.clearFlags )
+            .WithMember( "background_color", c => c.backgroundColor )
+            .WithMember( "culling_mask", c => c.cullingMask )
             .WithMember( "orthographic", c => c.orthographic )
-            .WithMember( "orthographicSize", c => c.orthographicSize )
-            .WithMember( "fieldOfView", c => c.fieldOfView )
-            .WithMember( "nearClipPlane", c => c.nearClipPlane )
-            .WithMember( "farClipPlane", c => c.farClipPlane )
+            .WithMember( "orthographic_size", c => c.orthographicSize )
+            .WithMember( "field_of_view", c => c.fieldOfView )
+            .WithMember( "near_clip_plane", c => c.nearClipPlane )
+            .WithMember( "far_clip_plane", c => c.farClipPlane )
             .WithMember( "depth", c => c.depth );
 
         [MapsInheritingFrom( typeof( Light ) )]
@@ -76,21 +76,21 @@ namespace UnityPlus.Serialization
             .WithMember( "color", l => l.color )
             .WithMember( "intensity", l => l.intensity )
             .WithMember( "range", l => l.range )
-            .WithMember( "spotAngle", l => l.spotAngle )
+            .WithMember( "spot_angle", l => l.spotAngle )
             .WithMember( "shadows", l => l.shadows );
 
         [MapsInheritingFrom( typeof( LODGroup ) )]
         public static IDescriptor LODGroup() => new MemberwiseDescriptor<LODGroup>()
-            .WithMember( "localReferencePoint", l => l.localReferencePoint )
+            .WithMember( "local_reference_point", l => l.localReferencePoint )
             .WithMember( "size", l => l.size )
-            .WithMember( "fadeMode", l => l.fadeMode )
-            .WithMember( "animateCrossFading", l => l.animateCrossFading )
+            .WithMember( "fade_mode", l => l.fadeMode )
+            .WithMember( "animate_cross_fading", l => l.animateCrossFading )
             .WithMember( "lods", l => l.GetLODs(), ( l, v ) => l.SetLODs( v ) );
 
         [MapsInheritingFrom( typeof( LOD ) )]
         public static IDescriptor LOD() => new MemberwiseDescriptor<LOD>()
-            .WithMember( "screenRelativeTransitionHeight", l => l.screenRelativeTransitionHeight )
-            .WithMember( "fadeTransitionWidth", l => l.fadeTransitionWidth )
-            .WithMember( "renderers", typeof( Ctx.Ref ), l => l.renderers );
+            .WithMember( "screen_relative_transition_height", l => l.screenRelativeTransitionHeight )
+            .WithMember( "fade_transition_width", l => l.fadeTransitionWidth )
+            .WithMember( "renderers", typeof( Ctx.Array<Ctx.Ref> ), l => l.renderers );
     }
 }

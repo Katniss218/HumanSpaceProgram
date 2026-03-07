@@ -71,7 +71,14 @@ namespace UnityPlus.Serialization
                 cursor.PendingActualType = actualType;
                 if( actualType != null )
                 {
-                    cursor.Descriptor = TypeDescriptorRegistry.GetDescriptor( actualType );
+                    ContextKey ctx = ContextKey.Default;
+                    if( cursor.TargetObj.Member != null )
+                    {
+                        // Use the context from the member definition.
+                        // This ensures that even if the type changes (polymorphism), the context (e.g. Asset vs Ref) is preserved.
+                        ctx = cursor.TargetObj.Member.GetContext( cursor.TargetObj.Parent );
+                    }
+                    cursor.Descriptor = TypeDescriptorRegistry.GetDescriptor( actualType, ctx );
                 }
             }
 

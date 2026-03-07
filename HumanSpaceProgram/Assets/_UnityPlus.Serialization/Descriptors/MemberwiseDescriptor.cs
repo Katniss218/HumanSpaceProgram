@@ -539,7 +539,15 @@ namespace UnityPlus.Serialization
             if( stepIndex < ctorCount )
             {
                 var (name, type) = _constructorParams[stepIndex];
-                IDescriptor typeDesc = TypeDescriptorRegistry.GetDescriptor( type, 0 );
+                // Try to find context from registered members
+                ContextKey context = ContextKey.Default;
+                var memberDef = _members.Find( m => m.Name == name );
+                if( memberDef != null )
+                {
+                    context = memberDef.Context;
+                }
+
+                IDescriptor typeDesc = TypeDescriptorRegistry.GetDescriptor( type, context );
                 return new BufferMemberInfo( stepIndex, name, type, typeDesc );
             }
 
