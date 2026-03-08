@@ -4,6 +4,7 @@ using HSP.Input;
 using UnityEngine;
 using UnityPlus.Input;
 using UnityPlus.Serialization;
+using Ctx = UnityPlus.Serialization.Ctx;
 
 namespace HSP.Vanilla.Components
 {
@@ -128,7 +129,7 @@ namespace HSP.Vanilla.Components
         public static IDescriptor FPlayerInputAvionicsMapping()
         {
             return new MemberwiseDescriptor<FPlayerInputAvionics>()
-                .WithMember( "control_frame", ObjectContext.Ref, o => o.ControlFrame )
+                .WithMember( "control_frame", typeof( Ctx.Ref ), o => o.ControlFrame )
                 .WithMember( "on_set_throttle", o => o.OnSetThrottle )
                 .WithMember( "on_set_attitude", o => o.OnSetAttitude )
                 .WithMember( "on_set_translation", o => o.OnSetTranslation );

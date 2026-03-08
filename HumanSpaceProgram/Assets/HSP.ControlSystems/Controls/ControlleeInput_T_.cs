@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using UnityEngine;
 using UnityPlus.Serialization;
+using Ctx = UnityPlus.Serialization.Ctx;
 
 namespace HSP.ControlSystems.Controls
 {
@@ -86,7 +86,7 @@ namespace HSP.ControlSystems.Controls
             return new MemberwiseDescriptor<ControlleeInput<T>>()
                 .WithReadonlyMember( "on_invoke", o => o.onInvoke )
                 .WithFactory<Action<T>>( onInvoke => new ControlleeInput<T>( onInvoke ), "on_invoke" )
-                .WithMember( "connects_to", ArrayContext.Refs, o => o.outputs, ( o, value ) =>
+                .WithMember( "connects_to", typeof( Ctx.Array<Ctx.Ref> ), o => o.outputs, ( o, value ) =>
                 {
                     if( value == null ) 
                         return;

@@ -1,30 +1,30 @@
-﻿using HSP.Vessels.Construction;
-using System.Linq;
+﻿using System.Linq;
 using UnityEngine;
 using UnityPlus.AssetManagement;
 using UnityPlus.Serialization;
+using Ctx = UnityPlus.Serialization.Ctx;
 
 namespace HSP.Vanilla.Components
 {
     public static class IGhostable_Ex
     {
-        [MapsInheritingFrom( typeof( Renderer ), Context = GhostableContext.Ghost )]
+        [MapsInheritingFrom( typeof( Renderer ), ContextType = typeof( Ctx.Ghost ) )]
         public static IDescriptor RendererMapping()
         {
             return new MemberwiseDescriptor<Renderer>()
-                .WithMember( "shared_materials", ArrayContext.Assets,
+                .WithMember( "shared_materials", typeof( Ctx.Array<Ctx.Asset> ),
                     o => o.sharedMaterials.Select( m => AssetRegistry.Get<Material>( "builtin::Resources/Materials/ghost_wireframe" ) ).ToArray(),
                    ( o, value ) => o.sharedMaterials = value );
         }
 
-        [MapsInheritingFrom( typeof( Collider ), Context = GhostableContext.Ghost )]
+        [MapsInheritingFrom( typeof( Collider ), ContextType = typeof( Ctx.Ghost ) )]
         public static IDescriptor ColliderMapping()
         {
             return new MemberwiseDescriptor<Collider>()
                 .WithMember( "is_trigger", o => true, ( o, value ) => o.isTrigger = value );
         }
 
-        [MapsInheritingFrom( typeof( FPointMass ), Context = GhostableContext.Ghost )]
+        [MapsInheritingFrom( typeof( FPointMass ), ContextType = typeof( Ctx.Ghost ) )]
         public static IDescriptor FPointMassMapping()
         {
             return new MemberwiseDescriptor<FPointMass>()

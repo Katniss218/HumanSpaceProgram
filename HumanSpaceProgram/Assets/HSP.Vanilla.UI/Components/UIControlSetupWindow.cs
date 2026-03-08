@@ -253,15 +253,6 @@ namespace HSP.Vanilla.UI.Components
             return false;
         }
 
-        void OnDestroy()
-        {
-            _lastVisibleComponents = this._visibleComponents.Select( c => new LastVisibleEntry()
-            {
-                component = c.Key,
-                lastAnchoredPosition = ((RectTransform)c.Value.transform).anchoredPosition
-            } ).ToArray();
-        }
-
         public static UIControlSetupWindow Create( UICanvas canvas, UICanvas contextMenuCanvas, Transform target )
         {
             _lastVisibleComponents = _lastVisibleComponents.Where( x => x.component != null ).ToArray(); // Removes components that were destroyed.
@@ -295,6 +286,14 @@ namespace HSP.Vanilla.UI.Components
             controlWindow.ConnectionContainer = connectionLayerPanel;
             controlWindow.scrollView = scrollView;
             controlWindow._contextMenuCanvas = contextMenuCanvas;
+            controlWindow.OnDestroyListener += () =>
+            {
+                _lastVisibleComponents = controlWindow._visibleComponents.Select( c => new LastVisibleEntry()
+                {
+                    component = c.Key,
+                    lastAnchoredPosition = ((RectTransform)c.Value.transform).anchoredPosition
+                } ).ToArray();
+            };
 
             componentListButton.onClick = () =>
             {

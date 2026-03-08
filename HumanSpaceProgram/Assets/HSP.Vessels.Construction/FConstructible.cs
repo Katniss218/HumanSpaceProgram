@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using UnityEngine;
 using UnityPlus.Serialization;
-using UnityPlus.Serialization.Json;
 using UnityPlus.Serialization.ReferenceMaps;
+using Ctx = UnityPlus.Serialization.Ctx;
 
 namespace HSP.Vessels.Construction
 {
@@ -208,7 +207,7 @@ namespace HSP.Vessels.Construction
             return new MemberwiseDescriptor<FConstructible>()
                 .WithMember( "max_build_points", o => o._maxBuildPoints )
                 .WithMember( "build_points", o => o._buildPoints )
-                .WithMember( "cached_data", KeyValueContext.RefToValue, o => o._cachedData );
+                .WithMember( "cached_data", typeof( Ctx.KeyValue<Ctx.Ref, Ctx.Value> ), o => o._cachedData );
         }
     }
 }

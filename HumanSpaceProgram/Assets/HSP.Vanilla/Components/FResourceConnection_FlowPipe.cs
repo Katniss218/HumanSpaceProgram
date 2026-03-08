@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityPlus.Serialization;
+using Ctx = UnityPlus.Serialization.Ctx;
 
 namespace HSP.Vanilla.Components
 {
@@ -101,8 +102,8 @@ namespace HSP.Vanilla.Components
         public static IDescriptor FResourceConnection_FlowPipeMapping()
         {
             return new MemberwiseDescriptor<FResourceConnection_FlowPipe>()
-                .WithMember( "from_inlet", ObjectContext.Ref, o => o.FromInlet )
-                .WithMember( "to_inlet", ObjectContext.Ref, o => o.ToInlet )
+                .WithMember( "from_inlet", typeof( Ctx.Ref ), o => o.FromInlet )
+                .WithMember( "to_inlet", typeof( Ctx.Ref ), o => o.ToInlet )
                 .WithMember( "conductivity_factor", o => o.ConductivityFactor )
                 .WithMember( "length", o => o.Length )
                 .WithMember( "modifiers", o => o.Modifiers );

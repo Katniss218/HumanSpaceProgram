@@ -1,10 +1,10 @@
 ﻿using HSP.CelestialBodies;
 using HSP.ResourceFlow;
-using HSP.Time;
 using HSP.Vessels;
 using System;
 using UnityEngine;
 using UnityPlus.Serialization;
+using Ctx = UnityPlus.Serialization.Ctx;
 
 namespace HSP.Vanilla.Components
 {
@@ -68,8 +68,8 @@ namespace HSP.Vanilla.Components
             public static IDescriptor PortMapping()
             {
                 return new MemberwiseDescriptor<Port>()
-                    .WithMember<object>( "obj_c", ObjectContext.Ref, o => (object)o._objC, ( o, value ) => o._objC = (IResourceConsumer)value )
-                    .WithMember<object>( "obj_p", ObjectContext.Ref, o => (object)o._objP, ( o, value ) => o._objP = (IResourceProducer)value )
+                    .WithMember<object>( "obj_c", typeof( Ctx.Ref ), o => (object)o._objC, ( o, value ) => o._objC = (IResourceConsumer)value )
+                    .WithMember<object>( "obj_p", typeof( Ctx.Ref ), o => (object)o._objP, ( o, value ) => o._objP = (IResourceProducer)value )
                     .WithMember( "position", o => o.Position )
                     .WithMember( "forward", o => o.Forward );
             }

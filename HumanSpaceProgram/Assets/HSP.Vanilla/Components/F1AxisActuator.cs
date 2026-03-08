@@ -2,6 +2,7 @@
 using HSP.ControlSystems.Controls;
 using UnityEngine;
 using UnityPlus.Serialization;
+using Ctx = UnityPlus.Serialization.Ctx;
 
 namespace HSP.Vanilla.Components
 {
@@ -57,8 +58,8 @@ namespace HSP.Vanilla.Components
         public static IDescriptor F1AxisActuatorMapping()
         {
             return new MemberwiseDescriptor<F1AxisActuator>()
-                .WithMember( "reference_transform", ObjectContext.Ref, o => o.ReferenceTransform )
-                .WithMember( "x_actuator_transform", ObjectContext.Ref, o => o.XActuatorTransform )
+                .WithMember( "reference_transform", typeof( Ctx.Ref ), o => o.ReferenceTransform )
+                .WithMember( "x_actuator_transform", typeof( Ctx.Ref ), o => o.XActuatorTransform )
 
                 .WithMember( "x", o => o.X )
                 .WithMember( "min_x", o => o.MinX )

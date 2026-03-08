@@ -1,6 +1,6 @@
-﻿using HSP.Effects.Lights;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityPlus.Serialization;
+using Ctx = UnityPlus.Serialization.Ctx;
 
 namespace HSP.Effects.Audio
 {
@@ -78,7 +78,7 @@ namespace HSP.Effects.Audio
         public static IDescriptor AudioEffectDefinitionMapping()
         {
             return new MemberwiseDescriptor<AudioEffectDefinition>()
-                .WithMember( "audio_clip", ObjectContext.Asset, o => o.Clip )
+                .WithMember( "audio_clip", typeof( Ctx.Asset ), o => o.Clip )
                 .WithMember( "audio_channel", o => o.Channel )
                 .WithMember( "volume", o => o.Volume )
                 .WithMember( "pitch", o => o.Pitch )

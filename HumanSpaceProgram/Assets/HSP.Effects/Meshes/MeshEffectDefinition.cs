@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityPlus.Serialization;
+using Ctx = UnityPlus.Serialization.Ctx;
 
 namespace HSP.Effects.Meshes
 {
@@ -194,8 +195,8 @@ namespace HSP.Effects.Meshes
         public static IDescriptor MeshEffectDefinitionMapping()
         {
             return new MemberwiseDescriptor<MeshEffectDefinition>()
-                .WithMember( "mesh", ObjectContext.Asset, o => o.Mesh )
-                .WithMember( "material", ObjectContext.Asset, o => o.Material )
+                .WithMember( "mesh", typeof( Ctx.Asset ), o => o.Mesh )
+                .WithMember( "material", typeof( Ctx.Asset ), o => o.Material )
                 .WithMember( "duration", o => o.Duration )
                 .WithMember( "loop", o => o.Loop )
                 .WithMember( "bones", o => o.Bones )

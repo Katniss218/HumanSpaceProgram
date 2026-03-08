@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Reflection;
+using UnityEngine;
 
 namespace UnityPlus.Serialization
 {
@@ -10,6 +12,32 @@ namespace UnityPlus.Serialization
             {
                 state.RootResult = null;
                 return;
+            }
+
+            // Resolve Polymorphism for Root
+            if( rootData is SerializedObject rootObj )
+            {
+                Type actualType = Persistent_Type.ReadTypeHeader( rootObj, state.Context.Config.TypeResolver );
+                if( actualType != null && actualType != rootDescriptor.MappedType )
+                {
+                    if( !rootDescriptor.MappedType.IsAssignableFrom( actualType ) )
+                    {
+                        string msg = $"Polymorphic type mismatch: Data specifies type '{actualType.FullName}', which is not assignable to root expected type '{rootDescriptor.MappedType.FullName}'.";
+                        throw new UPSSerializationException( state.Context, msg, "root", rootDescriptor, null, "Resolve Polymorphism", null );
+                    }
+
+                    if( root != null )
+                    {
+                        Type existingType = root.GetType();
+                        if( actualType != existingType && !existingType.IsAssignableFrom( actualType ) )
+                        {
+                            string msg = $"Polymorphic type mismatch: Data specifies type '{actualType.FullName}', which is incompatible with existing root target of type '{existingType.FullName}'.";
+                            throw new UPSSerializationException( state.Context, msg, "root", rootDescriptor, null, "Resolve Polymorphism", null );
+                        }
+                    }
+
+                    rootDescriptor = TypeDescriptorRegistry.GetDescriptor( actualType, ContextKey.Default );
+                }
             }
 
             // [Primitive Root]
@@ -65,29 +93,13 @@ namespace UnityPlus.Serialization
 
         private static SerializationCursorResult PhasePreProcessing( ref SerializationCursor cursor, SerializationState state )
         {
-            if( cursor.PendingActualType == null && cursor.DataNode is SerializedObject rootObj )
-            {
-                Type actualType = Persistent_Type.ReadTypeHeader( rootObj, state.Context.Config.TypeResolver );
-                cursor.PendingActualType = actualType;
-                if( actualType != null )
-                {
-                    ContextKey ctx = ContextKey.Default;
-                    if( cursor.TargetObj.Member != null )
-                    {
-                        // Use the context from the member definition.
-                        // This ensures that even if the type changes (polymorphism), the context (e.g. Asset vs Ref) is preserved.
-                        ctx = cursor.TargetObj.Member.GetContext( cursor.TargetObj.Parent );
-                    }
-                    cursor.Descriptor = TypeDescriptorRegistry.GetDescriptor( actualType, ctx );
-                }
-            }
-
             // Capture ID before unwrapping collections (e.g. List wrapped in Object with $id)
             if( cursor.DataNode is SerializedObject objNode && Persistent_Guid.TryReadIdHeader( objNode, out Guid preId ) )
             {
                 cursor.PendingID = preId;
             }
 
+#warning TODO - potentially move this to the descriptor itself, since this is somewhat descriptor-specific (formatting).
             if( cursor.Descriptor is ICollectionDescriptor )
             {
                 var valNode = SerializationHelpers.GetValueNode( cursor.DataNode, state.Context.Config.ForceStandardJson );
@@ -146,7 +158,14 @@ namespace UnityPlus.Serialization
             if( result == MemberResolutionResult.Resolved )
             {
                 object buffer = cursor.ConstructionBuffer;
-                memberInfo.SetValue( ref buffer, val );
+                try
+                {
+                    memberInfo.SetValue( ref buffer, val );
+                }
+                catch( Exception ex )
+                {
+                    WrapException( ex, state, "Setting Construction Argument", cursor.Descriptor, memberInfo );
+                }
                 return SerializationCursorResult.Advance;
             }
             else if( result == MemberResolutionResult.Missing )
@@ -167,7 +186,14 @@ namespace UnityPlus.Serialization
 
                 // Fallback to null/default
                 object buf = cursor.ConstructionBuffer;
-                memberInfo.SetValue( ref buf, null );
+                try
+                {
+                    memberInfo.SetValue( ref buf, null );
+                }
+                catch( Exception ex )
+                {
+                    WrapException( ex, state, "Setting Default Construction Argument", cursor.Descriptor, memberInfo );
+                }
                 return SerializationCursorResult.Advance;
             }
             else if( result == MemberResolutionResult.RequiresPush )
@@ -190,7 +216,7 @@ namespace UnityPlus.Serialization
             }
             else
             {
-                UnityEngine.Debug.LogWarning( $"Failed to resolve construction argument {memberInfo.Name}" );
+                Debug.LogWarning( $"Failed to resolve construction argument {memberInfo.Name}" );
                 return SerializationCursorResult.Advance;
             }
         }
@@ -203,24 +229,47 @@ namespace UnityPlus.Serialization
             // If we skipped construction (Target != null && StepCount == 0), we keep existing target.
             if( cursor.ConstructionBuffer != null )
             {
-                object newInstance = compositeDesc.Construct( cursor.ConstructionBuffer );
-                cursor.TargetObj = cursor.TargetObj.WithTarget( newInstance );
+                try
+                {
+                    object newInstance = compositeDesc.Construct( cursor.ConstructionBuffer );
+                    cursor.TargetObj = cursor.TargetObj.WithTarget( newInstance );
+                }
+                catch( Exception ex )
+                {
+                    WrapException( ex, state, "Constructing Object", cursor.Descriptor, null );
+                }
             }
             else if( cursor.TargetObj.Target == null )
             {
-                object newInstance = compositeDesc.CreateInitialTarget( cursor.DataNode, state.Context );
-                cursor.TargetObj = cursor.TargetObj.WithTarget( newInstance );
+                try
+                {
+                    object newInstance = compositeDesc.CreateInitialTarget( cursor.DataNode, state.Context );
+                    cursor.TargetObj = cursor.TargetObj.WithTarget( newInstance );
+                }
+                catch( Exception ex )
+                {
+                    WrapException( ex, state, "Creating Initial Target", cursor.Descriptor, null );
+                }
             }
 
             if( cursor.TargetObj.Target == null )
-                throw new Exception( "Factory returned null." );
+            {
+                WrapException( new InvalidOperationException( "Factory returned null." ), state, "Constructing Object", cursor.Descriptor, null );
+            }
 
             // If we are populating an existing collection (Target != null), we need to prepare it.
             // Resize is intended to clear existing contents and prepare for population, but it also serves to resize arrays if needed.
             if( cursor.Descriptor is ICollectionDescriptor colDesc && cursor.DataNode is SerializedArray arr )
             {
-                object resized = colDesc.Resize( cursor.TargetObj.Target, arr.Count );
-                cursor.TargetObj = cursor.TargetObj.WithTarget( resized );
+                try
+                {
+                    object resized = colDesc.Resize( cursor.TargetObj.Target, arr.Count );
+                    cursor.TargetObj = cursor.TargetObj.WithTarget( resized );
+                }
+                catch( Exception ex )
+                {
+                    WrapException( ex, state, "Resizing Collection", cursor.Descriptor, null );
+                }
             }
 
             if( cursor.PendingID.HasValue )
@@ -256,7 +305,6 @@ namespace UnityPlus.Serialization
                 return SerializationCursorResult.Jump;
             }
 
-#warning TODO - phasepopulation and initializeroot is kind of duplicated. same for primitive and composite null handling.
             var parentDesc = (ICompositeDescriptor)cursor.Descriptor;
             int offset = cursor.ConstructionStepCount;
             int absoluteIndex = cursor.StepIndex + offset;
@@ -273,7 +321,14 @@ namespace UnityPlus.Serialization
             if( result == MemberResolutionResult.Resolved )
             {
                 object t = cursor.TargetObj.Target;
-                memberInfo.SetValue( ref t, val );
+                try
+                {
+                    memberInfo.SetValue( ref t, val );
+                }
+                catch( Exception ex )
+                {
+                    WrapException( ex, state, "Setting Member Value", cursor.Descriptor, memberInfo );
+                }
 
                 // Update cursor target in case of value type replacement
                 cursor.TargetObj = cursor.TargetObj.WithTarget( t );
@@ -332,7 +387,19 @@ namespace UnityPlus.Serialization
                     return MemberResolutionResult.Missing;
                 }
 
-                DeserializationResult result = primitiveDesc.DeserializeDirect( primitiveData, state.Context, out value );
+                DeserializationResult result = DeserializationResult.Success;
+                try
+                {
+                    result = primitiveDesc.DeserializeDirect( primitiveData, state.Context, out value );
+                }
+                catch( Exception ex )
+                {
+                    value = null;
+                    // Can't use WrapException easily here because we don't have the cursor/descriptor handy in the same way,
+                    // but we can pass what we have.
+                    // We need to re-throw or handle. Since this method returns a result, throwing is appropriate for fatal errors.
+                    WrapException( ex, state, "Deserializing Primitive", memberDesc, memberInfo );
+                }
 
                 if( result == DeserializationResult.Success )
                     return MemberResolutionResult.Resolved;
@@ -403,6 +470,13 @@ namespace UnityPlus.Serialization
                 Type actualType = Persistent_Type.ReadTypeHeader( childObj, state.Context.Config.TypeResolver );
                 if( actualType != null && actualType != memberInfo.MemberType )
                 {
+                    if( !memberInfo.MemberType.IsAssignableFrom( actualType ) )
+                    {
+                        string path = state.Stack.BuildPath();
+                        string msg = $"Polymorphic type mismatch: Data specifies type '{actualType.FullName}', which is not assignable to the member type '{memberInfo.MemberType.AssemblyQualifiedName}'.";
+                        throw new UPSSerializationException( state.Context, msg, path, parentCursor.Descriptor, memberInfo, "Resolve Polymorphism", null );
+                    }
+
                     memberDesc = TypeDescriptorRegistry.GetDescriptor( actualType, memberInfo.GetContext( parentObj ) );
                 }
             }
@@ -438,6 +512,17 @@ namespace UnityPlus.Serialization
                 return true;
             }
             return false;
+        }
+
+        private static void WrapException( Exception ex, SerializationState state, string operation, IDescriptor descriptor, IMemberInfo member )
+        {
+            if( ex is UPSSerializationException )
+                throw ex;
+
+            string path = state.Stack.BuildPath();
+            string message = $"Deserialization Error: {operation} at '{path}': {ex.Message}";
+
+            throw new UPSSerializationException( state.Context, message, path, descriptor, member, operation, ex );
         }
     }
 }

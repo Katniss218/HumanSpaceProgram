@@ -1,18 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
 using UnityPlus.Serialization;
+using Ctx = UnityPlus.Serialization.Ctx;
 
 namespace HSP.ControlSystems.Controls
 {
-	/// <summary>
-	/// Represents a control that consumes an empty control signal.
-	/// </summary>
-	public sealed class ControlleeInput : ControlleeInputBase
+    /// <summary>
+    /// Represents a control that consumes an empty control signal.
+    /// </summary>
+    public sealed class ControlleeInput : ControlleeInputBase
     {
 		internal Action onInvoke;
 
@@ -86,7 +83,7 @@ namespace HSP.ControlSystems.Controls
             return new MemberwiseDescriptor<ControlleeInput>()
                 .WithReadonlyMember( "on_invoke", o => o.onInvoke )
                 .WithFactory<Action>( onInvoke => new ControlleeInput( onInvoke ), "on_invoke" )
-                .WithMember( "connects_to", ArrayContext.Refs, o => o.outputs, ( o, value ) =>
+                .WithMember( "connects_to", typeof( Ctx.Array<Ctx.Ref> ), o => o.outputs, ( o, value ) =>
                 {
                     if( value == null )
                         return;

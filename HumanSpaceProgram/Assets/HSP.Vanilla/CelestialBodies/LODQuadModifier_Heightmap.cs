@@ -4,6 +4,7 @@ using System.Runtime.CompilerServices;
 using Unity.Collections;
 using UnityEngine;
 using UnityPlus.Serialization;
+using Ctx = UnityPlus.Serialization.Ctx;
 
 namespace HSP.Vanilla.CelestialBodies
 {
@@ -340,12 +341,12 @@ namespace HSP.Vanilla.CelestialBodies
         public static IDescriptor LODQuadModifier_HeightmapMapping()
         {
             return new MemberwiseDescriptor<LODQuadModifier_Heightmap>()
-                .WithMember( "heightmap_xn", ObjectContext.Asset, o => o.HeightmapXn )
-                .WithMember( "heightmap_xp", ObjectContext.Asset, o => o.HeightmapXp )
-                .WithMember( "heightmap_yn", ObjectContext.Asset, o => o.HeightmapYn )
-                .WithMember( "heightmap_yp", ObjectContext.Asset, o => o.HeightmapYp )
-                .WithMember( "heightmap_zn", ObjectContext.Asset, o => o.HeightmapZn )
-                .WithMember( "heightmap_zp", ObjectContext.Asset, o => o.HeightmapZp )
+                .WithMember( "heightmap_xn", typeof( Ctx.Asset ), o => o.HeightmapXn )
+                .WithMember( "heightmap_xp", typeof( Ctx.Asset ), o => o.HeightmapXp )
+                .WithMember( "heightmap_yn", typeof( Ctx.Asset ), o => o.HeightmapYn )
+                .WithMember( "heightmap_yp", typeof( Ctx.Asset ), o => o.HeightmapYp )
+                .WithMember( "heightmap_zn", typeof( Ctx.Asset ), o => o.HeightmapZn )
+                .WithMember( "heightmap_zp", typeof( Ctx.Asset ), o => o.HeightmapZp )
                 .WithMember( "min_level", o => o.MinLevel )
                 .WithMember( "max_level", o => o.MaxLevel );
         }

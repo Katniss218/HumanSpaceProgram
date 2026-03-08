@@ -2,6 +2,7 @@
 using HSP.Vanilla.Components;
 using UnityEngine;
 using UnityPlus.Serialization;
+using Ctx = UnityPlus.Serialization.Ctx;
 
 namespace HSP.Vanilla.Effects
 {
@@ -149,7 +150,7 @@ namespace HSP.Vanilla.Effects
         public static IDescriptor FRocketEngineExhaustFxMapping()
         {
             return new MemberwiseDescriptor<FRocketEngineFX>()
-                .WithMember( "engine", ObjectContext.Ref, o => o.Engine )
+                .WithMember( "engine", typeof( Ctx.Ref ), o => o.Engine )
                 .WithMember( "ignition_system", o => o.OnIgnition )
                 .WithMember( "loop_system", o => o.OnRunning )
                 .WithMember( "shutdown_system", o => o.OnShutdown );

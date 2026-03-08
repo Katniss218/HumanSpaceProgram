@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityPlus.Serialization;
+using Ctx = UnityPlus.Serialization.Ctx;
 
 namespace HSP.Effects.Particles.RenderModes
 {
@@ -33,7 +34,7 @@ namespace HSP.Effects.Particles.RenderModes
         public static IDescriptor MeshRenderModeMapping()
         {
             return new MemberwiseDescriptor<MeshRenderMode>()
-                .WithMember( "meshes", ArrayContext.Assets, o => o.Meshes );
+                .WithMember( "meshes", typeof( Ctx.Array<Ctx.Asset> ), o => o.Meshes );
         }
     }
 }

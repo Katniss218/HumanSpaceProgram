@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityPlus.Serialization;
+using Ctx = UnityPlus.Serialization.Ctx;
 
 namespace HSP.CelestialBodies.Atmospheres
 {
@@ -75,7 +76,7 @@ namespace HSP.CelestialBodies.Atmospheres
         {
             return new MemberwiseDescriptor<AtmosphereRenderer>()
                 .WithMember( "height", o => o.Height )
-                .WithMember( "shared_material", ObjectContext.Asset, o => o.sharedMaterial );
+                .WithMember( "shared_material", typeof( Ctx.Asset ), o => o.sharedMaterial );
         }
     }
 }

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using UnityEngine;
 using UnityPlus.Serialization;
+using Ctx = UnityPlus.Serialization.Ctx;
 
 namespace HSP.ResourceFlow
 {
@@ -401,7 +401,7 @@ namespace HSP.ResourceFlow
             public static IDescriptor SubstanceStateMapping()
             {
                 return new MemberwiseDescriptor<SubstanceState>()
-                    .WithMember( "substance", ObjectContext.Asset, o => o.Substance )
+                    .WithMember( "substance", typeof( Ctx.Asset ), o => o.Substance )
                     .WithMember( "mass", o => o.Mass );
             }
         }

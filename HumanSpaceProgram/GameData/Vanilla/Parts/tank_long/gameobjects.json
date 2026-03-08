@@ -7,7 +7,7 @@
     "name": "tank_long",
     "tag": "Untagged",
     "children": {
-        "$type": "UnityEngine.GameObject[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+        
         "$id": "515a77ae-35d3-4ad9-8e7b-add7af4e53c0",
         "value": [
             {
@@ -19,12 +19,12 @@
                 "name": "tank_long",
                 "tag": "Untagged",
                 "children": {
-                    "$type": "UnityEngine.GameObject[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                    
                     "$id": "d3517b6b-e604-4473-af46-1ed2298a81b3",
                     "value": []
                 },
                 "components": {
-                    "$type": "UnityEngine.Component[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                    
                     "$id": "f571423b-a0da-4ebf-b660-497a3bfc59b7",
                     "value": [
                         {
@@ -82,12 +82,12 @@
                 "name": "volumeTransform",
                 "tag": "Untagged",
                 "children": {
-                    "$type": "UnityEngine.GameObject[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                    
                     "$id": "d3517b6b-e604-4473-af46-1ed2298a81b3",
                     "value": []
                 },
                 "components": {
-                    "$type": "UnityEngine.Component[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                    
                     "$id": "7e559c72-55b4-419b-abb4-54d7dbcf4051",
                     "value": [
                         {
@@ -122,12 +122,12 @@
                 "name": "NODE",
                 "tag": "Untagged",
                 "children": {
-                    "$type": "UnityEngine.GameObject[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                    
                     "$id": "d3517b6b-e604-4473-af46-1ed2298a81b3",
                     "value": []
                 },
                 "components": {
-                    "$type": "UnityEngine.Component[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                    
                     "$id": "b70b6ea3-c58b-4f38-927e-47395270ee56",
                     "value": [
                         {
@@ -168,12 +168,12 @@
                 "name": "NODE",
                 "tag": "Untagged",
                 "children": {
-                    "$type": "UnityEngine.GameObject[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                    
                     "$id": "d3517b6b-e604-4473-af46-1ed2298a81b3",
                     "value": []
                 },
                 "components": {
-                    "$type": "UnityEngine.Component[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                    
                     "$id": "4d28387e-a7c5-41e7-81bf-e9810e654d76",
                     "value": [
                         {
@@ -208,7 +208,7 @@
         ]
     },
     "components": {
-        "$type": "UnityEngine.Component[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+        
         "$id": "d85af2cf-a589-47e0-8300-ef52f27537b1",
         "value": [
             {

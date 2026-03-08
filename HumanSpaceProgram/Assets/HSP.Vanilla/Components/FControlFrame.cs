@@ -1,7 +1,6 @@
-﻿using HSP.ReferenceFrames;
-using HSP.Vessels;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityPlus.Serialization;
+using Ctx = UnityPlus.Serialization.Ctx;
 
 namespace HSP.Vanilla.Components
 {
@@ -25,7 +24,7 @@ namespace HSP.Vanilla.Components
         public static IDescriptor FControlFrameMapping()
         {
             return new MemberwiseDescriptor<FControlFrame>()
-                .WithMember( "reference_transform", ObjectContext.Ref, o => o._referenceTransform );
+                .WithMember( "reference_transform", typeof( Ctx.Ref ), o => o._referenceTransform );
         }
     }
 }

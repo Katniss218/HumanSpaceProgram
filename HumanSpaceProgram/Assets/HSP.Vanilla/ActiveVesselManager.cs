@@ -2,6 +2,7 @@
 using System;
 using UnityEngine;
 using UnityPlus.Serialization;
+using Ctx = UnityPlus.Serialization.Ctx;
 
 namespace HSP.Vanilla
 {
@@ -76,7 +77,7 @@ namespace HSP.Vanilla
         public static IDescriptor ActiveObjectManagerMapping()
         {
             return new MemberwiseDescriptor<ActiveVesselManager>()
-                .WithMember( "active_object", ObjectContext.Ref, o => ActiveVesselManager.ActiveObject, ( o, value ) => ActiveVesselManager.ActiveObject = value );
+                .WithMember( "active_object", typeof( Ctx.Ref ), o => ActiveVesselManager.ActiveObject, ( o, value ) => ActiveVesselManager.ActiveObject = value );
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityPlus.Serialization;
+using Ctx = UnityPlus.Serialization.Ctx;
 
 namespace HSP.ControlSystems
 {
@@ -42,7 +43,7 @@ namespace HSP.ControlSystems
         public static IDescriptor ControlMapping()
         {
             return new MemberwiseDescriptor<Control>()
-                .WithMember( "transform", ObjectContext.Ref, o => o.transform );
+                .WithMember( "transform", typeof( Ctx.Ref ), o => o.transform );
         }
     }
 }

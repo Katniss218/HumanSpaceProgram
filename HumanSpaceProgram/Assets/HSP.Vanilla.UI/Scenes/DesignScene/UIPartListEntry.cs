@@ -1,5 +1,6 @@
 ﻿using HSP.Content.Vessels;
 using HSP.Content.Vessels.Serialization;
+using HSP.UI.Windows;
 using HSP.Vanilla.Scenes.DesignScene;
 using HSP.Vanilla.Scenes.DesignScene.Tools;
 using UnityEngine;
@@ -21,6 +22,14 @@ namespace HSP.Vanilla.UI.Scenes.DesignScene
             PickTool pickTool = DesignSceneToolManager.UseTool<PickTool>();
 
             GameObject spawnedPart = PartRegistry.Load( _part.ID );
+            if( spawnedPart == null )
+            {
+                UICanvas canvas = DesignSceneM.Instance.GetWindowCanvas();
+                Debug.LogError( $"Failed to load part with ID '{_part.ID}'." );
+                canvas.AddConfirmWindow( "Error", $"Failed to load part with ID '{_part.ID}'. See log for details.", null );
+                return;
+            }
+
             if( DesignVesselManager.DesignObject == null )
             {
                 spawnedPart.transform.localPosition = Vector3.zero;

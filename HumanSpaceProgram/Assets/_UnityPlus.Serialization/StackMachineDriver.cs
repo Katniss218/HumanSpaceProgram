@@ -255,10 +255,21 @@ namespace UnityPlus.Serialization
             if( ex is UPSSerializationException )
                 throw ex;
 
-            string message = $"Serialization Fatal Error during {stage} at '{_state.Stack.BuildPath()}': {ex.Message}";
+            string path = _state.Stack.BuildPath();
+            string message = $"Serialization Fatal Error during {stage} at '{path}': {ex.Message}";
             _state.Context.Log.Log( LogLevel.Fatal, message );
 
-            throw new UPSSerializationException( _state.Context, message, ex );
+            IDescriptor descriptor = null;
+            IMemberInfo member = null;
+
+            if( _state.Stack.Count > 0 )
+            {
+                var cursor = _state.Stack.Peek();
+                descriptor = cursor.Descriptor;
+                member = cursor.TargetObj.Member;
+            }
+
+            throw new UPSSerializationException( _state.Context, message, path, descriptor, member, stage, ex );
         }
     }
 }

@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityPlus.Serialization;
+using Ctx = UnityPlus.Serialization.Ctx;
 
 namespace HSP.Vessels
 {
@@ -305,7 +306,7 @@ namespace HSP.Vessels
         {
             return new MemberwiseDescriptor<Vessel>()
                 .WithMember( "display_name", o => o.DisplayName )
-                .WithMember( "root_part", ObjectContext.Ref, o => o._rootPart )
+                .WithMember( "root_part", typeof( Ctx.Ref ), o => o._rootPart )
                 .WithMember( "on_after_recalculate_parts", o => o.OnAfterRecalculateParts );
         }
     }

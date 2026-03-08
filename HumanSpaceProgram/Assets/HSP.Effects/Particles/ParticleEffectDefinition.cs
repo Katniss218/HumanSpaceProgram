@@ -1,10 +1,10 @@
-﻿using HSP.Effects.Meshes;
-using HSP.Effects.Particles.SimulationFrames;
+﻿using HSP.Effects.Particles.SimulationFrames;
 using System;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityPlus.Serialization;
+using Ctx = UnityPlus.Serialization.Ctx;
 
 namespace HSP.Effects.Particles
 {
@@ -58,7 +58,7 @@ namespace HSP.Effects.Particles
             {
                 return new MemberwiseDescriptor<Render>()
                     .WithMember( "render_mode", o => o.RenderMode )
-                    .WithMember( "material", ObjectContext.Asset, o => o.Material )
+                    .WithMember( "material", typeof( Ctx.Asset ), o => o.Material )
                     .WithMember( "vertex_streams", o => o.VertexStreams )
                     .WithMember( "shadow_casting_mode", o => o.VertexStreams )
                     .WithMember( "receive_shadows", o => o.VertexStreams )
@@ -481,7 +481,7 @@ namespace HSP.Effects.Particles
             public static IDescriptor TrailMapping()
             {
                 return new MemberwiseDescriptor<Trail>()
-                    .WithMember( "material", ObjectContext.Asset, t => t.Material )
+                    .WithMember( "material", typeof( Ctx.Asset ), t => t.Material )
                     .WithMember( "style", t => t.Style )
                     .WithMember( "inherit_tint", t => t.InheritTint )
                     .WithMember( "width_from_size", t => t.WidthFromSize )

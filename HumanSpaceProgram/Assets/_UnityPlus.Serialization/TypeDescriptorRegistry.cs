@@ -186,25 +186,43 @@ namespace UnityPlus.Serialization
 
                 // --- 2. Inheritance Hierarchy (Specific Bases) ---
                 if( _inheritingSearcher.TryGet( contextId, type, out method ) )
-                    return InvokeProvider( method, type, context );
+                {
+                    var desc = InvokeProvider( method, type, context );
+                    if( desc != null ) return desc;
+                }
 
                 // --- 3. Interfaces ---
                 if( _implementingSearcher.TryGet( contextId, type, out method ) )
-                    return InvokeProvider( method, type, context );
+                {
+                    var desc = InvokeProvider( method, type, context );
+                    if( desc != null ) return desc;
+                }
 
                 // --- 5. Category Fallbacks (Any Class/Struct/Interface) ---
                 if( _anyClassSearcher.TryGet( contextId, type, out method ) )
-                    return InvokeProvider( method, type, context );
+                {
+                    var desc = InvokeProvider( method, type, context );
+                    if( desc != null ) return desc;
+                }
 
                 if( _anyStructSearcher.TryGet( contextId, type, out method ) )
-                    return InvokeProvider( method, type, context );
+                {
+                    var desc = InvokeProvider( method, type, context );
+                    if( desc != null ) return desc;
+                }
 
                 if( _anyInterfaceSearcher.TryGet( contextId, type, out method ) )
-                    return InvokeProvider( method, type, context );
+                {
+                    var desc = InvokeProvider( method, type, context );
+                    if( desc != null ) return desc;
+                }
 
                 // --- 6. Absolute Fallback (Any) ---
                 if( _anySearcher.TryGet( contextId, type, out method ) )
-                    return InvokeProvider( method, type, context );
+                {
+                    var desc = InvokeProvider( method, type, context );
+                    if( desc != null ) return desc;
+                }
 
                 if( context == ContextKey.Default )
                 {
@@ -263,15 +281,24 @@ namespace UnityPlus.Serialization
                 // CASE 2: The Provider Method itself is Generic (e.g. static Method<T>() )
                 else if( method.IsGenericMethodDefinition )
                 {
-                    // Safety check: ensure generic args match method definition count
-                    if( method.GetGenericArguments().Length == genericArgs.Length )
+                    try
                     {
-                        method = method.MakeGenericMethod( genericArgs );
+                        // Safety check: ensure generic args match method definition count
+                        if( method.GetGenericArguments().Length == genericArgs.Length )
+                        {
+                            method = method.MakeGenericMethod( genericArgs );
+                        }
+                        else if( method.GetGenericArguments().Length == 1 && genericArgs.Length == 0 )
+                        {
+                            // Special case: Method<T> called for non-generic type (e.g. MapsAnyClass -> T is the type itself)
+                            method = method.MakeGenericMethod( targetType );
+                        }
                     }
-                    else if( method.GetGenericArguments().Length == 1 && genericArgs.Length == 0 )
+                    catch( ArgumentException )
                     {
-                        // Special case: Method<T> called for non-generic type (e.g. MapsAnyClass -> T is the type itself)
-                        method = method.MakeGenericMethod( targetType );
+                        // The target type does not satisfy the generic constraints of the provider method.
+                        // This means the provider is not applicable to this specific type.
+                        return null;
                     }
                 }
 

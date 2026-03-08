@@ -4,10 +4,10 @@ using HSP.ResourceFlow;
 using HSP.Time;
 using HSP.Vessels;
 using System;
-using System.Linq;
 using UnityEngine;
 using UnityPlus.Serialization;
 using static HSP.Vanilla.Components.IPropulsion;
+using Ctx = UnityPlus.Serialization.Ctx;
 
 namespace HSP.Vanilla.Components
 {
@@ -536,7 +536,7 @@ namespace HSP.Vanilla.Components
                 .WithMember( "set_throttle", o => o.SetThrottle )
                 .WithMember( "ignite", o => o.Ignite )
                 .WithMember( "shutdown", o => o.Shutdown )
-                .WithMember( "thrust_transform", ObjectContext.Ref, o => o.ThrustTransform )
+                .WithMember( "thrust_transform", typeof( Ctx.Ref ), o => o.ThrustTransform )
                 .WithMember( "inlets", o => o.Inlets );
         }
     }

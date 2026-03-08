@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityPlus.Serialization;
+using Ctx = UnityPlus.Serialization.Ctx;
 
 namespace HSP
 {
@@ -31,7 +32,7 @@ namespace HSP
         public static IDescriptor FClickInteractionRedirectMapping()
         {
             return new MemberwiseDescriptor<TransformRedirect>()
-                .WithMember( "target", ObjectContext.Ref, o => o.Target );
+                .WithMember( "target", typeof( Ctx.Ref ), o => o.Target );
         }
     }
 }

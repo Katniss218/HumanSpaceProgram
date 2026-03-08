@@ -17,7 +17,14 @@ namespace UnityPlus.Serialization
             if( rootDescriptor is IPrimitiveDescriptor primitiveRoot )
             {
                 SerializedData d = null;
-                primitiveRoot.SerializeDirect( root, ref d, state.Context );
+                try
+                {
+                    primitiveRoot.SerializeDirect( root, ref d, state.Context );
+                }
+                catch( Exception ex )
+                {
+                    WrapException( ex, state, "Serializing Primitive Root", rootDescriptor, null );
+                }
                 state.RootResult = d;
                 return; // Stack remains empty, IsFinished = true
             }
@@ -187,7 +194,15 @@ namespace UnityPlus.Serialization
             childNode = null;
 
             // 1. Get Value
-            object val = memberInfo.GetValue( target );
+            object val = null;
+            try
+            {
+                val = memberInfo.GetValue( target );
+            }
+            catch( Exception ex )
+            {
+                WrapException( ex, state, "Getting Member Value", null, memberInfo );
+            }
 
             // 2. Null
             if( val == null )
@@ -214,7 +229,14 @@ namespace UnityPlus.Serialization
             if( descriptor is IPrimitiveDescriptor primitiveDesc )
             {
                 SerializedData primitiveData = null;
-                primitiveDesc.SerializeDirect( val, ref primitiveData, state.Context );
+                try
+                {
+                    primitiveDesc.SerializeDirect( val, ref primitiveData, state.Context );
+                }
+                catch( Exception ex )
+                {
+                    WrapException( ex, state, "Serializing Primitive", descriptor, memberInfo );
+                }
                 LinkDataNode( parentData, memberInfo.Name, primitiveData, index );
                 return MemberResolutionResult.Resolved;
             }
@@ -339,6 +361,17 @@ namespace UnityPlus.Serialization
                 return;
 
             Persistent_Type.WriteTypeHeader( dataNode, actualType );
+        }
+
+        private static void WrapException( Exception ex, SerializationState state, string operation, IDescriptor descriptor, IMemberInfo member )
+        {
+            if( ex is UPSSerializationException )
+                throw ex;
+
+            string path = state.Stack.BuildPath();
+            string message = $"Serialization Error: {operation} at '{path}': {ex.Message}";
+
+            throw new UPSSerializationException( state.Context, message, path, descriptor, member, operation, ex );
         }
     }
 }

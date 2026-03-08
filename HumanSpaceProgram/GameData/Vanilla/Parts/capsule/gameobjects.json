@@ -7,7 +7,7 @@
     "name": "capsule",
     "tag": "Untagged",
     "children": {
-        "$type": "UnityEngine.GameObject[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+        
         "$id": "56612866-732e-464c-9483-59af345709a5",
         "value": [
             {
@@ -19,12 +19,13 @@
                 "name": "mesh",
                 "tag": "Untagged",
                 "children": {
-                    "$type": "UnityEngine.GameObject[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                    
                     "$id": "f073594b-3a5d-45a1-9502-8f80634f9695",
                     "value": []
                 },
                 "components": {
                     "$type": "UnityEngine.Component[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                    
                     "$id": "486cca1e-15c7-49e7-b2a6-3937a5197a3c",
                     "value": [
                         {
@@ -82,12 +83,12 @@
                 "name": "NODE",
                 "tag": "Untagged",
                 "children": {
-                    "$type": "UnityEngine.GameObject[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                    
                     "$id": "f073594b-3a5d-45a1-9502-8f80634f9695",
                     "value": []
                 },
                 "components": {
-                    "$type": "UnityEngine.Component[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                    
                     "$id": "fde8e942-84ab-4777-bf8f-048c0e12058f",
                     "value": [
                         {
@@ -128,12 +129,12 @@
                 "name": "NODE",
                 "tag": "Untagged",
                 "children": {
-                    "$type": "UnityEngine.GameObject[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                    
                     "$id": "f073594b-3a5d-45a1-9502-8f80634f9695",
                     "value": []
                 },
                 "components": {
-                    "$type": "UnityEngine.Component[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                    
                     "$id": "92ac180f-b9f5-49b1-b6bf-f2ca82d326f8",
                     "value": [
                         {
@@ -174,12 +175,12 @@
                 "name": "controlFrameTransform",
                 "tag": "Untagged",
                 "children": {
-                    "$type": "UnityEngine.GameObject[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                    
                     "$id": "f073594b-3a5d-45a1-9502-8f80634f9695",
                     "value": []
                 },
                 "components": {
-                    "$type": "UnityEngine.Component[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                    
                     "$id": "4ea4817d-8cb0-4020-b16d-6736ff0bd4da",
                     "value": [
                         {
@@ -214,12 +215,12 @@
                 "name": "mesh (1)",
                 "tag": "Untagged",
                 "children": {
-                    "$type": "UnityEngine.GameObject[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                    
                     "$id": "f073594b-3a5d-45a1-9502-8f80634f9695",
                     "value": []
                 },
                 "components": {
-                    "$type": "UnityEngine.Component[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                    
                     "$id": "12928e5d-e430-4032-b50d-c91874367813",
                     "value": [
                         {
@@ -277,12 +278,12 @@
                 "name": "mesh (2)",
                 "tag": "Untagged",
                 "children": {
-                    "$type": "UnityEngine.GameObject[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                    
                     "$id": "f073594b-3a5d-45a1-9502-8f80634f9695",
                     "value": []
                 },
                 "components": {
-                    "$type": "UnityEngine.Component[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                    
                     "$id": "ccdde809-ee69-485d-ba34-f80e03cf8847",
                     "value": [
                         {
@@ -340,12 +341,12 @@
                 "name": "mesh (3)",
                 "tag": "Untagged",
                 "children": {
-                    "$type": "UnityEngine.GameObject[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                    
                     "$id": "f073594b-3a5d-45a1-9502-8f80634f9695",
                     "value": []
                 },
                 "components": {
-                    "$type": "UnityEngine.Component[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                    
                     "$id": "30e2f5f9-692a-4f3f-88b7-6e157e565dfc",
                     "value": [
                         {
@@ -397,7 +398,7 @@
         ]
     },
     "components": {
-        "$type": "UnityEngine.Component[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+        
         "$id": "6826fe44-7ca2-4ecd-946c-22d43f458e8f",
         "value": [
             {

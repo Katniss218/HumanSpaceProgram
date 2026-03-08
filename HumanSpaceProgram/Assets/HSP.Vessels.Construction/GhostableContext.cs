@@ -1,8 +1,13 @@
 
-namespace HSP.Vessels.Construction
+//namespace HSP.Vessels.Construction
+//{
+//    public static class GhostableContext
+//    {
+//        public const int Ghost = -2137042352;
+//    }
+//}
+
+namespace UnityPlus.Serialization.Ctx
 {
-    public static class GhostableContext
-    {
-        public const int Ghost = -2137042352;
-    }
+    public interface Ghost : IContext { }
 }

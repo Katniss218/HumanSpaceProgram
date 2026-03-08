@@ -7,7 +7,7 @@
     "name": "testlaunchsite",
     "tag": "Untagged",
     "children": {
-        "$type": "UnityEngine.GameObject[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+        
         "$id": "acfda209-8ae5-480e-ac7f-85855430a0c5",
         "value": [
             {
@@ -19,12 +19,12 @@
                 "name": "spawn",
                 "tag": "Untagged",
                 "children": {
-                    "$type": "UnityEngine.GameObject[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                    
                     "$id": "e5d57559-96ca-4a61-92b0-c0606530f90e",
                     "value": []
                 },
                 "components": {
-                    "$type": "UnityEngine.Component[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                    
                     "$id": "71de93fc-dd19-48c5-a75b-9cc6b9b6b92e",
                     "value": [
                         {
@@ -58,7 +58,7 @@
         ]
     },
     "components": {
-        "$type": "UnityEngine.Component[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+        
         "$id": "f935967a-0a5a-4257-9e96-e34bcfdf07ca",
         "value": [
             {

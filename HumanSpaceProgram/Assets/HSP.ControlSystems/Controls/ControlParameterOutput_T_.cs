@@ -1,17 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
 using UnityPlus.Serialization;
+using Ctx = UnityPlus.Serialization.Ctx;
 
 namespace HSP.ControlSystems.Controls
 {
-	/// <summary>
-	/// Represents a control that produces a parameter of type <typeparamref name="T"/>.
-	/// </summary>
-	public sealed class ControlParameterOutput<T> : ControlParameterOutputBase
+    /// <summary>
+    /// Represents a control that produces a parameter of type <typeparamref name="T"/>.
+    /// </summary>
+    public sealed class ControlParameterOutput<T> : ControlParameterOutputBase
 	{
 		internal Func<T> getter;
 
@@ -74,7 +72,7 @@ namespace HSP.ControlSystems.Controls
             return new MemberwiseDescriptor<ControlParameterOutput<T>>()
                 .WithReadonlyMember( "getter", o => o.getter )
                 .WithFactory<Func<T>>( onInvoke => new ControlParameterOutput<T>( onInvoke ), "getter" )
-                .WithMember( "connects_to", ArrayContext.Refs, o => o.inputs, ( o, value ) =>
+                .WithMember( "connects_to", typeof( Ctx.Array<Ctx.Ref> ), o => o.inputs, ( o, value ) =>
                 {
                     if( value == null )
                         return;

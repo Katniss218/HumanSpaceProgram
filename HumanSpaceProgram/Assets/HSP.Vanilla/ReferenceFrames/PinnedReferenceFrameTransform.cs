@@ -3,6 +3,7 @@ using HSP.Time;
 using System;
 using UnityEngine;
 using UnityPlus.Serialization;
+using Ctx = UnityPlus.Serialization.Ctx;
 
 namespace HSP.Vanilla
 {
@@ -426,7 +427,7 @@ namespace HSP.Vanilla
 
                 .WithMember( "DO_NOT_TOUCH", o => true, ( o, value ) => o._rb.isKinematic = true )
 
-                .WithMember( "reference_transform", ObjectContext.Ref, o => o.ReferenceTransform )
+                .WithMember( "reference_transform", typeof( Ctx.Ref ), o => o.ReferenceTransform )
                 .WithMember( "reference_position", o => o.ReferencePosition )
                 .WithMember( "reference_rotation", o => o.ReferenceRotation );
         }

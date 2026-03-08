@@ -121,7 +121,7 @@
 //        public static IDescriptor FBulkContainer_SphereMapping()
 //        {
 //            return new MemberwiseDescriptor<FBulkContainer_Sphere>()
-//                .WithMember( "volume_transform", ObjectContext.Ref, o => o.VolumeTransform )
+//                .WithMember( "volume_transform", typeof( Ctx.Ref ), o => o.VolumeTransform )
 //                .WithMember( "max_volume", o => o.MaxVolume )
 //                .WithMember( "radius",  o => o.Radius )
 //                .WithMember( "contents", o => o.Contents );

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityPlus.Serialization;
+using Ctx = UnityPlus.Serialization.Ctx;
 
 namespace HSP.CelestialBodies.Surfaces
 {
@@ -409,7 +410,7 @@ namespace HSP.CelestialBodies.Surfaces
                 .WithMember( "mode", o => o.Mode )
                 .WithMember( "edge_subdivisions", o => o.EdgeSubdivisions )
                 .WithMember( "max_depth", o => o.MaxDepth )
-                .WithMember( "materials", ArrayContext.Assets, o => o.Materials )
+                .WithMember( "materials", typeof( Ctx.Array<Ctx.Asset> ), o => o.Materials )
                 .WithMember( "poi_getter", o => o.PoIGetter )
                 .WithMember( "max_poi_distance_delta", o => o.MaxPOIDistanceDelta )
                 .WithMember( "jobs", o => o.Jobs, ( o, value ) => o.SetJobs( value ) );

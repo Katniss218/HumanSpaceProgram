@@ -1,6 +1,7 @@
 ﻿using HSP.Content;
 using HSP.Content.Vessels;
 using HSP.Content.Vessels.Serialization;
+using System;
 using System.IO;
 using UnityEngine;
 using UnityPlus.Serialization;
@@ -32,10 +33,19 @@ namespace HSP.Vanilla.Content.AssetLoaders
 
         public override GameObject Load( IForwardReferenceMap refMap )
         {
-            var data = new JsonSerializedDataHandler( Path.Combine( _filePath, "gameobjects.json" ) )
+            var data = new FileSerializedDataHandler( Path.Combine( _filePath, "gameobjects.json" ), JsonFormat.Instance )
                 .Read();
 
-            return SerializationUnit.Deserialize<GameObject>( data, refMap );
+            try
+            {
+                return SerializationUnit.Deserialize<GameObject>( data, refMap );
+            }
+            catch( Exception ex )
+            {
+                Debug.LogError( $"Failed to load part from {_filePath}: {ex.Message}" );
+                Debug.LogException( ex );
+                return null;
+            }
         }
 
         public static void ReloadParts()
