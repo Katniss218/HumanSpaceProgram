@@ -23,6 +23,11 @@ namespace UnityPlus.Serialization
         {
         }
 
+        public UPSUnresolvableObjectException( IReadonlySerializationContext ctx, string message, string path, IDescriptor descriptor, IMemberInfo member, string operation, Exception innerException )
+            : base( ctx, message, path, descriptor, member, operation, innerException )
+        {
+        }
+
 
 
         protected UPSUnresolvableObjectException( SerializationInfo info, StreamingContext context )

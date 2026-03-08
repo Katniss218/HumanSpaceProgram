@@ -124,17 +124,17 @@ namespace HSP.Vessels.Construction
 
         private void RunOriginalToGhost()
         {
-            foreach( var (component, data) in _cachedData )
+            foreach( var (component, data) in _cachedData.ToArray() )
             {
-                SerializationUnit.Populate<Component>( component, data.fwd );
+                SerializationUnit.Populate<Component>( component, data.fwd, _cachedRefStore );
             }
         }
 
         private void RunGhostToOriginal()
         {
-            foreach( var (component, data) in _cachedData )
+            foreach( var (component, data) in _cachedData.ToArray() )
             {
-                SerializationUnit.Populate<Component>( component, data.rev );
+                SerializationUnit.Populate<Component>( component, data.rev, _cachedRefStore );
             }
         }
 
@@ -154,46 +154,34 @@ namespace HSP.Vessels.Construction
         private void RecalculateGhostAndUnghostData()
         {
 #warning TODO - this runs in the VAB scene too, and saves the entire data twice, even if the current state is equal.
-            bool wasNull = _cachedData == null;
-            if( wasNull )
+            if( _cachedData != null )
+                return;
+
+            _cachedData = new Dictionary<Component, (SerializedData fwd, SerializedData rev)>();
+
+            _cachedRefStore.Clear();
+
+            // this entire thing could be ran once per entire vessel and cached until something is added/removed from it.
+            AncestralMap<FConstructible> partMap = AncestralMap<FConstructible>.Create( transform );
+            if( partMap.TryGetValue( this, out var ourPartsTransforms ) )
             {
-                _cachedData = new();
+                IEnumerable<Component> comps = ourPartsTransforms.SelectMany( t => t.GetComponents() );
 
-                _cachedRefStore.Clear();
-#warning TODO - FIXME BEFORE PUSH
-                // this entire thing could be ran once per entire vessel and cached until something is added/removed from it.
-                //AncestralMap<FConstructible> partMap = AncestralMap<FConstructible>.Create( transform );
-                //if( partMap.TryGetValue( this, out var ourPartsTransforms ) )
-                //{
-                //    IEnumerable<Component> comps = ourPartsTransforms.SelectMany( t => t.GetComponents() );
+                foreach( var comp in comps )
+                {
+                    SerializedData originalToGhost = SerializationUnit.Serialize<Component>( typeof( Ctx.Ghost ), comp, _cachedRefStore );
+                    if( originalToGhost == null ) // Only cache what can be ghosted - should probably be signified differently than == null, but it works for now.
+                        continue;
+                    SerializedData ghostToOriginal = SerializationUnit.Serialize<Component>( typeof( Ctx.Value ), comp, _cachedRefStore );
 
-                //    var su = SerializationUnit.FromObjects<Component>( GhostableContext.Ghost, comps );
+                    // TODO - remove keys from revObj, that aren't present in forwardObj.
+                    /*if( originalToGhost is SerializedObject forwardObj && ghostToOriginal is SerializedObject revObj )
+                    {
 
-                //    su.Serialize( _cachedRefStore );
+                    }*/
 
-                //    foreach( var originalToGhost in su.GetData().Where( d => d != null ) )
-                //    {
-                //        // Only cache things that are ghostable.
-                //        // This should probably be signified differently than by a null, but it works for now.
-
-                //        Component comp = (Component)_cachedRefStore.GetObj( originalToGhost[KeyNames.ID].DeserializeGuid() );
-                //        su = SerializationUnit.FromObjects<Component>( ObjectContext.Value, comp );
-
-                //        su.Serialize( _cachedRefStore );
-
-                //        var ghostToOriginal = su.GetData().First();
-
-                //        // TODO - remove keys from revObj, that aren't present in forwardObj.
-                //        /*if( originalToGhost is SerializedObject forwardObj && ghostToOriginal is SerializedObject revObj )
-                //        {
-
-                //        }*/
-
-                //        _cachedData.Add( comp, (originalToGhost, ghostToOriginal) );
-                //    }
-                //}
-
-
+                    _cachedData.Add( comp, (originalToGhost, ghostToOriginal) );
+                }
             }
         }
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace UnityPlus.Serialization
@@ -6,13 +7,30 @@ namespace UnityPlus.Serialization
     public readonly struct ComponentCollection
     {
         public readonly GameObject GameObject;
-        public ComponentCollection( GameObject go ) => GameObject = go;
+        public readonly Component[] CachedComponents;
+
+        public ComponentCollection( GameObject go )
+        {
+            GameObject = go;
+            CachedComponents = go.GetComponents<Component>();
+        }
     }
 
     public readonly struct ChildCollection
     {
         public readonly GameObject GameObject;
-        public ChildCollection( GameObject go ) => GameObject = go;
+        public readonly Transform[] CachedChildren;
+
+        public ChildCollection( GameObject go )
+        {
+            GameObject = go;
+            int count = go.transform.childCount;
+            CachedChildren = new Transform[count];
+            for( int i = 0; i < count; i++ )
+            {
+                CachedChildren[i] = go.transform.GetChild( i );
+            }
+        }
     }
 
     public class GameObjectDescriptor : CompositeDescriptor
@@ -56,8 +74,8 @@ namespace UnityPlus.Serialization
 
         public override object CreateInitialTarget( SerializedData data, SerializationContext ctx )
         {
-            // Pre-scan for RectTransform to determine creation method
-            bool hasRectTransform = false;
+            var go = new GameObject();
+            go.SetActive( false ); // Ensure it's inactive during population
 
             SerializedArray componentsArray = null;
             if( data is SerializedObject objRoot && objRoot.TryGetValue( KeyNames.COMPONENTS, out var compNode ) )
@@ -67,28 +85,10 @@ namespace UnityPlus.Serialization
 
             if( componentsArray != null )
             {
-                foreach( var cNode in componentsArray )
-                {
-                    if( cNode is SerializedObject cObj && Persistent_Type.TryReadTypeName( cObj, out string typeName ) )
-                    {
-                        if( typeName.Contains( "RectTransform" ) )
-                        {
-                            hasRectTransform = true;
-                            break;
-                        }
-                    }
-                }
-            }
+                // Track usage of existing components (e.g. Transform, or those added by RequireComponent)
+                // to prevent duplicates or double-counting.
+                var usedCounts = new Dictionary<Type, int>();
 
-            var go = hasRectTransform
-                ? new GameObject( "New Game Object", typeof( RectTransform ) )
-                : new GameObject();
-
-            go.SetActive( false ); // Ensure it's inactive during population
-
-            // Pre-instantiate components based on data types
-            if( componentsArray != null )
-            {
                 foreach( var cNode in componentsArray )
                 {
                     if( cNode is SerializedObject cObj && Persistent_Type.TryReadTypeName( cObj, out string typeName ) )
@@ -97,10 +97,22 @@ namespace UnityPlus.Serialization
 
                         if( type != null )
                         {
-                            // Don't add duplicates of Transform/RectTransform which are auto-created
-                            if( go.GetComponent( type ) == null )
+                            // Check if we already have an available component of this type
+                            var existing = go.GetComponents( type );
+                            int used = 0;
+                            if( usedCounts.TryGetValue( type, out int u ) )
+                                used = u;
+
+                            if( existing.Length > used )
                             {
-                                go.AddComponent( type );
+                                // Claim the existing one
+                                usedCounts[type] = used + 1;
+                            }
+                            else
+                            {
+                                // Add a new one
+                                go.GetTransformOrAddComponent( type );
+                                usedCounts[type] = used + 1;
                             }
                         }
                     }
@@ -185,7 +197,7 @@ namespace UnityPlus.Serialization
 
         public override int GetStepCount( object target )
         {
-            return ((ComponentCollection)target).GameObject.GetComponents<Component>().Length;
+            return ((ComponentCollection)target).CachedComponents.Length;
         }
 
         public override object Resize( object target, int newSize )
@@ -223,7 +235,7 @@ namespace UnityPlus.Serialization
 
             public object GetValue( object target )
             {
-                var components = ((ComponentCollection)target).GameObject.GetComponents<Component>();
+                var components = ((ComponentCollection)target).CachedComponents;
                 if( _index < components.Length )
                     return components[_index];
                 return null;
@@ -254,7 +266,7 @@ namespace UnityPlus.Serialization
 
         public override int GetStepCount( object target )
         {
-            return ((ChildCollection)target).GameObject.transform.childCount;
+            return ((ChildCollection)target).CachedChildren.Length;
         }
 
         public override object Resize( object target, int newSize )
@@ -264,7 +276,7 @@ namespace UnityPlus.Serialization
             {
                 UnityEngine.Object.DestroyImmediate( t.GetChild( i ).gameObject );
             }
-            return target;
+            return new ChildCollection( ((ChildCollection)target).GameObject );
         }
 
         public override IMemberInfo GetMemberInfo( int stepIndex )
@@ -297,9 +309,9 @@ namespace UnityPlus.Serialization
 
             public object GetValue( object target )
             {
-                Transform t = ((ChildCollection)target).GameObject.transform;
-                if( _index < t.childCount )
-                    return t.GetChild( _index ).gameObject;
+                var children = ((ChildCollection)target).CachedChildren;
+                if( _index < children.Length )
+                    return children[_index].gameObject;
                 return null;
             }
 

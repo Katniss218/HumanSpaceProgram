@@ -24,7 +24,6 @@
                     "value": []
                 },
                 "components": {
-                    "$type": "UnityEngine.Component[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
                     
                     "$id": "486cca1e-15c7-49e7-b2a6-3937a5197a3c",
                     "value": [

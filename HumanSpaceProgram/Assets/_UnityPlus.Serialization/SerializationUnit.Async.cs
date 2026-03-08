@@ -53,22 +53,34 @@ namespace UnityPlus.Serialization
         // --- Serialize Async ---
 
         public static Task<SerializedData> SerializeAsync<T>( T obj, float timeBudgetMs = 2f )
-            => SerializeAsync( ObjectContext.Default, obj, null, null, timeBudgetMs );
+            => SerializeAsync( ContextKey.Default, obj, null, null, timeBudgetMs );
 
         public static Task<SerializedData> SerializeAsync<T>( T obj, SerializationConfiguration config, float timeBudgetMs = 2f )
-            => SerializeAsync( ObjectContext.Default, obj, null, config, timeBudgetMs );
+            => SerializeAsync( ContextKey.Default, obj, null, config, timeBudgetMs );
+
+        public static Task<SerializedData> SerializeAsync<T>( T obj, IReverseReferenceMap refs, float timeBudgetMs = 2f )
+            => SerializeAsync( ContextKey.Default, obj, refs, null, timeBudgetMs );
+
+        public static Task<SerializedData> SerializeAsync<T>( T obj, IReverseReferenceMap refs, SerializationConfiguration config, float timeBudgetMs = 2f )
+            => SerializeAsync( ContextKey.Default, obj, refs, config, timeBudgetMs );
+
+        public static Task<SerializedData> SerializeAsync<T>( Type contextType, T obj, float timeBudgetMs = 2f )
+            => SerializeAsync( ContextRegistry.GetID( contextType ), obj, null, null, timeBudgetMs );
+
+        public static Task<SerializedData> SerializeAsync<T>( Type contextType, T obj, SerializationConfiguration config, float timeBudgetMs = 2f )
+            => SerializeAsync( ContextRegistry.GetID( contextType ), obj, null, config, timeBudgetMs );
+
+        public static Task<SerializedData> SerializeAsync<T>( Type contextType, T obj, IReverseReferenceMap s, float timeBudgetMs = 2f )
+            => SerializeAsync( ContextRegistry.GetID( contextType ), obj, s, null, timeBudgetMs );
+
+        public static Task<SerializedData> SerializeAsync<T>( Type contextType, T obj, IReverseReferenceMap s, SerializationConfiguration config, float timeBudgetMs = 2f )
+            => SerializeAsync( ContextRegistry.GetID( contextType ), obj, s, config, timeBudgetMs );
 
         public static Task<SerializedData> SerializeAsync<T>( ContextKey context, T obj, float timeBudgetMs = 2f )
             => SerializeAsync( context, obj, null, null, timeBudgetMs );
 
         public static Task<SerializedData> SerializeAsync<T>( ContextKey context, T obj, SerializationConfiguration config, float timeBudgetMs = 2f )
             => SerializeAsync( context, obj, null, config, timeBudgetMs );
-
-        public static Task<SerializedData> SerializeAsync<T>( T obj, IReverseReferenceMap refs, float timeBudgetMs = 2f )
-            => SerializeAsync( ObjectContext.Default, obj, refs, null, timeBudgetMs );
-
-        public static Task<SerializedData> SerializeAsync<T>( T obj, IReverseReferenceMap refs, SerializationConfiguration config, float timeBudgetMs = 2f )
-            => SerializeAsync( ObjectContext.Default, obj, refs, config, timeBudgetMs );
 
         public static Task<SerializedData> SerializeAsync<T>( ContextKey context, T obj, IReverseReferenceMap refs, float timeBudgetMs = 2f )
             => SerializeAsync( context, obj, refs, null, timeBudgetMs );
@@ -91,22 +103,34 @@ namespace UnityPlus.Serialization
         // --- Deserialize Async ---
 
         public static Task<T> DeserializeAsync<T>( SerializedData data, float timeBudgetMs = 2f )
-            => DeserializeAsync<T>( ObjectContext.Default, data, null, null, timeBudgetMs );
+            => DeserializeAsync<T>( ContextKey.Default, data, null, null, timeBudgetMs );
 
         public static Task<T> DeserializeAsync<T>( SerializedData data, SerializationConfiguration config, float timeBudgetMs = 2f )
-            => DeserializeAsync<T>( ObjectContext.Default, data, null, config, timeBudgetMs );
+            => DeserializeAsync<T>( ContextKey.Default, data, null, config, timeBudgetMs );
+
+        public static Task<T> DeserializeAsync<T>( SerializedData data, IForwardReferenceMap refs, float timeBudgetMs = 2f )
+            => DeserializeAsync<T>( ContextKey.Default, data, refs, null, timeBudgetMs );
+
+        public static Task<T> DeserializeAsync<T>( SerializedData data, IForwardReferenceMap refs, SerializationConfiguration config, float timeBudgetMs = 2f )
+            => DeserializeAsync<T>( ContextKey.Default, data, refs, config, timeBudgetMs );
+
+        public static Task<T> DeserializeAsync<T>( Type contextType, SerializedData data, float timeBudgetMs = 2f )
+            => DeserializeAsync<T>( ContextRegistry.GetID( contextType ), data, null, null, timeBudgetMs );
+
+        public static Task<T> DeserializeAsync<T>( Type contextType, SerializedData data, SerializationConfiguration config, float timeBudgetMs = 2f )
+            => DeserializeAsync<T>( ContextRegistry.GetID( contextType ), data, null, config, timeBudgetMs );
+
+        public static Task<T> DeserializeAsync<T>( Type contextType, SerializedData data, IForwardReferenceMap l, float timeBudgetMs = 2f )
+            => DeserializeAsync<T>( ContextRegistry.GetID( contextType ), data, l, null, timeBudgetMs );
+
+        public static Task<T> DeserializeAsync<T>( Type contextType, SerializedData data, IForwardReferenceMap l, SerializationConfiguration config, float timeBudgetMs = 2f )
+            => DeserializeAsync<T>( ContextRegistry.GetID( contextType ), data, l, config, timeBudgetMs );
 
         public static Task<T> DeserializeAsync<T>( ContextKey context, SerializedData data, float timeBudgetMs = 2f )
             => DeserializeAsync<T>( context, data, null, null, timeBudgetMs );
 
         public static Task<T> DeserializeAsync<T>( ContextKey context, SerializedData data, SerializationConfiguration config, float timeBudgetMs = 2f )
             => DeserializeAsync<T>( context, data, null, config, timeBudgetMs );
-
-        public static Task<T> DeserializeAsync<T>( SerializedData data, IForwardReferenceMap refs, float timeBudgetMs = 2f )
-            => DeserializeAsync<T>( ObjectContext.Default, data, refs, null, timeBudgetMs );
-
-        public static Task<T> DeserializeAsync<T>( SerializedData data, IForwardReferenceMap refs, SerializationConfiguration config, float timeBudgetMs = 2f )
-            => DeserializeAsync<T>( ObjectContext.Default, data, refs, config, timeBudgetMs );
 
         public static Task<T> DeserializeAsync<T>( ContextKey context, SerializedData data, IForwardReferenceMap refs, float timeBudgetMs = 2f )
             => DeserializeAsync<T>( context, data, refs, null, timeBudgetMs );
@@ -129,22 +153,34 @@ namespace UnityPlus.Serialization
         // --- Populate Async ---
 
         public static Task<T> PopulateAsync<T>( T obj, SerializedData data, float timeBudgetMs = 2f )
-            => PopulateAsync( ObjectContext.Default, obj, data, null, null, timeBudgetMs );
+            => PopulateAsync( ContextKey.Default, obj, data, null, null, timeBudgetMs );
 
         public static Task<T> PopulateAsync<T>( T obj, SerializedData data, SerializationConfiguration config, float timeBudgetMs = 2f )
-            => PopulateAsync( ObjectContext.Default, obj, data, null, config, timeBudgetMs );
+            => PopulateAsync( ContextKey.Default, obj, data, null, config, timeBudgetMs );
+
+        public static Task<T> PopulateAsync<T>( T obj, SerializedData data, IForwardReferenceMap refs, float timeBudgetMs = 2f )
+            => PopulateAsync( ContextKey.Default, obj, data, refs, null, timeBudgetMs );
+
+        public static Task<T> PopulateAsync<T>( T obj, SerializedData data, IForwardReferenceMap refs, SerializationConfiguration config, float timeBudgetMs = 2f )
+            => PopulateAsync( ContextKey.Default, obj, data, refs, config, timeBudgetMs );
+
+        public static Task<T> PopulateAsync<T>( Type contextType, T obj, SerializedData data, float timeBudgetMs = 2f ) where T : class
+            => PopulateAsync( ContextRegistry.GetID( contextType ), obj, data, null, null, timeBudgetMs );
+
+        public static Task<T> PopulateAsync<T>( Type contextType, T obj, SerializedData data, SerializationConfiguration config, float timeBudgetMs = 2f ) where T : class
+            => PopulateAsync( ContextRegistry.GetID( contextType ), obj, data, null, config, timeBudgetMs );
+
+        public static Task<T> PopulateAsync<T>( Type contextType, T obj, SerializedData data, IForwardReferenceMap l, float timeBudgetMs = 2f ) where T : class
+            => PopulateAsync( ContextRegistry.GetID( contextType ), obj, data, l, null, timeBudgetMs );
+
+        public static Task<T> PopulateAsync<T>( Type contextType, T obj, SerializedData data, IForwardReferenceMap l, SerializationConfiguration config, float timeBudgetMs = 2f ) where T : class
+            => PopulateAsync( ContextRegistry.GetID( contextType ), obj, data, l, config, timeBudgetMs );
 
         public static Task<T> PopulateAsync<T>( ContextKey context, T obj, SerializedData data, float timeBudgetMs = 2f )
             => PopulateAsync( context, obj, data, null, null, timeBudgetMs );
 
         public static Task<T> PopulateAsync<T>( ContextKey context, T obj, SerializedData data, SerializationConfiguration config, float timeBudgetMs = 2f )
             => PopulateAsync( context, obj, data, null, config, timeBudgetMs );
-
-        public static Task<T> PopulateAsync<T>( T obj, SerializedData data, IForwardReferenceMap refs, float timeBudgetMs = 2f )
-            => PopulateAsync( ObjectContext.Default, obj, data, refs, null, timeBudgetMs );
-
-        public static Task<T> PopulateAsync<T>( T obj, SerializedData data, IForwardReferenceMap refs, SerializationConfiguration config, float timeBudgetMs = 2f )
-            => PopulateAsync( ObjectContext.Default, obj, data, refs, config, timeBudgetMs );
 
         public static Task<T> PopulateAsync<T>( ContextKey context, T obj, SerializedData data, IForwardReferenceMap refs, float timeBudgetMs = 2f )
             => PopulateAsync( context, obj, data, refs, null, timeBudgetMs );
