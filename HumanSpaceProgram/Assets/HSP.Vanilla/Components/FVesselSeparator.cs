@@ -3,6 +3,7 @@ using HSP.ControlSystems.Controls;
 using HSP.Vessels;
 using UnityEngine;
 using UnityPlus.Serialization;
+using UnityPlus.Serialization.Descriptors;
 
 namespace HSP.Vanilla.Components
 {

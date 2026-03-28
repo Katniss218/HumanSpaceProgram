@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace UnityPlus.Serialization
+namespace UnityPlus.Serialization.Descriptors
 {
     public abstract class CollectionDescriptor : ICollectionDescriptor
     {
@@ -16,12 +16,19 @@ namespace UnityPlus.Serialization
 
         public virtual IEnumerator<IMemberInfo> GetMemberEnumerator( object target ) => null;
         public abstract object CreateInitialTarget( SerializedData data, SerializationContext ctx );
+        public virtual ObjectStructure DetermineObjectStructure( Type declaredType, Type actualType, SerializationConfiguration config, out bool needsId, out bool needsType )
+        {
+            SerializationHelpers.DetermineObjectStructure( declaredType, actualType, out needsId, out needsType );
+
+            if( (needsId || needsType) && !config.ForceStandardJson )
+            {
+                return ObjectStructure.Wrapped;
+            }
+            return ObjectStructure.Unwrapped;
+        }
 
         public virtual int GetConstructionStepCount( object target ) => 0;
         public object Construct( object initialTarget ) => initialTarget;
-
-        public virtual void OnSerializing( object target, SerializationContext context ) { }
-        public virtual void OnDeserialized( object target, SerializationContext context ) { }
 
         public virtual int GetMethodCount() => 0;
         public virtual IMethodInfo GetMethodInfo( int methodIndex ) => throw new IndexOutOfRangeException();

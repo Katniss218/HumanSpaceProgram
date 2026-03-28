@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityPlus.Serialization;
+using UnityPlus.Serialization.Descriptors;
 
 namespace HSP.Vessels
 {

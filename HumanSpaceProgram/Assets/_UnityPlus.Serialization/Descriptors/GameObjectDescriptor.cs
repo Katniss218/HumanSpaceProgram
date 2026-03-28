@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace UnityPlus.Serialization
+namespace UnityPlus.Serialization.Descriptors
 {
     public readonly struct ComponentCollection
     {
@@ -14,6 +14,9 @@ namespace UnityPlus.Serialization
             GameObject = go;
             CachedComponents = go.GetComponents<Component>();
         }
+
+        [MapsInheritingFrom( typeof( ComponentCollection ) )]
+        private static IDescriptor ProvideString() => new ComponentSequenceDescriptor();
     }
 
     public readonly struct ChildCollection
@@ -31,6 +34,9 @@ namespace UnityPlus.Serialization
                 CachedChildren[i] = go.transform.GetChild( i );
             }
         }
+
+        [MapsInheritingFrom( typeof( ChildCollection ) )]
+        private static IDescriptor ProvideString() => new ChildSequenceDescriptor();
     }
 
     public class GameObjectDescriptor : CompositeDescriptor
@@ -80,7 +86,7 @@ namespace UnityPlus.Serialization
             SerializedArray componentsArray = null;
             if( data is SerializedObject objRoot && objRoot.TryGetValue( KeyNames.COMPONENTS, out var compNode ) )
             {
-                componentsArray = SerializationHelpers.GetValueNode( compNode, ctx.Config.ForceStandardJson );
+                componentsArray = SerializationHelpers.GetValueNode( compNode );
             }
 
             if( componentsArray != null )
@@ -128,7 +134,7 @@ namespace UnityPlus.Serialization
         {
             public string Name { get; }
             public readonly int Index => -1;
-            public Type MemberType { get; }
+            public Type DeclaredType { get; }
             public IDescriptor TypeDescriptor { get; }
             public readonly bool RequiresWriteBack => false;
 
@@ -138,13 +144,13 @@ namespace UnityPlus.Serialization
             public PropertyMember( string name, Type type, Func<object, object> getter, RefSetter<object, object> setter )
             {
                 Name = name;
-                MemberType = type;
-                TypeDescriptor = TypeDescriptorRegistry.GetDescriptor( type );
+                DeclaredType = type;
+                TypeDescriptor = TypeDescriptorRegistry.GetDescriptor( type, ContextKey.Default );
                 _getter = getter;
                 _setter = setter;
             }
 
-            public ContextKey GetContext( object target ) => default;
+            public ContextKey GetContext( object target ) => ContextKey.Default;
 
             public object GetValue( object target ) => _getter( target );
             public void SetValue( ref object target, object value ) => _setter( ref target, value );
@@ -154,7 +160,7 @@ namespace UnityPlus.Serialization
         {
             public string Name { get; }
             public int Index => -1;
-            public Type MemberType { get; }
+            public Type DeclaredType { get; }
             public IDescriptor TypeDescriptor { get; }
             public bool RequiresWriteBack => false;
 
@@ -163,7 +169,7 @@ namespace UnityPlus.Serialization
             public VirtualListMember( string name, Type type, IDescriptor descriptor, Func<object, object> getter )
             {
                 Name = name;
-                MemberType = type;
+                DeclaredType = type;
                 TypeDescriptor = descriptor;
                 _getter = getter;
             }
@@ -197,6 +203,7 @@ namespace UnityPlus.Serialization
 
         public override int GetStepCount( object target )
         {
+            Debug.Log( "B" );
             return ((ComponentCollection)target).CachedComponents.Length;
         }
 
@@ -219,7 +226,7 @@ namespace UnityPlus.Serialization
         {
             public string Name => null; // Array element
             public int Index => _index;
-            public Type MemberType => typeof( Component );
+            public Type DeclaredType => typeof( Component );
             public IDescriptor TypeDescriptor { get; }
             public bool RequiresWriteBack => false;
 
@@ -293,7 +300,7 @@ namespace UnityPlus.Serialization
         {
             public string Name => null;
             public int Index => _index;
-            public Type MemberType => typeof( GameObject );
+            public Type DeclaredType => typeof( GameObject );
             public IDescriptor TypeDescriptor { get; }
             public bool RequiresWriteBack => false;
 

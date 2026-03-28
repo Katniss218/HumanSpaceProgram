@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
+using UnityPlus.Serialization.Descriptors;
 
 namespace UnityPlus.Serialization
 {
@@ -53,7 +54,8 @@ namespace UnityPlus.Serialization
                         var extAttributes = method.GetCustomAttributes<ExtendsMappingOfAttribute>( false );
                         foreach( var attr in extAttributes )
                         {
-                            var key = (attr.TargetType, attr.Context);
+                            int contextId = ContextRegistry.GetID( attr.ContextType ).ID;
+                            var key = (attr.TargetType, contextId);
                             if( !_extensions.ContainsKey( key ) )
                                 _extensions[key] = new List<MethodInfo>();
 
@@ -64,17 +66,24 @@ namespace UnityPlus.Serialization
                         var providerAttributes = method.GetCustomAttributes<MappingProviderAttribute>( false );
                         foreach( var attr in providerAttributes )
                         {
-                            if( !typeof( IDescriptor ).IsAssignableFrom( method.ReturnType ) ) continue;
+                            if( !typeof( IDescriptor ).IsAssignableFrom( method.ReturnType ) ) 
+                                continue;
 
-                            IEnumerable<int> targetContexts;
+                            int[] targetContexts;
                             if( attr.ContextType != null )
                             {
-                                int id = ContextRegistry.GetID( attr.ContextType ).ID;
-                                targetContexts = new int[] { id };
+                                targetContexts = new int[attr.ContextTypes.Length];
+                                for( int i = 0; i < attr.ContextTypes.Length; i++ )
+                                {
+                                    int contextId = ContextRegistry.GetID( attr.ContextType ).ID;
+                                    targetContexts[i] = contextId;
+                                }
                             }
                             else
                             {
+#pragma warning disable CS0618 // Type or member is obsolete
                                 targetContexts = attr.Contexts;
+#pragma warning restore CS0618
                             }
 
                             foreach( var ctx in targetContexts )
@@ -99,7 +108,6 @@ namespace UnityPlus.Serialization
                             }
                         }
                     }
-
                 }
             }
 
@@ -187,40 +195,40 @@ namespace UnityPlus.Serialization
                 // --- 2. Inheritance Hierarchy (Specific Bases) ---
                 if( _inheritingSearcher.TryGet( contextId, type, out method ) )
                 {
-                    var desc = InvokeProvider( method, type, context );
+                    IDescriptor desc = InvokeProvider( method, type, context );
                     if( desc != null ) return desc;
                 }
 
                 // --- 3. Interfaces ---
                 if( _implementingSearcher.TryGet( contextId, type, out method ) )
                 {
-                    var desc = InvokeProvider( method, type, context );
+                    IDescriptor desc = InvokeProvider( method, type, context );
                     if( desc != null ) return desc;
                 }
 
                 // --- 5. Category Fallbacks (Any Class/Struct/Interface) ---
                 if( _anyClassSearcher.TryGet( contextId, type, out method ) )
                 {
-                    var desc = InvokeProvider( method, type, context );
+                    IDescriptor desc = InvokeProvider( method, type, context );
                     if( desc != null ) return desc;
                 }
 
                 if( _anyStructSearcher.TryGet( contextId, type, out method ) )
                 {
-                    var desc = InvokeProvider( method, type, context );
+                    IDescriptor desc = InvokeProvider( method, type, context );
                     if( desc != null ) return desc;
                 }
 
                 if( _anyInterfaceSearcher.TryGet( contextId, type, out method ) )
                 {
-                    var desc = InvokeProvider( method, type, context );
+                    IDescriptor desc = InvokeProvider( method, type, context );
                     if( desc != null ) return desc;
                 }
 
                 // --- 6. Absolute Fallback (Any) ---
                 if( _anySearcher.TryGet( contextId, type, out method ) )
                 {
-                    var desc = InvokeProvider( method, type, context );
+                    IDescriptor desc = InvokeProvider( method, type, context );
                     if( desc != null ) return desc;
                 }
 
@@ -260,11 +268,6 @@ namespace UnityPlus.Serialization
                 }
                 else
                 {
-                    /*
-                    if( method.GetGenericArguments().Length != objType.GetGenericArguments().Length )
-                    {
-                        throw new InvalidOperationException( $"Couldn't initialize mapping from method `{method}` (mapped type: `{objType}`). Number of generic parameters on the method doesn't match the number of generic parameters on the mapped type." );
-                    }*/
                     genericArgs = Type.EmptyTypes;
                 }
 
@@ -309,6 +312,10 @@ namespace UnityPlus.Serialization
                 if( paramsInfo.Length == 1 && paramsInfo[0].ParameterType == typeof( ContextKey ) )
                 {
                     args = new object[] { context };
+                }
+                if( paramsInfo.Length == 2 && paramsInfo[0].ParameterType == typeof( ContextKey ) && paramsInfo[1].ParameterType == typeof( Type ) )
+                {
+                    args = new object[] { context, targetType };
                 }
 
                 return (IDescriptor)method.Invoke( null, args );

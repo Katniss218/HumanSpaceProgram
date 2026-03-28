@@ -2,6 +2,7 @@ using HSP.ReferenceFrames;
 using HSP.Time;
 using UnityEngine;
 using UnityPlus.Serialization;
+using UnityPlus.Serialization.Descriptors;
 
 namespace HSP.Aerodynamics
 {

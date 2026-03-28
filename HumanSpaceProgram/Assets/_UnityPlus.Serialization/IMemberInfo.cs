@@ -20,12 +20,12 @@ namespace UnityPlus.Serialization
         /// <summary>
         /// The C# type associated with this member ("storage location", not instance).
         /// </summary>
-        Type MemberType { get; }
+        Type DeclaredType { get; }
 
         /// <summary>
         /// The descriptor that handles this member's declared type.
         /// <para>
-        /// This should return the descriptor for <see cref="MemberType"/>, NOT the runtime type of the value.
+        /// This should return the descriptor for <see cref="DeclaredType"/>, NOT the runtime type of the value.
         /// Polymorphism is handled by the SerializationStrategy.
         /// </para>
         /// </summary>
@@ -36,6 +36,7 @@ namespace UnityPlus.Serialization
         /// </summary>
         bool RequiresWriteBack { get; }
 
+#warning TODO - this should also be overloaded for value and data separately.
         /// <summary>
         /// The serialization context used to resolve the descriptor for this member.
         /// </summary>

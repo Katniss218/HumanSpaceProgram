@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityPlus.Serialization;
+using UnityPlus.Serialization.Descriptors;
 
 namespace HSP.Settings
 {

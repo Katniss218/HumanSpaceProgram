@@ -3,6 +3,7 @@ using HSP.Timelines;
 using HSP.Vessels.Construction;
 using UnityEngine;
 using UnityPlus.Serialization;
+using UnityPlus.Serialization.Descriptors;
 
 namespace HSP.Vanilla.Settings
 {

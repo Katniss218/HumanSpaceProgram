@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace UnityPlus.Serialization
+namespace UnityPlus.Serialization.Descriptors
 {
     /// <summary>
     /// A descriptor that handles Nullable{T} by delegating to the descriptor of T.
@@ -15,6 +15,11 @@ namespace UnityPlus.Serialization
         public NullableDescriptor( ContextKey context )
         {
             _underlyingDescriptor = TypeDescriptorRegistry.GetDescriptor( typeof( T ), context );
+        }
+
+        internal NullableDescriptor( IDescriptor underlyingDescriptor )
+        {
+            _underlyingDescriptor = underlyingDescriptor;
         }
 
         public object CreateInitialTarget( SerializedData data, SerializationContext context )
@@ -35,6 +40,11 @@ namespace UnityPlus.Serialization
             // But we want it to behave like one if T is primitive.
 
             return Activator.CreateInstance<T>();
+        }
+
+        public ObjectStructure DetermineObjectStructure( Type declaredType, Type actualType, SerializationConfiguration config, out bool needsId, out bool needsType )
+        {
+            return _underlyingDescriptor.DetermineObjectStructure( declaredType, actualType, config, out needsId, out needsType );
         }
 
         public object Construct( object initialTarget )
@@ -106,17 +116,17 @@ namespace UnityPlus.Serialization
 
         public void OnSerializing( object target, SerializationContext context )
         {
-            if( target != null && _underlyingDescriptor is ICompositeDescriptor comp )
+            if( target != null && _underlyingDescriptor is ISerializationCallbackDescriptor callbackDesc )
             {
-                comp.OnSerializing( target, context );
+                callbackDesc.OnSerializing( target, context );
             }
         }
 
         public void OnDeserialized( object target, SerializationContext context )
         {
-            if( target != null && _underlyingDescriptor is ICompositeDescriptor comp )
+            if( target != null && _underlyingDescriptor is ISerializationCallbackDescriptor callbackDesc )
             {
-                comp.OnDeserialized( target, context );
+                callbackDesc.OnDeserialized( target, context );
             }
         }
     }
@@ -133,6 +143,11 @@ namespace UnityPlus.Serialization
         public NullablePrimitiveDescriptor( ContextKey context )
         {
             _underlyingDescriptor = (IPrimitiveDescriptor)TypeDescriptorRegistry.GetDescriptor( typeof( T ), context );
+        }
+
+        internal NullablePrimitiveDescriptor( IPrimitiveDescriptor underlyingDescriptor )
+        {
+            _underlyingDescriptor = underlyingDescriptor;
         }
 
         public void SerializeDirect( object target, ref SerializedData data, SerializationContext ctx )
@@ -162,6 +177,11 @@ namespace UnityPlus.Serialization
 
             return _underlyingDescriptor.CreateInitialTarget( data, ctx );
         }
+
+        public ObjectStructure DetermineObjectStructure( Type declaredType, Type actualType, SerializationConfiguration config, out bool needsId, out bool needsType )
+        {
+            return _underlyingDescriptor.DetermineObjectStructure( declaredType, actualType, config, out needsId, out needsType );
+        }
     }
 
     public static class NullableDescriptorProvider
@@ -169,7 +189,15 @@ namespace UnityPlus.Serialization
         [MapsInheritingFrom( typeof( Nullable<> ) )]
         public static IDescriptor GetNullableDescriptor<T>( ContextKey context ) where T : struct
         {
-            return new NullablePrimitiveDescriptor<T>( context );
+            IDescriptor underlyingDesc = TypeDescriptorRegistry.GetDescriptor( typeof( T ), context );
+
+            if( underlyingDesc == null )
+                return null;
+
+            if( underlyingDesc is IPrimitiveDescriptor primitiveDesc )
+                return new NullablePrimitiveDescriptor<T>( primitiveDesc );
+
+            return new NullableDescriptor<T>( context );
         }
     }
 }

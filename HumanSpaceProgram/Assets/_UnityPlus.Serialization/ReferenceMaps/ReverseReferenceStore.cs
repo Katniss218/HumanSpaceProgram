@@ -11,7 +11,7 @@ namespace UnityPlus.Serialization.ReferenceMaps
     /// </summary>
     public class ReverseReferenceStore : IReverseReferenceMap
     {
-        private readonly Dictionary<object, Guid> _reverse = new Dictionary<object, Guid>();
+        private readonly Dictionary<object, Guid> _reverse = new( ReferenceEqualityComparer.Instance );
 
         public ReverseReferenceStore() { }
 

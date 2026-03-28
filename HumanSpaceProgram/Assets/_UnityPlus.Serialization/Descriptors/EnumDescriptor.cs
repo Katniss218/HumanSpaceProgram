@@ -13,12 +13,15 @@ namespace UnityPlus.Serialization
         /// </summary>
         String
     }
+}
 
+namespace UnityPlus.Serialization.Descriptors
+{
     public class EnumDescriptor<T> : PrimitiveDescriptor<T> where T : struct, Enum
     {
         private readonly EnumSerializationMode _mode;
 
-        public EnumDescriptor() : this( EnumSerializationMode.Integer )
+        public EnumDescriptor() : this( EnumSerializationMode.String )
         {
         }
 
@@ -43,24 +46,24 @@ namespace UnityPlus.Serialization
         public override DeserializationResult DeserializeDirect( SerializedData data, SerializationContext ctx, out object result )
         {
             result = default( T );
-            if( data is SerializedPrimitive prim )
+            if( data is not SerializedPrimitive prim )
+                return DeserializationResult.Failed;
+
+            if( _mode == EnumSerializationMode.String )
             {
-                // Reading String
-                if( prim._type == SerializedPrimitive.DataType.String )
+                if( prim.TryGetString( out string val ) && Enum.TryParse<T>( val, true, out var res ) )
                 {
-                    if( Enum.TryParse<T>( (string)prim, true, out var res ) )
-                    {
-                        result = res;
-                        return DeserializationResult.Success;
-                    }
-                }
-                // Reading Number
-                else if( prim._type == SerializedPrimitive.DataType.Int64 )
-                {
-                    result = Enum.ToObject( typeof( T ), (long)prim );
+                    result = res;
                     return DeserializationResult.Success;
                 }
+                ctx.Log.Log( LogLevel.Warning, $"Failed to parse enum value '{prim}' for type '{typeof( T ).FullName}'." );
             }
+            else
+            {
+                result = Enum.ToObject( typeof( T ), (long)prim );
+                return DeserializationResult.Success;
+            }
+
             return DeserializationResult.Failed;
         }
     }

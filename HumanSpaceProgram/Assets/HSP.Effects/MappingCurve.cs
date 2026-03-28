@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityPlus.Serialization;
+using UnityPlus.Serialization.Descriptors;
 
 namespace HSP.Effects
 {

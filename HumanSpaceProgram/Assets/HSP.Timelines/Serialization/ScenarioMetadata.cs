@@ -5,6 +5,7 @@ using System.IO;
 using UnityEngine;
 using UnityPlus.AssetManagement;
 using UnityPlus.Serialization;
+using UnityPlus.Serialization.Descriptors;
 using UnityPlus.Serialization.Formats;
 using Version = HSP.Content.Version;
 
@@ -146,7 +147,7 @@ namespace HSP.Timelines.Serialization
 
             ScenarioMetadata scenarioMetadata = new ScenarioMetadata( scenarioId );
 
-            JsonSerializedDataHandler handler = new JsonSerializedDataHandler( filePath );
+            FileSerializedDataHandler handler = new FileSerializedDataHandler( filePath, JsonFormat.Instance );
             var data = handler.Read();
             SerializationUnit.Populate( scenarioMetadata, data );
             return scenarioMetadata;
@@ -161,7 +162,7 @@ namespace HSP.Timelines.Serialization
 
             var data = SerializationUnit.Serialize( this );
 
-            JsonSerializedDataHandler handler = new JsonSerializedDataHandler( filePath );
+            FileSerializedDataHandler handler = new FileSerializedDataHandler( filePath, JsonFormat.Instance );
             handler.Write( data );
         }
 

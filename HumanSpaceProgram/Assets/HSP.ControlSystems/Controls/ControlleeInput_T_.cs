@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using UnityPlus.Serialization;
+using UnityPlus.Serialization.Descriptors;
 using Ctx = UnityPlus.Serialization.Ctx;
 
 namespace HSP.ControlSystems.Controls

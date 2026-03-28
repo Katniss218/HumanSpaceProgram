@@ -6,6 +6,7 @@ using HSP.Vessels;
 using System;
 using UnityEngine;
 using UnityPlus.Serialization;
+using UnityPlus.Serialization.Descriptors;
 using static HSP.Vanilla.Components.IPropulsion;
 using Ctx = UnityPlus.Serialization.Ctx;
 

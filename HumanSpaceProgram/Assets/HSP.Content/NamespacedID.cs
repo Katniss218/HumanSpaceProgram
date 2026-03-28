@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using UnityPlus.Serialization;
+using UnityPlus.Serialization.Descriptors;
 
 namespace HSP.Content
 {

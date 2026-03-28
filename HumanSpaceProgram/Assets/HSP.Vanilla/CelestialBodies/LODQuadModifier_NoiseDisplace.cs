@@ -3,6 +3,7 @@ using System;
 using Unity.Collections;
 using UnityEngine;
 using UnityPlus.Serialization;
+using UnityPlus.Serialization.Descriptors;
 
 namespace HSP.Vanilla.CelestialBodies
 {

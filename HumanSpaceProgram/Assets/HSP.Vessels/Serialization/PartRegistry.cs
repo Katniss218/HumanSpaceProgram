@@ -12,7 +12,7 @@ namespace HSP.Content.Vessels
     /// </summary>
     public static class PartRegistry
     {
-        private static Dictionary<NamespacedID, PartFactory> _registry = new Dictionary<NamespacedID, PartFactory>();
+        private static readonly Dictionary<NamespacedID, PartFactory> _registry = new();
 
         /// <summary>
         /// Registers a Unity hierarchy factory under the specified mod and part IDs.
@@ -29,7 +29,7 @@ namespace HSP.Content.Vessels
         {
             _registry.Remove( namespacedPartId );
         }
-        
+
         public static void UnregisterAll()
         {
             _registry.Clear();
@@ -38,13 +38,26 @@ namespace HSP.Content.Vessels
         /// <summary>
         /// Loads all registered part metadata from their sources.
         /// </summary>
+        /// <returns>An array of all loaded part metadata. Skips entries that failed to load.</returns>
         public static PartMetadata[] LoadAllMetadata()
         {
-            List<PartMetadata> assets = new List<PartMetadata>();
+            List<PartMetadata> assets = new();
 
             foreach( var kvp in _registry )
             {
-                assets.Add( kvp.Value.LoadMetadata() );
+                PartMetadata m;
+                try
+                {
+                    m = kvp.Value.LoadMetadata();
+                }
+                catch( Exception ex )
+                {
+                    Debug.LogError( $"Failed to load part metadata for {kvp.Key}: {ex.Message}" );
+                    Debug.LogException( ex );
+                    continue;
+                }
+
+                assets.Add( m );
             }
 
             return assets.ToArray();
@@ -53,15 +66,28 @@ namespace HSP.Content.Vessels
         /// <summary>
         /// Loads all registered part metadata from a specified mod from their sources.
         /// </summary>
+        /// <returns>An array of all loaded part metadata. Skips entries that failed to load.</returns>
         public static PartMetadata[] LoadAllMetadata( string modId )
         {
-            List<PartMetadata> assets = new List<PartMetadata>();
+            List<PartMetadata> assets = new();
 
             foreach( var kvp in _registry )
             {
                 if( kvp.Key.ModID == modId )
                 {
-                    assets.Add( kvp.Value.LoadMetadata() );
+                    PartMetadata m;
+                    try
+                    {
+                        m = kvp.Value.LoadMetadata();
+                    }
+                    catch( Exception ex )
+                    {
+                        Debug.LogError( $"Failed to load part metadata for {kvp.Key}: {ex.Message}" );
+                        Debug.LogException( ex );
+                        continue;
+                    }
+
+                    assets.Add( m );
                 }
             }
 
@@ -71,6 +97,7 @@ namespace HSP.Content.Vessels
         /// <summary>
         /// Loads a specified registered part metadata from its source.
         /// </summary>
+        [Obsolete( "Use TryLoadMetadata." )]
         public static PartMetadata LoadMetadata( NamespacedID namespacedPartId )
         {
             if( _registry.TryGetValue( namespacedPartId, out PartFactory factory ) )
@@ -82,8 +109,32 @@ namespace HSP.Content.Vessels
         }
 
         /// <summary>
+        /// Loads a specified registered part metadata from its source.
+        /// </summary>
+        public static bool TryLoadMetadata( NamespacedID namespacedPartId, out PartMetadata metadata )
+        {
+            if( _registry.TryGetValue( namespacedPartId, out PartFactory factory ) )
+            {
+                try
+                {
+                    metadata = factory.LoadMetadata();
+                    return true;
+                }
+                catch( Exception ex )
+                {
+                    Debug.LogError( $"Failed to load part metadata for {namespacedPartId}: {ex.Message}" );
+                    Debug.LogException( ex );
+                }
+            }
+
+            metadata = null;
+            return false;
+        }
+
+        /// <summary>
         /// Loads a specified registered unity hierarchy from its source.
         /// </summary>
+        [Obsolete( "Use TryLoad." )]
         public static GameObject Load( NamespacedID namespacedPartId )
         {
             if( _registry.TryGetValue( namespacedPartId, out PartFactory factory ) )
@@ -93,10 +144,11 @@ namespace HSP.Content.Vessels
 
             return null;
         }
-
+        
         /// <summary>
         /// Loads a specified registered unity hierarchy from its source.
         /// </summary>
+        [Obsolete( "Use TryLoad." )]
         public static GameObject Load( NamespacedID namespacedPartId, IForwardReferenceMap refMap )
         {
             if( refMap == null )
@@ -110,6 +162,37 @@ namespace HSP.Content.Vessels
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// Loads a specified registered unity hierarchy from its source.
+        /// </summary>
+        public static bool TryLoad( NamespacedID namespacedPartId, out GameObject gameObject )
+        {
+            return TryLoad( namespacedPartId, new ForwardReferenceStore(), out gameObject );
+        }
+
+        /// <summary>
+        /// Loads a specified registered unity hierarchy from its source.
+        /// </summary>
+        public static bool TryLoad( NamespacedID namespacedPartId, IForwardReferenceMap refMap, out GameObject gameObject )
+        {
+            if( _registry.TryGetValue( namespacedPartId, out PartFactory factory ) )
+            {
+                try
+                {
+                    gameObject = factory.Load( refMap );
+                    return true;
+                }
+                catch( Exception ex )
+                {
+                    Debug.LogError( $"Failed to load part data for '{namespacedPartId}': {ex.Message}" );
+                    Debug.LogException( ex );
+                }
+            }
+
+            gameObject = null;
+            return false;
         }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace UnityPlus.Serialization
 {
@@ -9,27 +8,55 @@ namespace UnityPlus.Serialization
     /// </summary>
     public class ExecutionStack
     {
-        // We use List instead of Stack to allow index-based access for updating parent cursors.
-        private readonly List<SerializationCursor> _stack = new List<SerializationCursor>( 64 );
+        private SerializationCursor[] _stack = new SerializationCursor[64];
+        private int _count = 0;
 
-        public int Count => _stack.Count;
+        public int Count => _count;
 
-        /// <summary>
-        /// Provides read-only access to the stack frames for diagnostics/path building.
-        /// Index 0 is the Root. Index Count-1 is the Current (Top).
-        /// </summary>
-        public IReadOnlyList<SerializationCursor> Frames => _stack;
-
-        public void Push( SerializationCursor cursor )
+        public SerializationCursor this[int index]
         {
-            _stack.Add( cursor );
+            get
+            {
+                if( index < 0 || index >= _count )
+                    throw new IndexOutOfRangeException();
+                return _stack[index];
+            }
+        }
+
+        public void Push( SerializationCursor cursor, int maxDepth = int.MaxValue )
+        {
+            if( _count >= maxDepth )
+                throw new InvalidOperationException( $"Maximum recursion depth of {maxDepth} exceeded." );
+
+            if( _count == _stack.Length )
+            {
+                Array.Resize( ref _stack, _stack.Length * 2 );
+            }
+
+            _stack[_count++] = cursor;
         }
 
         public SerializationCursor Peek()
         {
-            if( _stack.Count == 0 )
+            if( _count == 0 )
                 throw new InvalidOperationException( "Stack is empty" );
-            return _stack[_stack.Count - 1];
+            return _stack[_count - 1];
+        }
+
+        public void UpdateTop( ref SerializationCursor cursor )
+        {
+            if( _count == 0 )
+                throw new InvalidOperationException( "Stack is empty" );
+
+            _stack[_count - 1] = cursor;
+        }
+
+        public void UpdateAt( int index, ref SerializationCursor cursor )
+        {
+            if( index < 0 || index >= _count )
+                throw new IndexOutOfRangeException();
+
+            _stack[index] = cursor;
         }
 
         /// <summary>
@@ -37,12 +64,12 @@ namespace UnityPlus.Serialization
         /// </summary>
         public SerializationCursor PopAndWriteback()
         {
-            if( _stack.Count == 0 )
+            if( _count == 0 )
                 throw new InvalidOperationException( "Stack is empty" );
 
-            int topIndex = _stack.Count - 1;
+            int topIndex = --_count;
             SerializationCursor cursor = _stack[topIndex];
-            _stack.RemoveAt( topIndex );
+            _stack[topIndex] = default; // Clear reference
 
             if( cursor.WriteBackOnPop && cursor.TargetObj.Parent != null )
             {
@@ -58,12 +85,12 @@ namespace UnityPlus.Serialization
         /// </summary>
         public SerializationCursor Pop()
         {
-            if( _stack.Count == 0 ) 
+            if( _count == 0 )
                 throw new InvalidOperationException( "Stack is empty" );
 
-            int topIndex = _stack.Count - 1;
+            int topIndex = --_count;
             SerializationCursor cursor = _stack[topIndex];
-            _stack.RemoveAt( topIndex );
+            _stack[topIndex] = default; // Clear reference
 
             return cursor;
         }
@@ -94,9 +121,9 @@ namespace UnityPlus.Serialization
         {
             // Scan down the stack to find the cursor that owns 'oldTarget'.
             // It will be near the top.
-            for( int i = _stack.Count - 1; i >= 0; i-- )
+            for( int i = _count - 1; i >= 0; i-- )
             {
-                // We have to copy the struct, modify it, and assign it back to the list.
+                // We have to copy the struct, modify it, and assign it back to the array.
                 var cursor = _stack[i];
 
                 if( ReferenceEquals( cursor.TargetObj.Target, oldTarget ) )
@@ -114,7 +141,21 @@ namespace UnityPlus.Serialization
 
         public void Clear()
         {
-            _stack.Clear();
+            Array.Clear( _stack, 0, _count );
+            _count = 0;
+        }
+
+        public bool ContainsTarget( object target )
+        {
+            if( target == null ) return false;
+            var stack = _stack;
+            int count = _count;
+            for( int i = 0; i < count; i++ )
+            {
+                if( ReferenceEquals( stack[i].TargetObj.Target, target ) )
+                    return true;
+            }
+            return false;
         }
     }
 }

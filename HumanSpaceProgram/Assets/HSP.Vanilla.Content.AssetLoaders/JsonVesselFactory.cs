@@ -41,16 +41,7 @@ namespace HSP.Vanilla.Content.AssetLoaders
             var data = new FileSerializedDataHandler( Path.Combine( filePath, "gameobjects.json" ), JsonFormat.Instance )
                 .Read();
 
-            try
-            {
-                return SerializationUnit.Deserialize<GameObject>( data, refMap );
-            }
-            catch( Exception ex )
-            {
-                Debug.LogError( $"Failed to load part from {filePath}: {ex.Message}" );
-                Debug.LogException( ex );
-                return null;
-            }
+            return SerializationUnit.Deserialize<GameObject>( data, refMap );
         }
 
         public static void ReloadVesselsAsParts()

@@ -15,5 +15,10 @@ namespace UnityPlus.Serialization
         /// For immutable types (constructor injection), this is an object[] buffer.
         /// </summary>
         object CreateInitialTarget( SerializedData data, SerializationContext ctx );
+
+        /// <summary>
+        /// Determines the object structure (wrapped, unwrapped, inline metadata) and whether it needs ID or Type metadata.
+        /// </summary>
+        ObjectStructure DetermineObjectStructure( Type declaredType, Type actualType, SerializationConfiguration config, out bool needsId, out bool needsType );
     }    
 }

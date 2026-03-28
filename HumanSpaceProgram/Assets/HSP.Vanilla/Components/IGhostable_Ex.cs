@@ -2,13 +2,13 @@
 using UnityEngine;
 using UnityPlus.AssetManagement;
 using UnityPlus.Serialization;
-using Ctx = UnityPlus.Serialization.Ctx;
+using UnityPlus.Serialization.Descriptors;
 
 namespace HSP.Vanilla.Components
 {
     public static class IGhostable_Ex
     {
-        [MapsInheritingFrom( typeof( Renderer ), ContextType = typeof( Ctx.Ghost ) )]
+        [MapsInheritingFrom( typeof( Renderer ), ContextType = typeof( Vessels.Construction.Contexts.Ctx.Ghost ) )]
         public static IDescriptor RendererMapping()
         {
             return new MemberwiseDescriptor<Renderer>()
@@ -17,14 +17,14 @@ namespace HSP.Vanilla.Components
                    ( o, value ) => o.sharedMaterials = value );
         }
 
-        [MapsInheritingFrom( typeof( Collider ), ContextType = typeof( Ctx.Ghost ) )]
+        [MapsInheritingFrom( typeof( Collider ), ContextType = typeof( Vessels.Construction.Contexts.Ctx.Ghost ) )]
         public static IDescriptor ColliderMapping()
         {
             return new MemberwiseDescriptor<Collider>()
                 .WithMember( "is_trigger", o => true, ( o, value ) => o.isTrigger = value );
         }
 
-        [MapsInheritingFrom( typeof( FPointMass ), ContextType = typeof( Ctx.Ghost ) )]
+        [MapsInheritingFrom( typeof( FPointMass ), ContextType = typeof( Vessels.Construction.Contexts.Ctx.Ghost ) )]
         public static IDescriptor FPointMassMapping()
         {
             return new MemberwiseDescriptor<FPointMass>()

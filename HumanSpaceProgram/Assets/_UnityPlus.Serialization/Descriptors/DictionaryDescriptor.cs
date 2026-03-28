@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace UnityPlus.Serialization
+namespace UnityPlus.Serialization.Descriptors
 {
     public class DictionaryDescriptor<TDict, TKey, TValue> : CollectionDescriptor, ICollectionDescriptorWithContext where TDict : IDictionary<TKey, TValue>, new()
     {
@@ -74,7 +74,7 @@ namespace UnityPlus.Serialization
         {
             public string Name => null;
             public int Index => _index;
-            public Type MemberType => typeof( KeyValuePair<TKey, TValue> );
+            public Type DeclaredType => typeof( KeyValuePair<TKey, TValue> );
             public bool RequiresWriteBack => true;
 
             public IDescriptor TypeDescriptor { get; }

@@ -3,6 +3,7 @@ using HSP.Time;
 using System;
 using UnityEngine;
 using UnityPlus.Serialization;
+using UnityPlus.Serialization.Descriptors;
 
 namespace HSP.Vanilla.Scenes.MapScene
 {

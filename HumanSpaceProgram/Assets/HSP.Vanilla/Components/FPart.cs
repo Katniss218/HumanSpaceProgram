@@ -3,6 +3,7 @@ using HSP.Content.Vessels;
 using HSP.Content.Vessels.Serialization;
 using UnityEngine;
 using UnityPlus.Serialization;
+using UnityPlus.Serialization.Descriptors;
 
 namespace HSP.Vessels.Components
 {
@@ -18,10 +19,13 @@ namespace HSP.Vessels.Components
         {
             while( obj != null )
             {
-                FPart part = obj.GetComponent<FPart>();
-                if( part != null )
+                if( obj.HasComponent( out FPart part ) )
                 {
-                    return PartRegistry.LoadMetadata( part.PartID );
+                    if( PartRegistry.TryLoadMetadata( part.PartID, out var metadata ) )
+                        return metadata;
+
+                    Debug.LogError( $"Failed to load part metadata for FPart with part ID '{part.PartID}'." );
+                    return null;
                 }
                 obj = obj.parent;
             }

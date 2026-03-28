@@ -2,6 +2,7 @@
 using HSP.Effects.Particles;
 using UnityEngine;
 using UnityPlus.Serialization;
+using UnityPlus.Serialization.Descriptors;
 
 namespace HSP.Effects
 {

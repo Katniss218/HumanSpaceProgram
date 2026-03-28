@@ -2,6 +2,7 @@
 using HSP.ControlSystems.Controls;
 using UnityEngine;
 using UnityPlus.Serialization;
+using UnityPlus.Serialization.Descriptors;
 using Ctx = UnityPlus.Serialization.Ctx;
 
 namespace HSP.Vanilla.Components

@@ -3,6 +3,7 @@ using UnityPlus.Serialization;
 using System.Runtime.CompilerServices;
 using System.Collections.Generic;
 using System.Linq;
+using UnityPlus.Serialization.Descriptors;
 
 namespace HSP.ControlSystems.Controls
 {

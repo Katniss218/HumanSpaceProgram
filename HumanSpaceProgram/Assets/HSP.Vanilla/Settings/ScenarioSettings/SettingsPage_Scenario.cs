@@ -1,6 +1,7 @@
 ﻿using HSP.Settings;
 using HSP.Timelines;
 using UnityPlus.Serialization;
+using UnityPlus.Serialization.Descriptors;
 
 namespace HSP.Vanilla.Settings
 {

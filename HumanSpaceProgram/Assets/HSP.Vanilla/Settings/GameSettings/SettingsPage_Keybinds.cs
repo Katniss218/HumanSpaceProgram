@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityPlus.Input;
 using UnityPlus.Input.Bindings;
 using UnityPlus.Serialization;
+using UnityPlus.Serialization.Descriptors;
 
 namespace HSP.Vanilla.Settings
 {

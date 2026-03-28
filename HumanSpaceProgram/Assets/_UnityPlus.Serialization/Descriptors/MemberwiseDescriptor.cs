@@ -1,92 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Runtime.Serialization;
+using UnityPlus.Serialization.Resolvers;
 
-namespace UnityPlus.Serialization
+namespace UnityPlus.Serialization.Descriptors
 {
-    /// <summary>
-    /// Base class for MemberwiseDescriptor to allow sharing members across generic instantiations.
-    /// </summary>
-    public abstract class MemberwiseDescriptorBase : CompositeDescriptor
-    {
-        internal readonly List<MemberDefinition> _members = new List<MemberDefinition>();
-        internal readonly List<IMethodInfo> _methods = new List<IMethodInfo>();
-
-        // Factories
-        internal Func<object> _simpleFactory;
-        internal Func<SerializedData, SerializationContext, object> _rawFactory;
-        internal Delegate _constructor;
-        internal (string name, Type type)[] _constructorParams;
-
-        internal class MemberDefinition : IMemberInfo
-        {
-            public string Name { get; }
-            public int Index => -1;
-            public ContextKey Context { get; }
-            public Func<object, object> Getter;
-            public Action<object, object> Setter;
-            public RefSetter<object, object> RefSetter;
-            public Type MemberType { get; }
-            public bool RequiresWriteBack => MemberType.IsValueType;
-
-            public Predicate<object> ShouldSerialize;
-            public Func<object, SerializationContext, bool> ShouldSerializeWithContext;
-
-            private IDescriptor _cachedDescriptor;
-
-            public IDescriptor TypeDescriptor
-            {
-                get
-                {
-                    if( _cachedDescriptor == null )
-                    {
-                        _cachedDescriptor = TypeDescriptorRegistry.GetDescriptor( MemberType, Context );
-                    }
-                    return _cachedDescriptor;
-                }
-            }
-
-            public MemberDefinition( string name, ContextKey context, Func<object, object> getter, Action<object, object> setter, RefSetter<object, object> refSetter, Type memberType )
-            {
-                Name = name;
-                Context = context;
-                Getter = getter;
-                Setter = setter;
-                RefSetter = refSetter;
-                MemberType = memberType;
-            }
-
-            public MemberDefinition Clone()
-            {
-                var clone = new MemberDefinition( Name, Context, Getter, Setter, RefSetter, MemberType );
-                clone.ShouldSerialize = ShouldSerialize;
-                clone.ShouldSerializeWithContext = ShouldSerializeWithContext;
-                return clone;
-            }
-
-            public ContextKey GetContext( object target ) => Context;
-
-            public object GetValue( object target ) => Getter( target );
-
-            public void SetValue( ref object target, object value )
-            {
-                if( RefSetter != null )
-                {
-                    RefSetter( ref target, value );
-                }
-                else if( Setter != null )
-                {
-                    Setter( target, value );
-                }
-            }
-        }
-    }
-
     /// <summary>
     /// A concrete descriptor for a class or struct, composed of named members.
     /// </summary>
     /// <typeparam name="T">The type being described.</typeparam>
-    public class MemberwiseDescriptor<T> : MemberwiseDescriptorBase
+    public class MemberwiseDescriptor<T> : MemberwiseDescriptorBase, ISerializationCallbackDescriptor
     {
         public readonly struct MemberModifier
         {
@@ -145,10 +68,32 @@ namespace UnityPlus.Serialization
 
         // Lifecycle
         private Action<T, SerializationContext> _onSerializing;
+        private Action<T, SerializationContext> _onSerialized;
+        private Action<T, SerializationContext> _onDeserializing;
         private Action<T, SerializationContext> _onDeserialized;
+
+        private readonly Action<object> _reflectionOnSerializing;
+        private readonly Action<object> _reflectionOnSerialized;
+        private readonly Action<object> _reflectionOnDeserializing;
+        private readonly Action<object> _reflectionOnDeserialized;
+        private readonly bool _implementsUnityCallback;
+
+        private readonly ConstructionStrategy _constructionStrategy;
+        private readonly Func<object> _defaultConstructor;
 
         public MemberwiseDescriptor()
         {
+            var callbacks = Resolvers.SerializationCallbackResolver.Resolve( typeof( T ) );
+            _reflectionOnSerializing = callbacks.onSerializing;
+            _reflectionOnSerialized = callbacks.onSerialized;
+            _reflectionOnDeserializing = callbacks.onDeserializing;
+            _reflectionOnDeserialized = callbacks.onDeserialized;
+            _implementsUnityCallback = typeof( UnityEngine.ISerializationCallbackReceiver ).IsAssignableFrom( typeof( T ) );
+
+            var construction = Resolvers.ObjectConstructionResolver.Resolve( typeof( T ) );
+            _constructionStrategy = construction.strategy;
+            _defaultConstructor = construction.constructor;
+
             IncludeBaseMembers();
         }
 
@@ -500,9 +445,9 @@ namespace UnityPlus.Serialization
 
         // --- Method / UI Support ---
 
-        public MemberwiseDescriptor<T> WithMethod( string name, Action<T> action, string displayName = null )
+        public MemberwiseDescriptor<T> WithMethod( string name, Action<T> action )
         {
-            _methods.Add( new ActionMethodInfo( name, displayName, action ) );
+            _methods.Add( new ActionMethodInfo( name, action ) );
             return this;
         }
 
@@ -514,9 +459,21 @@ namespace UnityPlus.Serialization
             return this;
         }
 
+        public MemberwiseDescriptor<T> OnSerialized( Action<T, SerializationContext> callback )
+        {
+            _onSerialized += callback;
+            return this;
+        }
+
         public MemberwiseDescriptor<T> OnDeserialized( Action<T, SerializationContext> callback )
         {
             _onDeserialized += callback;
+            return this;
+        }
+
+        public MemberwiseDescriptor<T> OnDeserializing( Action<T, SerializationContext> callback )
+        {
+            _onDeserializing += callback;
             return this;
         }
 
@@ -547,8 +504,8 @@ namespace UnityPlus.Serialization
                     context = memberDef.Context;
                 }
 
-                IDescriptor typeDesc = TypeDescriptorRegistry.GetDescriptor( type, context );
-                return new BufferMemberInfo( stepIndex, name, type, typeDesc );
+#warning TODO - cache these.
+                return new BufferMemberInfo( stepIndex, name, type, context );
             }
 
             int memberIndex = stepIndex - ctorCount;
@@ -575,9 +532,13 @@ namespace UnityPlus.Serialization
             if( _simpleFactory != null )
                 return _simpleFactory.Invoke();
 
-            if( typeof( T ).IsValueType ) return Activator.CreateInstance<T>();
-            try { return Activator.CreateInstance<T>(); }
-            catch { return null; }
+            return _constructionStrategy switch
+            {
+                ConstructionStrategy.DefaultConstructor => _defaultConstructor?.Invoke(),
+                ConstructionStrategy.NonPublicConstructor => _defaultConstructor?.Invoke(),
+                ConstructionStrategy.UninitializedObject => FormatterServices.GetUninitializedObject( typeof( T ) ),
+                _ => null,
+            };
         }
 
         public override object Construct( object initialTarget )
@@ -591,13 +552,31 @@ namespace UnityPlus.Serialization
             return initialTarget;
         }
 
-        public override void OnSerializing( object target, SerializationContext context )
+        public void OnSerializing( object target, SerializationContext context )
         {
+            if( _implementsUnityCallback )
+                ((UnityEngine.ISerializationCallbackReceiver)target).OnBeforeSerialize();
+            _reflectionOnSerializing?.Invoke( target );
             _onSerializing?.Invoke( (T)target, context );
         }
 
-        public override void OnDeserialized( object target, SerializationContext context )
+        public void OnSerialized( object target, SerializationContext context )
         {
+            _reflectionOnSerialized?.Invoke( target );
+            _onSerialized?.Invoke( (T)target, context );
+        }
+
+        public void OnDeserializing( object target, SerializationContext context )
+        {
+            _reflectionOnDeserializing?.Invoke( target );
+            _onDeserializing?.Invoke( (T)target, context );
+        }
+
+        public void OnDeserialized( object target, SerializationContext context )
+        {
+            if( _implementsUnityCallback )
+                ((UnityEngine.ISerializationCallbackReceiver)target).OnAfterDeserialize();
+            _reflectionOnDeserialized?.Invoke( target );
             _onDeserialized?.Invoke( (T)target, context );
         }
 
@@ -614,21 +593,22 @@ namespace UnityPlus.Serialization
         {
             public string Name { get; }
             public int Index => -1; // Constructor args are named
-            public Type MemberType { get; }
-            public IDescriptor TypeDescriptor { get; }
-            public bool RequiresWriteBack => MemberType.IsValueType;
+            public Type DeclaredType { get; }
+            public IDescriptor TypeDescriptor => null;
+            public bool RequiresWriteBack => DeclaredType.IsValueType;
 
             private readonly int _index;
+            private readonly ContextKey _context;
 
-            public BufferMemberInfo( int index, string name, Type type, IDescriptor desc )
+            public BufferMemberInfo( int index, string name, Type type, ContextKey context )
             {
                 _index = index;
                 Name = name;
-                MemberType = type;
-                TypeDescriptor = desc;
+                DeclaredType = type;
+                _context = context;
             }
 
-            public ContextKey GetContext( object target ) => default;
+            public ContextKey GetContext( object target ) => _context;
 
             public object GetValue( object target ) => ((object[])target)[_index];
             public void SetValue( ref object target, object value ) => ((object[])target)[_index] = value;
@@ -636,7 +616,6 @@ namespace UnityPlus.Serialization
 
         private class ActionMethodInfo : IMethodInfo
         {
-            public string Name { get; }
             public string DisplayName { get; }
             public bool IsStatic => false;
             public bool IsGeneric => false;
@@ -645,10 +624,9 @@ namespace UnityPlus.Serialization
 
             private readonly Action<T> _action;
 
-            public ActionMethodInfo( string name, string displayName, Action<T> action )
+            public ActionMethodInfo( string displayName, Action<T> action )
             {
-                Name = name;
-                DisplayName = displayName ?? name;
+                DisplayName = displayName;
                 _action = action;
             }
 

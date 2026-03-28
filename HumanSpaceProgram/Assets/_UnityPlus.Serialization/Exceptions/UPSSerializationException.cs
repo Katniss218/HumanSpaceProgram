@@ -52,19 +52,8 @@ namespace UnityPlus.Serialization
             }
         }
 
-        public UPSSerializationException( IReadonlySerializationContext ctx )
-        {
-            Context = ctx;
-        }
-
         public UPSSerializationException( IReadonlySerializationContext ctx, string message )
             : base( message )
-        {
-            Context = ctx;
-        }
-
-        public UPSSerializationException( IReadonlySerializationContext ctx, string message, Exception innerException )
-            : base( message, innerException )
         {
             Context = ctx;
         }
@@ -78,6 +67,8 @@ namespace UnityPlus.Serialization
             Member = member;
             Operation = operation;
         }
+
+
 
         protected UPSSerializationException( SerializationInfo info, StreamingContext context )
             : base( info, context )

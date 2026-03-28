@@ -45,10 +45,5 @@ namespace UnityPlus.Serialization
 
         int GetMethodCount();
         IMethodInfo GetMethodInfo( int methodIndex );
-
-        // Lifecycle Callbacks
-
-        void OnSerializing( object target, SerializationContext context );
-        void OnDeserialized( object target, SerializationContext context );
     }
 }

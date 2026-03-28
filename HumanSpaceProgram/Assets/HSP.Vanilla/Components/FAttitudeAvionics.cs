@@ -6,6 +6,7 @@ using System;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityPlus.Serialization;
+using UnityPlus.Serialization.Descriptors;
 
 namespace HSP.Vanilla.Components
 {

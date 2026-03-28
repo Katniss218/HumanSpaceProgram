@@ -4,6 +4,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityPlus.Serialization;
+using UnityPlus.Serialization.Descriptors;
 using Ctx = UnityPlus.Serialization.Ctx;
 
 namespace HSP.Effects.Particles

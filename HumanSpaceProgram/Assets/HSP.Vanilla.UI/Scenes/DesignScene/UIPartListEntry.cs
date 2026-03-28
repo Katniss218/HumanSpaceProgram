@@ -21,11 +21,10 @@ namespace HSP.Vanilla.UI.Scenes.DesignScene
             // otherwise, spawn a new vessel with that part as root.
             PickTool pickTool = DesignSceneToolManager.UseTool<PickTool>();
 
-            GameObject spawnedPart = PartRegistry.Load( _part.ID );
-            if( spawnedPart == null )
+            if( !PartRegistry.TryLoad( _part.ID, out GameObject spawnedPart ) )
             {
                 UICanvas canvas = DesignSceneM.Instance.GetWindowCanvas();
-                Debug.LogError( $"Failed to load part with ID '{_part.ID}'." );
+                Debug.LogError( $"Failed to load part with ID '{_part.ID}' from part list." );
                 canvas.AddConfirmWindow( "Error", $"Failed to load part with ID '{_part.ID}'. See log for details.", null );
                 return;
             }

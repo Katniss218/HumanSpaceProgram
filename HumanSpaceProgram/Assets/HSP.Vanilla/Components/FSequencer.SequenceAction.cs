@@ -1,6 +1,7 @@
 ﻿using HSP.ControlSystems;
 using HSP.ControlSystems.Controls;
 using UnityPlus.Serialization;
+using UnityPlus.Serialization.Descriptors;
 
 namespace HSP.Vanilla.Components
 {

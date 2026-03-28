@@ -7,7 +7,12 @@
 //    }
 //}
 
-namespace UnityPlus.Serialization.Ctx
+using UnityPlus.Serialization;
+
+namespace HSP.Vessels.Construction.Contexts
 {
-    public interface Ghost : IContext { }
+    public static class Ctx
+    {
+        public interface Ghost : IContext { }
+    }
 }

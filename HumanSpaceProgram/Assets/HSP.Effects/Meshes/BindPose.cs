@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityPlus.Serialization;
+using UnityPlus.Serialization.Descriptors;
 
 namespace HSP.Effects.Meshes
 {

@@ -51,9 +51,8 @@ namespace UnityPlus.Serialization
             };
 
             var driver = new StackMachineDriver( ctx );
-            var descriptor = TypeDescriptorRegistry.GetDescriptor( typeof( T ), context );
 
-            driver.Initialize( obj, descriptor, new SerializationStrategy() );
+            driver.Initialize( typeof( T ), context, new SerializationStrategy(), obj, null );
 
             while( !driver.IsFinished )
             {
@@ -106,9 +105,8 @@ namespace UnityPlus.Serialization
             };
 
             var driver = new StackMachineDriver( ctx );
-            var descriptor = TypeDescriptorRegistry.GetDescriptor( typeof( T ), context );
 
-            driver.Initialize( null, descriptor, new DeserializationStrategy(), data );
+            driver.Initialize( typeof( T ), context, new DeserializationStrategy(), null, data );
 
             while( !driver.IsFinished )
             {
@@ -163,9 +161,8 @@ namespace UnityPlus.Serialization
             };
 
             var driver = new StackMachineDriver( ctx );
-            var descriptor = TypeDescriptorRegistry.GetDescriptor( typeof( T ), context );
 
-            driver.Initialize( obj, descriptor, new DeserializationStrategy(), data );
+            driver.Initialize( typeof( T ), context, new DeserializationStrategy(), obj, data );
 
             while( !driver.IsFinished )
             {
@@ -216,9 +213,8 @@ namespace UnityPlus.Serialization
             };
 
             var driver = new StackMachineDriver( ctx );
-            var descriptor = TypeDescriptorRegistry.GetDescriptor( typeof( T ), context );
 
-            driver.Initialize( obj, descriptor, new DeserializationStrategy(), data );
+            driver.Initialize( typeof( T ), context, new DeserializationStrategy(), obj, data );
 
             while( !driver.IsFinished )
             {

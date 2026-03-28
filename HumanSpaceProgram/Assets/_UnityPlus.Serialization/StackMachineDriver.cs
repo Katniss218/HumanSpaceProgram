@@ -1,21 +1,20 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Linq;
 
 namespace UnityPlus.Serialization
 {
     public class StackMachineDriver
     {
-        private SerializationState _state;
-        private IOperationStrategy _strategy;
-        private readonly Stopwatch _timer = new Stopwatch();
-
         public bool IsFinished => _state != null && _state.Stack.Count == 0 && _state.Context.DeferredOperations.Count == 0;
 
         /// <summary>
         /// The final result of the operation.
         /// </summary>
         public object Result => _state?.RootResult;
+
+        private SerializationState _state;
+        private IOperationStrategy _strategy;
+        private readonly Stopwatch _timer = new Stopwatch();
 
         public StackMachineDriver( SerializationContext context )
         {
@@ -25,9 +24,12 @@ namespace UnityPlus.Serialization
         /// <summary>
         /// Initializes the driver with a specific strategy.
         /// </summary>
-        public void Initialize( object root, IDescriptor rootDescriptor, IOperationStrategy strategy, SerializedData rootData = null )
+        public void Initialize( Type declaredType, ContextKey context, IOperationStrategy strategy, object rootObj, SerializedData rootData )
         {
-            if( strategy == null ) throw new ArgumentNullException( nameof( strategy ) );
+            if( strategy == null )
+                throw new ArgumentNullException( nameof( strategy ) );
+            if( declaredType == null )
+                throw new ArgumentNullException( nameof( declaredType ) );
 
             _state.Stack.Clear();
             _state.Context.DeferredOperations.Clear();
@@ -38,7 +40,7 @@ namespace UnityPlus.Serialization
 
             try
             {
-                _strategy.InitializeRoot( root, rootDescriptor, rootData, _state );
+                _strategy.InitializeRoot( declaredType, context, rootObj, rootData, _state );
             }
             catch( Exception ex )
             {
@@ -49,23 +51,27 @@ namespace UnityPlus.Serialization
         public void Tick( float timeBudgetMs )
         {
             _timer.Restart();
+            long timeBudgetTicks = (long)(timeBudgetMs * Stopwatch.Frequency / 1000f);
+
+            if( timeBudgetTicks <= 0 )
+                timeBudgetTicks = long.MaxValue;
 
             // PASS 1: Main Stack Processing
             while( _state.Stack.Count > 0 )
             {
-                ProcessMainStack( timeBudgetMs );
+                ProcessMainStack( timeBudgetTicks );
             }
 
             // PASS 2: Deferred Resolution
             if( _state.Stack.Count == 0 && _state.Context.DeferredOperations.Count > 0 )
             {
-                ProcessDeferredQueue( timeBudgetMs );
+                ProcessDeferredQueue( timeBudgetTicks );
             }
         }
 
-        private void ProcessMainStack( float timeBudgetMs )
+        private void ProcessMainStack( long timeBudgetTicks )
         {
-            if( _timer.ElapsedMilliseconds > timeBudgetMs )
+            if( _timer.ElapsedTicks > timeBudgetTicks )
                 return;
 
             try
@@ -140,7 +146,7 @@ namespace UnityPlus.Serialization
             }
         }
 
-        private void ProcessDeferredQueue( float timeBudgetMs )
+        private void ProcessDeferredQueue( long timeBudgetTicks )
         {
             int count = _state.Context.DeferredOperations.Count;
             if( count == 0 )
@@ -151,7 +157,7 @@ namespace UnityPlus.Serialization
 
             for( int i = 0; i < count; i++ )
             {
-                if( _timer.ElapsedMilliseconds > timeBudgetMs )
+                if( _timer.ElapsedTicks > timeBudgetTicks )
                     return;
 
                 DeferredOperation op = _state.Context.DeferredOperations.Dequeue();
@@ -246,7 +252,7 @@ namespace UnityPlus.Serialization
             {
                 string message = $"Circular Dependency Deadlock: {_state.Context.DeferredOperations.Count} items could not be resolved.";
                 _state.Context.Log.Log( LogLevel.Fatal, message, _state );
-                throw new UPSUnresolvableObjectException( _state.Context, message, _state.Context.DeferredOperations.First().Member.Name, null, null, "Deferred Deadlock", null );
+                throw new UPSDeferredDeadlockException( _state.Context, message, _state.Stack.BuildPath(), null, null, "Deferred Deadlock", null );
             }
         }
 

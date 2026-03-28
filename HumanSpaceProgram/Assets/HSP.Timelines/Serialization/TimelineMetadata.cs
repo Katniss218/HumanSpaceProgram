@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using UnityPlus.Serialization;
+using UnityPlus.Serialization.Descriptors;
 using UnityPlus.Serialization.Formats;
 
 namespace HSP.Timelines.Serialization
@@ -125,7 +126,7 @@ namespace HSP.Timelines.Serialization
 
             TimelineMetadata timelineMetadata = new TimelineMetadata( timelineId );
 
-            JsonSerializedDataHandler handler = new JsonSerializedDataHandler( filePath );
+            FileSerializedDataHandler handler = new FileSerializedDataHandler( filePath, JsonFormat.Instance );
             var data = handler.Read();
             SerializationUnit.Populate( timelineMetadata, data );
             return timelineMetadata;
@@ -137,7 +138,7 @@ namespace HSP.Timelines.Serialization
 
             var data = SerializationUnit.Serialize( this );
 
-            JsonSerializedDataHandler handler = new JsonSerializedDataHandler( filePath );
+            FileSerializedDataHandler handler = new FileSerializedDataHandler( filePath, JsonFormat.Instance );
             handler.Write( data );
         }
 

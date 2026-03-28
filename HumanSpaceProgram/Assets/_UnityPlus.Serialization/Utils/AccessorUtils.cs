@@ -9,6 +9,10 @@ namespace UnityPlus.Serialization
     /// </summary>
     public static class AccessorUtils
     {
+        //
+        //  TYPED
+        //
+
         /// <summary>
         /// Creates a getter method from the member access expression.
         /// </summary>
@@ -94,6 +98,10 @@ namespace UnityPlus.Serialization
 
         // --- Untyped Reflection Helpers (for ReflectionFieldInfo) ---
 
+        //
+        //  FIELDS
+        //
+
         /// <summary>
         /// Creates an untyped getter (object -> object) for a specific field.
         /// </summary>
@@ -170,6 +178,78 @@ namespace UnityPlus.Serialization
 
             return Expression.Lambda<RefSetter<object, object>>( assignExp, targetParam, valueParam ).Compile();
         }
+
+        //
+        //  PROPERTIES
+        //
+
+        /// <summary>
+        /// Creates an untyped getter (object -> object) for a specific property.
+        /// </summary>
+        public static Getter<object, object> CreateUntypedGetter( PropertyInfo property )
+        {
+            ParameterExpression targetParam = Expression.Parameter( typeof( object ), "target" );
+
+            Expression sourceExp = (property.DeclaringType.IsValueType)
+                    ? Expression.Unbox( targetParam, property.DeclaringType )
+                    : Expression.Convert( targetParam, property.DeclaringType );
+
+            var propertyAccess = Expression.Property( sourceExp, property );
+            var castResult = Expression.Convert( propertyAccess, typeof( object ) );
+
+            return Expression.Lambda<Getter<object, object>>( castResult, targetParam ).Compile();
+        }
+
+        /// <summary>
+        /// Creates an untyped setter (object -> object) for a specific property on a Class (Reference Type).
+        /// </summary>
+        public static Setter<object, object> CreateUntypedSetter( PropertyInfo property )
+        {
+            if( property.DeclaringType.IsValueType )
+                throw new ArgumentException( "Cannot create a standard setter for a struct property. Use CreateUntypedStructSetter or PropertyInfo.SetValue." );
+
+            var setMethod = property.GetSetMethod( true );
+            if( setMethod == null )
+                throw new ArgumentException( $"Cannot create setter for property '{property.Name}' on type '{property.DeclaringType.Name}'. The property is read-only." );
+
+            ParameterExpression targetParam = Expression.Parameter( typeof( object ), "target" );
+            ParameterExpression valueParam = Expression.Parameter( typeof( object ), "value" );
+
+            var castTarget = Expression.Convert( targetParam, property.DeclaringType );
+            var castValue = Expression.Convert( valueParam, property.PropertyType );
+
+            var callExp = Expression.Call( castTarget, setMethod, castValue );
+
+            return Expression.Lambda<Setter<object, object>>( callExp, targetParam, valueParam ).Compile();
+        }
+
+        /// <summary>
+        /// Creates an untyped setter (ref object -> object) for a specific property on a Struct (Value Type).
+        /// Handles unboxing, assignment, and reboxing.
+        /// </summary>
+        public static RefSetter<object, object> CreateUntypedStructSetter( PropertyInfo property )
+        {
+            if( !property.DeclaringType.IsValueType )
+                throw new ArgumentException( "CreateUntypedStructSetter requires a property on a value type." );
+
+            var setMethod = property.GetSetMethod( true );
+            if( setMethod == null )
+                throw new ArgumentException( $"Cannot create setter for property '{property.Name}' on type '{property.DeclaringType.Name}'. The property is read-only." );
+
+            var targetParam = Expression.Parameter( typeof( object ).MakeByRefType(), "target" );
+            var valueParam = Expression.Parameter( typeof( object ), "value" );
+
+            var loadRef = Expression.Convert( targetParam, typeof( object ) );
+            var unboxExp = Expression.Unbox( loadRef, property.DeclaringType );
+
+            var callExp = Expression.Call( unboxExp, setMethod, Expression.Convert( valueParam, property.PropertyType ) );
+
+            return Expression.Lambda<RefSetter<object, object>>( callExp, targetParam, valueParam ).Compile();
+        }
+
+        //
+        //  CONSTRUCTORS
+        //
 
         /// <summary>
         /// Creates a compiled lambda to instantiate a type using its parameterless constructor.

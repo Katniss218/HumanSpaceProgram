@@ -1,6 +1,7 @@
 ﻿using HSP.CelestialBodies;
 using UnityEngine;
 using UnityPlus.Serialization;
+using UnityPlus.Serialization.Descriptors;
 
 namespace HSP.Vanilla
 {

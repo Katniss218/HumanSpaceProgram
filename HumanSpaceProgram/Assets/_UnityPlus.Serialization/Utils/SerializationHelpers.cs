@@ -1,54 +1,82 @@
 ﻿using System;
+using UnityEditor.EditorTools;
 
 namespace UnityPlus.Serialization
 {
-    public static class SerializationHelpers
+    public enum ObjectStructure : byte
     {
         /// <summary>
-        /// Extracts the underlying SerializedArray from a data node.
-        /// Enforces format based on <paramref name="forceStandardJson"/>.
+        /// primitive without a wrapper.
         /// </summary>
-        public static SerializedArray GetValueNode( SerializedData data, bool forceStandardJson )
-        {
-            if( forceStandardJson )
-            {
-                // Expect direct array
-                return data as SerializedArray;
-            }
-            else
-            {
-                // Expect wrapper object
-                if( data is SerializedObject obj && obj.TryGetValue( KeyNames.VALUE, out SerializedData inner ) && inner is SerializedArray innerArr )
-                    return innerArr;
+        Unwrapped,
+        /// <summary>
+        /// primitive or collection wrapped in an object with metadata headers and a "value" field.
+        /// </summary>
+        Wrapped,
+        /// <summary>
+        /// object with metadata headers, but the members are written directly on the root object instead of a "value" field.
+        /// </summary>
+        InlineMetadata
+    }
 
-                return null;
-            }
+    public static class SerializationHelpers
+    {
+        public static void DetermineObjectStructure( Type declaredType, Type actualType, out bool needsId, out bool needsType )
+        {
+            needsId = (!actualType.IsValueType
+                && actualType != typeof( string ))
+                || declaredType == typeof( object );
+
+            needsType = declaredType != actualType
+                && !declaredType.IsValueType
+                && !declaredType.IsSealed
+                && !typeof( Delegate ).IsAssignableFrom( declaredType );
         }
 
-        /// <summary>
-        /// Creates a Data Node for a collection.
-        /// If context settings or cycle detection requires it, creates a Boxed Object wrapper. 
-        /// Otherwise returns a plain SerializedArray.
-        /// </summary>
-        /// <returns>The Root Node (wrapper or array) that should be linked to the parent.</returns>
-        public static SerializedData CreateCollectionNode( object target, IReverseReferenceMap referenceMap, bool forceStandardJson, out SerializedArray arrayToPopulate )
+        public static void WriteMetadata( object value, ref SerializedData data, ObjectStructure structure, SerializationContext context, Type actualType, bool needsId, bool needsType )
         {
-            arrayToPopulate = new SerializedArray();
+            if( structure == ObjectStructure.Unwrapped )
+                return;
 
-            if( !forceStandardJson && target != null )
+            if( structure == ObjectStructure.InlineMetadata )
             {
-                // Boxed Collection (Circular Ref Support)
-                var wrapper = new SerializedObject();
-                Guid id = referenceMap.GetID( target );
-
-                Persistent_Guid.WriteIdHeader( wrapper, id );
-                wrapper[KeyNames.VALUE] = arrayToPopulate;
-
-                return wrapper;
+                if( data is SerializedObject objRaw )
+                {
+                    if( needsId )
+                        Persistent_Guid.WriteIdHeader( objRaw, context.ReverseMap.GetID( value ) );
+                    if( needsType )
+                        Persistent_Type.WriteTypeHeader( objRaw, actualType );
+                }
+                return;
             }
 
-            // Standard: Array
-            return arrayToPopulate;
+            if( structure == ObjectStructure.Wrapped )
+            {
+                var wrapper = new SerializedObject();
+                if( needsId ) 
+                    Persistent_Guid.WriteIdHeader( wrapper, context.ReverseMap.GetID( value ) );
+                if( needsType ) 
+                    Persistent_Type.WriteTypeHeader( wrapper, actualType );
+                wrapper[KeyNames.VALUE] = data;
+                data = wrapper;
+            }
+        }
+        /// <summary>
+        /// Extracts the underlying SerializedArray from a data node.
+        /// </summary>
+        public static SerializedArray GetValueNode( SerializedData data )
+        {
+            if( data is SerializedArray arr )
+            {
+                return arr;
+            }
+
+            if( data is SerializedObject obj && obj.TryGetValue( KeyNames.VALUE, out SerializedData inner ) && inner is SerializedArray innerArr )
+            {
+                return innerArr;
+            }
+
+            return null;
         }
     }
 }

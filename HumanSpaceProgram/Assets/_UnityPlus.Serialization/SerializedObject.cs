@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 
@@ -40,9 +41,14 @@ namespace UnityPlus.Serialization
             _children = new Dictionary<string, SerializedData>( capacity );
         }
 
-        public SerializedObject( IEnumerable<KeyValuePair<string, SerializedData>> collection )
+        public SerializedObject( IEnumerable<KeyValuePair<string, SerializedData>> children )
         {
-            _children = new Dictionary<string, SerializedData>( collection );
+            _children = new Dictionary<string, SerializedData>( children );
+        }
+
+        public SerializedObject( params KeyValuePair<string, SerializedData>[] children )
+        {
+            _children = new Dictionary<string, SerializedData>( children );
         }
 
         [MethodImpl( MethodImplOptions.AggressiveInlining )]

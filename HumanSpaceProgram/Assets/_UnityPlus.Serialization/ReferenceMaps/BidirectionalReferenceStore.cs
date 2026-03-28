@@ -11,8 +11,8 @@ namespace UnityPlus.Serialization.ReferenceMaps
     /// </summary>
     public class BidirectionalReferenceStore : IForwardReferenceMap, IReverseReferenceMap
     {
-        private readonly Dictionary<Guid, object> _forward = new Dictionary<Guid, object>();
-        private readonly Dictionary<object, Guid> _reverse = new Dictionary<object, Guid>();
+        private readonly Dictionary<Guid, object> _forward = new();
+        private readonly Dictionary<object, Guid> _reverse = new( ReferenceEqualityComparer.Instance );
 
         public BidirectionalReferenceStore() { }
 
@@ -62,6 +62,15 @@ namespace UnityPlus.Serialization.ReferenceMaps
             if( id == Guid.Empty || obj.IsUnityNull() )
                 return;
 
+            if( _forward.TryGetValue( id, out object oldObj ) )
+            {
+                _reverse.Remove( oldObj );
+            }
+            if( _reverse.TryGetValue( obj, out Guid oldId ) )
+            {
+                _forward.Remove( oldId );
+            }
+
             _forward[id] = obj; // same as setid
             _reverse[obj] = id;
         }
@@ -98,7 +107,15 @@ namespace UnityPlus.Serialization.ReferenceMaps
             if( obj.IsUnityNull() || id == Guid.Empty )
                 return;
 
-#warning TODO - might leave orphan entries.
+            if( _forward.TryGetValue( id, out object oldObj ) )
+            {
+                _reverse.Remove( oldObj );
+            }
+            if( _reverse.TryGetValue( obj, out Guid oldId ) )
+            {
+                _forward.Remove( oldId );
+            }
+
             _forward[id] = obj; // same as setobj
             _reverse[obj] = id;
         }

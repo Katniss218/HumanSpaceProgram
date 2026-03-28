@@ -1,7 +1,8 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityPlus.AssetManagement;
 
-namespace UnityPlus.Serialization
+namespace UnityPlus.Serialization.Descriptors
 {
     /// <summary>
     /// Serializes an object as an Asset ID ("$assetref") using the AssetRegistry.
@@ -9,6 +10,13 @@ namespace UnityPlus.Serialization
     /// </summary>
     public class AssetDescriptor<T> : PrimitiveDescriptor<T> where T : class
     {
+        public override ObjectStructure DetermineObjectStructure( Type declaredType, Type actualType, SerializationConfiguration config, out bool needsId, out bool needsType )
+        {
+            needsId = false;
+            needsType = false;
+            return ObjectStructure.Unwrapped;
+        }
+
         public override void SerializeDirect( object target, ref SerializedData data, SerializationContext ctx )
         {
             if( target == null || target.IsUnityNull() )
@@ -42,9 +50,11 @@ namespace UnityPlus.Serialization
             {
                 string assetID = (string)refData;
                 result = AssetRegistry.Get<T>( assetID );
+                if( result != null )
+                    return DeserializationResult.Success;
             }
 
-            return DeserializationResult.Success;
+            return DeserializationResult.Failed;
         }
     }
 }

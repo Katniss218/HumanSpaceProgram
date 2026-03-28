@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using UnityPlus.Serialization;
+using UnityPlus.Serialization.Descriptors;
 using UnityPlus.Serialization.Formats;
 
 namespace HSP.Content.Vessels.Serialization
@@ -80,7 +81,7 @@ namespace HSP.Content.Vessels.Serialization
 
             VesselMetadata vesselMetadata = new VesselMetadata( id );
 
-            JsonSerializedDataHandler handler = new JsonSerializedDataHandler( saveFilePath );
+            FileSerializedDataHandler handler = new FileSerializedDataHandler( saveFilePath, JsonFormat.Instance );
             var data = handler.Read();
             SerializationUnit.Populate( vesselMetadata, data );
             return vesselMetadata;
@@ -92,7 +93,7 @@ namespace HSP.Content.Vessels.Serialization
 
             var data = SerializationUnit.Serialize( this );
 
-            JsonSerializedDataHandler handler = new JsonSerializedDataHandler( saveFilePath );
+            FileSerializedDataHandler handler = new FileSerializedDataHandler( saveFilePath, JsonFormat.Instance );
             handler.Write( data );
         }
 

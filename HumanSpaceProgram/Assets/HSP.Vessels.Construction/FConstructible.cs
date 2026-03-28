@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityPlus.Serialization;
+using UnityPlus.Serialization.Descriptors;
 using UnityPlus.Serialization.ReferenceMaps;
 using Ctx = UnityPlus.Serialization.Ctx;
 
@@ -169,7 +170,7 @@ namespace HSP.Vessels.Construction
 
                 foreach( var comp in comps )
                 {
-                    SerializedData originalToGhost = SerializationUnit.Serialize<Component>( typeof( Ctx.Ghost ), comp, _cachedRefStore );
+                    SerializedData originalToGhost = SerializationUnit.Serialize<Component>( typeof( Contexts.Ctx.Ghost ), comp, _cachedRefStore );
                     if( originalToGhost == null ) // Only cache what can be ghosted - should probably be signified differently than == null, but it works for now.
                         continue;
                     SerializedData ghostToOriginal = SerializationUnit.Serialize<Component>( typeof( Ctx.Value ), comp, _cachedRefStore );

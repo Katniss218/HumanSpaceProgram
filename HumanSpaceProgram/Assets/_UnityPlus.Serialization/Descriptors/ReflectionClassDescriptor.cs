@@ -1,78 +1,43 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Reflection;
 using System.Runtime.Serialization;
 using UnityEngine;
+using UnityPlus.Serialization.Resolvers;
 
-namespace UnityPlus.Serialization
+namespace UnityPlus.Serialization.Descriptors
 {
-    public class ReflectionClassDescriptor<T> : CompositeDescriptor
+    public class ReflectionClassDescriptor<T> : CompositeDescriptor, ISerializationCallbackDescriptor
     {
         public override Type MappedType => typeof( T );
         private readonly IMemberInfo[] _members;
         private readonly IMethodInfo[] _methods;
-        private readonly Func<T> _constructor;
+
+        private readonly ConstructionStrategy _constructionStrategy;
+        private readonly Func<object> _constructor;
 
         private readonly bool _implementsUnityCallback;
         private readonly Action<object> _onSerializing;
+        private readonly Action<object> _onSerialized;
+        private readonly Action<object> _onDeserializing;
         private readonly Action<object> _onDeserialized;
 
         public ReflectionClassDescriptor()
         {
-            if( !typeof( T ).IsInterface && !typeof( ScriptableObject ).IsAssignableFrom( typeof( T ) ) && !typeof( Component ).IsAssignableFrom( typeof( T ) ) )
-            {
-                try
-                {
-                    var ctor = typeof( T ).GetConstructor( Type.EmptyTypes );
-                    if( ctor != null || typeof( T ).IsValueType )
-                    {
-                        _constructor = AccessorUtils.CreateConstructor<T>();
-                    }
-                }
-                catch { }
-            }
+            var type = typeof( T );
 
-            var fields = typeof( T ).GetFields( BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance );
-            var memberList = new List<IMemberInfo>();
+            var construction = ObjectConstructionResolver.Resolve( type );
+            _constructionStrategy = construction.strategy;
+            _constructor = construction.constructor;
 
-            foreach( var field in fields )
-            {
-                if( field.IsStatic )
-                    continue;
-                bool isPublic = field.IsPublic;
-                bool hasSerializeField = field.GetCustomAttribute<SerializeField>() != null;
-                bool hasNonSerialized = field.GetCustomAttribute<NonSerializedAttribute>() != null;
+            _members = SerializableMemberResolver.GetMembers( type );
+            _methods = SerializableMethodResolver.GetMethods( type );
 
-                if( hasNonSerialized )
-                    continue;
-                if( !isPublic && !hasSerializeField )
-                    continue;
+            var callbacks = SerializationCallbackResolver.Resolve( type );
+            _onSerializing = callbacks.onSerializing;
+            _onSerialized = callbacks.onSerialized;
+            _onDeserializing = callbacks.onDeserializing;
+            _onDeserialized = callbacks.onDeserialized;
 
-                memberList.Add( new ReflectionFieldInfo( field ) );
-            }
-            _members = memberList.ToArray();
-
-            var methods = typeof( T ).GetMethods( BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static );
-            var methodList = new List<IMethodInfo>();
-
-            foreach( var method in methods )
-            {
-                if( method.GetCustomAttribute<OnSerializingAttribute>() != null && method.GetParameters().Length == 1 )
-                    _onSerializing = ( obj ) => method.Invoke( obj, new object[] { default( StreamingContext ) } );
-
-                if( method.GetCustomAttribute<OnDeserializedAttribute>() != null && method.GetParameters().Length == 1 )
-                    _onDeserialized = ( obj ) => method.Invoke( obj, new object[] { default( StreamingContext ) } );
-
-                if( method.IsSpecialName )
-                    continue;
-                if( method.DeclaringType == typeof( object ) || method.DeclaringType == typeof( Component ) || method.DeclaringType == typeof( MonoBehaviour ) )
-                    continue;
-
-                methodList.Add( new ReflectionMethodInfo( method ) );
-            }
-            _methods = methodList.ToArray();
-
-            _implementsUnityCallback = typeof( ISerializationCallbackReceiver ).IsAssignableFrom( typeof( T ) );
+            _implementsUnityCallback = typeof( ISerializationCallbackReceiver ).IsAssignableFrom( type );
         }
 
         public override int GetStepCount( object target ) => _members.Length;
@@ -89,27 +54,37 @@ namespace UnityPlus.Serialization
             if( typeof( ScriptableObject ).IsAssignableFrom( typeof( T ) ) )
                 return ScriptableObject.CreateInstance( typeof( T ) );
 
-            if( _constructor != null )
-                return _constructor();
-
-            try
+            switch( _constructionStrategy )
             {
-                return Activator.CreateInstance<T>();
-            }
-            catch
-            {
-                return null;
+                case ConstructionStrategy.DefaultConstructor:
+                case ConstructionStrategy.NonPublicConstructor:
+                    return _constructor?.Invoke();
+                case ConstructionStrategy.UninitializedObject:
+                    return FormatterServices.GetUninitializedObject( typeof( T ) );
+                case ConstructionStrategy.None:
+                default:
+                    return null;
             }
         }
 
-        public override void OnSerializing( object target, SerializationContext context )
+        public void OnSerializing( object target, SerializationContext context )
         {
             if( _implementsUnityCallback )
                 ((ISerializationCallbackReceiver)target).OnBeforeSerialize();
             _onSerializing?.Invoke( target );
         }
 
-        public override void OnDeserialized( object target, SerializationContext context )
+        public void OnSerialized( object target, SerializationContext context )
+        {
+            _onSerialized?.Invoke( target );
+        }
+
+        public void OnDeserializing( object target, SerializationContext context )
+        {
+            _onDeserializing?.Invoke( target );
+        }
+
+        public void OnDeserialized( object target, SerializationContext context )
         {
             if( _implementsUnityCallback )
                 ((ISerializationCallbackReceiver)target).OnAfterDeserialize();

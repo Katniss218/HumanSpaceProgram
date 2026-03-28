@@ -1,24 +1,35 @@
 ﻿using System;
 using System.Reflection;
 
-namespace UnityPlus.Serialization
+namespace UnityPlus.Serialization.Descriptors
 {
     /// <summary>
-    /// An IMethodInfo implementation that wraps a System.Reflection.MethodInfo.
+    /// An IMethodInfo implementation that wraps a <see cref="MethodInfo"/>.
     /// </summary>
     public class ReflectionMethodInfo : IMethodInfo
     {
-        private MethodInfo _method;
-        public string Name => _method.Name;
-        public string DisplayName => _method.Name;
+        public string DisplayName { get; }
         public bool IsStatic => _method.IsStatic;
         public bool IsGeneric => _method.IsGenericMethodDefinition;
         public string[] GenericTypeParameters => IsGeneric ? Array.ConvertAll( _method.GetGenericArguments(), t => t.Name ) : Array.Empty<string>();
         public IParameterInfo[] Parameters { get; }
 
+        private MethodInfo _method;
+
         public ReflectionMethodInfo( MethodInfo method )
         {
             _method = method;
+
+            var contextMenu = method.GetCustomAttribute<UnityEngine.ContextMenu>();
+            if( contextMenu != null && !string.IsNullOrEmpty( contextMenu.menuItem ) )
+            {
+                DisplayName = contextMenu.menuItem;
+            }
+            else
+            {
+                DisplayName = method.Name;
+            }
+
             var parameters = method.GetParameters();
             Parameters = new IParameterInfo[parameters.Length];
             for( int i = 0; i < parameters.Length; i++ )
@@ -33,6 +44,9 @@ namespace UnityPlus.Serialization
         }
     }
 
+    /// <summary>
+    /// An IParameterInfo implementation that wraps a <see cref="ParameterInfo"/>.
+    /// </summary>
     public class ReflectionParameterInfo : IParameterInfo
     {
         private ParameterInfo _info;

@@ -5,8 +5,6 @@
     /// </summary>
     public interface IMethodInfo
     {
-#warning TODO - duplicated names. Not necessary/or differs from MemberInfo.
-        string Name { get; }
         string DisplayName { get; }
         bool IsStatic { get; }
         bool IsGeneric { get; }

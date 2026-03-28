@@ -9,9 +9,9 @@ namespace UnityPlus.Serialization
     [DebuggerDisplay( "{ToString()} (ID: {ID})" )]
     public readonly struct ContextKey : IEquatable<ContextKey>
     {
-        public static readonly ContextKey Default = new ContextKey( 0 );
+        public static ContextKey Default { get; } = new ContextKey( 0 );
 
-        public readonly int ID;
+        public int ID { get; }
 
         /// <summary>
         /// Gets the C# type associated with this context.
@@ -29,15 +29,18 @@ namespace UnityPlus.Serialization
             => ContextRegistry.TryGetGenericContextArguments( this, out args );
 
         public bool Equals( ContextKey other ) => ID == other.ID;
+
         public override bool Equals( object obj ) => obj is ContextKey other && Equals( other );
+
         public override int GetHashCode() => ID;
-        public static bool operator ==( ContextKey left, ContextKey right ) => left.Equals( right );
-        public static bool operator !=( ContextKey left, ContextKey right ) => !left.Equals( right );
 
         public override string ToString()
         {
             return ContextRegistry.GetContextName( this );
         }
+
+        public static bool operator ==( ContextKey left, ContextKey right ) => left.Equals( right );
+        public static bool operator !=( ContextKey left, ContextKey right ) => !left.Equals( right );
 
         public static implicit operator ContextKey( int id ) => new ContextKey( id );
     }

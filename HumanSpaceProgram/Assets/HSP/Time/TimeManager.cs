@@ -4,6 +4,7 @@ using UnityEngine.LowLevel;
 using UnityEngine.PlayerLoop;
 using UnityPlus;
 using UnityPlus.Serialization;
+using UnityPlus.Serialization.Descriptors;
 
 namespace HSP.Time
 {

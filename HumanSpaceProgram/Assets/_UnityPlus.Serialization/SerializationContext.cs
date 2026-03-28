@@ -60,6 +60,19 @@ namespace UnityPlus.Serialization
             } );
         }
 
+        public void EnqueueDeferredConstruction( object target, IMemberInfo member, SerializedData data, IDescriptor descriptor, object[] constructionBuffer, int constructionIndex )
+        {
+            DeferredOperations.Enqueue( new DeferredOperation
+            {
+                Target = target,
+                Member = member,
+                Data = data,
+                Descriptor = descriptor,
+                ConstructionBuffer = constructionBuffer,
+                ConstructionIndex = constructionIndex
+            } );
+        }
+
         public void EnqueueDeferredRoot( IDescriptor descriptor, SerializedData data )
         {
             DeferredOperations.Enqueue( new DeferredOperation

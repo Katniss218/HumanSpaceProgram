@@ -237,105 +237,161 @@ namespace UnityPlus.Serialization
         public static implicit operator SerializedPrimitive( decimal v ) => new SerializedPrimitive( new Value() { @decimal = v }, DataType.Decimal );
         public static implicit operator SerializedPrimitive( string v ) => new SerializedPrimitive( new Value() { str = v }, DataType.String );
 
-        public static implicit operator bool( SerializedPrimitive v ) => v._type switch
+        // --- TRY GET METHODS ---
+
+        public bool TryGetBoolean( out bool value )
         {
-            DataType.Boolean => v._value.boolean,
-            _ => throw new InvalidOperationException( $"Can't convert to `bool` from `{v._type}`." ),
-        };
-        public static implicit operator sbyte( SerializedPrimitive v ) => v._type switch
+            if( _type == DataType.Boolean )
+            {
+                value = _value.boolean;
+                return true;
+            }
+
+            value = default;
+            return false;
+        }
+
+        public bool TryGetInt64( out long value )
         {
-            DataType.Int64 => (sbyte)v._value.int64,
-            DataType.UInt64 => (sbyte)v._value.uint64,
-            DataType.Float64 => (sbyte)v._value.float64,
-            DataType.Decimal => (sbyte)v._value.@decimal,
-            _ => throw new InvalidOperationException( $"Can't convert to `sbyte` from `{v._type}`." ),
-        };
-        public static implicit operator byte( SerializedPrimitive v ) => v._type switch
+            switch( _type )
+            {
+                case DataType.Int64: value = _value.int64; return true;
+                case DataType.UInt64: value = (long)_value.uint64; return true;
+                case DataType.Float64: value = (long)_value.float64; return true;
+                case DataType.Decimal: value = (long)_value.@decimal; return true;
+                default: value = default; return false;
+            }
+        }
+
+        public bool TryGetUInt64( out ulong value )
         {
-            DataType.Int64 => (byte)v._value.int64,
-            DataType.UInt64 => (byte)v._value.uint64,
-            DataType.Float64 => (byte)v._value.float64,
-            DataType.Decimal => (byte)v._value.@decimal,
-            _ => throw new InvalidOperationException( $"Can't convert to `byte` from `{v._type}`." ),
-        };
-        public static implicit operator short( SerializedPrimitive v ) => v._type switch
+            switch( _type )
+            {
+                case DataType.Int64: value = (ulong)_value.int64; return true;
+                case DataType.UInt64: value = _value.uint64; return true;
+                case DataType.Float64: value = (ulong)_value.float64; return true;
+                case DataType.Decimal: value = (ulong)_value.@decimal; return true;
+                default: value = default; return false;
+            }
+        }
+
+        public bool TryGetDouble( out double value )
         {
-            DataType.Int64 => (short)v._value.int64,
-            DataType.UInt64 => (short)v._value.uint64,
-            DataType.Float64 => (short)v._value.float64,
-            DataType.Decimal => (short)v._value.@decimal,
-            _ => throw new InvalidOperationException( $"Can't convert to `short` from `{v._type}`." ),
-        };
-        public static implicit operator ushort( SerializedPrimitive v ) => v._type switch
+            switch( _type )
+            {
+                case DataType.Int64: value = (double)_value.int64; return true;
+                case DataType.UInt64: value = (double)_value.uint64; return true;
+                case DataType.Float64: value = _value.float64; return true;
+                case DataType.Decimal: value = (double)_value.@decimal; return true;
+                default: value = default; return false;
+            }
+        }
+
+        public bool TryGetDecimal( out decimal value )
         {
-            DataType.Int64 => (ushort)v._value.int64,
-            DataType.UInt64 => (ushort)v._value.uint64,
-            DataType.Float64 => (ushort)v._value.float64,
-            DataType.Decimal => (ushort)v._value.@decimal,
-            _ => throw new InvalidOperationException( $"Can't convert to `ushort` from `{v._type}`." ),
-        };
-        public static implicit operator int( SerializedPrimitive v ) => v._type switch
+            switch( _type )
+            {
+                case DataType.Int64: value = (decimal)_value.int64; return true;
+                case DataType.UInt64: value = (decimal)_value.uint64; return true;
+                case DataType.Float64: value = (decimal)_value.float64; return true;
+                case DataType.Decimal: value = _value.@decimal; return true;
+                default: value = default; return false;
+            }
+        }
+
+        public bool TryGetString( out string value )
         {
-            DataType.Int64 => (int)v._value.int64,
-            DataType.UInt64 => (int)v._value.uint64,
-            DataType.Float64 => (int)v._value.float64,
-            DataType.Decimal => (int)v._value.@decimal,
-            _ => throw new InvalidOperationException( $"Can't convert to `int` from `{v._type}`." ),
-        };
-        public static implicit operator uint( SerializedPrimitive v ) => v._type switch
+            if( _type == DataType.String )
+            {
+                value = _value.str;
+                return true;
+            }
+
+            value = default;
+            return false;
+        }
+
+
+        // --- IMPLICIT OPERATORS (delegate to Try methods) ---
+
+        public static implicit operator bool( SerializedPrimitive v )
         {
-            DataType.Int64 => (uint)v._value.int64,
-            DataType.UInt64 => (uint)v._value.uint64,
-            DataType.Float64 => (uint)v._value.float64,
-            DataType.Decimal => (uint)v._value.@decimal,
-            _ => throw new InvalidOperationException( $"Can't convert to `uint` from `{v._type}`." ),
-        };
-        public static implicit operator long( SerializedPrimitive v ) => v._type switch
+            if( v.TryGetBoolean( out bool r ) ) return r;
+            throw new InvalidOperationException( $"Can't convert to `bool` from `{v._type}`." );
+        }
+
+        public static implicit operator sbyte( SerializedPrimitive v )
         {
-            DataType.Int64 => (long)v._value.int64,
-            DataType.UInt64 => (long)v._value.uint64,
-            DataType.Float64 => (long)v._value.float64,
-            DataType.Decimal => (long)v._value.@decimal,
-            _ => throw new InvalidOperationException( $"Can't convert to `long` from `{v._type}`." ),
-        };
-        public static implicit operator ulong( SerializedPrimitive v ) => v._type switch
+            if( v.TryGetInt64( out long r ) ) return (sbyte)r;
+            throw new InvalidOperationException( $"Can't convert to `sbyte` from `{v._type}`." );
+        }
+
+        public static implicit operator byte( SerializedPrimitive v )
         {
-            DataType.Int64 => (ulong)v._value.int64,
-            DataType.UInt64 => (ulong)v._value.uint64,
-            DataType.Float64 => (ulong)v._value.float64,
-            DataType.Decimal => (ulong)v._value.@decimal,
-            _ => throw new InvalidOperationException( $"Can't convert to `ulong` from `{v._type}`." ),
-        };
-        public static implicit operator float( SerializedPrimitive v ) => v._type switch
+            if( v.TryGetUInt64( out ulong r ) ) return (byte)r;
+            throw new InvalidOperationException( $"Can't convert to `byte` from `{v._type}`." );
+        }
+
+        public static implicit operator short( SerializedPrimitive v )
         {
-            DataType.Int64 => (float)v._value.int64,
-            DataType.UInt64 => (float)v._value.uint64,
-            DataType.Float64 => (float)v._value.float64,
-            DataType.Decimal => (float)v._value.@decimal,
-            _ => throw new InvalidOperationException( $"Can't convert to `float` from `{v._type}`." ),
-        };
-        public static implicit operator double( SerializedPrimitive v ) => v._type switch
+            if( v.TryGetInt64( out long r ) ) return (short)r;
+            throw new InvalidOperationException( $"Can't convert to `short` from `{v._type}`." );
+        }
+
+        public static implicit operator ushort( SerializedPrimitive v )
         {
-            DataType.Int64 => (double)v._value.int64,
-            DataType.UInt64 => (double)v._value.uint64,
-            DataType.Float64 => (double)v._value.float64,
-            DataType.Decimal => (double)v._value.@decimal,
-            _ => throw new InvalidOperationException( $"Can't convert to `double` from `{v._type}`." ),
-        };
-        public static implicit operator decimal( SerializedPrimitive v ) => v._type switch
+            if( v.TryGetUInt64( out ulong r ) ) return (ushort)r;
+            throw new InvalidOperationException( $"Can't convert to `ushort` from `{v._type}`." );
+        }
+
+        public static implicit operator int( SerializedPrimitive v )
         {
-            DataType.Int64 => (decimal)v._value.int64,
-            DataType.UInt64 => (decimal)v._value.uint64,
-            DataType.Float64 => (decimal)v._value.float64,
-            DataType.Decimal => (decimal)v._value.@decimal,
-            _ => throw new InvalidOperationException( $"Can't convert to `decimal` from `{v._type}`." ),
-        };
-        //                                                                   \/ string is the only type that can actually hold null. When deserializing, it can be initialized to null.
-        public static implicit operator string( SerializedPrimitive v ) => v == null ? default : v._type switch
+            if( v.TryGetInt64( out long r ) ) return (int)r;
+            throw new InvalidOperationException( $"Can't convert to `int` from `{v._type}`." );
+        }
+
+        public static implicit operator uint( SerializedPrimitive v )
         {
-            DataType.String => v._value.str,
-            _ => throw new InvalidOperationException( $"Can't convert to `string` from `{v._type}`." ),
-        };
+            if( v.TryGetUInt64( out ulong r ) ) return (uint)r;
+            throw new InvalidOperationException( $"Can't convert to `uint` from `{v._type}`." );
+        }
+
+        public static implicit operator long( SerializedPrimitive v )
+        {
+            if( v.TryGetInt64( out long r ) ) return r;
+            throw new InvalidOperationException( $"Can't convert to `long` from `{v._type}`." );
+        }
+
+        public static implicit operator ulong( SerializedPrimitive v )
+        {
+            if( v.TryGetUInt64( out ulong r ) ) return r;
+            throw new InvalidOperationException( $"Can't convert to `ulong` from `{v._type}`." );
+        }
+
+        public static implicit operator float( SerializedPrimitive v )
+        {
+            if( v.TryGetDouble( out double r ) ) return (float)r;
+            throw new InvalidOperationException( $"Can't convert to `float` from `{v._type}`." );
+        }
+
+        public static implicit operator double( SerializedPrimitive v )
+        {
+            if( v.TryGetDouble( out double r ) ) return r;
+            throw new InvalidOperationException( $"Can't convert to `double` from `{v._type}`." );
+        }
+
+        public static implicit operator decimal( SerializedPrimitive v )
+        {
+            if( v.TryGetDecimal( out decimal r ) ) return r;
+            throw new InvalidOperationException( $"Can't convert to `decimal` from `{v._type}`." );
+        }
+
+        public static implicit operator string( SerializedPrimitive v )
+        {
+            if( v == null ) return default;
+            if( v.TryGetString( out string r ) ) return r;
+            throw new InvalidOperationException( $"Can't convert to `string` from `{v._type}`." );
+        }
 
 
         public static bool operator ==( SerializedPrimitive v1, SerializedPrimitive v2 )

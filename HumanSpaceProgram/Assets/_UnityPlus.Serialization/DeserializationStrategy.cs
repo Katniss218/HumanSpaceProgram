@@ -1,64 +1,33 @@
 ﻿using System;
-using System.Reflection;
 using UnityEngine;
 
 namespace UnityPlus.Serialization
 {
     public class DeserializationStrategy : IOperationStrategy
     {
-        public void InitializeRoot( object root, IDescriptor rootDescriptor, SerializedData rootData, SerializationState state )
+        public void InitializeRoot( Type declaredType, ContextKey context, object root, SerializedData rootData, SerializationState state )
         {
-            if( rootData == null )
+            MemberResolutionResult result = TryProcessMember( rootData, declaredType, context, null, state,
+                out object actualValue, out IDescriptor actualDescriptor, out SerializedData unwrappedNode, out Guid? pendingId );
+
+            if( result == MemberResolutionResult.Resolved )
             {
-                state.RootResult = null;
+                state.RootResult = actualValue;
                 return;
             }
 
-            // Resolve Polymorphism for Root
-            if( rootData is SerializedObject rootObj )
+            if( result == MemberResolutionResult.RequiresPush )
             {
-                Type actualType = Persistent_Type.ReadTypeHeader( rootObj, state.Context.Config.TypeResolver );
-                if( actualType != null && actualType != rootDescriptor.MappedType )
-                {
-                    if( !rootDescriptor.MappedType.IsAssignableFrom( actualType ) )
-                    {
-                        string msg = $"Polymorphic type mismatch: Data specifies type '{actualType.FullName}', which is not assignable to root expected type '{rootDescriptor.MappedType.FullName}'.";
-                        throw new UPSSerializationException( state.Context, msg, "root", rootDescriptor, null, "Resolve Polymorphism", null );
-                    }
-
-                    if( root != null )
-                    {
-                        Type existingType = root.GetType();
-                        if( actualType != existingType && !existingType.IsAssignableFrom( actualType ) )
-                        {
-                            string msg = $"Polymorphic type mismatch: Data specifies type '{actualType.FullName}', which is incompatible with existing root target of type '{existingType.FullName}'.";
-                            throw new UPSSerializationException( state.Context, msg, "root", rootDescriptor, null, "Resolve Polymorphism", null );
-                        }
-                    }
-
-                    rootDescriptor = TypeDescriptorRegistry.GetDescriptor( actualType, ContextKey.Default );
-                }
-            }
-
-            // [Primitive Root]
-            if( rootDescriptor is IPrimitiveDescriptor primitiveRoot )
-            {
-                if( primitiveRoot.DeserializeDirect( rootData, state.Context, out object res ) == DeserializationResult.Success )
-                    state.RootResult = res;
+                PushCursor( root, null, null, actualDescriptor, unwrappedNode, pendingId, false, state );
                 return;
             }
 
-            var cursor = new SerializationCursor
+            if( result == MemberResolutionResult.Failed )
             {
-                TargetObj = new TrackedObject( root ), // root Parent is null
-                Descriptor = rootDescriptor,
-                StepIndex = 0,
-                DataNode = rootData,
-                Phase = SerializationCursorPhase.PreProcessing,
-                WriteBackOnPop = false // Root has no parent to write back to
-            };
+                throw new UPSMemberResolutionException( state.Context, $"Failed to resolve the root object.", "root", actualDescriptor, null, "Initialize Root", null );
+            }
 
-            state.Stack.Push( cursor );
+            throw new UPSSerializationException( state.Context, "Root object cannot be a reference to an unresolved object.", "root", actualDescriptor, null, "Initialize Root", null );
         }
 
         public SerializationCursorResult Process( ref SerializationCursor cursor, SerializationState state )
@@ -76,15 +45,12 @@ namespace UnityPlus.Serialization
                 case SerializationCursorPhase.PostProcessing:
                     return PhasePostProcessing( ref cursor, state );
                 default:
-                    return SerializationCursorResult.Finished;
+                    throw new InvalidOperationException( $"Invalid cursor phase for deserialization: {cursor.Phase}" );
             }
         }
 
         public void OnCursorFinished( SerializationCursor cursor, SerializationState state )
         {
-            // CRITICAL FIX: If the root object was a Value Type (struct) or the reference was swapped
-            // (e.g. array resize, or re-boxing during population), the 'TargetObj.Target' inside
-            // the finished cursor holds the FINAL version. We must update the state result.
             if( cursor.TargetObj.IsRoot )
             {
                 state.RootResult = cursor.TargetObj.Target;
@@ -93,34 +59,31 @@ namespace UnityPlus.Serialization
 
         private static SerializationCursorResult PhasePreProcessing( ref SerializationCursor cursor, SerializationState state )
         {
-            // Capture ID before unwrapping collections (e.g. List wrapped in Object with $id)
-            if( cursor.DataNode is SerializedObject objNode && Persistent_Guid.TryReadIdHeader( objNode, out Guid preId ) )
-            {
-                cursor.PendingID = preId;
-            }
-
-#warning TODO - potentially move this to the descriptor itself, since this is somewhat descriptor-specific (formatting).
             if( cursor.Descriptor is ICollectionDescriptor )
             {
-                var valNode = SerializationHelpers.GetValueNode( cursor.DataNode, state.Context.Config.ForceStandardJson );
-                if( valNode != null )
-                    cursor.DataNode = valNode;
+#warning TODO - this causes incorrect handling of wrapped collections where expected = unwrapped. see the point lower about swallowing this silently for more details. The CreateInitialTarget is not even invoked.
+                if( cursor.DataNode is SerializedArray arr )
+                {
+                    cursor.PopulationStepCount = arr.Count;
+                }
+                else
+                {
+                    cursor.PopulationStepCount = 0;
+                }
             }
-
-            var compDesc = (ICompositeDescriptor)cursor.Descriptor;
-            cursor.ConstructionStepCount = compDesc.GetConstructionStepCount( cursor.TargetObj.Target );
-
-            if( cursor.Descriptor is ICollectionDescriptor && cursor.DataNode is SerializedArray arrNode )
+            else if( cursor.Descriptor is ICompositeDescriptor compDesc )
             {
-                cursor.PopulationStepCount = arrNode.Count;
-            }
-            else
-            {
-                cursor.PopulationStepCount = compDesc.GetStepCount( cursor.TargetObj.Target ) - cursor.ConstructionStepCount;
+                cursor.MemberEnumerator = compDesc.GetMemberEnumerator( cursor.TargetObj.Target );
+
+                if( cursor.MemberEnumerator == null )
+                {
+                    cursor.ConstructionStepCount = compDesc.GetConstructionStepCount( cursor.TargetObj.Target );
+                    cursor.PopulationStepCount = compDesc.GetStepCount( cursor.TargetObj.Target ) - cursor.ConstructionStepCount;
+                }
             }
 
-            // Always enter construction phase if the type requires it (e.g. immutable), 
-            // even if we have an existing target (Populate).
+            cursor.StepIndex = 0;
+
             if( cursor.ConstructionStepCount > 0 )
             {
                 cursor.ConstructionBuffer = new object[cursor.ConstructionStepCount];
@@ -131,7 +94,6 @@ namespace UnityPlus.Serialization
                 cursor.Phase = SerializationCursorPhase.Instantiation;
             }
 
-            cursor.StepIndex = 0;
             return SerializationCursorResult.Jump;
         }
 
@@ -144,112 +106,98 @@ namespace UnityPlus.Serialization
             }
 
             var parentDesc = (ICompositeDescriptor)cursor.Descriptor;
-            int activeIndex = cursor.StepIndex;
-            IMemberInfo memberInfo = parentDesc.GetMemberInfo( activeIndex );
+            IMemberInfo member = parentDesc.GetMemberInfo( cursor.StepIndex );
 
-            if( memberInfo == null )
+            if( member == null )
             {
                 return SerializationCursorResult.Advance;
             }
 
-#warning TODO - potentially replace call to construction buffer with just actual type.
-            MemberResolutionResult result = TryResolveMember( memberInfo, cursor.ConstructionBuffer, cursor.DataNode, activeIndex, state, out object val );
+            if( !TryGetDataNode( cursor.DataNode, member.Name, cursor.StepIndex, out SerializedData childNode ) )
+            {
+                return HandleMissingConstructionArgument( ref cursor, member, state );
+            }
+
+            ContextKey context = member.GetContext( cursor.ConstructionBuffer );
+
+            MemberResolutionResult result = TryProcessMember( childNode, member.DeclaredType, context, member, state,
+                out object actualValue, out IDescriptor actualDescriptor, out SerializedData unwrappedNode, out Guid? pendingId );
 
             if( result == MemberResolutionResult.Resolved )
             {
                 object buffer = cursor.ConstructionBuffer;
                 try
                 {
-                    memberInfo.SetValue( ref buffer, val );
+                    member.SetValue( ref buffer, actualValue );
                 }
                 catch( Exception ex )
                 {
-                    WrapException( ex, state, "Setting Construction Argument", cursor.Descriptor, memberInfo );
+                    WrapException( ex, state, "Setting Construction Argument", cursor.Descriptor, member );
                 }
                 return SerializationCursorResult.Advance;
             }
-            else if( result == MemberResolutionResult.Missing )
-            {
-                // Try to read from existing target if available (Populate)
-                if( cursor.TargetObj.Target != null )
-                {
-                    try
-                    {
-                        // Attempt to read the value from the existing instance to fill the construction buffer
-                        object existingVal = memberInfo.GetValue( cursor.TargetObj.Target );
-                        object buffer = cursor.ConstructionBuffer;
-                        memberInfo.SetValue( ref buffer, existingVal );
-                        return SerializationCursorResult.Advance;
-                    }
-                    catch { } // Ignore if descriptor doesn't support reading from instance
-                }
 
-                // Fallback to null/default
-                object buf = cursor.ConstructionBuffer;
-                try
-                {
-                    memberInfo.SetValue( ref buf, null );
-                }
-                catch( Exception ex )
-                {
-                    WrapException( ex, state, "Setting Default Construction Argument", cursor.Descriptor, memberInfo );
-                }
-                return SerializationCursorResult.Advance;
-            }
-            else if( result == MemberResolutionResult.RequiresPush )
+            if( result == MemberResolutionResult.RequiresPush )
             {
-                PushChildCursor( ref cursor, memberInfo, activeIndex, true, state );
-                return SerializationCursorResult.Push; // Driver handles parent increment
+                PushChildCursor( ref cursor, member, actualDescriptor, unwrappedNode, pendingId, true, state );
+                return SerializationCursorResult.Push;
             }
-            else if( result == MemberResolutionResult.Deferred )
+
+            if( result == MemberResolutionResult.Deferred )
             {
-                state.Context.DeferredOperations.Enqueue( new DeferredOperation()
-                {
-                    Target = cursor.TargetObj.Parent,
-                    Member = cursor.TargetObj.Member,
-                    Data = cursor.DataNode,
-                    Descriptor = cursor.Descriptor,
-                    ConstructionBuffer = cursor.ConstructionBuffer,
-                    ConstructionIndex = cursor.StepIndex
-                } );
+                state.Context.EnqueueDeferredConstruction( cursor.TargetObj.Parent, cursor.TargetObj.Member, cursor.DataNode, cursor.Descriptor, cursor.ConstructionBuffer, cursor.StepIndex );
                 return SerializationCursorResult.Deferred;
             }
-            else
+
+            Debug.LogWarning( $"Failed to resolve construction argument {member.Name}" );
+            return SerializationCursorResult.Advance;
+        }
+
+        private static SerializationCursorResult HandleMissingConstructionArgument( ref SerializationCursor cursor, IMemberInfo memberInfo, SerializationState state )
+        {
+            object buffer = cursor.ConstructionBuffer;
+            if( cursor.TargetObj.Target != null )
             {
-                Debug.LogWarning( $"Failed to resolve construction argument {memberInfo.Name}" );
-                return SerializationCursorResult.Advance;
+                try
+                {
+                    object existingVal = memberInfo.GetValue( cursor.TargetObj.Target );
+                    memberInfo.SetValue( ref buffer, existingVal );
+                    return SerializationCursorResult.Advance;
+                }
+                catch { }
             }
+
+            try
+            {
+                memberInfo.SetValue( ref buffer, null );
+            }
+            catch( Exception ex )
+            {
+                WrapException( ex, state, "Setting Default Construction Argument", cursor.Descriptor, memberInfo );
+            }
+            return SerializationCursorResult.Advance;
         }
 
         private static SerializationCursorResult PhaseInstantiation( ref SerializationCursor cursor, SerializationState state )
         {
             var compositeDesc = (ICompositeDescriptor)cursor.Descriptor;
 
-            // If we constructed a new instance (or forced construction), use it.
-            // If we skipped construction (Target != null && StepCount == 0), we keep existing target.
-            if( cursor.ConstructionBuffer != null )
+            try
             {
-                try
+                if( cursor.ConstructionBuffer != null )
                 {
                     object newInstance = compositeDesc.Construct( cursor.ConstructionBuffer );
                     cursor.TargetObj = cursor.TargetObj.WithTarget( newInstance );
                 }
-                catch( Exception ex )
-                {
-                    WrapException( ex, state, "Constructing Object", cursor.Descriptor, null );
-                }
-            }
-            else if( cursor.TargetObj.Target == null )
-            {
-                try
+                else if( cursor.TargetObj.Target == null )
                 {
                     object newInstance = compositeDesc.CreateInitialTarget( cursor.DataNode, state.Context );
                     cursor.TargetObj = cursor.TargetObj.WithTarget( newInstance );
                 }
-                catch( Exception ex )
-                {
-                    WrapException( ex, state, "Creating Initial Target", cursor.Descriptor, null );
-                }
+            }
+            catch( Exception ex )
+            {
+                WrapException( ex, state, (cursor.ConstructionBuffer != null) ? "Constructing Object" : "Creating Initial Target", cursor.Descriptor, null );
             }
 
             if( cursor.TargetObj.Target == null )
@@ -257,8 +205,6 @@ namespace UnityPlus.Serialization
                 WrapException( new InvalidOperationException( "Factory returned null." ), state, "Constructing Object", cursor.Descriptor, null );
             }
 
-            // If we are populating an existing collection (Target != null), we need to prepare it.
-            // Resize is intended to clear existing contents and prepare for population, but it also serves to resize arrays if needed.
             if( cursor.Descriptor is ICollectionDescriptor colDesc && cursor.DataNode is SerializedArray arr )
             {
                 try
@@ -273,17 +219,14 @@ namespace UnityPlus.Serialization
             }
 
             if( cursor.PendingID.HasValue )
-            {
                 state.Context.ForwardMap.SetObj( cursor.PendingID.Value, cursor.TargetObj.Target );
-            }
-            else if( cursor.DataNode is SerializedObject objNode && Persistent_Guid.TryReadIdHeader( objNode, out Guid guid ) )
-            {
-                state.Context.ForwardMap.SetObj( guid, cursor.TargetObj.Target );
-            }
 
             if( cursor.TargetObj.IsRoot && state.Stack.Count == 1 )
-            {
                 state.RootResult = cursor.TargetObj.Target;
+
+            if( cursor.Descriptor is ISerializationCallbackDescriptor callbackDesc )
+            {
+                callbackDesc.OnDeserializing( cursor.TargetObj.Target, state.Context );
             }
 
             cursor.Phase = SerializationCursorPhase.Population;
@@ -293,212 +236,250 @@ namespace UnityPlus.Serialization
 
         private static SerializationCursorResult PhasePopulation( ref SerializationCursor cursor, SerializationState state )
         {
-            if( cursor.TargetObj.Target == null )
+            if( cursor.StepIndex >= cursor.PopulationStepCount ) // Finished.
             {
                 cursor.Phase = SerializationCursorPhase.PostProcessing;
                 return SerializationCursorResult.Jump;
             }
 
-            if( cursor.StepIndex >= cursor.PopulationStepCount )
-            {
-                cursor.Phase = SerializationCursorPhase.PostProcessing;
-                return SerializationCursorResult.Jump;
-            }
+            int memberIndex = cursor.StepIndex + cursor.ConstructionStepCount;
+            IMemberInfo member = ((ICompositeDescriptor)cursor.Descriptor).GetMemberInfo( memberIndex );
 
-            var parentDesc = (ICompositeDescriptor)cursor.Descriptor;
-            int offset = cursor.ConstructionStepCount;
-            int absoluteIndex = cursor.StepIndex + offset;
-
-            IMemberInfo memberInfo = parentDesc.GetMemberInfo( absoluteIndex );
-
-            if( memberInfo == null )
+            if( member == null )
             {
                 return SerializationCursorResult.Advance;
             }
 
-            MemberResolutionResult result = TryResolveMember( memberInfo, cursor.TargetObj.Target, cursor.DataNode, absoluteIndex, state, out object val );
+            if( !TryGetDataNode( cursor.DataNode, member.Name, memberIndex, out SerializedData memberData ) )
+            {
+                return SerializationCursorResult.Advance;
+            }
+
+            ContextKey context = member.GetContext( cursor.TargetObj.Target );
+
+            MemberResolutionResult result = TryProcessMember( memberData, member.DeclaredType, context, member, state,
+                out object resolvedValue, out IDescriptor resolvedDescriptor, out SerializedData unwrappedNode, out Guid? pendingId );
 
             if( result == MemberResolutionResult.Resolved )
             {
-                object t = cursor.TargetObj.Target;
+                object target = cursor.TargetObj.Target;
                 try
                 {
-                    memberInfo.SetValue( ref t, val );
+                    member.SetValue( ref target, resolvedValue );
                 }
                 catch( Exception ex )
                 {
-                    WrapException( ex, state, "Setting Member Value", cursor.Descriptor, memberInfo );
+                    WrapException( ex, state, "Setting Member Value", cursor.Descriptor, member );
                 }
 
-                // Update cursor target in case of value type replacement
-                cursor.TargetObj = cursor.TargetObj.WithTarget( t );
+                cursor.TargetObj = cursor.TargetObj.WithTarget( target );
                 return SerializationCursorResult.Advance;
             }
-            else if( result == MemberResolutionResult.Missing )
-            {
-                return SerializationCursorResult.Advance; // Ignore missing members (Populate behavior)
-            }
-            else if( result == MemberResolutionResult.RequiresPush )
-            {
-                PushChildCursor( ref cursor, memberInfo, absoluteIndex, false, state );
-                return SerializationCursorResult.Push; // Driver increments
-            }
-            else if( result == MemberResolutionResult.Deferred )
-            {
-                // For population, we can't easily defer if we don't have the data node.
-                // But TryResolveMember only returns Deferred if it found a ref.
-                // If Missing, it returns Missing.
 
-                // If we are here, we found a ref but it's not resolved yet.
-                // We need the DataNode for the deferred operation.
-                TryGetDataNode( cursor.DataNode, memberInfo.Name, absoluteIndex, out SerializedData failedData );
-
-                state.Context.EnqueueDeferred( cursor.TargetObj.Target, memberInfo, failedData );
-                return SerializationCursorResult.Advance; // Skip member and continue
-            }
-            else
+            if( result == MemberResolutionResult.RequiresPush )
             {
+                PushChildCursor( ref cursor, member, resolvedDescriptor, unwrappedNode, pendingId, false, state );
+                return SerializationCursorResult.Push;
+            }
+
+            if( result == MemberResolutionResult.Deferred )
+            {
+                state.Context.EnqueueDeferred( cursor.TargetObj.Target, member, memberData );
                 return SerializationCursorResult.Advance;
             }
+#warning TODO - handle members that are IDisposable / custom-disposable (e.g. gameobjects are disposable but do not implement IDisposable). automatic cleanup is nice QOL.
+
+            return SerializationCursorResult.Advance;
         }
 
         private static SerializationCursorResult PhasePostProcessing( ref SerializationCursor cursor, SerializationState state )
         {
-            if( cursor.TargetObj.Target != null && cursor.Descriptor is ICompositeDescriptor comp )
+            if( cursor.Descriptor is ISerializationCallbackDescriptor callbackDesc )
             {
-                comp.OnDeserialized( cursor.TargetObj.Target, state.Context );
+                callbackDesc.OnDeserialized( cursor.TargetObj.Target, state.Context );
             }
             return SerializationCursorResult.Finished;
         }
 
-        private static MemberResolutionResult TryResolveMember( IMemberInfo memberInfo, object target, SerializedData parentData, int index, SerializationState state, out object value )
+
+
+        private static MemberResolutionResult TryProcessMember(
+            SerializedData node,
+            Type declaredType,
+            ContextKey context,
+            IMemberInfo memberInfo,
+            SerializationState state,
+            out object actualValue,
+            out IDescriptor actualDescriptor,
+            out SerializedData data,
+            out Guid? pendingId )
         {
-            IDescriptor memberDesc = memberInfo.TypeDescriptor;
-            if( memberDesc == null )
+            actualValue = null;
+#warning TODO - optimize - only get if actual type differs
+            actualDescriptor = TypeDescriptorRegistry.GetDescriptor( declaredType, context );
+            data = node;
+            pendingId = null;
+
+            // 1. Null check.
+            if( node == null )
             {
-                memberDesc = TypeDescriptorRegistry.GetDescriptor( memberInfo.MemberType, memberInfo.GetContext( target ) );
+                return MemberResolutionResult.Resolved;
             }
 
-            if( memberDesc is IPrimitiveDescriptor primitiveDesc )
+            // 3. Type resolution.
+            Type actualType = declaredType;
+
+            if( node is SerializedObject typeObj )
             {
-                if( !TryGetDataNode( parentData, memberInfo.Name, index, out SerializedData primitiveData ) )
+                if( Persistent_Guid.TryReadIdHeader( typeObj, out Guid id ) )
                 {
-                    value = null;
-                    return MemberResolutionResult.Missing;
+                    pendingId = id;
                 }
 
-                DeserializationResult result = DeserializationResult.Success;
+                if( Persistent_Type.TryReadTypeName( typeObj, out string typeName ) )
+                {
+                    Type resolvedType = state.Context.Config.TypeResolver.ResolveType( typeName );
+                    if( resolvedType == null )
+                    {
+                        string path = state.Stack.BuildPath();
+                        string msg = $"Unable to resolve type name '{typeName}' specified in data at '{path}'.";
+                        throw new UPSTypeResolutionException( state.Context, msg, path, actualDescriptor, memberInfo, "Resolve Polymorphism", null );
+                    }
+                    if( !declaredType.IsAssignableFrom( resolvedType ) )
+                    {
+                        string path = state.Stack.BuildPath();
+                        string msg = $"Data specifies type '{resolvedType.FullName}', which is not assignable to the expected type '{declaredType.AssemblyQualifiedName}'.";
+                        throw new UPSTypeResolutionException( state.Context, msg, path, actualDescriptor, memberInfo, "Resolve Polymorphism", null );
+                    }
+                    actualType = resolvedType;
+                }
+            }
+
+            actualDescriptor = TypeDescriptorRegistry.GetDescriptor( actualType, context );
+
+            // 4. Structure determination & unwrapping.
+            ObjectStructure expectedStructure = actualDescriptor.DetermineObjectStructure( declaredType, actualType, state.Context.Config, out _, out _ );
+
+            SerializedData wrappedNode = null;
+            if( node is SerializedObject wrapperObj )
+            {
+                bool flag = wrapperObj.TryGetValue( KeyNames.VALUE, out wrappedNode );
+                if( expectedStructure == ObjectStructure.Wrapped && flag )
+                {
+                    data = wrappedNode;
+                }
+                else if( expectedStructure == ObjectStructure.InlineMetadata )
+                {
+                    data = wrapperObj;
+                }
+            }
+
+            if( data == null ) // wrapped null.
+            {
+                return MemberResolutionResult.Resolved;
+            }
+
+            if( state.Context.Config.WrapperHandling == WrapperHandling.Strict )
+            {
+#warning TODO - case where expected = unwrapped, actual = wrapped is swallowed silently.
+#warning TODO - especially deadly when the wrapper is missing a $type field, because then the actual type is "wrong", which can lead to bad deserializations. 
+                // but that means the deserialization should still throw if there should be no wrapper.
+                // the main issue is that we can't reliably distinguish a malformed wrapper from a valid unwrapped data.
+                // we would have to look if the member has its own member named "value" or not, but then that's annoying and slow.
+                if( expectedStructure == ObjectStructure.Wrapped && data == node )
+                {
+                    throw new UPSInvalidWrapperException( state.Context, $"Expected a wrapper data object with '{KeyNames.VALUE}' for type {actualType.FullName}, but found unwrapped data.", state.Stack.BuildPath(), actualDescriptor, memberInfo, "Processing Value", null );
+                }
+#warning INFO - kinda ugly "fix" but it works.
+                if( expectedStructure == ObjectStructure.Unwrapped && actualDescriptor is ICollectionDescriptor && wrappedNode != null ) // wrappedNode implicitly checks for node is SerializedObject as well.
+                {
+                    throw new UPSInvalidWrapperException( state.Context, $"Expected unwrapped data for collection type {actualType.FullName}, but found wrapped data.", state.Stack.BuildPath(), actualDescriptor, memberInfo, "Processing Value", null );
+                }
+            }
+
+            // 5. Deserialization.
+            if( actualDescriptor is IPrimitiveDescriptor primitiveDesc )
+            {
+                DeserializationResult result = default;
                 try
                 {
-                    result = primitiveDesc.DeserializeDirect( primitiveData, state.Context, out value );
+#warning TODO - descriptor can "choose" to swallow exceptions and return a 'failure' state. we need to handle this.
+                    result = primitiveDesc.DeserializeDirect( data, state.Context, out actualValue );
                 }
                 catch( Exception ex )
                 {
-                    value = null;
-                    // Can't use WrapException easily here because we don't have the cursor/descriptor handy in the same way,
-                    // but we can pass what we have.
-                    // We need to re-throw or handle. Since this method returns a result, throwing is appropriate for fatal errors.
-                    WrapException( ex, state, "Deserializing Primitive", memberDesc, memberInfo );
+                    actualValue = null;
+                    WrapException( ex, state, "Deserializing Primitive", actualDescriptor, memberInfo );
                 }
 
                 if( result == DeserializationResult.Success )
+                {
+                    if( pendingId.HasValue && actualValue != null )
+                    {
+                        state.Context.ForwardMap.SetObj( pendingId.Value, actualValue );
+                    }
                     return MemberResolutionResult.Resolved;
+                }
                 if( result == DeserializationResult.Deferred )
                     return MemberResolutionResult.Deferred;
                 return MemberResolutionResult.Failed;
             }
 
-            if( !TryGetDataNode( parentData, memberInfo.Name, index, out SerializedData childNode ) )
+            // 6. Handle auto-references.
+            if( actualDescriptor is ICompositeDescriptor )
             {
-                value = null;
-                return MemberResolutionResult.Missing;
-            }
-
-            if( childNode == null )
-            {
-                value = null;
-                return MemberResolutionResult.Resolved;
-            }
-
-            MemberResolutionResult refResult = TryResolveReference( childNode, state, out value );
-            if( refResult == MemberResolutionResult.Resolved )
-                return MemberResolutionResult.Resolved;
-            if( refResult == MemberResolutionResult.Deferred )
-                return MemberResolutionResult.Deferred;
-
-            return MemberResolutionResult.RequiresPush;
-        }
-
-        private static MemberResolutionResult TryResolveReference( SerializedData data, SerializationState state, out object value )
-        {
-            value = null;
-            if( data is SerializedObject refObj && refObj.TryGetValue( KeyNames.REF, out var refVal ) )
-            {
-                if( refVal is SerializedPrimitive refPrim && Guid.TryParse( (string)refPrim, out Guid refGuid ) )
+                if( node is SerializedObject refObj && Persistent_Guid.TryReadRefHeader( refObj, out Guid refGuid ) )
                 {
                     if( state.Context.ForwardMap.TryGetObj( refGuid, out object existingObj ) )
                     {
-                        value = existingObj;
+                        actualValue = existingObj;
                         return MemberResolutionResult.Resolved;
                     }
-
-                    // Optimistic Deferral: If we can't find it now, assume it's coming later.
-                    // If it never shows up, the Driver's deadlock detector will catch it.
                     return MemberResolutionResult.Deferred;
                 }
+
+                if( data is SerializedPrimitive )
+                {
+                    throw new UPSDataMismatchException( state.Context, $"Expected either a {nameof( SerializedObject )} or a {nameof( SerializedArray )}  for type {actualType.FullName}, but found primitive.", state.Stack.BuildPath(), actualDescriptor, memberInfo, "Processing Value", null );
+                }
+
+                return MemberResolutionResult.RequiresPush;
             }
-            return MemberResolutionResult.Failed;
+
+            throw new UPSSerializationException( state.Context, $"Unsupported descriptor type: {actualDescriptor.GetType().FullName}", state.Stack.BuildPath(), actualDescriptor, memberInfo, "Processing Value", null );
         }
 
-        private static void PushChildCursor( ref SerializationCursor parentCursor, IMemberInfo memberInfo, int absoluteIndex, bool isConstructionPhase, SerializationState state )
+        private static void PushCursor( object target, object parent, IMemberInfo memberInfo, IDescriptor descriptor, SerializedData dataNode, Guid? pendingId, bool writeBackOnPop, SerializationState state )
         {
-            TryGetDataNode( parentCursor.DataNode, memberInfo.Name, absoluteIndex, out SerializedData childNode );
+            var cursor = new SerializationCursor()
+            {
+                TargetObj = new TrackedObject( target, parent, memberInfo ),
+                Descriptor = descriptor,
+                DataNode = dataNode,
+                PendingID = pendingId,
+                Phase = SerializationCursorPhase.PreProcessing,
+                StepIndex = 0,
+                WriteBackOnPop = writeBackOnPop
+            };
 
-            // Determine parent for the child. 
-            // If construction phase, parent is the buffer. If population, parent is the actual target.
+            state.Stack.Push( cursor );
+        }
+
+        private static void PushChildCursor( ref SerializationCursor parentCursor, IMemberInfo memberInfo, IDescriptor resolvedDescriptor, SerializedData unwrappedNode, Guid? pendingId, bool isConstructionPhase, SerializationState state )
+        {
             object parentObj = isConstructionPhase ? (object)parentCursor.ConstructionBuffer : parentCursor.TargetObj.Target;
 
-            // Resolve Polymorphism for Child
-            IDescriptor memberDesc = memberInfo.TypeDescriptor;
-            if( memberDesc == null )
-            {
-                memberDesc = TypeDescriptorRegistry.GetDescriptor( memberInfo.MemberType, memberInfo.GetContext( parentObj ) );
-            }
-
-            if( childNode is SerializedObject childObj )
-            {
-                Type actualType = Persistent_Type.ReadTypeHeader( childObj, state.Context.Config.TypeResolver );
-                if( actualType != null && actualType != memberInfo.MemberType )
-                {
-                    if( !memberInfo.MemberType.IsAssignableFrom( actualType ) )
-                    {
-                        string path = state.Stack.BuildPath();
-                        string msg = $"Polymorphic type mismatch: Data specifies type '{actualType.FullName}', which is not assignable to the member type '{memberInfo.MemberType.AssemblyQualifiedName}'.";
-                        throw new UPSSerializationException( state.Context, msg, path, parentCursor.Descriptor, memberInfo, "Resolve Polymorphism", null );
-                    }
-
-                    memberDesc = TypeDescriptorRegistry.GetDescriptor( actualType, memberInfo.GetContext( parentObj ) );
-                }
-            }
-
-            // Optimization: If not construction phase, and parent exists, try to get existing object (PopulateExisting)
             object existingChild = null;
             if( !isConstructionPhase && parentObj != null )
             {
-                existingChild = memberInfo.GetValue( parentObj );
+                try
+                {
+                    existingChild = memberInfo.GetValue( parentObj );
+                }
+                catch { }
             }
 
-            var childCursor = new SerializationCursor
-            {
-                TargetObj = new TrackedObject( existingChild, parentObj, memberInfo ),
-                Descriptor = memberDesc,
-                DataNode = childNode,
-                Phase = SerializationCursorPhase.PreProcessing,
-                StepIndex = 0,
-                WriteBackOnPop = true // Always write back deserialized children to their parents
-            };
-
-            state.Stack.Push( childCursor );
+            PushCursor( existingChild, parentObj, memberInfo, resolvedDescriptor, unwrappedNode, pendingId, true, state );
         }
 
         private static bool TryGetDataNode( SerializedData parent, string key, int index, out SerializedData data )

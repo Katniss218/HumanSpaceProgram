@@ -17,29 +17,27 @@ namespace HSP.Vanilla.Scenes.GameplayScene.Tools
     /// </summary>
     public class ConstructTool : GameplaySceneTool
     {
+        public bool AngleSnappingEnabled { get; set; }
+        public float AngleSnappingInterval { get; set; }
+
         Transform _heldPart = null;
 
         Vector3 _heldOffset;
         Quaternion _heldRotation = Quaternion.identity;
 
         FAttachNode[] _nodes;
-
-        public bool AngleSnappingEnabled { get; set; }
-        public float AngleSnappingInterval { get; set; }
-
         FAttachNode.SnappingCandidate? _currentSnap = null;
 
-        private Ray _cursorRay;
-        private Transform _hitObject;
-        private RaycastHit _hit;
-
-        IForwardReferenceMap refMap; // ref map used to spawn the object.
+        Ray _cursorRay;
+        Transform _hitObject;
+        RaycastHit _hit;
+        IForwardReferenceMap _refMap; // ref map used to spawn the object.
 
         public void SpawnVesselAndSetGhost( string vesselId )
         {
             ForwardReferenceStore refStore = new ForwardReferenceStore();
-            GameObject spawnedGameObject = PartRegistry.Load( new NamespacedID( "Vessels", vesselId ), refStore );
-            if( spawnedGameObject == null )
+
+            if( !PartRegistry.TryLoad( new NamespacedID( "Vessels", vesselId ), refStore, out GameObject spawnedGameObject ) )
             {
                 GameplaySceneToolManager.UseTool<DefaultTool>();
                 return;
@@ -50,7 +48,7 @@ namespace HSP.Vanilla.Scenes.GameplayScene.Tools
                 fc.BuildPoints = 0.0f; // This ghosts the new object.
             }
 
-            this.refMap = refStore;
+            this._refMap = refStore;
             this._heldPart = spawnedGameObject.transform;
             this._heldPart.gameObject.SetLayer( (int)Layer.VESSEL_DESIGN_HELD, true );
             this._heldOffset = Vector3.zero;

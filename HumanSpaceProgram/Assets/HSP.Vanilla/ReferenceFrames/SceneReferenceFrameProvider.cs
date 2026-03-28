@@ -2,6 +2,7 @@
 using HSP.Vanilla.Scenes.GameplayScene;
 using HSP.Vanilla.Scenes.MapScene;
 using UnityPlus.Serialization;
+using UnityPlus.Serialization.Descriptors;
 
 namespace HSP.Vanilla.ReferenceFrames
 {

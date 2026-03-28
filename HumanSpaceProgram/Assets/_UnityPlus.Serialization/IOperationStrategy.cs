@@ -1,11 +1,13 @@
-﻿namespace UnityPlus.Serialization
+﻿using System;
+
+namespace UnityPlus.Serialization
 {
     public interface IOperationStrategy
     {
         /// <summary>
         /// Sets up the initial stack state and root result logic.
         /// </summary>
-        void InitializeRoot( object root, IDescriptor descriptor, SerializedData data, SerializationState state );
+        void InitializeRoot( Type declaredType, ContextKey contextKey, object root, SerializedData data, SerializationState state );
 
         /// <summary>
         /// Processes the current cursor.

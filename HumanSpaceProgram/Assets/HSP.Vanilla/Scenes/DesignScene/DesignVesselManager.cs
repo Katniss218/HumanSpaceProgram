@@ -226,7 +226,7 @@ namespace HSP.Vanilla.Scenes.DesignScene
         {
             // save current vessel to the files defined by metadata's ID.
             Directory.CreateDirectory( CurrentVesselMetadata.GetRootDirectory() );
-            JsonSerializedDataHandler _designObjDataHandler = new JsonSerializedDataHandler( Path.Combine( CurrentVesselMetadata.GetRootDirectory(), "gameobjects.json" ) );
+            FileSerializedDataHandler _designObjDataHandler = new FileSerializedDataHandler( Path.Combine( CurrentVesselMetadata.GetRootDirectory(), "gameobjects.json" ), JsonFormat.Instance );
 
             HSPEvent.EventManager.TryInvoke( HSPEvent_BEFORE_DESIGN_SCENE_VESSEL_SAVED.ID, null );
 
@@ -243,7 +243,7 @@ namespace HSP.Vanilla.Scenes.DesignScene
 
             // load current vessel from the files defined by metadata's ID.
             Directory.CreateDirectory( loadedVesselMetadata.GetRootDirectory() );
-            JsonSerializedDataHandler _designObjDataHandler = new JsonSerializedDataHandler( Path.Combine( loadedVesselMetadata.GetRootDirectory(), "gameobjects.json" ) );
+            FileSerializedDataHandler _designObjDataHandler = new FileSerializedDataHandler( Path.Combine( loadedVesselMetadata.GetRootDirectory(), "gameobjects.json" ), JsonFormat.Instance );
 
             HSPEvent.EventManager.TryInvoke( HSPEvent_BEFORE_DESIGN_SCENE_VESSEL_LOADED.ID, null );
             CurrentVesselMetadata = loadedVesselMetadata; // CurrentVesselMetadata should be set after invoking before load.

@@ -34,7 +34,6 @@ namespace UnityPlus.Serialization
             Register( typeof( Ctx.Value ), ContextIDs.Default );
             Register( typeof( Ctx.Asset ), ContextIDs.Asset );
             Register( typeof( Ctx.Ref ), ContextIDs.Ref );
-
             RegisterName( ContextIDs.Default, "Default" );
             RegisterName( ContextIDs.Ref, "Reference" );
             RegisterName( ContextIDs.Asset, "Asset" );
@@ -42,12 +41,11 @@ namespace UnityPlus.Serialization
             // Register Array Contexts
             Register( typeof( Ctx.Array<Ctx.Ref> ), ContextIDs.ArrayRefs );
             Register( typeof( Ctx.Array<Ctx.Asset> ), ContextIDs.ArrayAssets );
-
-            RegisterContextArguments( new ContextKey( ContextIDs.ArrayRefs ), new ContextKey( ContextIDs.Ref ) );
-            RegisterContextArguments( new ContextKey( ContextIDs.ArrayAssets ), new ContextKey( ContextIDs.Asset ) );
-
             RegisterName( ContextIDs.ArrayRefs, "Array<Ref>" );
             RegisterName( ContextIDs.ArrayAssets, "Array<Asset>" );
+
+            RegisterSelector( new ContextKey( ContextIDs.ArrayRefs ), new UniformSelector( new ContextKey( ContextIDs.Ref ) ) );
+            RegisterSelector( new ContextKey( ContextIDs.ArrayAssets ), new UniformSelector( new ContextKey( ContextIDs.Asset ) ) );
 
             // Register Dictionary Contexts
             Register( typeof( Ctx.KeyValue<Ctx.Value, Ctx.Ref> ), ContextIDs.DictValueToRef );
@@ -55,28 +53,23 @@ namespace UnityPlus.Serialization
             Register( typeof( Ctx.KeyValue<Ctx.Ref, Ctx.Ref> ), ContextIDs.DictRefToRef );
             Register( typeof( Ctx.KeyValue<Ctx.Value, Ctx.Asset> ), ContextIDs.DictValueToAsset );
             Register( typeof( Ctx.KeyValue<Ctx.Ref, Ctx.Asset> ), ContextIDs.DictRefToAsset );
-
-            RegisterContextArguments( new ContextKey( ContextIDs.DictValueToRef ), new ContextKey( ContextIDs.Default ), new ContextKey( ContextIDs.Ref ) );
-            RegisterContextArguments( new ContextKey( ContextIDs.DictRefToValue ), new ContextKey( ContextIDs.Ref ), new ContextKey( ContextIDs.Default ) );
-            RegisterContextArguments( new ContextKey( ContextIDs.DictRefToRef ), new ContextKey( ContextIDs.Ref ), new ContextKey( ContextIDs.Ref ) );
-            RegisterContextArguments( new ContextKey( ContextIDs.DictValueToAsset ), new ContextKey( ContextIDs.Default ), new ContextKey( ContextIDs.Asset ) );
-            RegisterContextArguments( new ContextKey( ContextIDs.DictRefToAsset ), new ContextKey( ContextIDs.Ref ), new ContextKey( ContextIDs.Asset ) );
-
             RegisterName( ContextIDs.DictValueToRef, "Dict<Default, Ref>" );
             RegisterName( ContextIDs.DictRefToValue, "Dict<Ref, Default>" );
             RegisterName( ContextIDs.DictRefToRef, "Dict<Ref, Ref>" );
             RegisterName( ContextIDs.DictValueToAsset, "Dict<Default, Asset>" );
             RegisterName( ContextIDs.DictRefToAsset, "Dict<Ref, Asset>" );
+
+            RegisterSelector( new ContextKey( ContextIDs.DictValueToRef ), new UniformSelector( new ContextKey( ContextIDs.Default ), new ContextKey( ContextIDs.Ref ) ) );
+            RegisterSelector( new ContextKey( ContextIDs.DictRefToValue ), new UniformSelector( new ContextKey( ContextIDs.Ref ), new ContextKey( ContextIDs.Default ) ) );
+            RegisterSelector( new ContextKey( ContextIDs.DictRefToRef ), new UniformSelector( new ContextKey( ContextIDs.Ref ), new ContextKey( ContextIDs.Ref ) ) );
+            RegisterSelector( new ContextKey( ContextIDs.DictValueToAsset ), new UniformSelector( new ContextKey( ContextIDs.Default ), new ContextKey( ContextIDs.Asset ) ) );
+            RegisterSelector( new ContextKey( ContextIDs.DictRefToAsset ), new UniformSelector( new ContextKey( ContextIDs.Ref ), new ContextKey( ContextIDs.Asset ) ) );
         }
 
-        /// <summary>
-        /// Registers a fixed mapping between a Type and an ID. 
-        /// Used for v3 backward compatibility.
-        /// </summary>
-        [Obsolete( "Use GetID to automatically register context types and GetOrRegisterGenericContext for generic contexts instead of fixed mappings" )]
-        public static void Register( Type type, int id )
+        private static void Register( Type type, int id )
         {
-            if( type == null ) return;
+            if( type == null )
+                return;
             _typeToId[type] = id;
             _idToType[id] = type;
         }
@@ -88,9 +81,11 @@ namespace UnityPlus.Serialization
 
         public static string GetContextName( ContextKey key )
         {
-            if( _idToName.TryGetValue( key.ID, out string name ) ) return name;
-            if( _idToType.TryGetValue( key.ID, out Type t ) ) return t.Name;
-            return key.ID == 0 ? "Default" : $"Context_{key.ID}";
+            if( _idToName.TryGetValue( key.ID, out string name ) )
+                return name;
+            if( _idToType.TryGetValue( key.ID, out Type t ) )
+                return t.Name;
+            return key.ID == 0 ? nameof( Ctx.Value ) : $"Context_{key.ID}";
         }
 
         public static Type GetContextType( ContextKey key )
@@ -142,15 +137,6 @@ namespace UnityPlus.Serialization
             _selectors[context.ID] = selector;
         }
 
-        /// <summary>
-        /// Legacy compatibility: Registers a UniformSelector for the given arguments.
-        /// </summary>
-        [Obsolete( "Use RegisterSelector with UniformSelector or a custom IContextSelector for more complex selection logic" )]
-        public static void RegisterContextArguments( ContextKey context, params ContextKey[] args )
-        {
-            _selectors[context.ID] = new UniformSelector( args );
-        }
-
         public static IContextSelector GetSelector( ContextKey context )
         {
             return _selectors.TryGetValue( context.ID, out var selector )
@@ -191,8 +177,18 @@ namespace UnityPlus.Serialization
             return _selectors.TryGetValue( context.ID, out var selector ) && selector is UniformSelector;
         }
 
+        /// <summary>
+        /// Legacy compatibility: Registers a UniformSelector for the given arguments.
+        /// </summary>
+        [Obsolete( "Use RegisterSelector with UniformSelector or a custom IContextSelector for more complex selection logic" )]
+        public static void RegisterContextArguments( ContextKey context, params ContextKey[] args )
+        {
+            _selectors[context.ID] = new UniformSelector( args );
+        }
+
         public static bool TryGetGenericContextArguments( ContextKey context, out ContextKey[] genericArgs )
         {
+#warning TODO - I don't like how this is not technically obsolete because it doesn't have a true replacement to just get the generic arguments if the context is a simple uniform generic context.
             if( _selectors.TryGetValue( context.ID, out var selector ) && selector is UniformSelector uniform )
             {
                 genericArgs = uniform.Contexts;
@@ -218,27 +214,13 @@ namespace UnityPlus.Serialization
             return Array.Empty<ContextKey>();
         }
 
-        [Obsolete( "Use Resolve with a proper IContextSelector for dynamic resolution instead of fixed arguments" )]
-        public static ContextKey GetCollectionElementContext( ContextKey containerContext )
-        {
-            var args = GetContextArguments( containerContext );
-            return args.Length > 0 ? args[0] : ContextIDs.Default;
-        }
-
-        [Obsolete( "Use Resolve with a proper IContextSelector for dynamic resolution instead of fixed arguments" )]
-        public static (ContextKey keyCtx, ContextKey valCtx) GetDictionaryElementContexts( ContextKey containerContext )
-        {
-            var args = GetContextArguments( containerContext );
-            if( args.Length >= 2 ) return (args[0], args[1]);
-            return (ContextIDs.Default, ContextIDs.Default);
-        }
-
         /// <summary>
         /// Gets the unique ID for a context type.
         /// </summary>
         public static ContextKey GetID( Type contextType )
         {
-            if( contextType == null ) return ContextIDs.Default;
+            if( contextType == null )
+                return ContextIDs.Default;
 
             if( _typeToId.TryGetValue( contextType, out int id ) )
                 return new ContextKey( id );
@@ -246,20 +228,20 @@ namespace UnityPlus.Serialization
             if( typeof( Ctx.Asset ).IsAssignableFrom( contextType ) )
             {
                 Register( contextType, ContextIDs.Asset );
-                return ObjectContext.Asset;
+                return ContextIDs.Asset;
             }
             if( typeof( Ctx.Ref ).IsAssignableFrom( contextType ) )
             {
                 Register( contextType, ContextIDs.Ref );
-                return ObjectContext.Ref;
+                return ContextIDs.Ref;
             }
             if( typeof( Ctx.Value ).IsAssignableFrom( contextType ) )
             {
                 Register( contextType, ContextIDs.Default );
-                return ObjectContext.Default;
+                return ContextIDs.Default;
             }
 
-            if( contextType.IsGenericType && typeof( Ctx.IContext ).IsAssignableFrom( contextType ) )
+            if( contextType.IsGenericType && typeof( IContext ).IsAssignableFrom( contextType ) )
             {
                 if( TryProcessGenericType( contextType, contextType, out id ) )
                 {
@@ -272,8 +254,10 @@ namespace UnityPlus.Serialization
 
             foreach( var i in interfaces )
             {
-                if( !typeof( Ctx.IContext ).IsAssignableFrom( i ) ) continue;
-                if( i == typeof( Ctx.IContext ) ) continue;
+                if( !typeof( IContext ).IsAssignableFrom( i ) )
+                    continue;
+                if( i == typeof( IContext ) )
+                    continue;
 
                 if( i.IsGenericType )
                 {
@@ -291,7 +275,7 @@ namespace UnityPlus.Serialization
                 }
             }
 
-            if( contextType.IsInterface && typeof( Ctx.IContext ).IsAssignableFrom( contextType ) && contextType != typeof( Ctx.IContext ) )
+            if( contextType.IsInterface && typeof( IContext ).IsAssignableFrom( contextType ) && contextType != typeof( IContext ) )
             {
                 id = _nextDynamicId++;
                 Register( contextType, id );
@@ -303,7 +287,7 @@ namespace UnityPlus.Serialization
 
         private static bool TryProcessGenericType( Type genericInterface, Type originalType, out int id )
         {
-            if( !typeof( Ctx.IContext ).IsAssignableFrom( genericInterface ) )
+            if( !typeof( IContext ).IsAssignableFrom( genericInterface ) )
             {
                 id = 0;
                 return false;
@@ -326,7 +310,7 @@ namespace UnityPlus.Serialization
 
             foreach( var arg in typeArgs )
             {
-                if( typeof( Ctx.IContext ).IsAssignableFrom( arg ) )
+                if( typeof( IContext ).IsAssignableFrom( arg ) )
                 {
                     contextArgs.Add( GetID( arg ) );
                     hasValidArgs = true;
@@ -369,7 +353,7 @@ namespace UnityPlus.Serialization
                 _genericCombinations[key] = id;
 
                 // Register uniform selector for generic args
-                RegisterContextArguments( new ContextKey( id ), args );
+                RegisterSelector( new ContextKey( id ), new UniformSelector( args ) );
             }
 
             if( sourceContextType != null )

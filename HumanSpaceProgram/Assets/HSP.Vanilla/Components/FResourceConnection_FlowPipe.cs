@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityPlus.Serialization;
+using UnityPlus.Serialization.Descriptors;
 using Ctx = UnityPlus.Serialization.Ctx;
 
 namespace HSP.Vanilla.Components

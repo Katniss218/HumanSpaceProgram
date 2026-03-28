@@ -2,13 +2,13 @@
 
 namespace UnityPlus.Serialization
 {
-    namespace Ctx
-    {
-        /// <summary>
-        /// Base interface for all context marker types.
-        /// </summary>
-        public interface IContext { }
+    /// <summary>
+    /// Base interface for all context marker types.
+    /// </summary>
+    public interface IContext { }
 
+    public static class Ctx
+    {
         // --- Core Markers ---
 
         /// <summary>
