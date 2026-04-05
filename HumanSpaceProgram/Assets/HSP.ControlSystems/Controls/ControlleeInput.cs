@@ -89,8 +89,11 @@ namespace HSP.ControlSystems.Controls
                     if( value == null )
                         return;
 
-                    foreach( var c in value )
+                    foreach( var c in value.ToArray() )
                     {
+                        if( c == null )
+                            continue;
+
                         ControlleeInput.Connect( o, c );
                     }
                 } );

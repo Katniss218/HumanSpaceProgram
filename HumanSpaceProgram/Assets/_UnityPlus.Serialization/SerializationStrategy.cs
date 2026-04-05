@@ -150,6 +150,10 @@ namespace UnityPlus.Serialization
             Type actualType = value.GetType();
 
             // 2. Type resolution.
+            if( actualType.AssemblyQualifiedName.Contains( "ControlParameterInput" ) && actualType.AssemblyQualifiedName.Contains( "Transform" ) )
+            {
+
+            }
             actualDescriptor = TypeDescriptorRegistry.GetDescriptor( actualType, context );
 
             // 3. Metadata flags.

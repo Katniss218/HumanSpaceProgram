@@ -16,7 +16,7 @@ namespace HSP.Vanilla.Content.AssetLoaders
     public class TextureLoader : IAssetLoader
     {
         public const string RELOAD_TEXTURES = HSPEvent.NAMESPACE_HSP + ".gdtl.reload_textures";
-        [HSPEventListener( HSPEvent_STARTUP_IMMEDIATELY.ID, RELOAD_TEXTURES )]
+        [HSPEventListener( HSPEvent_STARTUP_IMMEDIATELY.ID, RELOAD_TEXTURES, Before = new[] { JsonLoader.RELOAD_JSON_DATA } )]
         private static void RegisterTextureLoader()
         {
             AssetRegistry.RegisterLoader( new TextureLoader() );

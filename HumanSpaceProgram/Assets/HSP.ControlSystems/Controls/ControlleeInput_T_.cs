@@ -71,6 +71,10 @@ namespace HSP.ControlSystems.Controls
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
         internal static void Connect( ControlleeInput<T> input, ControllerOutput<T> output )
         {
+            if( output == null )
+            {
+                return;
+            }
             // disconnect from previous, if connected.
             Disconnect( output );
 
@@ -92,7 +96,7 @@ namespace HSP.ControlSystems.Controls
                     if( value == null ) 
                         return;
 
-                    foreach( var c in value )
+                    foreach( var c in value.ToArray() )
                     {
                         if( c == null )
                             continue;

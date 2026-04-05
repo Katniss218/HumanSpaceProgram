@@ -155,6 +155,10 @@ namespace HSP.Vessels.Construction
         private void RecalculateGhostAndUnghostData()
         {
 #warning TODO - this runs in the VAB scene too, and saves the entire data twice, even if the current state is equal.
+            // Maintain _cachedData for all parts, but don’t call RunOriginalToGhost automatically.
+            // Let the scene manager( VAB/ Flight) decide whether to ghost based on part’s current status:
+
+
             if( _cachedData != null )
                 return;
 

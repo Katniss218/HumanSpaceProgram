@@ -20,7 +20,12 @@ namespace UnityPlus.Serialization.Descriptors
         {
             SerializationHelpers.DetermineObjectStructure( declaredType, actualType, out needsId, out needsType );
 
-            if( (needsId || needsType) && !config.ForceStandardJson )
+            // Set as Wrapped always (for now).
+            // This can be relaxed if contextual ID generation is added, which would store which objects are actually referenced by anything.
+            // But implementing that is not trivial, as we would have to either:
+            //   1. modify the SerializedObjects when referee is encountered,
+            //   2. do a pre-pass to determine which objects are referenced by anything
+            if( /*(needsId || needsType) &&*/ !config.ForceStandardJson )
             {
                 return ObjectStructure.Wrapped;
             }

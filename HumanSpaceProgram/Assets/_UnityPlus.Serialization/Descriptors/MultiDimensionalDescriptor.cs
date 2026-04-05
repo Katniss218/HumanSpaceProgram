@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace UnityPlus.Serialization.Descriptors
 {
@@ -105,7 +104,7 @@ namespace UnityPlus.Serialization.Descriptors
                 _getFlatValues = getFlatValues;
                 _setFlatValues = setFlatValues;
             }
-
+#warning TODO - we want to flip this, wrap both lengths and values in a single object wrapper, instead of both individually. This matches the policy.
             public string Name => "values";
             public int Index => 1;
             public Type DeclaredType => typeof( TElement[] );

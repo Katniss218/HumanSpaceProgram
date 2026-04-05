@@ -5,6 +5,16 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using UnityPlus.Serialization.Descriptors;
 
+namespace UnityPlus.Serialization
+{
+    public struct TextureInfo
+    {
+        public Texture texture;
+        public Vector2 offset;
+        public Vector2 scale;
+    }
+}
+
 namespace UnityPlus.Serialization.DescriptorProviders
 {
     public static class UnityAssetDescriptors
@@ -14,13 +24,6 @@ namespace UnityPlus.Serialization.DescriptorProviders
         public static IDescriptor ProvideAsset<T>() where T : class
         {
             return new AssetDescriptor<T>();
-        }
-
-        public struct TextureInfo
-        {
-            public Texture texture;
-            public Vector2 offset;
-            public Vector2 scale;
         }
 
         [MapsInheritingFrom( typeof( TextureInfo ) )]

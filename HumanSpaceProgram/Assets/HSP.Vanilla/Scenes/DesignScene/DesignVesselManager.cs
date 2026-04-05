@@ -4,6 +4,7 @@ using HSP.Vessels;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 using UnityPlus.Serialization;
 using UnityPlus.Serialization.Formats;
@@ -75,11 +76,30 @@ namespace HSP.Vanilla.Scenes.DesignScene
             return false;
         }
 
+        public static bool IsRootOfDesignObj( Transform obj )
+        {
+            if( instance._designObj == null )
+                return false;
+
+            return obj == instance._designObj.RootPart;
+        }
+        
+        public static bool HasRootOfDesignObj()
+        {
+            if( instance._designObj == null )
+                return false;
+
+            return instance._designObj.RootPart != null;
+        }
+
         /// <summary>
         /// Returns the root of every object that can have an object parented to it.
         /// </summary>
         public static IEnumerable<Transform> GetAttachableRoots()
         {
+            if( instance._designObj == null )
+                return Enumerable.Empty<Transform>();
+
             return instance._designObj.RootPart == null
                 ? new Transform[] { }
                 : new Transform[] { instance._designObj.RootPart };
@@ -92,6 +112,8 @@ namespace HSP.Vanilla.Scenes.DesignScene
         {
             if( parent == null )
                 return true;
+            if( instance._designObj == null )
+                return false;
 
             return parent.root == instance._designObj.transform;
         }
@@ -114,11 +136,9 @@ namespace HSP.Vanilla.Scenes.DesignScene
             // Place as loose or as root of vessel.
             if( parent == null )
             {
-                if( instance._designObj.RootPart == null )
+                if( !HasRootOfDesignObj() )
                 {
-                    instance._designObj.transform.SetPositionAndRotation( obj.position, obj.rotation );
-                    instance._designObj.RootPart = obj;
-                    return true;
+                    return TryAttachRoot( obj );
                 }
                 instance._looseParts.Add( obj );
             }
@@ -161,18 +181,23 @@ namespace HSP.Vanilla.Scenes.DesignScene
                 return false;
             }
 
-            if( obj == instance._designObj.RootPart )
+            if( IsRootOfDesignObj( obj ) )
             {
-                instance._designObj.RootPart = null;
-                VesselFactory.Destroy( instance._designObj );
-                ActiveVesselManager.ActiveObject = null;
-                instance._designObj = null;
+                DetachRoot();
                 return true;
             }
 
             instance._looseParts.Remove( obj ); // sometimes will do nothing, since the part might not be a loose part.
             obj.SetParent( null );
             return true;
+        }
+
+        private static void DetachRoot()
+        {
+            instance._designObj.RootPart = null;
+            VesselFactory.Destroy( instance._designObj );
+            ActiveVesselManager.ActiveObject = null;
+            instance._designObj = null;
         }
 
         /// <summary>

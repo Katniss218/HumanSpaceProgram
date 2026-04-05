@@ -11,7 +11,7 @@ namespace HSP.Vanilla.Content.AssetLoaders
     public class MeshLoader : IAssetLoader
     {
         public const string RELOAD_MESHES = HSPEvent.NAMESPACE_HSP + ".gdmsl.reload_meshes";
-        [HSPEventListener( HSPEvent_STARTUP_IMMEDIATELY.ID, RELOAD_MESHES )]
+        [HSPEventListener( HSPEvent_STARTUP_IMMEDIATELY.ID, RELOAD_MESHES, Before = new[] { JsonLoader.RELOAD_JSON_DATA } )]
         private static void RegisterMeshLoader()
         {
             AssetRegistry.RegisterLoader( new MeshLoader() );

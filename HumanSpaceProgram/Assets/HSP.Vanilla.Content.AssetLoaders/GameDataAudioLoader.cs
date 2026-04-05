@@ -11,7 +11,7 @@ namespace HSP.Vanilla.Content.AssetLoaders
     public class AudioLoader : IAssetLoader
     {
         public const string RELOAD_AUDIO = HSPEvent.NAMESPACE_HSP + ".gdal.reload_audio";
-        [HSPEventListener( HSPEvent_STARTUP_IMMEDIATELY.ID, RELOAD_AUDIO )]
+        [HSPEventListener( HSPEvent_STARTUP_IMMEDIATELY.ID, RELOAD_AUDIO, Before = new[] { JsonLoader.RELOAD_JSON_DATA } )]
         private static void RegisterAudioLoader()
         {
             AssetRegistry.RegisterLoader( new AudioLoader() );

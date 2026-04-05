@@ -449,6 +449,8 @@ namespace UnityPlus.AssetManagement
                 activeLoaders = new List<IAssetLoader>( _loaders );
             }
 
+            Type targetType = typeof( T );
+
             foreach( var handle in handles )
             {
                 if( handle == null )
@@ -456,8 +458,11 @@ namespace UnityPlus.AssetManagement
 
                 foreach( var loader in activeLoaders )
                 {
-                    // 1. Type Check: Does this loader produce the type we want?
-                    if( !typeof( T ).IsAssignableFrom( loader.OutputType ) )
+                    // 1. Type Check
+                    // We consider a loader if its OutputType is compatible with targetType in either direction.
+                    // - If loader.OutputType is more specific (e.g. Material -> object), it's a standard match.
+                    // - If loader.OutputType is more general (e.g. object -> Material), it's a general-purpose loader (like JsonLoader).
+                    if( !targetType.IsAssignableFrom( loader.OutputType ) && !loader.OutputType.IsAssignableFrom( targetType ) )
                         continue;
 
                     // 2. Format Check: Can the loader handle this data?
@@ -470,7 +475,8 @@ namespace UnityPlus.AssetManagement
                             return await loader.LoadAsync( handle, typeof( T ), ct ).ConfigureAwait( false );
                         }, ct ).ConfigureAwait( false );
 
-                        if( result != null )
+                        // Assignable check here prevents generic loaders of incorrect type loading when there are multiple handles for the same asset ID.
+                        if( result != null && targetType.IsAssignableFrom( result.GetType() ) )
                         {
                             Register( assetID, result );
                             return result;
@@ -517,7 +523,7 @@ namespace UnityPlus.AssetManagement
 
         private static void DisposeHandles( List<AssetDataHandle> handles, string assetID )
         {
-            if( handles == null ) 
+            if( handles == null )
                 return;
 
             foreach( var handle in handles )

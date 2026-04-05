@@ -189,7 +189,7 @@ namespace UnityPlus.Serialization
                     object newInstance = compositeDesc.Construct( cursor.ConstructionBuffer );
                     cursor.TargetObj = cursor.TargetObj.WithTarget( newInstance );
                 }
-                else if( cursor.TargetObj.Target == null )
+                else if( cursor.TargetObj.Target == null || !cursor.Descriptor.MappedType.IsAssignableFrom( cursor.TargetObj.Target.GetType() ) )
                 {
                     object newInstance = compositeDesc.CreateInitialTarget( cursor.DataNode, state.Context );
                     cursor.TargetObj = cursor.TargetObj.WithTarget( newInstance );
@@ -315,20 +315,20 @@ namespace UnityPlus.Serialization
             out Guid? pendingId )
         {
             actualValue = null;
-#warning TODO - optimize - only get if actual type differs
-            actualDescriptor = TypeDescriptorRegistry.GetDescriptor( declaredType, context );
             data = node;
             pendingId = null;
 
-            // 1. Null check.
+            // 1. Type resolution.
+            Type actualType = declaredType;
+
+            // 2. Null check.
             if( node == null )
             {
+                actualDescriptor = TypeDescriptorRegistry.GetDescriptor( declaredType, context );
                 return MemberResolutionResult.Resolved;
             }
 
-            // 3. Type resolution.
-            Type actualType = declaredType;
-
+            // 3. More type resolution.
             if( node is SerializedObject typeObj )
             {
                 if( Persistent_Guid.TryReadIdHeader( typeObj, out Guid id ) )
@@ -343,13 +343,13 @@ namespace UnityPlus.Serialization
                     {
                         string path = state.Stack.BuildPath();
                         string msg = $"Unable to resolve type name '{typeName}' specified in data at '{path}'.";
-                        throw new UPSTypeResolutionException( state.Context, msg, path, actualDescriptor, memberInfo, "Resolve Polymorphism", null );
+                        throw new UPSTypeResolutionException( state.Context, msg, path, null, memberInfo, "Resolve Polymorphism", null );
                     }
                     if( !declaredType.IsAssignableFrom( resolvedType ) )
                     {
                         string path = state.Stack.BuildPath();
                         string msg = $"Data specifies type '{resolvedType.FullName}', which is not assignable to the expected type '{declaredType.AssemblyQualifiedName}'.";
-                        throw new UPSTypeResolutionException( state.Context, msg, path, actualDescriptor, memberInfo, "Resolve Polymorphism", null );
+                        throw new UPSTypeResolutionException( state.Context, msg, path, null, memberInfo, "Resolve Polymorphism", null );
                     }
                     actualType = resolvedType;
                 }
@@ -371,6 +371,12 @@ namespace UnityPlus.Serialization
                 else if( expectedStructure == ObjectStructure.InlineMetadata )
                 {
                     data = wrapperObj;
+                }
+                else if( expectedStructure == ObjectStructure.Unwrapped && flag && actualDescriptor is ICollectionDescriptor )
+                {
+                    // If we expect unwrapped, but we got a wrapper for a collection, we can safely unwrap it
+                    // because collections are always arrays, so a SerializedObject with "value" must be a wrapper.
+                    data = wrappedNode;
                 }
             }
 
@@ -403,13 +409,18 @@ namespace UnityPlus.Serialization
                 DeserializationResult result = default;
                 try
                 {
-#warning TODO - descriptor can "choose" to swallow exceptions and return a 'failure' state. we need to handle this.
                     result = primitiveDesc.DeserializeDirect( data, state.Context, out actualValue );
                 }
                 catch( Exception ex )
                 {
                     actualValue = null;
                     WrapException( ex, state, "Deserializing Primitive", actualDescriptor, memberInfo );
+                }
+
+                if( result == DeserializationResult.Failed ) // Failures here are not recoverable.
+                {
+                    string path = state.Stack.BuildPath();
+                    throw new UPSSerializationException( state.Context, $"Deserialization failed for {actualDescriptor.GetType().Name} at '{path}'.", path, actualDescriptor, memberInfo, "Deserializing Primitive", null );
                 }
 
                 if( result == DeserializationResult.Success )

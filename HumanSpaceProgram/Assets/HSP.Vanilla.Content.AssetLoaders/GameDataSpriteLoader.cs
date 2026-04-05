@@ -82,7 +82,7 @@ namespace HSP.Vanilla.Content.AssetLoaders
                         string textureId = HumanSpaceProgramContent.GetAssetID( texturePath );
                         if( !string.IsNullOrEmpty( textureId ) )
                         {
-#warning TODO - there exists both a scenario.json (metadata for scenario itself), and a scenario.png (icon) files, leading to bad discovery.
+#warning TODO - this finds 2 handles, one json (sprite) and one png (texture). it then only tries to load the sprite.
                             // AssetRegistry.GetAsync handles its own threading, we await it here.
                             texture = await AssetRegistry.GetAsync<Texture2D>( textureId ).ConfigureAwait( false );
                         }

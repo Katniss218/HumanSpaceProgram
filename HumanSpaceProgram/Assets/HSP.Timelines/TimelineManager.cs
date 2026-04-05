@@ -301,6 +301,7 @@ namespace HSP.Timelines
             HSPEvent.EventManager.TryInvoke( HSPEvent_ON_SCENARIO_SAVE.ID, eventData );
             if( eventData.HasErrors )
             {
+                SaveLoadFinishUnlockUnpause();
                 Debug.LogError( $"Aborting scenario save due to errors in {nameof( HSPEvent_ON_SCENARIO_SAVE )} phase." );
                 HSPEvent.EventManager.TryInvoke( HSPEvent_ON_SCENARIO_SAVE_ERROR.ID, new HSPEvent_ON_SCENARIO_SAVE_ERROR.EventData( eventData ) );
                 return;
@@ -367,6 +368,7 @@ namespace HSP.Timelines
             HSPEvent.EventManager.TryInvoke( HSPEvent_ON_TIMELINE_SAVE.ID, eventData );
             if( eventData.HasErrors )
             {
+                SaveLoadFinishUnlockUnpause();
                 Debug.LogError( $"Aborting timeline save due to errors in {nameof( HSPEvent_ON_TIMELINE_SAVE )} phase." );
                 HSPEvent.EventManager.TryInvoke( HSPEvent_ON_TIMELINE_SAVE_ERROR.ID, new HSPEvent_ON_TIMELINE_SAVE_ERROR.EventData( eventData ) );
                 return;
@@ -466,6 +468,7 @@ namespace HSP.Timelines
             HSPEvent.EventManager.TryInvoke( HSPEvent_ON_TIMELINE_LOAD.ID, eventData );
             if( eventData.HasErrors )
             {
+                SaveLoadFinishUnlockUnpause();
                 Debug.LogError( $"Aborting timeline load due to errors in {nameof( HSPEvent_ON_TIMELINE_LOAD )} phase." );
                 HSPEvent.EventManager.TryInvoke( HSPEvent_ON_TIMELINE_LOAD_ERROR.ID, new HSPEvent_ON_TIMELINE_LOAD_ERROR.EventData( eventData ) );
                 return;
@@ -527,6 +530,7 @@ namespace HSP.Timelines
             HSPEvent.EventManager.TryInvoke( HSPEvent_ON_TIMELINE_NEW.ID, eventData );
             if( eventData.HasErrors )
             {
+                SaveLoadFinishUnlockUnpause();
                 Debug.LogError( $"Aborting new timeline creation due to errors in {nameof( HSPEvent_ON_TIMELINE_NEW )} phase." );
                 HSPEvent.EventManager.TryInvoke( HSPEvent_ON_TIMELINE_NEW_ERROR.ID, new HSPEvent_ON_TIMELINE_NEW_ERROR.EventData( eventData ) );
                 return;

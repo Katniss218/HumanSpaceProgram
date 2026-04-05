@@ -116,7 +116,7 @@ namespace HSP.Vanilla.Scenes.DesignScene.Tools
 
 		private void PlacePart()
 		{
-			if( _currentSnap != null )
+            if( _currentSnap != null )
 			{
 				Transform newRoot = VesselHierarchyUtils.ReRoot( _currentSnap.Value.snappedNode.transform.parent );
 				_heldPart = newRoot;

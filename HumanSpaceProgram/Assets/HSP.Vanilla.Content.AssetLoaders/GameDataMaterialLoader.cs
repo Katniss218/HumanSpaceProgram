@@ -13,7 +13,7 @@ namespace HSP.Vanilla.Content.AssetLoaders
     public class MaterialLoader : IAssetLoader
     {
         public const string RELOAD_MATERIALS = HSPEvent.NAMESPACE_HSP + ".gdml.reload_materials";
-        [HSPEventListener( HSPEvent_STARTUP_IMMEDIATELY.ID, RELOAD_MATERIALS )]
+        [HSPEventListener( HSPEvent_STARTUP_IMMEDIATELY.ID, RELOAD_MATERIALS, Before = new[] { JsonLoader.RELOAD_JSON_DATA } )]
         private static void RegisterMaterialLoader()
         {
             AssetRegistry.RegisterLoader( new MaterialLoader() );
@@ -51,7 +51,8 @@ namespace HSP.Vanilla.Content.AssetLoaders
 
             return await MainThreadDispatcher.RunAsync( () =>
             {
-                return SerializationUnit.Deserialize<Material>( data );
+                var mat = SerializationUnit.Deserialize<Material>( data );
+                return mat;
             } ).ConfigureAwait( false );
         }
     }

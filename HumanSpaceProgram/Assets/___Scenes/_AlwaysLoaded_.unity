@@ -629,6 +629,8 @@ MonoBehaviour:
     asset: {fileID: 2800000, guid: d17090d9f818409458984d34346bcd0d, type: 3}
   - assetID: builtin::HSP._DevUtils/Wireframe
     asset: {fileID: 4800000, guid: f1df184c254f8794abe3486d926034b1, type: 3}
+  - assetID: builtin::___Scenes/Scratchpad
+    asset: {fileID: 102900000, guid: 02f62321ab0c6d946bff3cf7ea0fa59d, type: 3}
   - assetID: builtin::Resources/Sprites/UI/button_30x30_new
     asset: {fileID: 21300000, guid: 0259fe815d290b74eb497477eba0e1a9, type: 3}
   - assetID: builtin::_TextMesh Pro/Shaders/TMP_Bitmap
@@ -783,8 +785,6 @@ MonoBehaviour:
     asset: {fileID: 21300000, guid: b65d568f1ce8e0844b4d02815d82b2a0, type: 3}
   - assetID: builtin::Resources/Sprites/std0/ui_button_square
     asset: {fileID: 21300000, guid: d6214bb3953756441b1a84f6286d1173, type: 3}
-  - assetID: builtin::Tests/___doc
-    asset: {fileID: 4900000, guid: d6087065e6258a6439efa8a9bf82fac6, type: 3}
   - assetID: builtin::Resources/Sprites/cursors/cursor_leftright
     asset: {fileID: 2800000, guid: d67af8e0cdb581045a67e1a4135a12a3, type: 3}
   - assetID: builtin::HSP._DevUtils/WireframeQuad
@@ -823,6 +823,8 @@ MonoBehaviour:
     asset: {fileID: 21300000, guid: 882dc041b5e078542bbb35672d455345, type: 3}
   - assetID: builtin::Resources/Sprites/UI/button_vertical
     asset: {fileID: 21300000, guid: 9824aa2ac9104804fbeec9c9d1fca2e3, type: 3}
+  - assetID: builtin::HSP.UI/polylineshader
+    asset: {fileID: 4800000, guid: 98d4326a1ddc8ef4ea65b11cf13fa217, type: 3}
   - assetID: builtin::HSP.UI/Hidden_ScreenSpaceLine
     asset: {fileID: 2100000, guid: b8e3e61726751c34ba0ce0f438e61029, type: 2}
   - assetID: builtin::_TextMesh Pro/Shaders/TMP_SDF-Mobile SSD
@@ -989,6 +991,8 @@ MonoBehaviour:
     asset: {fileID: 11400000, guid: 2e498d1c8094910479dc3e1b768306a4, type: 2}
   - assetID: builtin::Resources/Sprites/UI/control_node_close
     asset: {fileID: 21300000, guid: 3e65f21fcc9b1b844bfb057255f3f3d5, type: 3}
+  - assetID: builtin::HSP.UI/nodebillboardshader
+    asset: {fileID: 4800000, guid: 4e0587a89d7d2074d996608db904c07f, type: 3}
   - assetID: builtin::HSP._DevUtils/smokeparticle3
     asset: {fileID: 2800000, guid: 4ef50cb3c0213444fade783ba22be522, type: 3}
   - assetID: builtin::Resources/Sprites/UI/button_up_gold
@@ -1197,6 +1201,8 @@ MonoBehaviour:
     asset: {fileID: 2800000, guid: 1378a33cdd085d64c9da863d2484ff21, type: 3}
   - assetID: builtin::com.unity.postprocessing/PostProcessing/Shaders/API/PSSL
     asset: {fileID: 10900000, guid: 2399c8729aaf8344e8f9cf4721c5803a, type: 3}
+  - assetID: builtin::com.unity.burst/Third Party Notices
+    asset: {fileID: 4900000, guid: 73b432af27133f55a35c890c3bdf64c3, type: 3}
   - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/SMAA/AreaTex
     asset: {fileID: 2800000, guid: 73ec4ae984a0a0f44a2be737e41a6f2f, type: 3}
   - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/BlueNoise64px/LDR_LLL1_54
@@ -1207,6 +1213,8 @@ MonoBehaviour:
     asset: {fileID: 4800000, guid: b34a29e523cb9d545881e193a079f2df, type: 3}
   - assetID: builtin::com.unity.modules.terrainphysics/package
     asset: {fileID: 8385607101436470782, guid: d3cbe921f7b3d9a3257e7c61a5761796, type: 3}
+  - assetID: builtin::com.unity.mathematics/package
+    asset: {fileID: 8385607101436470782, guid: d34d0af25c21141a98c0cf3c0066444f, type: 3}
   - assetID: builtin::com.unity.textmeshpro/Editor Resources/Textures/SectionHeader_Light
     asset: {fileID: 2800000, guid: e3b0f810fdea84e40ab4ba20f256f7e8, type: 3}
   - assetID: builtin::com.unity.2d.sprite/README
@@ -1223,6 +1231,8 @@ MonoBehaviour:
     asset: {fileID: 4800000, guid: 34a819c9e33402547a81619693adc8d5, type: 3}
   - assetID: builtin::com.unity.textmeshpro/Editor Resources/Textures/btn_AlignRight
     asset: {fileID: 2800000, guid: 342a0f8aca7f4f0691338912faec0494, type: 3}
+  - assetID: builtin::com.unity.burst/CHANGELOG
+    asset: {fileID: 4900000, guid: 345fbf1c69e936e180653ef894fe94fa, type: 3}
   - assetID: builtin::com.unity.postprocessing/PostProcessing/Shaders/Builtins/SubpixelMorphologicalAntialiasingBridge
     asset: {fileID: 10900000, guid: 4484ba9c9f221894bad091ea59c4b9c0, type: 3}
   - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/BlueNoise64px/LDR_LLL1_39
@@ -1285,8 +1295,12 @@ MonoBehaviour:
     asset: {fileID: 2747690628134850419, guid: 16037dbd798344f57a526d53d48f5ead, type: 3}
   - assetID: builtin::com.unity.modules.unityanalytics/package
     asset: {fileID: 8385607101436470782, guid: 26a4f29db434fd79025c91f6126382cc, type: 3}
+  - assetID: builtin::com.unity.burst/Runtime/Editor/Unity.Burst.ForEditor
+    asset: {fileID: 4261883464758730180, guid: 268a64be2367b3248a24f317d458861a, type: 3}
   - assetID: builtin::com.unity.settings-manager/README
     asset: {fileID: 4900000, guid: 561e43493ab773746acefbe0f624795e, type: 3}
+  - assetID: builtin::com.unity.mathematics/CHANGELOG
+    asset: {fileID: 4900000, guid: 56de866d5032f461baa43decd9ce3bd8, type: 3}
   - assetID: builtin::com.unity.ide.rider/package
     asset: {fileID: 8385607101436470782, guid: 66c95bb3c74257f41bae2622511dc02d, type: 3}
   - assetID: builtin::com.unity.postprocessing/CHANGELOG
@@ -1333,6 +1347,8 @@ MonoBehaviour:
     asset: {fileID: 8177471321811730583, guid: 87aaca0a643d54397ba969dab4fc8875, type: 3}
   - assetID: builtin::com.unity.postprocessing/PostProcessing/Shaders/API/D3D9
     asset: {fileID: 10900000, guid: a741cbbb27e6ad747a354440a9132a66, type: 3}
+  - assetID: builtin::com.unity.mathematics/LICENSE
+    asset: {fileID: 4900000, guid: a7f87992cd1d44040ae42b05e5fbdaa5, type: 3}
   - assetID: builtin::com.unity.textmeshpro/Editor Resources/Gizmos/TMP - Dropdown
       Icon
     asset: {fileID: 2800000, guid: a7ec9e7ad8b847b7ae4510af83c5d868, type: 3}
@@ -1593,6 +1609,8 @@ MonoBehaviour:
     asset: {fileID: 4900000, guid: 5e83f8baac96eaa47bdd9ca781cd2002, type: 3}
   - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/BlueNoise64px/LDR_LLL1_55
     asset: {fileID: 2800000, guid: 5e542d0126a2c7848b66bffc428905fd, type: 3}
+  - assetID: builtin::com.unity.mathematics/ValidationExceptions
+    asset: {fileID: 4900000, guid: 5ed727127196a4ecc90e24e2cd7af338, type: 3}
   - assetID: builtin::com.unity.modules.animation/package
     asset: {fileID: 8385607101436470782, guid: 7ef8348b8ea834d7e1bc214b07f7fb87, type: 3}
   - assetID: builtin::com.unity.testtools.codecoverage/README
@@ -1614,8 +1632,12 @@ MonoBehaviour:
     asset: {fileID: 4800000, guid: fe144c7e314047f4bb779d555c5405ac, type: 3}
   - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/BlueNoise64px/LDR_LLL1_30
     asset: {fileID: 2800000, guid: 0fa10b21877c61b4db40ba5708815f81, type: 3}
+  - assetID: builtin::com.unity.burst/LICENSE
+    asset: {fileID: 4900000, guid: 0f8d496d402837948694e70f29a6c3af, type: 3}
   - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/BlueNoise256px/LDR_LLL1_1
     asset: {fileID: 2800000, guid: 0f8fa14b3731cda4e947062e734d5e1e, type: 3}
+  - assetID: builtin::com.unity.burst/Unity.Burst.Unsafe
+    asset: {fileID: 4900000, guid: 1f35a383fc36434aaf9e13a75fba3b24, type: 3}
   - assetID: builtin::com.unity.ide.visualstudio/LICENSE
     asset: {fileID: 4900000, guid: 1fe9e6e1ae93cf64bbdfbd29300752e1, type: 3}
   - assetID: builtin::com.unity.textmeshpro/Editor Resources/Gizmos/TMP - Text Component
@@ -1633,6 +1655,8 @@ MonoBehaviour:
     asset: {fileID: 8385607101436470782, guid: 4f0f9b9f3ed97ad2b9ba8f1a8e4666c2, type: 3}
   - assetID: builtin::com.unity.postprocessing/PostProcessing/Gizmos/PostProcessLayer
     asset: {fileID: 2800000, guid: 5f51e0b22aa8cb84b9f422576ce87ff9, type: 3}
+  - assetID: builtin::com.unity.burst/package
+    asset: {fileID: 8385607101436470782, guid: 5fb28db57db3325b95957fcfe1a0108b, type: 3}
   - assetID: builtin::com.unity.feature.development/CHANGELOG
     asset: {fileID: 4900000, guid: 5f2f5f9622f1e424c8e6cda71ab1c9e8, type: 3}
   - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/BlueNoise64px/LDR_LLL1_4

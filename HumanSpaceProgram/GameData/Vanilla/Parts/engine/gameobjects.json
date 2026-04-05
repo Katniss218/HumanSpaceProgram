@@ -500,14 +500,12 @@
                                                 "keys": {
                                                     "value": [
                                                         {
-                                                            "$type": "HSP.Effects.MappingCurve`1[[System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]].Keyframe, HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
                                                             "t": 0,
                                                             "v": 0,
                                                             "v_in": 0,
                                                             "v_out": 0
                                                         },
                                                         {
-                                                            "$type": "HSP.Effects.MappingCurve`1[[System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]].Keyframe, HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
                                                             "t": 1,
                                                             "v": 1,
                                                             "v_in": 0,
