@@ -71,10 +71,6 @@ namespace HSP.ControlSystems.Controls
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
         internal static void Connect( ControlleeInput<T> input, ControllerOutput<T> output )
         {
-            if( output == null )
-            {
-                return;
-            }
             // disconnect from previous, if connected.
             Disconnect( output );
 

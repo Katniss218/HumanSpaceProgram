@@ -203,7 +203,6 @@ namespace UnityPlus.Serialization.Descriptors
 
         public override int GetStepCount( object target )
         {
-            Debug.Log( "B" );
             return ((ComponentCollection)target).CachedComponents.Length;
         }
 

@@ -655,7 +655,7 @@ namespace HSP.Trajectories
             {
                 _isSimulating = true;
 
-                Profiler.BeginSample( "TrajectorySimulator.Simulate_Internal" );
+                Profiler.BeginSample( "TrajectorySimulator2.Simulate_Internal" );
 
                 FixStale();
 
@@ -679,6 +679,9 @@ namespace HSP.Trajectories
                 bool forward = _direction == SimulationDirection.Forward;
 
                 // Simulate attractors.
+
+                Profiler.BeginSample( "TrajectorySimulator2.Simulate_Internal.Attractors" );
+                Profiler.EndSample();
 
                 double attractorStartUT = _initialUT;
                 TimeInterval attractorInterval = GetSimulatedInterval( SimulatedIntervalOptions.IncludeAttractors );
@@ -758,6 +761,9 @@ namespace HSP.Trajectories
                 // Simulate followers in parallel.
                 // The simulation can technically include just followers, without attractors (e.g. path-based, or maneuver-based, etc).
 
+                Profiler.BeginSample( "TrajectorySimulator2.Simulate_Internal.Followers" );
+#warning TODO - this can take a very long time to simulate if I remove and re-add the trajectory transform (follower) after creating a new scenario.
+
                 if( _followers != null && _followers.Length > 0 )
                 {
                     double followerStartUT = attractorStartUT;
@@ -832,6 +838,7 @@ namespace HSP.Trajectories
                     } );
                 }
 
+                Profiler.EndSample();
                 Profiler.EndSample();
             }
             finally

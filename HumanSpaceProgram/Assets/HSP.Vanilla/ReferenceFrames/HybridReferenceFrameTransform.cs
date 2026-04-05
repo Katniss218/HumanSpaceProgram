@@ -462,7 +462,7 @@ namespace HSP.Vanilla
             _rb.isKinematic = !_isSceneSpace;
             _rb.drag = 0;
             _rb.angularDrag = 0;
-            _rb.maxAngularVelocity = float.PositiveInfinity;
+            _rb.maxAngularVelocity = 9000;
         }
 
         void FixedUpdate()

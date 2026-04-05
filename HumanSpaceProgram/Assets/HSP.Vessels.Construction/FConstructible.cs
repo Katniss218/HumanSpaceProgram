@@ -59,9 +59,8 @@ namespace HSP.Vessels.Construction
             get => _buildPoints;
             set
             {
-                float oldBuildPerc = BuildPercent;
                 _buildPoints = value;
-                OnAfterBuildPointPercentChanged( BuildPercent - oldBuildPerc );
+                OnAfterBuildPointsChanged();
             }
         }
 
@@ -78,9 +77,8 @@ namespace HSP.Vessels.Construction
             get => _maxBuildPoints;
             set
             {
-                float oldBuildPerc = BuildPercent;
                 _maxBuildPoints = value;
-                OnAfterBuildPointPercentChanged( BuildPercent - oldBuildPerc );
+                OnAfterBuildPointsChanged();
             }
         }
 
@@ -93,6 +91,8 @@ namespace HSP.Vessels.Construction
 
         public List<IConstructionCondition> Conditions { get; set; }
 
+        bool _isGhost = false; // false by default if omitted.
+
         /// <summary>
         /// Calculates the current build speed multiplier for this specific part, taking into account the build conditions.
         /// </summary>
@@ -101,26 +101,22 @@ namespace HSP.Vessels.Construction
             return Conditions?.Sum( c => c.GetBuildSpeedMultiplier( this.transform.position ) ) ?? 1.0f;
         }
 
-        void OnAfterBuildPointPercentChanged( float delta )
+        void OnAfterBuildPointsChanged()
         {
-            // This method shouldn't handle the destroying of the part from the vessel after deconstruction is 'finished'.
-
-            if( (this.BuildPercent >= 0.0f && this.BuildPercent - delta <= 0.0f)  // start construction
-             || (this.BuildPercent < 1.0f && this.BuildPercent - delta >= 1.0f) ) // start deconstruction
-            {
-                RunOriginalToGhost();
-                var vessel = this.transform.GetVessel();
-                if( vessel != null )
-                    vessel.RecalculatePartCache();
-            }
-
-            if( this.BuildPercent >= 1.0f && this.BuildPercent - delta <= 1.0f ) // end construction
-            {
-                RunGhostToOriginal();
-                var vessel = this.transform.GetVessel();
-                if( vessel != null )
-                    vessel.RecalculatePartCache();
-            }
+            //if( !_isGhost && this.BuildPercent < 1.0f )
+            //{
+            //    RunOriginalToGhost();
+            //    var vessel = this.transform.GetVessel();
+            //    if( vessel != null )
+            //        vessel.RecalculatePartCache();
+            //}
+            //else if( _isGhost && this.BuildPercent == 1.0f )
+            //{
+            //    RunGhostToOriginal();
+            //    var vessel = this.transform.GetVessel();
+            //    if( vessel != null )
+            //        vessel.RecalculatePartCache();
+            //}
         }
 
         private void RunOriginalToGhost()
@@ -146,7 +142,7 @@ namespace HSP.Vessels.Construction
         {
             RecalculateGhostAndUnghostData();
 
-            OnAfterBuildPointPercentChanged( this.BuildPercent );
+            OnAfterBuildPointsChanged();
         }
 
         /// <summary>
@@ -154,11 +150,6 @@ namespace HSP.Vessels.Construction
         /// </summary>
         private void RecalculateGhostAndUnghostData()
         {
-#warning TODO - this runs in the VAB scene too, and saves the entire data twice, even if the current state is equal.
-            // Maintain _cachedData for all parts, but don’t call RunOriginalToGhost automatically.
-            // Let the scene manager( VAB/ Flight) decide whether to ghost based on part’s current status:
-
-
             if( _cachedData != null )
                 return;
 
@@ -200,6 +191,7 @@ namespace HSP.Vessels.Construction
             return new MemberwiseDescriptor<FConstructible>()
                 .WithMember( "max_build_points", o => o._maxBuildPoints )
                 .WithMember( "build_points", o => o._buildPoints )
+                .WithMember( "is_ghost", o => o._isGhost )
                 .WithMember( "cached_data", typeof( Ctx.KeyValue<Ctx.Ref, Ctx.Value> ), o => o._cachedData );
         }
     }
