@@ -32,6 +32,8 @@ namespace HSP.Vanilla.Content.AssetLoaders
             string json = await sr.ReadToEndAsync();
 
             SerializedData data = new JsonStringReader( json ).Read();
+            if( targetType == typeof( SerializedData ) )
+                return data;
 
             return SerializationUnit.Deserialize<object>( data ); // Will create the real instance according to the "$type" property.
         }

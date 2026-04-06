@@ -17,7 +17,6 @@ namespace UnityPlus.Serialization.Descriptors
 
         public override void SerializeDirect( object target, ref SerializedData data, SerializationContext ctx )
         {
-            Type t = typeof( T );
             data = ctx.ReverseMap.WriteObjectReference( (T)target );
         }
 

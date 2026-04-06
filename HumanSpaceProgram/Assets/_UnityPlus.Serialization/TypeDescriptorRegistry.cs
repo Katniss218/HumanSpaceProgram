@@ -260,7 +260,6 @@ namespace UnityPlus.Serialization
                 }
                 else if( targetType.IsGenericType )
                 {
-#warning TODO - if targetType is ControlleeInput<T> in context of Ref, the Ref method getter should get the full type. but this needs to be generalized. uhh...
                     genericArgs = targetType.GetGenericArguments();
                 }
                 else if( targetType.IsEnum )
@@ -290,7 +289,7 @@ namespace UnityPlus.Serialization
                         // Safety check: ensure generic args match method definition count
                         if( method.GetGenericArguments().Length == genericArgs.Length )
                         {
-                            method = method.MakeGenericMethod( genericArgs ); // genericArgs [Transform]
+                            method = method.MakeGenericMethod( genericArgs );
                         }
                         else if( method.GetGenericArguments().Length == 1 && genericArgs.Length == 0 )
                         {

@@ -8,26 +8,26 @@ namespace UnityPlus.Serialization
         public void InitializeRoot( Type declaredType, ContextKey context, object root, SerializedData rootData, SerializationState state )
         {
             MemberResolutionResult result = TryProcessMember( rootData, declaredType, context, null, state,
-                out object actualValue, out IDescriptor actualDescriptor, out SerializedData unwrappedNode, out Guid? pendingId );
+                out object memberValue, out IDescriptor memberDescriptor, out SerializedData unwrappedNode, out Guid? pendingId );
 
             if( result == MemberResolutionResult.Resolved )
             {
-                state.RootResult = actualValue;
+                state.RootResult = memberValue;
                 return;
             }
 
             if( result == MemberResolutionResult.RequiresPush )
             {
-                PushCursor( root, null, null, actualDescriptor, unwrappedNode, pendingId, false, state );
+                PushCursor( root, null, null, memberDescriptor, unwrappedNode, pendingId, false, state );
                 return;
             }
 
             if( result == MemberResolutionResult.Failed )
             {
-                throw new UPSMemberResolutionException( state.Context, $"Failed to resolve the root object.", "root", actualDescriptor, null, "Initialize Root", null );
+                throw new UPSMemberResolutionException( state.Context, $"Failed to resolve the root object.", "root", memberDescriptor, null, "Initialize Root", null );
             }
 
-            throw new UPSSerializationException( state.Context, "Root object cannot be a reference to an unresolved object.", "root", actualDescriptor, null, "Initialize Root", null );
+            throw new UPSSerializationException( state.Context, "Root object cannot be a reference to an unresolved object.", "root", memberDescriptor, null, "Initialize Root", null );
         }
 
         public SerializationCursorResult Process( ref SerializationCursor cursor, SerializationState state )
@@ -258,14 +258,14 @@ namespace UnityPlus.Serialization
             ContextKey context = member.GetContext( cursor.TargetObj.Target );
 
             MemberResolutionResult result = TryProcessMember( memberData, member.DeclaredType, context, member, state,
-                out object resolvedValue, out IDescriptor resolvedDescriptor, out SerializedData unwrappedNode, out Guid? pendingId );
+                out object memberValue, out IDescriptor memberDescriptor, out SerializedData unwrappedNode, out Guid? pendingId );
 
             if( result == MemberResolutionResult.Resolved )
             {
                 object target = cursor.TargetObj.Target;
                 try
                 {
-                    member.SetValue( ref target, resolvedValue );
+                    member.SetValue( ref target, memberValue );
                 }
                 catch( Exception ex )
                 {
@@ -278,7 +278,7 @@ namespace UnityPlus.Serialization
 
             if( result == MemberResolutionResult.RequiresPush )
             {
-                PushChildCursor( ref cursor, member, resolvedDescriptor, unwrappedNode, pendingId, false, state );
+                PushChildCursor( ref cursor, member, memberDescriptor, unwrappedNode, pendingId, false, state );
                 return SerializationCursorResult.Push;
             }
 
@@ -286,6 +286,11 @@ namespace UnityPlus.Serialization
             {
                 state.Context.EnqueueDeferred( cursor.TargetObj.Target, member, memberData );
                 return SerializationCursorResult.Advance;
+            }
+
+            if( result == MemberResolutionResult.Failed )
+            {
+                throw new UPSMemberResolutionException( state.Context, $"Failed to resolve member.", state.Stack.BuildPath(), memberDescriptor, null, "Population", null );
             }
 #warning TODO - handle members that are IDisposable / custom-disposable (e.g. gameobjects are disposable but do not implement IDisposable). automatic cleanup is nice QOL.
 

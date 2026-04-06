@@ -764,6 +764,8 @@ namespace HSP.Trajectories
                 Profiler.BeginSample( "TrajectorySimulator2.Simulate_Internal.Followers" );
 #warning TODO - this can take a very long time to simulate if I remove and re-add the trajectory transform (follower) after creating a new scenario.
 
+#warning TODO - add a differ to serializeddata.
+
                 if( _followers != null && _followers.Length > 0 )
                 {
                     double followerStartUT = attractorStartUT;

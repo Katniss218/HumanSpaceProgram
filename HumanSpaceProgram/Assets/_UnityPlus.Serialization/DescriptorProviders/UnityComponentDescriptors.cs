@@ -18,33 +18,47 @@ namespace UnityPlus.Serialization.DescriptorProviders
 
         // --- PHYSICS ---
 
+        [MapsInheritingFrom( typeof( Rigidbody ) )]
+        public static IDescriptor RigidbodyMapping() => new MemberwiseDescriptor<Rigidbody>()
+            .WithMember( "is_kinematic", o => o.isKinematic );
+
+
+        [MapsInheritingFrom( typeof( Collider ) )]
+        public static IDescriptor Collider() => new MemberwiseDescriptor<Collider>()
+            .WithMember( "is_enabled", o => o.enabled )
+            .WithMember( "is_trigger", c => c.isTrigger );
+
         [MapsInheritingFrom( typeof( BoxCollider ) )]
         public static IDescriptor BoxCollider() => new MemberwiseDescriptor<BoxCollider>()
-            .WithMember( "is_trigger", c => c.isTrigger )
-            .WithMember( "center", c => c.center )
-            .WithMember( "size", c => c.size );
+            .WithMember( "size", c => c.size )
+            .WithMember( "center", c => c.center );
 
         [MapsInheritingFrom( typeof( SphereCollider ) )]
         public static IDescriptor SphereCollider() => new MemberwiseDescriptor<SphereCollider>()
-            .WithMember( "is_trigger", c => c.isTrigger )
-            .WithMember( "center", c => c.center )
-            .WithMember( "radius", c => c.radius );
+            .WithMember( "radius", c => c.radius )
+            .WithMember( "center", c => c.center );
 
         [MapsInheritingFrom( typeof( CapsuleCollider ) )]
         public static IDescriptor CapsuleCollider() => new MemberwiseDescriptor<CapsuleCollider>()
-            .WithMember( "is_trigger", c => c.isTrigger )
-            .WithMember( "center", c => c.center )
             .WithMember( "radius", c => c.radius )
             .WithMember( "height", c => c.height )
-            .WithMember( "direction", c => c.direction );
+            .WithMember( "direction", c => c.direction )
+            .WithMember( "center", c => c.center );
 
         [MapsInheritingFrom( typeof( MeshCollider ) )]
         public static IDescriptor MeshCollider() => new MemberwiseDescriptor<MeshCollider>()
-            .WithMember( "is_trigger", c => c.isTrigger )
-            .WithMember( "convex", c => c.convex )
+            .WithMember( "is_convex", c => c.convex )
             .WithMember( "shared_mesh", typeof( Ctx.Asset ), c => c.sharedMesh );
 
         // --- RENDERING ---
+
+        [MapsInheritingFrom( typeof( Behaviour ) )]
+        public static IDescriptor BehaviourMapping() => new MemberwiseDescriptor<Behaviour>()
+            .WithMember( "is_enabled", o => o.enabled );
+
+        [MapsInheritingFrom( typeof( Renderer ) )]
+        public static IDescriptor RendererMapping() => new MemberwiseDescriptor<Renderer>()
+            .WithMember( "is_enabled", o => o.enabled );
 
         [MapsInheritingFrom( typeof( MeshFilter ) )]
         public static IDescriptor MeshFilter() => new MemberwiseDescriptor<MeshFilter>()
@@ -52,14 +66,12 @@ namespace UnityPlus.Serialization.DescriptorProviders
 
         [MapsInheritingFrom( typeof( MeshRenderer ) )]
         public static IDescriptor MeshRenderer() => new MemberwiseDescriptor<MeshRenderer>()
-            .WithMember( "enabled", r => r.enabled )
             .WithMember( "shadow_casting_mode", r => r.shadowCastingMode )
             .WithMember( "receive_shadows", r => r.receiveShadows )
             .WithMember( "shared_materials", typeof( Ctx.Array<Ctx.Asset> ), r => r.sharedMaterials );
 
         [MapsInheritingFrom( typeof( Camera ) )]
         public static IDescriptor Camera() => new MemberwiseDescriptor<Camera>()
-            .WithMember( "enabled", c => c.enabled )
             .WithMember( "clear_flags", c => c.clearFlags )
             .WithMember( "background_color", c => c.backgroundColor )
             .WithMember( "culling_mask", c => c.cullingMask )
@@ -72,7 +84,6 @@ namespace UnityPlus.Serialization.DescriptorProviders
 
         [MapsInheritingFrom( typeof( Light ) )]
         public static IDescriptor Light() => new MemberwiseDescriptor<Light>()
-            .WithMember( "enabled", l => l.enabled )
             .WithMember( "type", l => l.type )
             .WithMember( "color", l => l.color )
             .WithMember( "intensity", l => l.intensity )
@@ -82,16 +93,14 @@ namespace UnityPlus.Serialization.DescriptorProviders
 
         [MapsInheritingFrom( typeof( LODGroup ) )]
         public static IDescriptor LODGroup() => new MemberwiseDescriptor<LODGroup>()
-            .WithMember( "local_reference_point", l => l.localReferencePoint )
+            .WithMember( "is_enabled", l => l.enabled )
             .WithMember( "size", l => l.size )
-            .WithMember( "fade_mode", l => l.fadeMode )
-            .WithMember( "animate_cross_fading", l => l.animateCrossFading )
             .WithMember( "lods", l => l.GetLODs(), ( l, v ) => l.SetLODs( v ) );
 
         [MapsInheritingFrom( typeof( LOD ) )]
         public static IDescriptor LOD() => new MemberwiseDescriptor<LOD>()
-            .WithMember( "screen_relative_transition_height", l => l.screenRelativeTransitionHeight )
-            .WithMember( "fade_transition_width", l => l.fadeTransitionWidth )
+            .WithMember( "fade_width", l => l.fadeTransitionWidth )
+            .WithMember( "percent", l => l.screenRelativeTransitionHeight )
             .WithMember( "renderers", typeof( Ctx.Array<Ctx.Ref> ), l => l.renderers );
     }
 }

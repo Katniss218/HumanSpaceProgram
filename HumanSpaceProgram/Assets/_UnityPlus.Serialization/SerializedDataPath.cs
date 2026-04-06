@@ -72,10 +72,26 @@ namespace UnityPlus.Serialization
             return pivot;
         }
 
+        /// <summary>
+        /// Creates a new path by appending a segment to the current path.
+        /// </summary>
+        public SerializedDataPath Append( SerializedDataPathSegment segment )
+        {
+            if( _segments == null )
+                return new SerializedDataPath( segment );
+
+            var newSegments = new SerializedDataPathSegment[_segments.Length + 1];
+            Array.Copy( _segments, newSegments, _segments.Length );
+            newSegments[_segments.Length] = segment;
+            return new SerializedDataPath( newSegments );
+        }
+
         public bool Equals( SerializedDataPath other )
         {
-            if( ReferenceEquals( this, other ) ) return true;
-            if( _segments.Length != other._segments.Length ) return false;
+            if( ReferenceEquals( this, other ) ) 
+                return true;
+            if( _segments.Length != other._segments.Length )
+                return false;
 
             for( int i = 0; i < _segments.Length; i++ )
             {
@@ -87,7 +103,8 @@ namespace UnityPlus.Serialization
 
         public override bool Equals( object obj )
         {
-            if( obj is SerializedDataPath other ) return Equals( other );
+            if( obj is SerializedDataPath other )
+                return Equals( other );
             return false;
         }
 
@@ -116,7 +133,8 @@ namespace UnityPlus.Serialization
 
         public static SerializedDataPath Parse( string s )
         {
-            if( s == null ) throw new ArgumentNullException( nameof( s ) );
+            if( s == null ) 
+                throw new ArgumentNullException( nameof( s ) );
 
             int pos = 0;
 
@@ -160,7 +178,9 @@ namespace UnityPlus.Serialization
             bool EatQuotedString( out SerializedDataPathSegment segment )
             {
                 segment = default;
-                if( pos >= s.Length || s[pos] != '"' ) return false;
+                if( pos >= s.Length || s[pos] != '"' )
+                    return false;
+
                 pos++;
 
                 var sb = new StringBuilder();
@@ -174,13 +194,21 @@ namespace UnityPlus.Serialization
                     }
                     if( c == '\\' )
                     {
-                        if( pos >= s.Length ) throw new FormatException( "Invalid escape sequence at end of input." );
+                        if( pos >= s.Length ) 
+                            throw new FormatException( "Invalid escape sequence at end of input." );
+
                         char esc = s[pos++];
                         switch( esc )
                         {
-                            case '"': sb.Append( '"' ); break;
-                            case '\\': sb.Append( '\\' ); break;
-                            default: sb.Append( esc ); break; // Simple handling
+                            case '"': 
+                                sb.Append( '"' );
+                                break;
+                            case '\\': 
+                                sb.Append( '\\' );
+                                break;
+                            default: 
+                                sb.Append( esc );
+                                break; // Simple handling
                         }
                     }
                     else
@@ -194,24 +222,30 @@ namespace UnityPlus.Serialization
             bool EatBracketedIndexer( out SerializedDataPathSegment segment )
             {
                 segment = default;
-                if( pos >= s.Length || s[pos] != '[' ) return false;
+                if( pos >= s.Length || s[pos] != '[' ) 
+                    return false;
                 pos++;
 
                 int startInner = pos;
                 int bracketDepth = 1;
                 while( pos < s.Length && bracketDepth > 0 )
                 {
-                    if( s[pos] == ']' ) bracketDepth--;
-                    else if( s[pos] == '[' ) bracketDepth++;
+                    if( s[pos] == ']' )
+                        bracketDepth--;
+                    else if( s[pos] == '[' )
+                        bracketDepth++;
+
                     pos++;
                 }
 
-                if( pos >= s.Length || s[pos - 1] != ']' ) throw new FormatException( "Unterminated bracket." );
+                if( pos >= s.Length || s[pos - 1] != ']' )
+                    throw new FormatException( "Unterminated bracket." );
 
                 int endInner = pos - 1;
                 string inner = s[startInner..endInner].Trim();
 
-                if( inner.Length == 0 ) throw new FormatException( "Empty indexer." );
+                if( inner.Length == 0 ) 
+                    throw new FormatException( "Empty indexer." );
 
                 if( inner == "*" )
                 {
@@ -253,11 +287,17 @@ namespace UnityPlus.Serialization
             bool EatNamedChild( out SerializedDataPathSegment segment )
             {
                 segment = default;
-                if( pos >= s.Length ) return false;
+                if( pos >= s.Length ) 
+                    return false;
+
                 int start = pos;
-                if( !IsIdentifierChar( s[pos] ) ) return false;
+                if( !IsIdentifierChar( s[pos] ) ) 
+                    return false;
+
                 pos++;
-                while( pos < s.Length && IsIdentifierChar( s[pos] ) ) pos++;
+                while( pos < s.Length && IsIdentifierChar( s[pos] ) )
+                    pos++;
+
                 string name = s[start..pos];
                 segment = SerializedDataPathSegment.Named( name );
                 return true;
@@ -276,7 +316,8 @@ namespace UnityPlus.Serialization
             {
                 if( s[pos] == '[' )
                 {
-                    if( !EatBracketedIndexer( out var idxSeg ) ) throw new FormatException( "Failed to parse indexer." );
+                    if( !EatBracketedIndexer( out var idxSeg ) )
+                        throw new FormatException( "Failed to parse indexer." );
                     segments.Add( idxSeg );
                     continue;
                 }
@@ -286,7 +327,8 @@ namespace UnityPlus.Serialization
 
                 if( s[pos] == '"' )
                 {
-                    if( !EatQuotedString( out var quoted ) ) throw new FormatException( "Failed to parse quoted string." );
+                    if( !EatQuotedString( out var quoted ) )
+                        throw new FormatException( "Failed to parse quoted string." );
                     segments.Add( quoted );
                     continue;
                 }
@@ -305,7 +347,9 @@ namespace UnityPlus.Serialization
 
         public override string ToString()
         {
-            if( _segments == null || _segments.Length == 0 ) return string.Empty;
+            if( _segments == null || _segments.Length == 0 )
+                return string.Empty;
+
             var sb = new StringBuilder();
             for( int i = 0; i < _segments.Length; i++ )
             {

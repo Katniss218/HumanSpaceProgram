@@ -1,1 +1,1 @@
-{"$id":"2d073c11-f939-4b51-bd86-b2b812205ae9","name":"The default scenario","description":"","author":"Katniss","file_version":"0.0","mod_versions":{"$id":"0433c398-9067-42c1-8e2a-77c52a596640","value":[{"key":"Vanilla","value":"3.0"},{"key":"TestMod","value":"0.0"}]}}
+{"$id":"cdd93374-cba7-4e90-9080-11fb905941ba","name":"The default scenario","description":"","author":"Katniss","file_version":"0.0","mod_versions":{"$id":"1fc3fef5-c2b1-4d64-85bd-23182063b9e7","value":[{"key":"Vanilla","value":"3.0"},{"key":"Debug","value":"1.0"},{"key":"TestMod","value":"0.0"}]}}

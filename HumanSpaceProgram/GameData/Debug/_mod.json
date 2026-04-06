@@ -1,0 +1,16 @@
+﻿{
+    "mod_id": "Debug",
+    "version": "1.0",
+    "name": "Debug Assets and Utils",
+    "author": "Katniss",
+    "description": "",
+    "license": "AGPLv3",
+    "dependencies": {
+        "value": [
+            {
+                "id": "Vanilla",
+                "version": ">=3.0"
+            }
+        ]
+    }
+}

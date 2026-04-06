@@ -1,27 +1,17 @@
-﻿using HSP.Effects;
-using HSP.CelestialBodies;
-using HSP.Content;
-using HSP.Content.Vessels;
+﻿using HSP.CelestialBodies;
 using HSP.Content.Vessels.Serialization;
 using HSP.ReferenceFrames;
-using HSP.ResourceFlow;
+using HSP.SceneManagement;
 using HSP.Time;
-using HSP.Timelines;
-using HSP.Vanilla;
 using HSP.Vanilla.Components;
-using HSP.Vanilla.Scenes.AlwaysLoadedScene;
+using HSP.Vanilla.Scenes.GameplayScene;
 using HSP.Vessels;
-using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityPlus.AssetManagement;
 using UnityPlus.Serialization;
 using UnityPlus.Serialization.Formats;
-using HSP.Vanilla.Scenes.GameplayScene;
-using HSP.SceneManagement;
 
 namespace HSP._DevUtils
 {
@@ -155,11 +145,11 @@ namespace HSP._DevUtils
                 Vector3Dbl airfPos = spawnerPosAirf + closestBoundToVesselAirf;
                 v2.ReferenceFrameTransform.AbsolutePosition = airfPos;
             }
-            if( UnityEngine.Input.GetKeyDown( KeyCode.F5 ) )
-            {
-                DevDefaultScenarioCreator.CreateScenario();
-                //CreateVessel( launchSite );
-            }
+            //if( UnityEngine.Input.GetKeyDown( KeyCode.F5 ) )
+            //{
+            //    DevDefaultScenarioCreator.CreateScenario();
+            //    //CreateVessel( launchSite );
+            //}
             // disabled to prevent accidental overwrite with data that needs to be edited manually (unity can't serialize everything we need)
             /*if( UnityEngine.Input.GetKeyDown( KeyCode.F1 ) )
             {

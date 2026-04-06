@@ -6,13 +6,13 @@ namespace UnityPlus.Serialization
     {
         public void InitializeRoot(  Type declaredType, ContextKey context, object root, SerializedData rootData, SerializationState state )
         {
-            MemberResolutionResult result = TryProcessMember( root, declaredType, context, state, out SerializedData node, out IDescriptor actualDescriptor, out ObjectStructure structure );
+            MemberResolutionResult result = TryProcessMember( root, declaredType, context, state, out SerializedData memberData, out IDescriptor memberDescriptor, out ObjectStructure structure );
 
-            state.RootResult = node;
+            state.RootResult = memberData;
 
             if( result == MemberResolutionResult.RequiresPush )
             {
-                PushCursor( root, null, null, actualDescriptor, structure, node, state );
+                PushCursor( root, null, null, memberDescriptor, structure, memberData, state );
             }
         }
 
@@ -104,13 +104,13 @@ namespace UnityPlus.Serialization
             ContextKey context = member.GetContext( cursor.TargetObj.Target );
 
             MemberResolutionResult result =
-                TryProcessMember( value, member.DeclaredType, context, state, out SerializedData memberData, out IDescriptor childDesc, out ObjectStructure structure );
+                TryProcessMember( value, member.DeclaredType, context, state, out SerializedData memberData, out IDescriptor memberDescriptor, out ObjectStructure structure );
 
             LinkDataNode( cursor.DataNode, member.Name, memberData, memberIndex );
 
             if( result == MemberResolutionResult.RequiresPush )
             {
-                PushCursor( value, cursor.TargetObj.Target, member, childDesc, structure, memberData, state );
+                PushCursor( value, cursor.TargetObj.Target, member, memberDescriptor, structure, memberData, state );
                 return SerializationCursorResult.Push;
             }
 
@@ -150,10 +150,6 @@ namespace UnityPlus.Serialization
             Type actualType = value.GetType();
 
             // 2. Type resolution.
-            if( actualType.AssemblyQualifiedName.Contains( "ControlParameterInput" ) && actualType.AssemblyQualifiedName.Contains( "Transform" ) )
-            {
-
-            }
             actualDescriptor = TypeDescriptorRegistry.GetDescriptor( actualType, context );
 
             // 3. Metadata flags.

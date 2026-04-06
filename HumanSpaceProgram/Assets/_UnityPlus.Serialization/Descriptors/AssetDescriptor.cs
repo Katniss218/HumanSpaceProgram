@@ -49,10 +49,6 @@ namespace UnityPlus.Serialization.Descriptors
             if( data.TryGetValue( KeyNames.ASSETREF, out SerializedData refData ) )
             {
                 string assetID = (string)refData;
-                if(assetID == "Vanilla::Assets/testparticle" )
-                {
-
-                }
                 result = AssetRegistry.Get<T>( assetID );
                 if( result != null )
                     return DeserializationResult.Success;

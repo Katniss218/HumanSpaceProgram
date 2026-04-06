@@ -151,7 +151,7 @@ namespace UnityPlus.Serialization.DescriptorProviders
         );
 
         [MapsInheritingFrom( typeof( KeyValuePair<,> ) )]
-        private static IDescriptor GetDescriptor<TKey, TValue>( ContextKey context )
+        private static IDescriptor ProvideKeyValuePair<TKey, TValue>( ContextKey context )
         {
             IContextSelector selector = ContextRegistry.GetSelector( context );
             ContextKey keyContext = selector.Select( new ContextSelectionArgs( 0, typeof( TKey ), typeof( TKey ), 2 ) );
@@ -171,7 +171,7 @@ namespace UnityPlus.Serialization.DescriptorProviders
         // --- Inner Types ---
 
         [MapsInheritingFrom( typeof( Delegate ) )]
-        private static IDescriptor DelegateMapping() => new PrimitiveConfigurableDescriptor<Delegate>(
+        private static IDescriptor ProvideDelegate() => new PrimitiveConfigurableDescriptor<Delegate>(
             ( v, w, c ) =>
             {
                 var data = Persistent_Delegate.GetData( v, c.ReverseMap );
@@ -193,13 +193,13 @@ namespace UnityPlus.Serialization.DescriptorProviders
 
         [MapsAnyInterface( ContextType = typeof( Ctx.Ref ) )]
         [MapsAnyClass( ContextType = typeof( Ctx.Ref ) )]
-        private static IDescriptor ProvideReference<T>( ContextKey context, Type targetType ) where T : class
+        private static IDescriptor ProvideReference<T>( ContextKey _, Type targetType ) where T : class
         {
             // if the targetType is itself generic (and has only 1 generic type param that matches our params), then the type T that is passed is only going to have that 1 type parameter.
             // example: targetType = MyClass<int>
             // then T = int. and this breaks, we provide the reference to an Int.
             return (IDescriptor)Activator.CreateInstance( typeof( ReferenceDescriptor<> ).MakeGenericType( targetType ) );
-            //return new ReferenceDescriptor<T>();
+            // return new ReferenceDescriptor<T>();
         }
     }
 }
