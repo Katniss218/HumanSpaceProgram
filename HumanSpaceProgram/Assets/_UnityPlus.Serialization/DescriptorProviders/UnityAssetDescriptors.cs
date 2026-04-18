@@ -21,7 +21,7 @@ namespace UnityPlus.Serialization.DescriptorProviders
     {
         [MapsAnyInterface( ContextType = typeof( Ctx.Asset ) )]
         [MapsInheritingFrom( typeof( object ), ContextType = typeof( Ctx.Asset ) )]
-        public static IDescriptor ProvideAsset<T>() where T : class
+        public static IDescriptor ProvideAsset<[BindTarget] T>() where T : class
         {
             return new AssetDescriptor<T>();
         }

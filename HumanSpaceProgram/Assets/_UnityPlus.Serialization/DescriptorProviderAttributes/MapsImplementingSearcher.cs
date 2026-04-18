@@ -1,17 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace UnityPlus.Serialization
 {
     /// <summary>
     /// Searches for a provider registered to an interface implemented by the queried type.
     /// </summary>
-    public class MapsImplementingSearcher<TContext, T> : IMappingProviderSearcher<TContext, T>
+    public class MapsImplementingSearcher : IMappingProviderSearcher
     {
         // Key: (Context, InterfaceType)
-        private readonly Dictionary<(TContext, Type), T> _map = new Dictionary<(TContext, Type), T>();
+        private readonly Dictionary<(int, Type), MethodInfo> _map = new Dictionary<(int, Type), MethodInfo>();
 
-        public bool TryGet( TContext context, Type type, out T value )
+        public bool TryGet( int contextId, Type type, out MethodInfo boundMethod )
         {
             if( type == null )
                 throw new ArgumentNullException( nameof( type ) );
@@ -19,51 +20,60 @@ namespace UnityPlus.Serialization
             // If the type itself is an interface, check it first
             if( type.IsInterface )
             {
-                if( CheckInterface( context, type, out value ) )
+                if( CheckInterface( contextId, type, type, out boundMethod ) )
                     return true;
             }
 
             // Iterate all implemented interfaces
             foreach( Type interfaceType in type.GetInterfaces() )
             {
-                if( CheckInterface( context, interfaceType, out value ) )
+                if( CheckInterface( contextId, type, interfaceType, out boundMethod ) )
                     return true;
             }
 
-            value = default;
+            boundMethod = default;
             return false;
         }
 
-        private bool CheckInterface( TContext context, Type interfaceType, out T value )
+        private bool CheckInterface( int contextId, Type targetType, Type interfaceType, out MethodInfo boundMethod )
         {
             // 1. Exact Match (e.g. IList<int>)
-            if( _map.TryGetValue( (context, interfaceType), out value ) )
-                return true;
+            if( _map.TryGetValue( (contextId, interfaceType), out MethodInfo rawMethod ) )
+            {
+                Type[] mappedArgs = ProviderArgsResolver.GetDeconstructedArgs( targetType, interfaceType );
+                boundMethod = ProviderBindingUtility.Bind( rawMethod, targetType, mappedArgs );
+                if( boundMethod != null ) return true;
+            }
 
             // 2. Generic Definition Match (e.g. IList<>)
             if( interfaceType.IsGenericType && !interfaceType.IsGenericTypeDefinition )
             {
-                if( _map.TryGetValue( (context, interfaceType.GetGenericTypeDefinition()), out value ) )
-                    return true;
+                Type genericDef = interfaceType.GetGenericTypeDefinition();
+                if( _map.TryGetValue( (contextId, genericDef), out rawMethod ) )
+                {
+                    Type[] mappedArgs = ProviderArgsResolver.GetDeconstructedArgs( targetType, genericDef );
+                    boundMethod = ProviderBindingUtility.Bind( rawMethod, targetType, mappedArgs );
+                    if( boundMethod != null ) return true;
+                }
             }
 
-            value = default;
+            boundMethod = default;
             return false;
         }
 
-        public bool TrySet( TContext context, Type type, T value )
+        public bool TrySet( int contextId, Type type, MethodInfo method )
         {
             // type here is the Interface specified in the Attribute
-            if( type == null ) 
+            if( type == null )
                 throw new ArgumentNullException( nameof( type ) );
-            if( !type.IsInterface ) 
+            if( !type.IsInterface )
                 throw new ArgumentException( "Type must be an interface", nameof( type ) );
 
-            var key = (context, type);
+            var key = (contextId, type);
             if( _map.ContainsKey( key ) )
                 return false;
 
-            _map[key] = value;
+            _map[key] = method;
             return true;
         }
 

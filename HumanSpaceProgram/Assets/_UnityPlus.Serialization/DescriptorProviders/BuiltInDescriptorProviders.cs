@@ -193,13 +193,9 @@ namespace UnityPlus.Serialization.DescriptorProviders
 
         [MapsAnyInterface( ContextType = typeof( Ctx.Ref ) )]
         [MapsAnyClass( ContextType = typeof( Ctx.Ref ) )]
-        private static IDescriptor ProvideReference<T>( ContextKey _, Type targetType ) where T : class
+        private static IDescriptor ProvideReference<[BindTarget] T>() where T : class
         {
-            // if the targetType is itself generic (and has only 1 generic type param that matches our params), then the type T that is passed is only going to have that 1 type parameter.
-            // example: targetType = MyClass<int>
-            // then T = int. and this breaks, we provide the reference to an Int.
-            return (IDescriptor)Activator.CreateInstance( typeof( ReferenceDescriptor<> ).MakeGenericType( targetType ) );
-            // return new ReferenceDescriptor<T>();
+            return new ReferenceDescriptor<T>();
         }
     }
 }

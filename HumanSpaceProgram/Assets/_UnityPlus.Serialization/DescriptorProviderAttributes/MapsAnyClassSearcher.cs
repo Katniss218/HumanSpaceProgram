@@ -1,31 +1,37 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace UnityPlus.Serialization
 {
-    public class MapsAnyClassSearcher<TContext, T> : IMappingProviderSearcher<TContext, T>
+    public class MapsAnyClassSearcher : IMappingProviderSearcher
     {
-        private readonly Dictionary<TContext, T> _map = new Dictionary<TContext, T>();
+        private readonly Dictionary<int, MethodInfo> _map = new Dictionary<int, MethodInfo>();
 
-        public bool TryGet( TContext context, Type type, out T value )
+        public bool TryGet( int contextId, Type type, out MethodInfo boundMethod )
         {
             if( type == null )
                 throw new ArgumentNullException( nameof( type ) );
 
             if( type.IsClass && !type.IsAbstract && !typeof( Delegate ).IsAssignableFrom( type ) )
             {
-                return _map.TryGetValue( context, out value );
+                if( _map.TryGetValue( contextId, out MethodInfo rawMethod ) )
+                {
+                    Type[] mappedArgs = ProviderArgsResolver.GetDeconstructedArgs( type, null );
+                    boundMethod = ProviderBindingUtility.Bind( rawMethod, type, mappedArgs );
+                    if( boundMethod != null ) return true;
+                }
             }
 
-            value = default;
+            boundMethod = default;
             return false;
         }
 
-        public bool TrySet( TContext context, Type type, T value )
+        public bool TrySet( int contextId, Type type, MethodInfo method )
         {
-            if( _map.ContainsKey( context ) ) 
+            if( _map.ContainsKey( contextId ) )
                 return false;
-            _map[context] = value;
+            _map[contextId] = method;
             return true;
         }
 

@@ -12,12 +12,12 @@ namespace UnityPlus.Serialization
         private static readonly Dictionary<(Type, int), IDescriptor> _descriptors = new Dictionary<(Type, int), IDescriptor>();
 
         // Provider Lookups (V3 Style - Generalized)
-        private static readonly MapsInheritingFromSearcher<int, MethodInfo> _inheritingSearcher = new();
-        private static readonly MapsImplementingSearcher<int, MethodInfo> _implementingSearcher = new();
-        private static readonly MapsAnyClassSearcher<int, MethodInfo> _anyClassSearcher = new();
-        private static readonly MapsAnyStructSearcher<int, MethodInfo> _anyStructSearcher = new();
-        private static readonly MapsAnyInterfaceSearcher<int, MethodInfo> _anyInterfaceSearcher = new();
-        private static readonly MapsAnySearcher<int, MethodInfo> _anySearcher = new();
+        private static readonly MapsInheritingFromSearcher _inheritingSearcher = new();
+        private static readonly MapsImplementingSearcher _implementingSearcher = new();
+        private static readonly MapsAnyClassSearcher _anyClassSearcher = new();
+        private static readonly MapsAnyStructSearcher _anyStructSearcher = new();
+        private static readonly MapsAnyInterfaceSearcher _anyInterfaceSearcher = new();
+        private static readonly MapsAnySearcher _anySearcher = new();
 
         // Extensions: (TargetType, Context) -> List of Extension Methods
         private static readonly Dictionary<(Type, int), List<MethodInfo>> _extensions = new Dictionary<(Type, int), List<MethodInfo>>();
@@ -190,45 +190,45 @@ namespace UnityPlus.Serialization
 
             foreach( int contextId in contextHierarchy )
             {
-                MethodInfo method;
+                MethodInfo boundMethod;
 
                 // --- 2. Inheritance Hierarchy (Specific Bases) ---
-                if( _inheritingSearcher.TryGet( contextId, type, out method ) )
+                if( _inheritingSearcher.TryGet( contextId, type, out boundMethod ) )
                 {
-                    IDescriptor desc = InvokeProvider( method, type, context );
+                    IDescriptor desc = InvokeBoundProvider( boundMethod, type, context );
                     if( desc != null ) return desc;
                 }
 
                 // --- 3. Interfaces ---
-                if( _implementingSearcher.TryGet( contextId, type, out method ) )
+                if( _implementingSearcher.TryGet( contextId, type, out boundMethod ) )
                 {
-                    IDescriptor desc = InvokeProvider( method, type, context );
+                    IDescriptor desc = InvokeBoundProvider( boundMethod, type, context );
                     if( desc != null ) return desc;
                 }
 
                 // --- 5. Category Fallbacks (Any Class/Struct/Interface) ---
-                if( _anyClassSearcher.TryGet( contextId, type, out method ) )
+                if( _anyClassSearcher.TryGet( contextId, type, out boundMethod ) )
                 {
-                    IDescriptor desc = InvokeProvider( method, type, context );
+                    IDescriptor desc = InvokeBoundProvider( boundMethod, type, context );
                     if( desc != null ) return desc;
                 }
 
-                if( _anyStructSearcher.TryGet( contextId, type, out method ) )
+                if( _anyStructSearcher.TryGet( contextId, type, out boundMethod ) )
                 {
-                    IDescriptor desc = InvokeProvider( method, type, context );
+                    IDescriptor desc = InvokeBoundProvider( boundMethod, type, context );
                     if( desc != null ) return desc;
                 }
 
-                if( _anyInterfaceSearcher.TryGet( contextId, type, out method ) )
+                if( _anyInterfaceSearcher.TryGet( contextId, type, out boundMethod ) )
                 {
-                    IDescriptor desc = InvokeProvider( method, type, context );
+                    IDescriptor desc = InvokeBoundProvider( boundMethod, type, context );
                     if( desc != null ) return desc;
                 }
 
                 // --- 6. Absolute Fallback (Any) ---
-                if( _anySearcher.TryGet( contextId, type, out method ) )
+                if( _anySearcher.TryGet( contextId, type, out boundMethod ) )
                 {
-                    IDescriptor desc = InvokeProvider( method, type, context );
+                    IDescriptor desc = InvokeBoundProvider( boundMethod, type, context );
                     if( desc != null ) return desc;
                 }
 
@@ -248,63 +248,10 @@ namespace UnityPlus.Serialization
             return null;
         }
 
-        private static IDescriptor InvokeProvider( MethodInfo method, Type targetType, ContextKey context )
+        private static IDescriptor InvokeBoundProvider( MethodInfo method, Type targetType, ContextKey context )
         {
             try
             {
-                // Determine Generic Arguments based on the Target Type
-                Type[] genericArgs;
-                if( targetType.IsArray )
-                {
-                    genericArgs = new Type[] { targetType.GetElementType() };
-                }
-                else if( targetType.IsGenericType )
-                {
-                    genericArgs = targetType.GetGenericArguments();
-                }
-                else if( targetType.IsEnum )
-                {
-                    genericArgs = new Type[] { targetType };
-                }
-                else
-                {
-                    genericArgs = Type.EmptyTypes;
-                }
-
-                // CASE 1: The Provider is inside a Generic Class (e.g. class Provider<T> { static Method() } )
-                if( method.DeclaringType.IsGenericTypeDefinition )
-                {
-                    // We must close the declaring type with the generic args
-                    Type closedProviderType = method.DeclaringType.MakeGenericType( genericArgs );
-
-                    // We must find the matching method on the closed type. 
-                    // MethodBase.GetMethodFromHandle is the most robust way to map Open Method -> Closed Method
-                    method = (MethodInfo)MethodBase.GetMethodFromHandle( method.MethodHandle, closedProviderType.TypeHandle );
-                }
-                // CASE 2: The Provider Method itself is Generic (e.g. static Method<T>() )
-                else if( method.IsGenericMethodDefinition )
-                {
-                    try
-                    {
-                        // Safety check: ensure generic args match method definition count
-                        if( method.GetGenericArguments().Length == genericArgs.Length )
-                        {
-                            method = method.MakeGenericMethod( genericArgs );
-                        }
-                        else if( method.GetGenericArguments().Length == 1 && genericArgs.Length == 0 )
-                        {
-                            // Special case: Method<T> called for non-generic type (e.g. MapsAnyClass -> T is the type itself)
-                            method = method.MakeGenericMethod( targetType );
-                        }
-                    }
-                    catch( ArgumentException )
-                    {
-                        // The target type does not satisfy the generic constraints of the provider method.
-                        // This means the provider is not applicable to this specific type.
-                        return null;
-                    }
-                }
-
                 // Inject Context if requested
                 ParameterInfo[] paramsInfo = method.GetParameters();
                 object[] args = null;
