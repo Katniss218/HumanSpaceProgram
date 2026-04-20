@@ -53,7 +53,7 @@ namespace UnityPlus.Serialization.Input.Mappings
                 .WithFactory<float, KeyCode[]>( ( value, keys ) =>
                 {
                     return new MultipleKeyDownBinding( value, keys );
-                }, "value", "key" );
+                }, "value", "keys" );
         }
 
         [MapsInheritingFrom( typeof( AxisBinding ) )]
