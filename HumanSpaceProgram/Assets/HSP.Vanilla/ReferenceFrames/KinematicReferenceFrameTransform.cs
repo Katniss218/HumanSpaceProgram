@@ -4,8 +4,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.LowLevel;
-using UnityEngine.PlayerLoop;
-using UnityPlus;
+using UnityPlus.PlayerLoop;
 using UnityPlus.Serialization;
 using UnityPlus.Serialization.Descriptors;
 
@@ -322,11 +321,6 @@ namespace HSP.Vanilla
         {
             _sceneReferenceFrameProvider?.SubscribeIfNotSubscribed( this );
             _activeKinematicTransforms.Add( this );
-            if( _activeKinematicTransforms.Count == 1 )
-            {
-                PlayerLoopUtils.InsertSystemAfter<FixedUpdate>( in _afterFixedUpdatePlayerLoopSystem, typeof( FixedUpdate.ScriptRunBehaviourFixedUpdate ) );
-                PlayerLoopUtils.AddSystem<FixedUpdate, FixedUpdate.PhysicsFixedUpdate>( in _playerLoopSystem );
-            }
             _rb.isKinematic = true; // Force kinematic.
         }
 
@@ -334,11 +328,6 @@ namespace HSP.Vanilla
         {
             _sceneReferenceFrameProvider?.UnsubscribeIfSubscribed( this );
             _activeKinematicTransforms.Remove( this );
-            if( _activeKinematicTransforms.Count == 0 )
-            {
-                PlayerLoopUtils.RemoveSystem<FixedUpdate>( in _afterFixedUpdatePlayerLoopSystem );
-                PlayerLoopUtils.RemoveSystem<FixedUpdate, FixedUpdate.PhysicsFixedUpdate>( in _playerLoopSystem );
-            }
             _rb.isKinematic = true;
         }
 
@@ -362,58 +351,53 @@ namespace HSP.Vanilla
         }
 
 
-        private static PlayerLoopSystem _afterFixedUpdatePlayerLoopSystem = new PlayerLoopSystem()
-        {
-            type = typeof( KinematicReferenceFrameTransform ),
-            updateDelegate = AfterFixedUpdate,
-            subSystemList = null
-        };
-        private static PlayerLoopSystem _playerLoopSystem = new PlayerLoopSystem()
-        {
-            type = typeof( KinematicReferenceFrameTransform ),
-            updateDelegate = InsidePhysicsStep,
-            subSystemList = null
-        };
-
         private static List<KinematicReferenceFrameTransform> _activeKinematicTransforms = new();
 
-        private static void AfterFixedUpdate() // we update it here (after all fixed behaviour updates)
-                                               // because otherwise the execution order might fuck things,
-                                               // and I don't want to change the order manually.
+        [PlayerLoopSystem( typeof( UnityPlus.PlayerLoop.Phases.PostFixedUpdate ) )] // we update it here (after all fixed behaviour updates)
+                                                                                    // because otherwise the execution order might fuck things,
+                                                                                    // and I don't want to change the order manually.
+        public sealed class KinematicReferenceFrameTransformFixedUpdateSystem : IPlayerLoopSystem
         {
-            foreach( var t in _activeKinematicTransforms )
+            public void Run()
             {
-                IReferenceFrame sceneReferenceFrameAfterPhysicsProcessing = t.SceneReferenceFrameProvider.GetSceneReferenceFrame().AtUT( TimeManager.UT );
+                foreach( var t in _activeKinematicTransforms )
+                {
+                    IReferenceFrame sceneReferenceFrameAfterPhysicsProcessing = t.SceneReferenceFrameProvider.GetSceneReferenceFrame().AtUT( TimeManager.UT );
 
-                // `_actualAbsolutePosition` should be up to date due to the callback inside physics step, which was invoked in the previous frame.
+                    // `_actualAbsolutePosition` should be up to date due to the callback inside physics step, which was invoked in the previous frame.
 
-                var vel = t._absoluteVelocity + t._absoluteAcceleration * TimeManager.FixedDeltaTime;
-                var angvel = t._absoluteAngularVelocity + t._absoluteAngularAcceleration * TimeManager.FixedDeltaTime;
+                    var vel = t._absoluteVelocity + t._absoluteAcceleration * TimeManager.FixedDeltaTime;
+                    var angvel = t._absoluteAngularVelocity + t._absoluteAngularAcceleration * TimeManager.FixedDeltaTime;
 
-                t._requestedAbsolutePosition = t._actualAbsolutePosition + vel * TimeManager.FixedDeltaTime;
-                QuaternionDbl deltaRotation = QuaternionDbl.AngleAxis( angvel.magnitude * TimeManager.FixedDeltaTime * 57.29577951308232, angvel );
-                t._requestedAbsoluteRotation = deltaRotation * t._actualAbsoluteRotation;
+                    t._requestedAbsolutePosition = t._actualAbsolutePosition + vel * TimeManager.FixedDeltaTime;
+                    QuaternionDbl deltaRotation = QuaternionDbl.AngleAxis( angvel.magnitude * TimeManager.FixedDeltaTime * 57.29577951308232, angvel );
+                    t._requestedAbsoluteRotation = deltaRotation * t._actualAbsoluteRotation;
 
-                var requestedPos = (Vector3)sceneReferenceFrameAfterPhysicsProcessing.InverseTransformPosition( t._requestedAbsolutePosition );
-                var requestedRot = (Quaternion)sceneReferenceFrameAfterPhysicsProcessing.InverseTransformRotation( t._requestedAbsoluteRotation );
+                    var requestedPos = (Vector3)sceneReferenceFrameAfterPhysicsProcessing.InverseTransformPosition( t._requestedAbsolutePosition );
+                    var requestedRot = (Quaternion)sceneReferenceFrameAfterPhysicsProcessing.InverseTransformRotation( t._requestedAbsoluteRotation );
 
-                t._rb.Move( requestedPos, requestedRot );
+                    t._rb.Move( requestedPos, requestedRot );
+                }
             }
         }
 
-        private static void InsidePhysicsStep()
+        [PlayerLoopSystem( typeof( UnityPlus.PlayerLoop.Phases.PhysicsStep ), Before = new[] { typeof( HSP.Trajectories.TrajectoryManager.TrajectoryManagerPostPhysicsStepSystem ) } )] // InsidePhysicsStep
+        public sealed class KinematicReferenceFrameTransformSystem : IPlayerLoopSystem
         {
-            // Assume that other objects aren't allowed to get the absolute position/velocity *in* the physics step, as it is undefined (changes) during it.
-            foreach( var t in _activeKinematicTransforms )
+            public void Run()
             {
-                t._absoluteVelocity += t._absoluteAcceleration * TimeManager.FixedDeltaTime;
-                t._absoluteAngularVelocity += t._absoluteAngularAcceleration * TimeManager.FixedDeltaTime;
+                // Assume that other objects aren't allowed to get the absolute position/velocity *in* the physics step, as it is undefined (changes) during it.
+                foreach( var t in _activeKinematicTransforms )
+                {
+                    t._absoluteVelocity += t._absoluteAcceleration * TimeManager.FixedDeltaTime;
+                    t._absoluteAngularVelocity += t._absoluteAngularAcceleration * TimeManager.FixedDeltaTime;
 
-                t._absoluteAcceleration = Vector3Dbl.zero;
-                t._absoluteAngularAcceleration = Vector3Dbl.zero;
+                    t._absoluteAcceleration = Vector3Dbl.zero;
+                    t._absoluteAngularAcceleration = Vector3Dbl.zero;
 
-                t._actualAbsolutePosition = t._requestedAbsolutePosition;
-                t._actualAbsoluteRotation = t._requestedAbsoluteRotation;
+                    t._actualAbsolutePosition = t._requestedAbsolutePosition;
+                    t._actualAbsoluteRotation = t._requestedAbsoluteRotation;
+                }
             }
         }
 

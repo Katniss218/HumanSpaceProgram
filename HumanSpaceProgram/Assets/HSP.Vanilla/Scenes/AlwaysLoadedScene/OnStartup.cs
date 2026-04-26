@@ -5,6 +5,7 @@ using HSP.SceneManagement;
 using HSP.ScreenCapturing;
 using HSP.Time;
 using UnityPlus.Input;
+using UnityPlus.PlayerLoop;
 
 namespace HSP.Vanilla.Scenes.AlwaysLoadedScene
 {
@@ -15,6 +16,14 @@ namespace HSP.Vanilla.Scenes.AlwaysLoadedScene
         public const string ADD_AUDIO_EFFECT_MANAGER = HSPEvent.NAMESPACE_HSP + ".add_audio_effect_manager";
         public const string ADD_PARTICLE_EFFECT_MANAGER = HSPEvent.NAMESPACE_HSP + ".add_particle_effect_manager";
         public const string LOAD_MAIN_MENU = HSPEvent.NAMESPACE_HSP + ".load_main_menu";
+
+        [HSPEventListener( HSPEvent_STARTUP_IMMEDIATELY.ID, "bc60724a-ed22-492d-b7e4-c7e76c37cd2c" )]
+        private static void InitializePlayerLoopManager()
+        {
+            PlayerLoopManager.Initialize( BucketHandling.IncludeThrow );
+
+            PlayerLoopUtils.PrintCurrentPlayerLoop();
+        }
 
         [HSPEventListener( HSPEvent_STARTUP_IMMEDIATELY.ID, ADD_TIME_MANAGER )]
         private static void AddTimeManager()

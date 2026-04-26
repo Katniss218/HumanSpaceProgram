@@ -3,8 +3,7 @@ using HSP.Vanilla.Trajectories;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.LowLevel;
-using UnityEngine.PlayerLoop;
-using UnityPlus;
+using UnityPlus.PlayerLoop;
 
 namespace HSP.Trajectories
 {
@@ -132,34 +131,6 @@ namespace HSP.Trajectories
             }
         }
 
-        void OnEnable()
-        {
-            PlayerLoopUtils.InsertSystemBefore<FixedUpdate>( in _beforePlayerLoopSystem, typeof( FixedUpdate.PhysicsFixedUpdate ) );
-            //PlayerLoopUtils.InsertSystemAfter<FixedUpdate>( in _afterPlayerLoopSystem, typeof( FixedUpdate.Physics2DFixedUpdate ) );
-            PlayerLoopUtils.AddSystem<FixedUpdate, FixedUpdate.PhysicsFixedUpdate>( in _afterPlayerLoopSystem );
-        }
-
-        void OnDisable()
-        {
-            PlayerLoopUtils.RemoveSystem<FixedUpdate>( in _beforePlayerLoopSystem );
-            //PlayerLoopUtils.RemoveSystem<FixedUpdate>( in _afterPlayerLoopSystem );
-            PlayerLoopUtils.RemoveSystem<FixedUpdate, FixedUpdate.PhysicsFixedUpdate>( in _afterPlayerLoopSystem );
-        }
-
-        private static PlayerLoopSystem _beforePlayerLoopSystem = new PlayerLoopSystem()
-        {
-            type = typeof( TrajectoryManager ),
-            updateDelegate = ImmediatelyBeforeUnityPhysicsStep,
-            subSystemList = null
-        };
-
-        private static PlayerLoopSystem _afterPlayerLoopSystem = new PlayerLoopSystem()
-        {
-            type = typeof( TrajectoryManager ),
-            updateDelegate = ImmediatelyAfterUnityPhysicsStep,
-            subSystemList = null
-        };
-
         // Simulation works as follows:
 
         //          FIXED UPDATE
@@ -180,79 +151,90 @@ namespace HSP.Trajectories
         //          UPDATE
         //          LATE UPDATE
 
-        private static void ImmediatelyBeforeUnityPhysicsStep()
+        [PlayerLoopSystem( typeof( UnityPlus.PlayerLoop.Phases.PrePhysicsStep ) )] // ImmediatelyBeforeUnityPhysicsStep
+        public sealed class TrajectoryManagerPrePhysicsStepSystem : IPlayerLoopSystem
         {
-            if( !instanceExists )
+            public void Run()
             {
+#warning TODO - this is buggy and a mess. new playerloop should hopefully make the ordering more controllable, so we can refactor this.
                 return;
-            }
-
-            instance.EnsureSimulatorsExist();
-
-            foreach( var trajectoryTransform in instance._transforms )
-            {
-                if( trajectoryTransform.TrajectoryNeedsUpdating() )
+                if( !instanceExists )
                 {
-                    foreach( var simulator in instance._simulators )
+                    return;
+                }
+
+                instance.EnsureSimulatorsExist();
+
+                foreach( var trajectoryTransform in instance._transforms )
+                {
+                    if( trajectoryTransform.TrajectoryNeedsUpdating() )
                     {
-                        simulator.MarkStale( trajectoryTransform );
+                        foreach( var simulator in instance._simulators )
+                        {
+                            simulator.MarkStale( trajectoryTransform );
+                        }
                     }
                 }
-            }
 
-            if( instance._simulators[SIMULATOR_INDEX].GetSimulatedInterval().duration == 0 )
-            {
-                instance._simulators[SIMULATOR_INDEX].SetInitialTime( TimeManager.OldUT );
-            }
-            if( instance._simulators[PREDICTION_SIMULATOR_INDEX].GetSimulatedInterval().duration == 0 )
-            {
-                instance._simulators[PREDICTION_SIMULATOR_INDEX].SetInitialTime( TimeManager.OldUT );
-            }
-#warning TODO - the first evaluation starts at 0 and simulates to 0 + deltaTime + duration
-            // start = 0.2 - 0.2
-            // end = 0.2 + duration
-            instance._simulators[SIMULATOR_INDEX].Simulate( TimeManager.UT );
-            instance._simulators[PREDICTION_SIMULATOR_INDEX].Simulate( TimeManager.OldUT + FlightPlanDuration );
-
-            foreach( var trajectoryTransform in instance._transforms )
-            {
-                TrajectoryStateVector stateVector = Simulator.GetCurrentStateVector( trajectoryTransform );
-
-                if( trajectoryTransform.TrajectoryNeedsUpdating() )
+                if( instance._simulators[SIMULATOR_INDEX].GetSimulatedInterval().duration == 0 )
                 {
-                    instance._posAndVelCache[trajectoryTransform] = (stateVector.AbsolutePosition, stateVector.AbsoluteVelocity, Vector3Dbl.zero);
-                    //trajectoryTransform.SuppressValueChanged(); // for some reason, suppressing it here makes engines not work right.
-                    trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity = stateVector.AbsoluteVelocity;
-                    //trajectoryTransform.AllowValueChanged();
+                    instance._simulators[SIMULATOR_INDEX].SetInitialTime( TimeManager.OldUT );
                 }
-                else
+                if( instance._simulators[PREDICTION_SIMULATOR_INDEX].GetSimulatedInterval().duration == 0 )
                 {
-                    // If the transform is synchronized, make the velocity what it should be to make it move to the target location.
-                    // This - at least in theory - should make PhysX happier, because the position is not being reset, in turn resetting some physics scene stuff.
-                    Vector3Dbl interpolatedVel = (stateVector.AbsolutePosition - trajectoryTransform.ReferenceFrameTransform.AbsolutePosition) / TimeManager.FixedDeltaTime;
-                    instance._posAndVelCache[trajectoryTransform] = (stateVector.AbsolutePosition, stateVector.AbsoluteVelocity, interpolatedVel);
+                    instance._simulators[PREDICTION_SIMULATOR_INDEX].SetInitialTime( TimeManager.OldUT );
+                }
+#warning TODO - the first evaluation starts at 0 and simulates to 0 + deltaTime + duration
+                // start = 0.2 - 0.2
+                // end = 0.2 + duration
+                instance._simulators[SIMULATOR_INDEX].Simulate( TimeManager.UT );
+                instance._simulators[PREDICTION_SIMULATOR_INDEX].Simulate( TimeManager.OldUT + FlightPlanDuration );
 
-                    trajectoryTransform.SuppressValueChanged();
-                    trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity = interpolatedVel;
-                    trajectoryTransform.AllowValueChanged();
+                foreach( var trajectoryTransform in instance._transforms )
+                {
+                    TrajectoryStateVector stateVector = Simulator.GetCurrentStateVector( trajectoryTransform );
+
+                    if( trajectoryTransform.TrajectoryNeedsUpdating() )
+                    {
+                        instance._posAndVelCache[trajectoryTransform] = (stateVector.AbsolutePosition, stateVector.AbsoluteVelocity, Vector3Dbl.zero);
+                        //trajectoryTransform.SuppressValueChanged(); // for some reason, suppressing it here makes engines not work right.
+                        trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity = stateVector.AbsoluteVelocity;
+                        //trajectoryTransform.AllowValueChanged();
+                    }
+                    else
+                    {
+                        // If the transform is synchronized, make the velocity what it should be to make it move to the target location.
+                        // This - at least in theory - should make PhysX happier, because the position is not being reset, in turn resetting some physics scene stuff.
+                        Vector3Dbl interpolatedVel = (stateVector.AbsolutePosition - trajectoryTransform.ReferenceFrameTransform.AbsolutePosition) / TimeManager.FixedDeltaTime;
+                        instance._posAndVelCache[trajectoryTransform] = (stateVector.AbsolutePosition, stateVector.AbsoluteVelocity, interpolatedVel);
+
+                        trajectoryTransform.SuppressValueChanged();
+                        trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity = interpolatedVel;
+                        trajectoryTransform.AllowValueChanged();
+                    }
                 }
             }
         }
 
-        private static void ImmediatelyAfterUnityPhysicsStep()
+        [PlayerLoopSystem( typeof( UnityPlus.PlayerLoop.Phases.PhysicsStep ) )] // ImmediatelyAfterUnityPhysicsStep
+        public sealed class TrajectoryManagerPostPhysicsStepSystem : IPlayerLoopSystem
         {
-            if( !instanceExists )
-                return;
-
-            foreach( var trajectoryTransform in instance._transforms )
+            public void Run()
             {
-                var (_, vel, interpolatedVel) = instance._posAndVelCache[trajectoryTransform];
+                return;
+                if( !instanceExists )
+                    return;
 
-                if( !trajectoryTransform.TrajectoryNeedsUpdating() || trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity == interpolatedVel )
+                foreach( var trajectoryTransform in instance._transforms )
                 {
-                    trajectoryTransform.SuppressValueChanged();
-                    trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity = vel;
-                    trajectoryTransform.AllowValueChanged();
+                    var (_, vel, interpolatedVel) = instance._posAndVelCache[trajectoryTransform];
+
+                    if( !trajectoryTransform.TrajectoryNeedsUpdating() || trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity == interpolatedVel )
+                    {
+                        trajectoryTransform.SuppressValueChanged();
+                        trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity = vel;
+                        trajectoryTransform.AllowValueChanged();
+                    }
                 }
             }
         }

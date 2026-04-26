@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.LowLevel;
 using UnityEngine.PlayerLoop;
 using UnityPlus;
+using UnityPlus.PlayerLoop;
 using UnityPlus.Serialization;
 using UnityPlus.Serialization.Descriptors;
 
@@ -556,22 +557,12 @@ namespace HSP.Vanilla
         {
             _sceneReferenceFrameProvider?.SubscribeIfNotSubscribed( this );
             _activeHybridTransforms.Add( this );
-            if( _activeHybridTransforms.Count == 1 )
-            {
-                PlayerLoopUtils.InsertSystemAfter<FixedUpdate>( in _afterFixedUpdatePlayerLoopSystem, typeof( FixedUpdate.ScriptRunBehaviourFixedUpdate ) );
-                PlayerLoopUtils.AddSystem<FixedUpdate, FixedUpdate.PhysicsFixedUpdate>( in _playerLoopSystem );
-            }
         }
 
         protected virtual void OnDisable()
         {
             _sceneReferenceFrameProvider?.UnsubscribeIfSubscribed( this );
             _activeHybridTransforms.Remove( this );
-            if( _activeHybridTransforms.Count == 0 )
-            {
-                PlayerLoopUtils.RemoveSystem<FixedUpdate>( in _afterFixedUpdatePlayerLoopSystem );
-                PlayerLoopUtils.RemoveSystem<FixedUpdate, FixedUpdate.PhysicsFixedUpdate>( in _playerLoopSystem );
-            }
         }
 
         protected virtual void OnCollisionEnter( Collision collision )
@@ -594,67 +585,63 @@ namespace HSP.Vanilla
         }
 
 
-        private static PlayerLoopSystem _afterFixedUpdatePlayerLoopSystem = new PlayerLoopSystem()
-        {
-            type = typeof( HybridReferenceFrameTransform ),
-            updateDelegate = AfterFixedUpdate,
-            subSystemList = null
-        };
-        private static PlayerLoopSystem _playerLoopSystem = new PlayerLoopSystem()
-        {
-            type = typeof( SceneReferenceFrameManager ),
-            updateDelegate = InsidePhysicsStep,
-            subSystemList = null
-        };
-
         static List<HybridReferenceFrameTransform> _activeHybridTransforms = new();
 
-        private static void AfterFixedUpdate() // we update it here (after all fixed behaviour updates)
-                                               // because otherwise the execution order might fuck things,
-                                               // and I don't want to change the order manually.
+        [PlayerLoopSystem( typeof( UnityPlus.PlayerLoop.Phases.PostFixedUpdate ) )] // we update it here (after all fixed behaviour updates)
+                                                                                    // because otherwise the execution order might fuck things,
+                                                                                    // and I don't want to change the order manually.
+        public sealed class HybridReferenceFrameTransformFixedUpdateSystem : IPlayerLoopSystem
         {
-            foreach( var t in _activeHybridTransforms )
+            public void Run()
             {
-                if( !t._isSceneSpace )
+                foreach( var t in _activeHybridTransforms )
                 {
-                    IReferenceFrame sceneReferenceFrameAfterPhysicsProcessing = t.SceneReferenceFrameProvider.GetSceneReferenceFrame().AtUT( TimeManager.UT );
+                    if( !t._isSceneSpace )
+                    {
+                        IReferenceFrame sceneReferenceFrameAfterPhysicsProcessing = t.SceneReferenceFrameProvider.GetSceneReferenceFrame().AtUT( TimeManager.UT );
 
-                    // `_actualAbsolutePosition` should be up to date due to the callback inside physics step, which was invoked in the previous frame.
+                        // `_actualAbsolutePosition` should be up to date due to the callback inside physics step, which was invoked in the previous frame.
 
-                    var vel = t._absoluteVelocity + t._absoluteAcceleration * TimeManager.FixedDeltaTime;
-                    var angvel = t._absoluteAngularVelocity + t._absoluteAngularAcceleration * TimeManager.FixedDeltaTime;
+                        var vel = t._absoluteVelocity + t._absoluteAcceleration * TimeManager.FixedDeltaTime;
+                        var angvel = t._absoluteAngularVelocity + t._absoluteAngularAcceleration * TimeManager.FixedDeltaTime;
 
-                    t._requestedAbsolutePosition = t._actualAbsolutePosition + vel * TimeManager.FixedDeltaTime;
-                    QuaternionDbl deltaRotation = QuaternionDbl.AngleAxis( angvel.magnitude * TimeManager.FixedDeltaTime * 57.29577951308232, angvel );
-                    t._requestedAbsoluteRotation = deltaRotation * t._actualAbsoluteRotation;
+                        t._requestedAbsolutePosition = t._actualAbsolutePosition + vel * TimeManager.FixedDeltaTime;
+                        QuaternionDbl deltaRotation = QuaternionDbl.AngleAxis( angvel.magnitude * TimeManager.FixedDeltaTime * 57.29577951308232, angvel );
+                        t._requestedAbsoluteRotation = deltaRotation * t._actualAbsoluteRotation;
 
-                    var requestedPos = (Vector3)sceneReferenceFrameAfterPhysicsProcessing.InverseTransformPosition( t._requestedAbsolutePosition );
-                    var requestedRot = (Quaternion)sceneReferenceFrameAfterPhysicsProcessing.InverseTransformRotation( t._requestedAbsoluteRotation );
+                        var requestedPos = (Vector3)sceneReferenceFrameAfterPhysicsProcessing.InverseTransformPosition( t._requestedAbsolutePosition );
+                        var requestedRot = (Quaternion)sceneReferenceFrameAfterPhysicsProcessing.InverseTransformRotation( t._requestedAbsoluteRotation );
 
-                    t._rb.Move( requestedPos, requestedRot );
+                        t._rb.Move( requestedPos, requestedRot );
+                    }
                 }
             }
         }
-        static void InsidePhysicsStep()
+
+        [PlayerLoopSystem( typeof( UnityPlus.PlayerLoop.Phases.PhysicsStep ), Before = new[] { typeof( HSP.Trajectories.TrajectoryManager.TrajectoryManagerPostPhysicsStepSystem ) } )] // InsidePhysicsStep
+        public sealed class HybridReferenceFrameTransformSystem : IPlayerLoopSystem
         {
-            // This is required to happen indide physics step to properly account for all forces added during fixedupdate IF THE OBJECT IS IN ABSOLUTE MODE.
-            // Some calls to AddForce might happen after FixedUpdate for this component has been called, and thus would only be accounted for in the next frame.
-            //   This is unacceptable.
-
-            // Assume that other objects aren't allowed to get the absolute position/velocity during physics step, as it is undefined (changes) during it.
-            foreach( var t in _activeHybridTransforms )
+            public void Run()
             {
-                if( !t._isSceneSpace )
+                // This is required to happen indide physics step to properly account for all forces added during fixedupdate IF THE OBJECT IS IN ABSOLUTE MODE.
+                // Some calls to AddForce might happen after FixedUpdate for this component has been called, and thus would only be accounted for in the next frame.
+                //   This is unacceptable.
+
+                // Assume that other objects aren't allowed to get the absolute position/velocity during physics step, as it is undefined (changes) during it.
+                foreach( var t in _activeHybridTransforms )
                 {
-                    t._absoluteVelocity += t._absoluteAcceleration * TimeManager.FixedDeltaTime;
-                    t._absoluteAngularVelocity += t._absoluteAngularAcceleration * TimeManager.FixedDeltaTime;
+                    if( !t._isSceneSpace )
+                    {
+                        t._absoluteVelocity += t._absoluteAcceleration * TimeManager.FixedDeltaTime;
+                        t._absoluteAngularVelocity += t._absoluteAngularAcceleration * TimeManager.FixedDeltaTime;
+                    }
+
+                    t._absoluteAcceleration = Vector3Dbl.zero;
+                    t._absoluteAngularAcceleration = Vector3Dbl.zero;
+
+                    t._actualAbsolutePosition = t._requestedAbsolutePosition;
+                    t._actualAbsoluteRotation = t._requestedAbsoluteRotation;
                 }
-
-                t._absoluteAcceleration = Vector3Dbl.zero;
-                t._absoluteAngularAcceleration = Vector3Dbl.zero;
-
-                t._actualAbsolutePosition = t._requestedAbsolutePosition;
-                t._actualAbsoluteRotation = t._requestedAbsoluteRotation;
             }
         }
 

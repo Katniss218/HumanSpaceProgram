@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.LowLevel;
 using UnityEngine.PlayerLoop;
 using UnityPlus;
+using UnityPlus.PlayerLoop;
 using UnityPlus.Serialization;
 using UnityPlus.Serialization.Descriptors;
 
@@ -175,31 +176,17 @@ namespace HSP.Time
             SetTimeScale( 1 );
         }
 
-
-        void OnEnable()
+        [PlayerLoopSystem( typeof( UnityPlus.PlayerLoop.Phases.PreFixedUpdate ) )]
+        public sealed class TimeManagerSystem : IPlayerLoopSystem
         {
-            PlayerLoopUtils.InsertSystemBefore<FixedUpdate>( in _playerLoopSystem, typeof( FixedUpdate.ClearLines ) );
-        }
+            public void Run()
+            {
+                if( !instanceExists )
+                    return;
 
-        void OnDisable()
-        {
-            PlayerLoopUtils.RemoveSystem<FixedUpdate>( in _playerLoopSystem );
-        }
-
-        private static PlayerLoopSystem _playerLoopSystem = new PlayerLoopSystem()
-        {
-            type = typeof( TimeManager ),
-            updateDelegate = PlayerLoopImmediatelyAtTheStartOfFixedUpdate,
-            subSystemList = null
-        };
-
-        private static void PlayerLoopImmediatelyAtTheStartOfFixedUpdate()
-        {
-            if( !instanceExists )
-                return;
-
-            OldUT = UT;
-            UT += FixedDeltaTime;
+                OldUT = UT;
+                UT += FixedDeltaTime;
+            }
         }
 
 

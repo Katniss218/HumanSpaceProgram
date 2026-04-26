@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.LowLevel;
 using UnityEngine.PlayerLoop;
 using UnityPlus;
+using UnityPlus.PlayerLoop;
 using UnityPlus.Serialization;
 using UnityPlus.Serialization.Descriptors;
 
@@ -439,10 +440,6 @@ namespace HSP.Vanilla
         {
             _sceneReferenceFrameProvider?.SubscribeIfNotSubscribed( this );
             _activeFreeTransforms.Add( this );
-            if( _activeFreeTransforms.Count == 1 )
-            {
-                PlayerLoopUtils.AddSystem<FixedUpdate, FixedUpdate.PhysicsFixedUpdate>( in _playerLoopSystem );
-            }
             _rb.isKinematic = false; // Can't do `enabled = false` (doesn't exist) for a rigidbody, so we set it to kinematic instead.
         }
 
@@ -450,10 +447,6 @@ namespace HSP.Vanilla
         {
             _sceneReferenceFrameProvider?.UnsubscribeIfSubscribed( this );
             _activeFreeTransforms.Remove( this );
-            if( _activeFreeTransforms.Count == 0 )
-            {
-                PlayerLoopUtils.RemoveSystem<FixedUpdate, FixedUpdate.PhysicsFixedUpdate>( in _playerLoopSystem );
-            }
             _rb.isKinematic = true; // Can't do `enabled = false` (doesn't exist) for a rigidbody, so we set it to kinematic instead.
         }
 
@@ -476,22 +469,19 @@ namespace HSP.Vanilla
             IsColliding = false;
         }
 
-        private static PlayerLoopSystem _playerLoopSystem = new PlayerLoopSystem()
-        {
-            type = typeof( KinematicReferenceFrameTransform ),
-            updateDelegate = InsidePhysicsStep,
-            subSystemList = null
-        };
-
         private static List<FreeReferenceFrameTransform> _activeFreeTransforms = new();
 
-        private static void InsidePhysicsStep()
+        [PlayerLoopSystem( typeof( UnityPlus.PlayerLoop.Phases.PhysicsStep ), Before = new[] { typeof( HSP.Trajectories.TrajectoryManager.TrajectoryManagerPostPhysicsStepSystem ) } )] // InsidePhysicsStep
+        public sealed class FreeReferenceFrameTransformSystem : IPlayerLoopSystem
         {
-            // Assume that other objects aren't allowed to get the absolute position/velocity *in* the physics step, as it is undefined (changes) during it.
-            foreach( var t in _activeFreeTransforms )
+            public void Run()
             {
-                t._absoluteAccelerationSum = Vector3Dbl.zero;
-                t._absoluteAngularAccelerationSum = Vector3Dbl.zero;
+                // Assume that other objects aren't allowed to get the absolute position/velocity *in* the physics step, as it is undefined (changes) during it.
+                foreach( var t in _activeFreeTransforms )
+                {
+                    t._absoluteAccelerationSum = Vector3Dbl.zero;
+                    t._absoluteAngularAccelerationSum = Vector3Dbl.zero;
+                }
             }
         }
 

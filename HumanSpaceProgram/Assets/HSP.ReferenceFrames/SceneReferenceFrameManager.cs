@@ -5,7 +5,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.LowLevel;
 using UnityEngine.PlayerLoop;
-using UnityPlus;
+using UnityPlus.PlayerLoop;
 
 namespace HSP.ReferenceFrames
 {
@@ -197,52 +197,37 @@ namespace HSP.ReferenceFrames
         {
             // This can now be inside Awake because the frame is switched during unity physics step, and not immediately.
             OnAfterReferenceFrameSwitch = null;
-            //OnAfterReferenceFrameSwitch += ReferenceFrameSwitch_Responders;
         }
 
         protected virtual void OnEnable()
         {
-            //PlayerLoopUtils.InsertSystemAfter<FixedUpdate>( in _playerLoopSystem, typeof( FixedUpdate.PhysicsFixedUpdate ) );
             _managers.Add( this );
-            if( _managers.Count == 1 )
-            {
-                //PlayerLoopUtils.AddSystem<FixedUpdate, FixedUpdate.PhysicsFixedUpdate>( in _playerLoopSystem );
-                PlayerLoopUtils.InsertSystemAfter<FixedUpdate>( in _playerLoopSystem, typeof( FixedUpdate.Physics2DFixedUpdate ) );
-            }
         }
 
         protected virtual void OnDisable()
         {
             _managers.Remove( this );
-            if( _managers.Count == 0 )
-            {
-                //PlayerLoopUtils.RemoveSystem<FixedUpdate, FixedUpdate.PhysicsFixedUpdate>( in _playerLoopSystem );
-                PlayerLoopUtils.RemoveSystem<FixedUpdate>( in _playerLoopSystem );
-            }
         }
 
-        private static PlayerLoopSystem _playerLoopSystem = new PlayerLoopSystem()
+        [PlayerLoopSystem( typeof( UnityPlus.PlayerLoop.Phases.PostPhysicsStep ) )]
+        public sealed class SceneReferenceFrameManagerSystem : IPlayerLoopSystem
         {
-            type = typeof( SceneReferenceFrameManager ),
-            updateDelegate = ImmediatelyAfterUnityPhysicsStep,
-            subSystemList = null
-        };
-
-        private static void ImmediatelyAfterUnityPhysicsStep()
-        {
-            if( !_managers.Any() )
-                return;
-
-            foreach( var manager in _managers )
+            public void Run()
             {
-                // IMPORTANT: Do not put any code before the reference frame is updated.
-                //   If you do, things can desync - You'll be using updated rigidbody values alongside a non-updated reference frame.
-                manager.referenceFrame = manager.referenceFrame.AtUT( TimeManager.UT );
+                if( !_managers.Any() )
+                    return;
 
-                // Checking object in scene bounds after unity physics step ensures that the new frame will match where the object is.
-                manager.EnsureTargetObjectInSceneBounds();
+                foreach( var manager in _managers )
+                {
+                    // IMPORTANT: Do not put any code before the reference frame is updated.
+                    //   If you do, things can desync - You'll be using updated rigidbody values alongside a non-updated reference frame.
+                    manager.referenceFrame = manager.referenceFrame.AtUT( TimeManager.UT );
 
-                manager.TrySwitchToRequestedReferenceFrame();
+                    // Checking object in scene bounds after unity physics step ensures that the new frame will match where the object is.
+                    manager.EnsureTargetObjectInSceneBounds();
+
+                    manager.TrySwitchToRequestedReferenceFrame();
+                }
             }
         }
     }
