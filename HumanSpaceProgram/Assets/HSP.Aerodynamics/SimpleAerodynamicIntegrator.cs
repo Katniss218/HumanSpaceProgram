@@ -1,4 +1,5 @@
 using HSP.ReferenceFrames;
+using HSP.Spatial;
 using HSP.Time;
 using UnityEngine;
 using UnityPlus.Serialization;
@@ -49,7 +50,7 @@ namespace HSP.Aerodynamics
 
         void FixedUpdate()
         {
-            bool inAtmosphere = HSP.Spatial.SpatialAtmosphere.EvaluatePoint( ReferenceFrameTransform.Position, out HSP.Spatial.AtmosphereData atmosphereData );
+            bool inAtmosphere = SpatialAtmosphere.EvaluatePoint( ReferenceFrameTransform.GetPosition(), out AtmosphereData atmosphereData );
             if( inAtmosphere )
             {
                 Vector3 sceneForce = CalculateNetAerodynamicForce( atmosphereData );
@@ -61,9 +62,9 @@ namespace HSP.Aerodynamics
             }
         }
 
-        Vector3 CalculateNetAerodynamicForce( HSP.Spatial.AtmosphereData atmosphereData )
+        Vector3 CalculateNetAerodynamicForce( AtmosphereData atmosphereData )
         {
-            Vector3 velocity = ReferenceFrameTransform.Velocity;
+            Vector3 velocity = ReferenceFrameTransform.GetVelocity();
             Vector3 relativeWind = velocity - atmosphereData.WindVelocity;
             float speed = relativeWind.magnitude;
             if( speed < 0.01 )

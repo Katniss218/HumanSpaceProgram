@@ -1,5 +1,6 @@
 using HSP.CelestialBodies;
 using HSP.ReferenceFrames;
+using HSP.Vanilla.ReferenceFrames;
 using HSP.Vanilla.Trajectories;
 using HSP.Vessels;
 using System;

@@ -1,5 +1,6 @@
 ﻿using HSP.ControlSystems;
 using HSP.ControlSystems.Controls;
+using HSP.ReferenceFrames;
 using HSP.Time;
 using HSP.Vessels;
 using System;
@@ -139,7 +140,7 @@ namespace HSP.Vanilla.Components
 
 		private void UpdatePredictionPI()
 		{
-			_omega0 = _vessel.ReferenceFrameTransform.AngularVelocity;
+			_omega0 = _vessel.ReferenceFrameTransform.GetAngularVelocity();
 
 			UpdateError();
 

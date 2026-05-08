@@ -55,13 +55,13 @@ namespace HSP.Vanilla.UI.Components
                 Quaternion airfRotation = (Quaternion)SelectedControlFrameManager.GetAbsoluteRotation( fallback: activeVessel.ReferenceTransform );
                 Matrix4x4 airfToLocalMatrix = Matrix4x4.Rotate( airfRotation ).inverse;
 
-                Vector3Dbl airfVelocity = activeVessel.ReferenceFrameTransform.AbsoluteVelocity;
-                CelestialBody closestBody = CelestialBodyManager.GetClosest( activeVessel.ReferenceFrameTransform.AbsolutePosition );
+                Vector3Dbl airfVelocity = activeVessel.ReferenceFrameTransform.GetAbsoluteVelocity();
+                CelestialBody closestBody = CelestialBodyManager.GetClosest( activeVessel.ReferenceFrameTransform.GetAbsolutePosition() );
                 Vector3Dbl velocityRelativeToBody = closestBody.ReferenceFrameTransform.CenteredInertialReferenceFrame().InverseTransformVelocity( airfVelocity );
 
                 if( velocityRelativeToBody.magnitude > MIN_ABSOLUTE_VELOCITY_FOR_MARKERS )
                 {
-                    Vector3Dbl gravityAcc = GravityUtils.GetNBodyGravityAcceleration( activeVessel.ReferenceFrameTransform.AbsolutePosition );
+                    Vector3Dbl gravityAcc = GravityUtils.GetNBodyGravityAcceleration( activeVessel.ReferenceFrameTransform.GetAbsolutePosition() );
 
                     OrbitalFrame orbitalFrame = new OrbitalFrame( velocityRelativeToBody.NormalizeToVector3(), -gravityAcc.NormalizeToVector3() );
 

@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityPlus.Serialization;
 using UnityPlus.Serialization.Descriptors;
@@ -35,78 +35,47 @@ namespace HSP.ReferenceFrames
             if( deltaTime == 0 )
                 return this;
 
-            var newPos = _position + (_velocity * deltaTime);
+            Vector3Dbl newPos = _position;
+            Integrate( ref newPos, _velocity, deltaTime );
             return new CenteredInertialReferenceFrame( ut, newPos, _velocity );
         }
 
-
-        public Vector3Dbl TransformPosition( Vector3Dbl localPosition )
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        private static void Integrate( ref Vector3Dbl position, in Vector3Dbl velocity, double deltaTime )
         {
-            return Vector3Dbl.Add( _position, localPosition );
-        }
-        public Vector3Dbl InverseTransformPosition( Vector3Dbl globalPosition )
-        {
-            return Vector3Dbl.Subtract( globalPosition, _position );
+            position += velocity * deltaTime;
         }
 
 
-        public Vector3 TransformDirection( Vector3 localDirection )
+        public KinematicState TransformState( in KinematicState localState )
         {
-            return localDirection;
-        }
-        public Vector3 InverseTransformDirection( Vector3 globalDirection )
-        {
-            return globalDirection;
-        }
-
-
-        public QuaternionDbl TransformRotation( QuaternionDbl localRotation )
-        {
-            return localRotation;
-        }
-        public QuaternionDbl InverseTransformRotation( QuaternionDbl globalRotation )
-        {
-            return globalRotation;
+            return new KinematicState( null )
+            {
+                Position = Vector3Dbl.Add( _position, localState.Position ),
+                Rotation = localState.Rotation,
+                Velocity = Vector3Dbl.Add( _velocity, localState.Velocity ),
+                AngularVelocity = localState.AngularVelocity,
+                Acceleration = localState.Acceleration,
+                AngularAcceleration = localState.AngularAcceleration
+            };
         }
 
-
-        public Vector3Dbl TransformVelocity( Vector3Dbl localVelocity )
+        public KinematicState InverseTransformState( in KinematicState globalState )
         {
-            return Vector3Dbl.Add( localVelocity, _velocity );
-        }
-        public Vector3Dbl InverseTransformVelocity( Vector3Dbl globalVelocity )
-        {
-            return Vector3Dbl.Subtract( globalVelocity, _velocity );
-        }
-
-
-        public Vector3Dbl TransformAngularVelocity( Vector3Dbl localAngularVelocity )
-        {
-            return localAngularVelocity;
-        }
-        public Vector3Dbl InverseTransformAngularVelocity( Vector3Dbl globalAngularVelocity )
-        {
-            return globalAngularVelocity;
+            return new KinematicState( this )
+            {
+                Position = Vector3Dbl.Subtract( globalState.Position, _position ),
+                Rotation = globalState.Rotation,
+                Velocity = Vector3Dbl.Subtract( globalState.Velocity, _velocity ),
+                AngularVelocity = globalState.AngularVelocity,
+                Acceleration = globalState.Acceleration,
+                AngularAcceleration = globalState.AngularAcceleration
+            };
         }
 
-
-        public Vector3Dbl TransformAcceleration( Vector3Dbl localAcceleration )
+        public override string ToString()
         {
-            return localAcceleration;
-        }
-        public Vector3Dbl InverseTransformAcceleration( Vector3Dbl absoluteAcceleration )
-        {
-            return absoluteAcceleration;
-        }
-
-
-        public Vector3Dbl TransformAngularAcceleration( Vector3Dbl localAngularAcceleration )
-        {
-            return localAngularAcceleration;
-        }
-        public Vector3Dbl InverseTransformAngularAcceleration( Vector3Dbl absoluteAngularAcceleration )
-        {
-            return absoluteAngularAcceleration;
+            return $"CenteredInertialReferenceFrame( UT={ReferenceUT}, Pos={Position}, Vel={Velocity} )";
         }
 
         public bool Equals( IReferenceFrame other )
@@ -114,12 +83,11 @@ namespace HSP.ReferenceFrames
             if( other == null )
                 return false;
 
-            return other.TransformPosition( Vector3Dbl.zero ) == this._position
-                && other.TransformRotation( QuaternionDbl.identity ) == QuaternionDbl.identity
-                && other.TransformVelocity( Vector3Dbl.zero ) == this._velocity
-                && other.TransformAngularVelocity( Vector3Dbl.zero ) == Vector3Dbl.zero
-                && other.TransformAcceleration( Vector3Dbl.zero ) == Vector3Dbl.zero
-                && other.TransformAngularAcceleration( Vector3Dbl.zero ) == Vector3Dbl.zero;
+            var state = KinematicState.AbsoluteIdentity;
+            var otherState = other.TransformState( state );
+            var thisState = this.TransformState( state );
+
+            return otherState.Equals( thisState );
         }
 
         public bool EqualsIgnoreUT( IReferenceFrame other )
@@ -129,12 +97,11 @@ namespace HSP.ReferenceFrames
 
             IReferenceFrame otherNormalizedUT = other.AtUT( this.ReferenceUT );
 
-            return otherNormalizedUT.TransformPosition( Vector3Dbl.zero ) == this._position
-                && otherNormalizedUT.TransformRotation( QuaternionDbl.identity ) == QuaternionDbl.identity
-                && otherNormalizedUT.TransformVelocity( Vector3Dbl.zero ) == this._velocity
-                && otherNormalizedUT.TransformAngularVelocity( Vector3Dbl.zero ) == Vector3Dbl.zero
-                && otherNormalizedUT.TransformAcceleration( Vector3Dbl.zero ) == Vector3Dbl.zero
-                && otherNormalizedUT.TransformAngularAcceleration( Vector3Dbl.zero ) == Vector3Dbl.zero;
+            var state = KinematicState.AbsoluteIdentity;
+            var otherState = otherNormalizedUT.TransformState( state );
+            var thisState = this.TransformState( state );
+
+            return otherState.Equals( thisState );
         }
 
         [MapsInheritingFrom( typeof( CenteredInertialReferenceFrame ) )]

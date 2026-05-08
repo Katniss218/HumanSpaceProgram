@@ -1,16 +1,11 @@
 ﻿using HSP.ReferenceFrames;
-using HSP_Tests.NUnit;
 using NUnit.Framework;
-using System.Collections.Generic;
 using UnityEngine;
 
-namespace HSP_Tests_EditMode
+namespace HSP_Tests_EditMode.ReferenceFrames
 {
     public class CenteredNonInertialReferenceFrameTests
     {
-        static IEqualityComparer<Vector3Dbl> vector3DblApproxComparer = new Vector3DblApproximateComparer( 1e-12 );
-        static IEqualityComparer<QuaternionDbl> quaternionDblApproxComparer = new QuaternionDblApproximateComparer( 1e-12 );
-
         [Test]
         public void Constructor___SetsCorrectValues()
         {
@@ -105,14 +100,14 @@ namespace HSP_Tests_EditMode
         public void AllTransforms___RoundTripAccuracy()
         {
             var frame = new CenteredNonInertialReferenceFrame( 0.0, new Vector3Dbl( 1.0, 2.0, 3.0 ), new Vector3Dbl( 0.1, 0.2, 0.3 ), new Vector3Dbl( 0.01, 0.02, 0.03 ), new Vector3Dbl( 0.001, 0.002, 0.003 ), new Vector3Dbl( 0.0001, 0.0002, 0.0003 ) );
-            ReferenceFrameTestHelpers.AssertRoundTripAccuracy( frame, "CenteredNonInertialReferenceFrame" );
+            ReferenceFrameTestUtils.AssertRoundTripAccuracy( frame, "CenteredNonInertialReferenceFrame" );
         }
 
         [Test]
         public void TimeEvolution___PreservesProperties()
         {
             var frame = new CenteredNonInertialReferenceFrame( 0.0, Vector3Dbl.zero, Vector3Dbl.zero, Vector3Dbl.zero, Vector3Dbl.zero, Vector3Dbl.zero );
-            ReferenceFrameTestHelpers.AssertTimeEvolution( frame, 100.0, "CenteredNonInertialReferenceFrame" );
+            ReferenceFrameTestUtils.AssertTimeEvolution( frame, 100.0, "CenteredNonInertialReferenceFrame" );
         }
 
         [Test]
@@ -122,8 +117,8 @@ namespace HSP_Tests_EditMode
             var frame2 = new CenteredNonInertialReferenceFrame( 0.0, Vector3Dbl.zero, Vector3Dbl.zero, Vector3Dbl.zero, Vector3Dbl.zero, Vector3Dbl.zero );
             var frame3 = new CenteredNonInertialReferenceFrame( 0.0, Vector3Dbl.zero, Vector3Dbl.zero, new Vector3Dbl( 0.1, 0.0, 0.0 ), Vector3Dbl.zero, Vector3Dbl.zero );
 
-            ReferenceFrameTestHelpers.AssertEqualityMethods( frame1, frame2, true, "CenteredNonInertialReferenceFrame" );
-            ReferenceFrameTestHelpers.AssertEqualityMethods( frame1, frame3, false, "CenteredNonInertialReferenceFrame" );
+            ReferenceFrameTestUtils.AssertEqualityMethods( frame1, frame2, true, "CenteredNonInertialReferenceFrame" );
+            ReferenceFrameTestUtils.AssertEqualityMethods( frame1, frame3, false, "CenteredNonInertialReferenceFrame" );
         }
     }
 }

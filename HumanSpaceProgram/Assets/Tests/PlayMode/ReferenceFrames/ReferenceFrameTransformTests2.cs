@@ -1,6 +1,5 @@
 ﻿using HSP.ReferenceFrames;
 using HSP.Time;
-using HSP.Vanilla;
 using HSP.Vanilla.ReferenceFrames;
 using HSP.Vanilla.Scenes.GameplayScene;
 using HSP_Tests.NUnit;
@@ -11,7 +10,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.TestTools;
 
-namespace HSP_Tests_PlayMode
+namespace HSP_Tests_PlayMode.ReferenceFrames
 {
     public class ReferenceFrametransformTests2
     {
@@ -74,19 +73,19 @@ namespace HSP_Tests_PlayMode
             Vector3 expectedSceneAcc = (Vector3)sceneRef.InverseTransformAcceleration( expectedAbsAcc );
             Vector3 expectedSceneAngAcc = (Vector3)sceneRef.InverseTransformAngularAcceleration( expectedAbsAngAcc );
 
-            Assert.That( sut.AbsolutePosition, Is.EqualTo( expectedAbsPos ).Using( vector3DblApproxComparer ) );
-            Assert.That( sut.AbsoluteRotation, Is.EqualTo( expectedAbsRot ).Using( quaternionDblApproxComparer ) );
-            Assert.That( sut.AbsoluteVelocity, Is.EqualTo( expectedAbsVel ).Using( vector3DblApproxComparer ) );
-            Assert.That( sut.AbsoluteAngularVelocity, Is.EqualTo( expectedAbsAngVel ).Using( vector3DblApproxComparer ) );
-            Assert.That( sut.AbsoluteAcceleration, Is.EqualTo( expectedAbsAcc ).Using( vector3DblApproxComparer ) );
-            Assert.That( sut.AbsoluteAngularAcceleration, Is.EqualTo( expectedAbsAngAcc ).Using( vector3DblApproxComparer ) );
+            Assert.That( sut.GetAbsolutePosition(), Is.EqualTo( expectedAbsPos ).Using( vector3DblApproxComparer ) );
+            Assert.That( sut.GetAbsoluteRotation(), Is.EqualTo( expectedAbsRot ).Using( quaternionDblApproxComparer ) );
+            Assert.That( sut.GetAbsoluteVelocity(), Is.EqualTo( expectedAbsVel ).Using( vector3DblApproxComparer ) );
+            Assert.That( sut.GetAbsoluteAngularVelocity(), Is.EqualTo( expectedAbsAngVel ).Using( vector3DblApproxComparer ) );
+            Assert.That( sut.GetAbsoluteAcceleration(), Is.EqualTo( expectedAbsAcc ).Using( vector3DblApproxComparer ) );
+            Assert.That( sut.GetAbsoluteAngularAcceleration(), Is.EqualTo( expectedAbsAngAcc ).Using( vector3DblApproxComparer ) );
 
-            Assert.That( sut.Position, Is.EqualTo( expectedScenePos ).Using( vector3ApproxComparer ) );
-            Assert.That( sut.Rotation, Is.EqualTo( expectedSceneRot ).Using( quaternionApproxComparer ) );
-            Assert.That( sut.Velocity, Is.EqualTo( expectedSceneVel ).Using( vector3ApproxComparer ) );
-            Assert.That( sut.AngularVelocity, Is.EqualTo( expectedSceneAngVel ).Using( vector3ApproxComparer ) );
-            Assert.That( sut.Acceleration, Is.EqualTo( expectedSceneAcc ).Using( vector3ApproxComparer ) );
-            Assert.That( sut.AngularAcceleration, Is.EqualTo( expectedSceneAngAcc ).Using( vector3ApproxComparer ) );
+            Assert.That( sut.GetPosition(), Is.EqualTo( expectedScenePos ).Using( vector3ApproxComparer ) );
+            Assert.That( sut.GetRotation(), Is.EqualTo( expectedSceneRot ).Using( quaternionApproxComparer ) );
+            Assert.That( sut.GetVelocity(), Is.EqualTo( expectedSceneVel ).Using( vector3ApproxComparer ) );
+            Assert.That( sut.GetAngularVelocity(), Is.EqualTo( expectedSceneAngVel ).Using( vector3ApproxComparer ) );
+            Assert.That( sut.GetAcceleration(), Is.EqualTo( expectedSceneAcc ).Using( vector3ApproxComparer ) );
+            Assert.That( sut.GetAngularAcceleration(), Is.EqualTo( expectedSceneAngAcc ).Using( vector3ApproxComparer ) );
         }
 
         private static void AssertCorrectPinnedReferenceFrameTransformValues( IReferenceFrameTransform sut, IReferenceFrameTransform pinnedSut, Vector3Dbl initialPosition, QuaternionDbl initialRotation, Vector3Dbl initialVelocity, Vector3Dbl initialAngularVelocity, Vector3Dbl pinnedPos, QuaternionDbl pinnedRot, double deltaTime )
@@ -126,19 +125,19 @@ namespace HSP_Tests_PlayMode
             Vector3 expectedPinnedSceneAngAcc = (Vector3)sceneRef.InverseTransformAngularAcceleration( expectedPinnedAbsAngAcc );
 
             // Assert pinned transform values
-            Assert.That( pinnedSut.AbsolutePosition, Is.EqualTo( expectedPinnedAbsPos ).Using( vector3DblApproxComparer ) );
-            Assert.That( pinnedSut.AbsoluteRotation, Is.EqualTo( expectedPinnedAbsRot ).Using( quaternionDblApproxComparer ) );
-            Assert.That( pinnedSut.AbsoluteVelocity, Is.EqualTo( expectedPinnedAbsVel ).Using( vector3DblApproxComparer ) );
-            Assert.That( pinnedSut.AbsoluteAngularVelocity, Is.EqualTo( expectedPinnedAbsAngVel ).Using( vector3DblApproxComparer ) );
-            Assert.That( pinnedSut.AbsoluteAcceleration, Is.EqualTo( expectedPinnedAbsAcc ).Using( vector3DblApproxComparer ) );
-            Assert.That( pinnedSut.AbsoluteAngularAcceleration, Is.EqualTo( expectedPinnedAbsAngAcc ).Using( vector3DblApproxComparer ) );
+            Assert.That( pinnedSut.GetAbsolutePosition(), Is.EqualTo( expectedPinnedAbsPos ).Using( vector3DblApproxComparer ) );
+            Assert.That( pinnedSut.GetAbsoluteRotation(), Is.EqualTo( expectedPinnedAbsRot ).Using( quaternionDblApproxComparer ) );
+            Assert.That( pinnedSut.GetAbsoluteVelocity(), Is.EqualTo( expectedPinnedAbsVel ).Using( vector3DblApproxComparer ) );
+            Assert.That( pinnedSut.GetAbsoluteAngularVelocity(), Is.EqualTo( expectedPinnedAbsAngVel ).Using( vector3DblApproxComparer ) );
+            Assert.That( pinnedSut.GetAbsoluteAcceleration(), Is.EqualTo( expectedPinnedAbsAcc ).Using( vector3DblApproxComparer ) );
+            Assert.That( pinnedSut.GetAbsoluteAngularAcceleration(), Is.EqualTo( expectedPinnedAbsAngAcc ).Using( vector3DblApproxComparer ) );
 
-            Assert.That( pinnedSut.Position, Is.EqualTo( expectedPinnedScenePos ).Using( vector3ApproxComparer ) );
-            Assert.That( pinnedSut.Rotation, Is.EqualTo( expectedPinnedSceneRot ).Using( quaternionApproxComparer ) );
-            Assert.That( pinnedSut.Velocity, Is.EqualTo( expectedPinnedSceneVel ).Using( vector3ApproxComparer ) );
-            Assert.That( pinnedSut.AngularVelocity, Is.EqualTo( expectedPinnedSceneAngVel ).Using( vector3ApproxComparer ) );
-            Assert.That( pinnedSut.Acceleration, Is.EqualTo( expectedPinnedSceneAcc ).Using( vector3ApproxComparer ) );
-            Assert.That( pinnedSut.AngularAcceleration, Is.EqualTo( expectedPinnedSceneAngAcc ).Using( vector3ApproxComparer ) );
+            Assert.That( pinnedSut.GetPosition(), Is.EqualTo( expectedPinnedScenePos ).Using( vector3ApproxComparer ) );
+            Assert.That( pinnedSut.GetRotation(), Is.EqualTo( expectedPinnedSceneRot ).Using( quaternionApproxComparer ) );
+            Assert.That( pinnedSut.GetVelocity(), Is.EqualTo( expectedPinnedSceneVel ).Using( vector3ApproxComparer ) );
+            Assert.That( pinnedSut.GetAngularVelocity(), Is.EqualTo( expectedPinnedSceneAngVel ).Using( vector3ApproxComparer ) );
+            Assert.That( pinnedSut.GetAcceleration(), Is.EqualTo( expectedPinnedSceneAcc ).Using( vector3ApproxComparer ) );
+            Assert.That( pinnedSut.GetAngularAcceleration(), Is.EqualTo( expectedPinnedSceneAngAcc ).Using( vector3ApproxComparer ) );
         }
 
         [TestCase( typeof( FreeReferenceFrameTransform ), 1, 2, 3, -1, 2, 3, ExpectedResult = null )]
@@ -156,10 +155,10 @@ namespace HSP_Tests_PlayMode
             Vector3Dbl initialVelocity = new Vector3Dbl( vx, vy, vz );
             Vector3Dbl initialAngularVelocity = new Vector3Dbl( ax, ay, az );
 
-            sut.AbsolutePosition = initialPosition;
-            sut.AbsoluteRotation = initialRotation;
-            sut.AbsoluteVelocity = initialVelocity;
-            sut.AbsoluteAngularVelocity = initialAngularVelocity;
+            sut.SetAbsolutePosition( initialPosition );
+            sut.SetAbsoluteRotation( initialRotation );
+            sut.SetAbsoluteVelocity( initialVelocity );
+            sut.SetAbsoluteAngularVelocity( initialAngularVelocity );
 
             yield return new WaitForFixedUpdate();
 
@@ -206,10 +205,10 @@ namespace HSP_Tests_PlayMode
             Vector3Dbl initialVelocity = new Vector3Dbl( vx, vy, vz );
             Vector3Dbl initialAngularVelocity = new Vector3Dbl( ax, ay, az );
 
-            sut.AbsolutePosition = initialPosition;
-            sut.AbsoluteRotation = initialRotation;
-            sut.AbsoluteVelocity = initialVelocity;
-            sut.AbsoluteAngularVelocity = initialAngularVelocity;
+            sut.SetAbsolutePosition( initialPosition );
+            sut.SetAbsoluteRotation( initialRotation );
+            sut.SetAbsoluteVelocity( initialVelocity );
+            sut.SetAbsoluteAngularVelocity( initialAngularVelocity );
 
             var scheduledSwitches = new double[]
             {
@@ -217,10 +216,10 @@ namespace HSP_Tests_PlayMode
             };
             var scheduledFrames = new Func<IReferenceFrame>[]
             {
-                () => new CenteredReferenceFrame( TimeManager.UT, sut.AbsolutePosition ),
-                () => new OrientedReferenceFrame( TimeManager.UT, sut.AbsolutePosition, sut.AbsoluteRotation ),
-                () => new CenteredInertialReferenceFrame( TimeManager.UT, sut.AbsolutePosition, sut.AbsoluteVelocity ),
-                () => new OrientedInertialReferenceFrame( TimeManager.UT, sut.AbsolutePosition, sut.AbsoluteRotation, sut.AbsoluteVelocity ),
+                () => new CenteredReferenceFrame( TimeManager.UT, sut.GetAbsolutePosition() ),
+                () => new OrientedReferenceFrame( TimeManager.UT, sut.GetAbsolutePosition(), sut.GetAbsoluteRotation() ),
+                () => new CenteredInertialReferenceFrame( TimeManager.UT, sut.GetAbsolutePosition(), sut.GetAbsoluteVelocity() ),
+                () => new OrientedInertialReferenceFrame( TimeManager.UT, sut.GetAbsolutePosition(), sut.GetAbsoluteRotation(), sut.GetAbsoluteVelocity() ),
             };
             int nextSwitchIndex = 0;
 
@@ -279,20 +278,21 @@ namespace HSP_Tests_PlayMode
 
             IReferenceFrameTransform sut = CreateObject( transformType, new GameplaySceneReferenceFrameProvider() );
             GameObject pinned = new GameObject( "Pinned" );
-            PinnedReferenceFrameTransform pinnedSut = pinned.AddComponent<PinnedReferenceFrameTransform>();
-            pinnedSut.SceneReferenceFrameProvider = new GameplaySceneReferenceFrameProvider();
+            PinnedReferenceFrameTransform pinnedSutConcrete = pinned.AddComponent<PinnedReferenceFrameTransform>();
+            IReferenceFrameTransform pinnedSut = pinnedSutConcrete;
+            pinnedSutConcrete.SceneReferenceFrameProvider = new GameplaySceneReferenceFrameProvider();
             Vector3Dbl pinPosition = new Vector3Dbl( 5, 10, 0 );
             QuaternionDbl pinRotation = Quaternion.Euler( 45, 90, 135 );
-            pinnedSut.SetReference( sut, pinPosition, pinRotation );
+            pinnedSutConcrete.SetReference( sut, pinPosition, pinRotation );
             Vector3Dbl initialPosition = Vector3Dbl.zero;
             QuaternionDbl initialRotation = QuaternionDbl.identity;
             Vector3Dbl initialVelocity = new Vector3Dbl( vx, vy, vz );
             Vector3Dbl initialAngularVelocity = new Vector3Dbl( 1, 2, 3 );
 
-            sut.AbsolutePosition = initialPosition;
-            sut.AbsoluteRotation = initialRotation;
-            sut.AbsoluteVelocity = initialVelocity;
-            sut.AbsoluteAngularVelocity = initialAngularVelocity;
+            sut.SetAbsolutePosition( initialPosition );
+            sut.SetAbsoluteRotation( initialRotation );
+            sut.SetAbsoluteVelocity( initialVelocity );
+            sut.SetAbsoluteAngularVelocity( initialAngularVelocity );
 
             var scheduledSwitches = new double[]
             {
@@ -300,10 +300,10 @@ namespace HSP_Tests_PlayMode
             };
             var scheduledFrames = new Func<IReferenceFrame>[]
             {
-                () => new CenteredReferenceFrame( TimeManager.UT, sut.AbsolutePosition ),
-                () => new OrientedReferenceFrame( TimeManager.UT, sut.AbsolutePosition, sut.AbsoluteRotation ),
-                () => new CenteredInertialReferenceFrame( TimeManager.UT, sut.AbsolutePosition, sut.AbsoluteVelocity ),
-                () => new OrientedInertialReferenceFrame( TimeManager.UT, sut.AbsolutePosition, sut.AbsoluteRotation, sut.AbsoluteVelocity ),
+                () => new CenteredReferenceFrame( TimeManager.UT, sut.GetAbsolutePosition() ),
+                () => new OrientedReferenceFrame( TimeManager.UT, sut.GetAbsolutePosition(), sut.GetAbsoluteRotation() ),
+                () => new CenteredInertialReferenceFrame( TimeManager.UT, sut.GetAbsolutePosition(), sut.GetAbsoluteVelocity() ),
+                () => new OrientedInertialReferenceFrame( TimeManager.UT, sut.GetAbsolutePosition(), sut.GetAbsoluteRotation(), sut.GetAbsoluteVelocity() ),
             };
             int nextSwitchIndex = 0;
 
@@ -372,10 +372,10 @@ namespace HSP_Tests_PlayMode
             Vector3Dbl initialVelocity = new Vector3Dbl( vx, vy, vz );
             Vector3Dbl initialAngularVelocity = Vector3Dbl.zero;
 
-            sut.AbsolutePosition = initialPosition;
-            sut.AbsoluteRotation = initialRotation;
-            sut.AbsoluteVelocity = initialVelocity;
-            sut.AbsoluteAngularVelocity = initialAngularVelocity;
+            sut.SetAbsolutePosition( initialPosition );
+            sut.SetAbsoluteRotation( initialRotation );
+            sut.SetAbsoluteVelocity( initialVelocity );
+            sut.SetAbsoluteAngularVelocity( initialAngularVelocity );
 
             // Set mass and inertia for predictable physics
             physicsSut.Mass = 1000f; // [kg]
@@ -414,22 +414,22 @@ namespace HSP_Tests_PlayMode
                 expectedAcceleration = nextAcceleration;
 
                 IReferenceFrame sceneRef = GameplaySceneReferenceFrameManager.ReferenceFrame;
-                Assert.That( sut.Position, Is.EqualTo( (Vector3)sceneRef.InverseTransformPosition( prevExpectedPosition ) ).Using( vector3ApproxComparer ) );
-                Assert.That( sut.Velocity, Is.EqualTo( (Vector3)sceneRef.InverseTransformVelocity( prevExpectedVelocity ) ).Using( vector3ApproxComparer ) );
+                Assert.That( sut.GetPosition(), Is.EqualTo( (Vector3)sceneRef.InverseTransformPosition( prevExpectedPosition ) ).Using( vector3ApproxComparer ) );
+                Assert.That( sut.GetVelocity(), Is.EqualTo( (Vector3)sceneRef.InverseTransformVelocity( prevExpectedVelocity ) ).Using( vector3ApproxComparer ) );
 
-                Assert.That( sut.Acceleration, Is.EqualTo( (Vector3)sceneRef.InverseTransformAcceleration( expectedAcceleration ) ).Using( vector3ApproxComparer ) );
+                Assert.That( sut.GetAcceleration(), Is.EqualTo( (Vector3)sceneRef.InverseTransformAcceleration( expectedAcceleration ) ).Using( vector3ApproxComparer ) );
 
-                Assert.That( sut.AbsolutePosition, Is.EqualTo( prevExpectedPosition ).Using( vector3DblApproxComparer ) );
-                Assert.That( sut.AbsoluteVelocity, Is.EqualTo( prevExpectedVelocity ).Using( vector3DblApproxComparer ) );
+                Assert.That( sut.GetAbsolutePosition(), Is.EqualTo( prevExpectedPosition ).Using( vector3DblApproxComparer ) );
+                Assert.That( sut.GetAbsoluteVelocity(), Is.EqualTo( prevExpectedVelocity ).Using( vector3DblApproxComparer ) );
 
-                Assert.That( sut.AbsoluteAcceleration, Is.EqualTo( expectedAcceleration ).Using( vector3DblApproxComparer ) );
+                Assert.That( sut.GetAbsoluteAcceleration(), Is.EqualTo( expectedAcceleration ).Using( vector3DblApproxComparer ) );
             } );
 
             assertMonoBeh.AddAssert( AssertMonoBehaviour.Step.Update, ( frameInfo ) =>
             {
-                //Assert.That( sut.AbsolutePosition, Is.EqualTo( expectedPosition ).Using( vector3DblApproxComparer ) );
-                //Assert.That( sut.AbsoluteVelocity, Is.EqualTo( expectedVelocity ).Using( vector3DblApproxComparer ) );
-                //Assert.That( sut.AbsoluteAcceleration, Is.EqualTo( expectedAcceleration ).Using( vector3DblApproxComparer ) );
+                //Assert.That( sut.GetAbsolutePosition(), Is.EqualTo( expectedPosition ).Using( vector3DblApproxComparer ) );
+                //Assert.That( sut.GetAbsoluteVelocity(), Is.EqualTo( expectedVelocity ).Using( vector3DblApproxComparer ) );
+                //Assert.That( sut.GetAbsoluteAcceleration(), Is.EqualTo( expectedAcceleration ).Using( vector3DblApproxComparer ) );
             } );
 
             assertMonoBeh.Enable();
@@ -458,10 +458,10 @@ namespace HSP_Tests_PlayMode
             Vector3Dbl initialVelocity = new Vector3Dbl( vx, vy, vz );
             Vector3Dbl initialAngularVelocity = Vector3Dbl.zero;
 
-            sut.AbsolutePosition = initialPosition;
-            sut.AbsoluteRotation = initialRotation;
-            sut.AbsoluteVelocity = initialVelocity;
-            sut.AbsoluteAngularVelocity = initialAngularVelocity;
+            sut.SetAbsolutePosition( initialPosition );
+            sut.SetAbsoluteRotation( initialRotation );
+            sut.SetAbsoluteVelocity( initialVelocity );
+            sut.SetAbsoluteAngularVelocity( initialAngularVelocity );
 
             physicsSut.Mass = 1000f;
             physicsSut.MomentsOfInertia = new Vector3( 1000f, 500f, 200f );
@@ -503,21 +503,21 @@ namespace HSP_Tests_PlayMode
                 expectedAngularAcceleration = nextAngularAcceleration;
 
                 IReferenceFrame sceneRef = GameplaySceneReferenceFrameManager.ReferenceFrame;
-                Assert.That( sut.Rotation, Is.EqualTo( (Quaternion)sceneRef.InverseTransformRotation( prevExpectedRotation ) ).Using( quaternionApproxComparer ) );
-                Assert.That( sut.AngularVelocity, Is.EqualTo( (Vector3)sceneRef.InverseTransformAngularVelocity( prevExpectedAngularVelocity ) ).Using( vector3ApproxComparer ) );
+                Assert.That( sut.GetRotation(), Is.EqualTo( (Quaternion)sceneRef.InverseTransformRotation( prevExpectedRotation ) ).Using( quaternionApproxComparer ) );
+                Assert.That( sut.GetAngularVelocity(), Is.EqualTo( (Vector3)sceneRef.InverseTransformAngularVelocity( prevExpectedAngularVelocity ) ).Using( vector3ApproxComparer ) );
 
-                Assert.That( sut.AngularAcceleration, Is.EqualTo( (Vector3)sceneRef.InverseTransformAngularAcceleration( expectedAngularAcceleration ) ).Using( vector3ApproxComparer ) );
+                Assert.That( sut.GetAngularAcceleration(), Is.EqualTo( (Vector3)sceneRef.InverseTransformAngularAcceleration( expectedAngularAcceleration ) ).Using( vector3ApproxComparer ) );
 
-                Assert.That( sut.AbsoluteRotation, Is.EqualTo( prevExpectedRotation ).Using( quaternionDblApproxComparer ) );
-                Assert.That( sut.AbsoluteAngularVelocity, Is.EqualTo( prevExpectedAngularVelocity ).Using( vector3DblApproxComparer ) );
+                Assert.That( sut.GetAbsoluteRotation(), Is.EqualTo( prevExpectedRotation ).Using( quaternionDblApproxComparer ) );
+                Assert.That( sut.GetAbsoluteAngularVelocity(), Is.EqualTo( prevExpectedAngularVelocity ).Using( vector3DblApproxComparer ) );
 
-                Assert.That( sut.AbsoluteAngularAcceleration, Is.EqualTo( expectedAngularAcceleration ).Using( vector3DblApproxComparer ) );
+                Assert.That( sut.GetAbsoluteAngularAcceleration(), Is.EqualTo( expectedAngularAcceleration ).Using( vector3DblApproxComparer ) );
             } );
 
             assertMonoBeh.AddAssert( AssertMonoBehaviour.Step.Update, ( frameInfo ) =>
             {
-                //Assert.That( sut.AbsoluteAngularVelocity, Is.EqualTo( expectedAngularVelocity ).Using( vector3DblApproxComparer ) );
-                //Assert.That( sut.AbsoluteAngularAcceleration, Is.EqualTo( expectedAngularAcceleration ).Using( vector3DblApproxComparer ) );
+                //Assert.That( sut.GetAbsoluteAngularVelocity(), Is.EqualTo( expectedAngularVelocity ).Using( vector3DblApproxComparer ) );
+                //Assert.That( sut.GetAbsoluteAngularAcceleration(), Is.EqualTo( expectedAngularAcceleration ).Using( vector3DblApproxComparer ) );
             } );
 
             assertMonoBeh.AddAssert( AssertMonoBehaviour.Step.Update, ( frameInfo ) => { } );
@@ -549,10 +549,10 @@ namespace HSP_Tests_PlayMode
             Vector3Dbl initialVelocity = new Vector3Dbl( vx, vy, vz );
             Vector3Dbl initialAngularVelocity = Vector3Dbl.zero;
 
-            sut.AbsolutePosition = initialPosition;
-            sut.AbsoluteRotation = initialRotation;
-            sut.AbsoluteVelocity = initialVelocity;
-            sut.AbsoluteAngularVelocity = initialAngularVelocity;
+            sut.SetAbsolutePosition( initialPosition );
+            sut.SetAbsoluteRotation( initialRotation );
+            sut.SetAbsoluteVelocity( initialVelocity );
+            sut.SetAbsoluteAngularVelocity( initialAngularVelocity );
 
             // Set mass and inertia for predictable physics
             physicsSut.Mass = 1000f; // [kg]
@@ -614,30 +614,30 @@ namespace HSP_Tests_PlayMode
                 expectedPosition = nextPosition;
                 expectedRotation = nextRotation;
                 expectedVelocity = nextVelocity;
-                expectedAngularVelocity = nextAngularVelocity; 
+                expectedAngularVelocity = nextAngularVelocity;
                 expectedAcceleration = nextAcceleration;
                 expectedAngularAcceleration = nextAngularAcceleration;
 
                 IReferenceFrame sceneRef = GameplaySceneReferenceFrameManager.ReferenceFrame;
-                Assert.That( sut.Position, Is.EqualTo( (Vector3)sceneRef.InverseTransformPosition( prevExpectedPosition ) ).Using( vector3ApproxComparer ) );
-                Assert.That( sut.Rotation, Is.EqualTo( (Quaternion)sceneRef.InverseTransformRotation( prevExpectedRotation ) ).Using( quaternionApproxComparer ) );
-                Assert.That( sut.Velocity, Is.EqualTo( (Vector3)sceneRef.InverseTransformVelocity( prevExpectedVelocity ) ).Using( vector3ApproxComparer ) );
-                Assert.That( sut.AngularVelocity, Is.EqualTo( (Vector3)sceneRef.InverseTransformAngularVelocity( prevExpectedAngularVelocity ) ).Using( vector3ApproxComparer ) );
+                Assert.That( sut.GetPosition(), Is.EqualTo( (Vector3)sceneRef.InverseTransformPosition( prevExpectedPosition ) ).Using( vector3ApproxComparer ) );
+                Assert.That( sut.GetRotation(), Is.EqualTo( (Quaternion)sceneRef.InverseTransformRotation( prevExpectedRotation ) ).Using( quaternionApproxComparer ) );
+                Assert.That( sut.GetVelocity(), Is.EqualTo( (Vector3)sceneRef.InverseTransformVelocity( prevExpectedVelocity ) ).Using( vector3ApproxComparer ) );
+                Assert.That( sut.GetAngularVelocity(), Is.EqualTo( (Vector3)sceneRef.InverseTransformAngularVelocity( prevExpectedAngularVelocity ) ).Using( vector3ApproxComparer ) );
 
-                Assert.That( sut.Acceleration, Is.EqualTo( (Vector3)sceneRef.InverseTransformAcceleration( expectedAcceleration ) ).Using( vector3ApproxComparer ) );
-                Assert.That( sut.AngularAcceleration, Is.EqualTo( (Vector3)sceneRef.InverseTransformAngularAcceleration( expectedAngularAcceleration ) ).Using( vector3ApproxComparer ) );
+                Assert.That( sut.GetAcceleration(), Is.EqualTo( (Vector3)sceneRef.InverseTransformAcceleration( expectedAcceleration ) ).Using( vector3ApproxComparer ) );
+                Assert.That( sut.GetAngularAcceleration(), Is.EqualTo( (Vector3)sceneRef.InverseTransformAngularAcceleration( expectedAngularAcceleration ) ).Using( vector3ApproxComparer ) );
 
-                Assert.That( sut.AbsolutePosition, Is.EqualTo( prevExpectedPosition ).Using( vector3DblApproxComparer ) );
-                Assert.That( sut.AbsoluteRotation, Is.EqualTo( prevExpectedRotation ).Using( quaternionDblApproxComparer ) );
-                Assert.That( sut.AbsoluteVelocity, Is.EqualTo( prevExpectedVelocity ).Using( vector3DblApproxComparer ) );
-                Assert.That( sut.AbsoluteAngularVelocity, Is.EqualTo( prevExpectedAngularVelocity ).Using( vector3DblApproxComparer ) );
+                Assert.That( sut.GetAbsolutePosition(), Is.EqualTo( prevExpectedPosition ).Using( vector3DblApproxComparer ) );
+                Assert.That( sut.GetAbsoluteRotation(), Is.EqualTo( prevExpectedRotation ).Using( quaternionDblApproxComparer ) );
+                Assert.That( sut.GetAbsoluteVelocity(), Is.EqualTo( prevExpectedVelocity ).Using( vector3DblApproxComparer ) );
+                Assert.That( sut.GetAbsoluteAngularVelocity(), Is.EqualTo( prevExpectedAngularVelocity ).Using( vector3DblApproxComparer ) );
 
-                Assert.That( sut.AbsoluteAcceleration, Is.EqualTo( expectedAcceleration ).Using( vector3DblApproxComparer ) );
-                Assert.That( sut.AbsoluteAngularAcceleration, Is.EqualTo( expectedAngularAcceleration ).Using( vector3DblApproxComparer ) );
+                Assert.That( sut.GetAbsoluteAcceleration(), Is.EqualTo( expectedAcceleration ).Using( vector3DblApproxComparer ) );
+                Assert.That( sut.GetAbsoluteAngularAcceleration(), Is.EqualTo( expectedAngularAcceleration ).Using( vector3DblApproxComparer ) );
             } );
 
-            assertMonoBeh.AddAssert( AssertMonoBehaviour.Step.Update, ( frameInfo ) => 
-            { 
+            assertMonoBeh.AddAssert( AssertMonoBehaviour.Step.Update, ( frameInfo ) =>
+            {
 
             } );
 
@@ -689,19 +689,19 @@ namespace HSP_Tests_PlayMode
                     Vector3 testLocalPos = (Vector3)currentFrame.InverseTransformPosition( testAbsPos );
                     Quaternion testLocalRot = (Quaternion)currentFrame.InverseTransformRotation( testAbsRot );
 
-                    sut.AbsolutePosition = testAbsPos;
-                    sut.AbsoluteRotation = testAbsRot;
-                    sut.AbsoluteVelocity = testAbsVel;
-                    sut.AbsoluteAngularVelocity = testAbsAngVel;
+                    sut.SetAbsolutePosition( testAbsPos );
+                    sut.SetAbsoluteRotation( testAbsRot );
+                    sut.SetAbsoluteVelocity( testAbsVel );
+                    sut.SetAbsoluteAngularVelocity( testAbsAngVel );
 
                     // Assert immediately after setting absolute values
-                    Assert.That( sut.AbsolutePosition, Is.EqualTo( testAbsPos ).Using( vector3DblApproxComparer ),
+                    Assert.That( sut.GetAbsolutePosition(), Is.EqualTo( testAbsPos ).Using( vector3DblApproxComparer ),
                         $"Absolute position not set correctly in FixedUpdate for frame {currentFrame.GetType().Name}" );
-                    Assert.That( sut.AbsoluteRotation, Is.EqualTo( testAbsRot ).Using( quaternionDblApproxComparer ),
+                    Assert.That( sut.GetAbsoluteRotation(), Is.EqualTo( testAbsRot ).Using( quaternionDblApproxComparer ),
                         $"Absolute rotation not set correctly in FixedUpdate for frame {currentFrame.GetType().Name}" );
-                    Assert.That( sut.AbsoluteVelocity, Is.EqualTo( testAbsVel ).Using( vector3DblApproxComparer ),
+                    Assert.That( sut.GetAbsoluteVelocity(), Is.EqualTo( testAbsVel ).Using( vector3DblApproxComparer ),
                         $"Absolute velocity not set correctly in FixedUpdate for frame {currentFrame.GetType().Name}" );
-                    Assert.That( sut.AbsoluteAngularVelocity, Is.EqualTo( testAbsAngVel ).Using( vector3DblApproxComparer ),
+                    Assert.That( sut.GetAbsoluteAngularVelocity(), Is.EqualTo( testAbsAngVel ).Using( vector3DblApproxComparer ),
                         $"Absolute angular velocity not set correctly in FixedUpdate for frame {currentFrame.GetType().Name}" );
 
                     Assert.That( sut.transform.position, Is.EqualTo( testLocalPos ).Using( vector3ApproxComparer ),
@@ -715,19 +715,19 @@ namespace HSP_Tests_PlayMode
                     Vector3 testLocalVel = new Vector3( 0.5f, 1.0f, 1.5f );
                     Vector3 testLocalAngVel = new Vector3( 0.05f, 0.1f, 0.15f );
 
-                    sut.Position = testLocalPos;
-                    sut.Rotation = testLocalRot;
-                    sut.Velocity = testLocalVel;
-                    sut.AngularVelocity = testLocalAngVel;
+                    sut.SetPosition( testLocalPos );
+                    sut.SetRotation( testLocalRot );
+                    sut.SetVelocity( testLocalVel );
+                    sut.SetAngularVelocity( testLocalAngVel );
 
                     // Assert immediately after setting local values
-                    Assert.That( sut.Position, Is.EqualTo( testLocalPos ).Using( vector3ApproxComparer ),
+                    Assert.That( sut.GetPosition(), Is.EqualTo( testLocalPos ).Using( vector3ApproxComparer ),
                         $"Local position not set correctly in FixedUpdate for frame {currentFrame.GetType().Name}" );
-                    Assert.That( sut.Rotation, Is.EqualTo( testLocalRot ).Using( quaternionApproxComparer ),
+                    Assert.That( sut.GetRotation(), Is.EqualTo( testLocalRot ).Using( quaternionApproxComparer ),
                         $"Local rotation not set correctly in FixedUpdate for frame {currentFrame.GetType().Name}" );
-                    Assert.That( sut.Velocity, Is.EqualTo( testLocalVel ).Using( vector3ApproxComparer ),
+                    Assert.That( sut.GetVelocity(), Is.EqualTo( testLocalVel ).Using( vector3ApproxComparer ),
                         $"Local velocity not set correctly in FixedUpdate for frame {currentFrame.GetType().Name}" );
-                    Assert.That( sut.AngularVelocity, Is.EqualTo( testLocalAngVel ).Using( vector3ApproxComparer ),
+                    Assert.That( sut.GetAngularVelocity(), Is.EqualTo( testLocalAngVel ).Using( vector3ApproxComparer ),
                         $"Local angular velocity not set correctly in FixedUpdate for frame {currentFrame.GetType().Name}" );
 
                     Assert.That( sut.transform.position, Is.EqualTo( testLocalPos ).Using( vector3ApproxComparer ),
@@ -777,19 +777,19 @@ namespace HSP_Tests_PlayMode
                     Vector3 testLocalPos = (Vector3)currentFrame.InverseTransformPosition( testAbsPos );
                     Quaternion testLocalRot = (Quaternion)currentFrame.InverseTransformRotation( testAbsRot );
 
-                    sut.AbsolutePosition = testAbsPos;
-                    sut.AbsoluteRotation = testAbsRot;
-                    sut.AbsoluteVelocity = testAbsVel;
-                    sut.AbsoluteAngularVelocity = testAbsAngVel;
+                    sut.SetAbsolutePosition( testAbsPos );
+                    sut.SetAbsoluteRotation( testAbsRot );
+                    sut.SetAbsoluteVelocity( testAbsVel );
+                    sut.SetAbsoluteAngularVelocity( testAbsAngVel );
 
                     // Assert immediately after setting absolute values
-                    Assert.That( sut.AbsolutePosition, Is.EqualTo( testAbsPos ).Using( vector3DblApproxComparer ),
+                    Assert.That( sut.GetAbsolutePosition(), Is.EqualTo( testAbsPos ).Using( vector3DblApproxComparer ),
                         $"Absolute position not set correctly in Update for frame {currentFrame.GetType().Name}" );
-                    Assert.That( sut.AbsoluteRotation, Is.EqualTo( testAbsRot ).Using( quaternionDblApproxComparer ),
+                    Assert.That( sut.GetAbsoluteRotation(), Is.EqualTo( testAbsRot ).Using( quaternionDblApproxComparer ),
                         $"Absolute rotation not set correctly in Update for frame {currentFrame.GetType().Name}" );
-                    Assert.That( sut.AbsoluteVelocity, Is.EqualTo( testAbsVel ).Using( vector3DblApproxComparer ),
+                    Assert.That( sut.GetAbsoluteVelocity(), Is.EqualTo( testAbsVel ).Using( vector3DblApproxComparer ),
                         $"Absolute velocity not set correctly in Update for frame {currentFrame.GetType().Name}" );
-                    Assert.That( sut.AbsoluteAngularVelocity, Is.EqualTo( testAbsAngVel ).Using( vector3DblApproxComparer ),
+                    Assert.That( sut.GetAbsoluteAngularVelocity(), Is.EqualTo( testAbsAngVel ).Using( vector3DblApproxComparer ),
                         $"Absolute angular velocity not set correctly in Update for frame {currentFrame.GetType().Name}" );
 
                     Assert.That( sut.transform.position, Is.EqualTo( testLocalPos ).Using( vector3ApproxComparer ),
@@ -803,19 +803,19 @@ namespace HSP_Tests_PlayMode
                     Vector3 testLocalVel = new Vector3( 0.8f, 1.2f, 1.6f );
                     Vector3 testLocalAngVel = new Vector3( 0.08f, 0.12f, 0.16f );
 
-                    sut.Position = testLocalPos;
-                    sut.Rotation = testLocalRot;
-                    sut.Velocity = testLocalVel;
-                    sut.AngularVelocity = testLocalAngVel;
+                    sut.SetPosition( testLocalPos );
+                    sut.SetRotation( testLocalRot );
+                    sut.SetVelocity( testLocalVel );
+                    sut.SetAngularVelocity( testLocalAngVel );
 
                     // Assert immediately after setting local values
-                    Assert.That( sut.Position, Is.EqualTo( testLocalPos ).Using( vector3ApproxComparer ),
+                    Assert.That( sut.GetPosition(), Is.EqualTo( testLocalPos ).Using( vector3ApproxComparer ),
                         $"Local position not set correctly in Update for frame {currentFrame.GetType().Name}" );
-                    Assert.That( sut.Rotation, Is.EqualTo( testLocalRot ).Using( quaternionApproxComparer ),
+                    Assert.That( sut.GetRotation(), Is.EqualTo( testLocalRot ).Using( quaternionApproxComparer ),
                         $"Local rotation not set correctly in Update for frame {currentFrame.GetType().Name}" );
-                    Assert.That( sut.Velocity, Is.EqualTo( testLocalVel ).Using( vector3ApproxComparer ),
+                    Assert.That( sut.GetVelocity(), Is.EqualTo( testLocalVel ).Using( vector3ApproxComparer ),
                         $"Local velocity not set correctly in Update for frame {currentFrame.GetType().Name}" );
-                    Assert.That( sut.AngularVelocity, Is.EqualTo( testLocalAngVel ).Using( vector3ApproxComparer ),
+                    Assert.That( sut.GetAngularVelocity(), Is.EqualTo( testLocalAngVel ).Using( vector3ApproxComparer ),
                         $"Local angular velocity not set correctly in Update for frame {currentFrame.GetType().Name}" );
 
                     Assert.That( sut.transform.position, Is.EqualTo( testLocalPos ).Using( vector3ApproxComparer ),
@@ -873,21 +873,21 @@ namespace HSP_Tests_PlayMode
                     Vector3 testLocalPos = (Vector3)currentFrame.InverseTransformPosition( testAbsPos );
                     Quaternion testLocalRot = (Quaternion)currentFrame.InverseTransformRotation( testAbsRot );
 
-                    sut.AbsolutePosition = testAbsPos;
-                    sut.AbsoluteRotation = testAbsRot;
-                    sut.AbsoluteVelocity = testAbsVel;
-                    sut.AbsoluteAngularVelocity = testAbsAngVel;
+                    sut.SetAbsolutePosition( testAbsPos );
+                    sut.SetAbsoluteRotation( testAbsRot );
+                    sut.SetAbsoluteVelocity( testAbsVel );
+                    sut.SetAbsoluteAngularVelocity( testAbsAngVel );
 
                     sut.gameObject.SetActive( false );
 
                     // Assert immediately after setting absolute values
-                    Assert.That( sut.AbsolutePosition, Is.EqualTo( testAbsPos ).Using( vector3DblApproxComparer ),
+                    Assert.That( sut.GetAbsolutePosition(), Is.EqualTo( testAbsPos ).Using( vector3DblApproxComparer ),
                         $"Absolute position not set correctly in FixedUpdate for frame {currentFrame.GetType().Name}" );
-                    Assert.That( sut.AbsoluteRotation, Is.EqualTo( testAbsRot ).Using( quaternionDblApproxComparer ),
+                    Assert.That( sut.GetAbsoluteRotation(), Is.EqualTo( testAbsRot ).Using( quaternionDblApproxComparer ),
                         $"Absolute rotation not set correctly in FixedUpdate for frame {currentFrame.GetType().Name}" );
-                    Assert.That( sut.AbsoluteVelocity, Is.EqualTo( testAbsVel ).Using( vector3DblApproxComparer ),
+                    Assert.That( sut.GetAbsoluteVelocity(), Is.EqualTo( testAbsVel ).Using( vector3DblApproxComparer ),
                         $"Absolute velocity not set correctly in FixedUpdate for frame {currentFrame.GetType().Name}" );
-                    Assert.That( sut.AbsoluteAngularVelocity, Is.EqualTo( testAbsAngVel ).Using( vector3DblApproxComparer ),
+                    Assert.That( sut.GetAbsoluteAngularVelocity(), Is.EqualTo( testAbsAngVel ).Using( vector3DblApproxComparer ),
                         $"Absolute angular velocity not set correctly in FixedUpdate for frame {currentFrame.GetType().Name}" );
 
                     Assert.That( sut.transform.position, Is.EqualTo( testLocalPos ).Using( vector3ApproxComparer ),
@@ -903,21 +903,21 @@ namespace HSP_Tests_PlayMode
                     Vector3 testLocalVel = new Vector3( 0.5f, 1.0f, 1.5f );
                     Vector3 testLocalAngVel = new Vector3( 0.05f, 0.1f, 0.15f );
 
-                    sut.Position = testLocalPos;
-                    sut.Rotation = testLocalRot;
-                    sut.Velocity = testLocalVel;
-                    sut.AngularVelocity = testLocalAngVel;
+                    sut.SetPosition( testLocalPos );
+                    sut.SetRotation( testLocalRot );
+                    sut.SetVelocity( testLocalVel );
+                    sut.SetAngularVelocity( testLocalAngVel );
 
                     sut.gameObject.SetActive( false );
 
                     // Assert immediately after setting local values
-                    Assert.That( sut.Position, Is.EqualTo( testLocalPos ).Using( vector3ApproxComparer ),
+                    Assert.That( sut.GetPosition(), Is.EqualTo( testLocalPos ).Using( vector3ApproxComparer ),
                         $"Local position not set correctly in FixedUpdate for frame {currentFrame.GetType().Name}" );
-                    Assert.That( sut.Rotation, Is.EqualTo( testLocalRot ).Using( quaternionApproxComparer ),
+                    Assert.That( sut.GetRotation(), Is.EqualTo( testLocalRot ).Using( quaternionApproxComparer ),
                         $"Local rotation not set correctly in FixedUpdate for frame {currentFrame.GetType().Name}" );
-                    Assert.That( sut.Velocity, Is.EqualTo( testLocalVel ).Using( vector3ApproxComparer ),
+                    Assert.That( sut.GetVelocity(), Is.EqualTo( testLocalVel ).Using( vector3ApproxComparer ),
                         $"Local velocity not set correctly in FixedUpdate for frame {currentFrame.GetType().Name}" );
-                    Assert.That( sut.AngularVelocity, Is.EqualTo( testLocalAngVel ).Using( vector3ApproxComparer ),
+                    Assert.That( sut.GetAngularVelocity(), Is.EqualTo( testLocalAngVel ).Using( vector3ApproxComparer ),
                         $"Local angular velocity not set correctly in FixedUpdate for frame {currentFrame.GetType().Name}" );
 
                     Assert.That( sut.transform.position, Is.EqualTo( testLocalPos ).Using( vector3ApproxComparer ),
@@ -969,21 +969,21 @@ namespace HSP_Tests_PlayMode
                     Vector3 testLocalPos = (Vector3)currentFrame.InverseTransformPosition( testAbsPos );
                     Quaternion testLocalRot = (Quaternion)currentFrame.InverseTransformRotation( testAbsRot );
 
-                    sut.AbsolutePosition = testAbsPos;
-                    sut.AbsoluteRotation = testAbsRot;
-                    sut.AbsoluteVelocity = testAbsVel;
-                    sut.AbsoluteAngularVelocity = testAbsAngVel;
+                    sut.SetAbsolutePosition( testAbsPos );
+                    sut.SetAbsoluteRotation( testAbsRot );
+                    sut.SetAbsoluteVelocity( testAbsVel );
+                    sut.SetAbsoluteAngularVelocity( testAbsAngVel );
 
                     sut.gameObject.SetActive( false );
 
                     // Assert immediately after setting absolute values
-                    Assert.That( sut.AbsolutePosition, Is.EqualTo( testAbsPos ).Using( vector3DblApproxComparer ),
+                    Assert.That( sut.GetAbsolutePosition(), Is.EqualTo( testAbsPos ).Using( vector3DblApproxComparer ),
                         $"Absolute position not set correctly in Update for frame {currentFrame.GetType().Name}" );
-                    Assert.That( sut.AbsoluteRotation, Is.EqualTo( testAbsRot ).Using( quaternionDblApproxComparer ),
+                    Assert.That( sut.GetAbsoluteRotation(), Is.EqualTo( testAbsRot ).Using( quaternionDblApproxComparer ),
                         $"Absolute rotation not set correctly in Update for frame {currentFrame.GetType().Name}" );
-                    Assert.That( sut.AbsoluteVelocity, Is.EqualTo( testAbsVel ).Using( vector3DblApproxComparer ),
+                    Assert.That( sut.GetAbsoluteVelocity(), Is.EqualTo( testAbsVel ).Using( vector3DblApproxComparer ),
                         $"Absolute velocity not set correctly in Update for frame {currentFrame.GetType().Name}" );
-                    Assert.That( sut.AbsoluteAngularVelocity, Is.EqualTo( testAbsAngVel ).Using( vector3DblApproxComparer ),
+                    Assert.That( sut.GetAbsoluteAngularVelocity(), Is.EqualTo( testAbsAngVel ).Using( vector3DblApproxComparer ),
                         $"Absolute angular velocity not set correctly in Update for frame {currentFrame.GetType().Name}" );
 
                     Assert.That( sut.transform.position, Is.EqualTo( testLocalPos ).Using( vector3ApproxComparer ),
@@ -999,21 +999,21 @@ namespace HSP_Tests_PlayMode
                     Vector3 testLocalVel = new Vector3( 0.8f, 1.2f, 1.6f );
                     Vector3 testLocalAngVel = new Vector3( 0.08f, 0.12f, 0.16f );
 
-                    sut.Position = testLocalPos;
-                    sut.Rotation = testLocalRot;
-                    sut.Velocity = testLocalVel;
-                    sut.AngularVelocity = testLocalAngVel;
+                    sut.SetPosition( testLocalPos );
+                    sut.SetRotation( testLocalRot );
+                    sut.SetVelocity( testLocalVel );
+                    sut.SetAngularVelocity( testLocalAngVel );
 
                     sut.gameObject.SetActive( false );
 
                     // Assert immediately after setting local values
-                    Assert.That( sut.Position, Is.EqualTo( testLocalPos ).Using( vector3ApproxComparer ),
+                    Assert.That( sut.GetPosition(), Is.EqualTo( testLocalPos ).Using( vector3ApproxComparer ),
                         $"Local position not set correctly in Update for frame {currentFrame.GetType().Name}" );
-                    Assert.That( sut.Rotation, Is.EqualTo( testLocalRot ).Using( quaternionApproxComparer ),
+                    Assert.That( sut.GetRotation(), Is.EqualTo( testLocalRot ).Using( quaternionApproxComparer ),
                         $"Local rotation not set correctly in Update for frame {currentFrame.GetType().Name}" );
-                    Assert.That( sut.Velocity, Is.EqualTo( testLocalVel ).Using( vector3ApproxComparer ),
+                    Assert.That( sut.GetVelocity(), Is.EqualTo( testLocalVel ).Using( vector3ApproxComparer ),
                         $"Local velocity not set correctly in Update for frame {currentFrame.GetType().Name}" );
-                    Assert.That( sut.AngularVelocity, Is.EqualTo( testLocalAngVel ).Using( vector3ApproxComparer ),
+                    Assert.That( sut.GetAngularVelocity(), Is.EqualTo( testLocalAngVel ).Using( vector3ApproxComparer ),
                         $"Local angular velocity not set correctly in Update for frame {currentFrame.GetType().Name}" );
 
                     Assert.That( sut.transform.position, Is.EqualTo( testLocalPos ).Using( vector3ApproxComparer ),

@@ -26,73 +26,14 @@ namespace HSP.ReferenceFrames
         IReferenceFrame AtUT( double ut );
 
         /// <summary>
-        /// Transforms a point in the frame's local space to the absolute space.
+        /// Transforms state UP: FROM this frame TO its immediate parent frame.
         /// </summary>
-        Vector3Dbl TransformPosition( Vector3Dbl localPosition );
-        /// <summary>
-        /// Transforms a point in the absolute space to the frame's space.
-        /// </summary>
-        Vector3Dbl InverseTransformPosition( Vector3Dbl absolutePosition );
-
+        KinematicState TransformState( in KinematicState localState );
 
         /// <summary>
-        /// Transforms a direction (magnitude stays unchanged) in the frame's local space to the absolute space.
+        /// Transforms state DOWN: FROM the immediate parent frame TO this frame.
         /// </summary>
-        Vector3 TransformDirection( Vector3 localDirection );
-        /// <summary>
-        /// Transforms a direction (magnitude stays unchanged) in the absolute space to the frame's space.
-        /// </summary>
-        Vector3 InverseTransformDirection( Vector3 absoluteDirection );
-
-
-        /// <summary>
-        /// Transforms rotation/orientation in the frame's local space to the absolute space.
-        /// </summary>
-        QuaternionDbl TransformRotation( QuaternionDbl localRotation );
-        /// <summary>
-        /// Transforms rotation/orientation in the absolute space to the frame's space.
-        /// </summary>
-        QuaternionDbl InverseTransformRotation( QuaternionDbl absoluteRotation );
-
-
-        /// <summary>
-        /// Transforms velocity in the frame's local space to the absolute space.
-        /// </summary>
-        Vector3Dbl TransformVelocity( Vector3Dbl localVelocity );
-        /// <summary>
-        /// Transforms velocity in the absolute space to the frame's space.
-        /// </summary>
-        Vector3Dbl InverseTransformVelocity( Vector3Dbl absoluteVelocity );
-
-
-        /// <summary>
-        /// Transforms angular velocity in the frame's local space to the absolute space.
-        /// </summary>
-        Vector3Dbl TransformAngularVelocity( Vector3Dbl localAngularVelocity );
-        /// <summary>
-        /// Transforms angular velocity in the absolute space to the frame's space.
-        /// </summary>
-        Vector3Dbl InverseTransformAngularVelocity( Vector3Dbl absoluteAngularVelocity );
-
-
-        /// <summary>
-        /// Transforms acceleration in the frame's local space to the absolute space.
-        /// </summary>
-        Vector3Dbl TransformAcceleration( Vector3Dbl localAcceleration );
-        /// <summary>
-        /// Transforms acceleration in the absolute space to the frame's space.
-        /// </summary>
-        Vector3Dbl InverseTransformAcceleration( Vector3Dbl absoluteAcceleration );
-
-
-        /// <summary>
-        /// Transforms angular acceleration in the frame's local space to the absolute space.
-        /// </summary>
-        Vector3Dbl TransformAngularAcceleration( Vector3Dbl localAngularAcceleration );
-        /// <summary>
-        /// Transforms angular acceleration in the absolute space to the frame's space.
-        /// </summary>
-        Vector3Dbl InverseTransformAngularAcceleration( Vector3Dbl absoluteAngularAcceleration );
+        KinematicState InverseTransformState( in KinematicState parentState );
 
         /// <summary>
         /// Brings the other reference frame to this frame's UT, and then checks for equality. Useful for inertial and non-inertial (moving) reference frames.

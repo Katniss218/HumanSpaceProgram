@@ -1,4 +1,5 @@
-﻿using HSP.SceneManagement;
+﻿using HSP.ReferenceFrames;
+using HSP.SceneManagement;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -266,8 +267,8 @@ namespace HSP.CelestialBodies.Surfaces
             if( Jobs == null )
                 return;
 
-            Vector3Dbl pos = this.CelestialBody.ReferenceFrameTransform.AbsolutePosition;
-            QuaternionDbl invRot = this.CelestialBody.ReferenceFrameTransform.AbsoluteRotation.Inverse();
+            Vector3Dbl pos = this.CelestialBody.ReferenceFrameTransform.GetAbsolutePosition();
+            QuaternionDbl invRot = this.CelestialBody.ReferenceFrameTransform.GetAbsoluteRotation().Inverse();
             double scale = this.CelestialBody.Radius;
 
 #warning TODO - something with pois to determine how much each quad should subdivide towards it (stopping subdiv level) (may be useful for camera frustum biasing and for fast moving objects)

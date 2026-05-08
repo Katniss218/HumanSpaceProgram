@@ -1,5 +1,7 @@
 using HSP.ReferenceFrames;
 using HSP.Time;
+using HSP.Vanilla.ReferenceFrames;
+using HSP.Vanilla.Scenes.GameplayScene;
 using HSP_Tests.NUnit;
 using NUnit.Framework;
 using System;
@@ -7,51 +9,22 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.TestTools;
+using UnityPlus.PlayerLoop;
 
-namespace HSP_Tests_PlayMode
+namespace HSP_Tests_PlayMode.ReferenceFrames
 {
     public class SceneReferenceFrameManagerTests
     {
         private static IEqualityComparer<Vector3Dbl> vector3DblApproxComparer = new Vector3DblApproximateComparer( 0.0001 );
 
-        private class MockReferenceFrameTransform : IReferenceFrameTransform
-        {
-            public ISceneReferenceFrameProvider SceneReferenceFrameProvider { get; set; }
-            public Vector3 Position { get; set; }
-            public Vector3Dbl AbsolutePosition { get; set; }
-            public Quaternion Rotation { get; set; }
-            public QuaternionDbl AbsoluteRotation { get; set; }
-            public Vector3 Velocity { get; set; }
-            public Vector3Dbl AbsoluteVelocity { get; set; }
-            public Vector3 AngularVelocity { get; set; }
-            public Vector3Dbl AbsoluteAngularVelocity { get; set; }
-            public Vector3 Acceleration => Vector3.zero;
-            public Vector3Dbl AbsoluteAcceleration => Vector3Dbl.zero;
-            public Vector3 AngularAcceleration => Vector3.zero;
-            public Vector3Dbl AbsoluteAngularAcceleration => Vector3Dbl.zero;
-
-            public Transform transform => throw new NotImplementedException();
-
-            public GameObject gameObject => throw new NotImplementedException();
-
-            public event Action OnAbsolutePositionChanged;
-            public event Action OnAbsoluteRotationChanged;
-            public event Action OnAbsoluteVelocityChanged;
-            public event Action OnAbsoluteAngularVelocityChanged;
-            public event Action OnAnyValueChanged;
-
-            public void OnSceneReferenceFrameSwitch( SceneReferenceFrameManager.ReferenceFrameSwitchData data )
-            {
-                // Mock implementation - do nothing
-            }
-        }
-
         [UnityTest]
         public IEnumerator MovingReferenceFrame_PropagatesCorrectly()
         {
+            PlayerLoopManager.Initialize( BucketHandling.IncludeThrow );
+
             GameObject go = new GameObject();
             TimeManager timeManager = go.AddComponent<TimeManager>();
-            SceneReferenceFrameManager sman = go.AddComponent<SceneReferenceFrameManager>();
+            GameplaySceneReferenceFrameManager sman = go.AddComponent<GameplaySceneReferenceFrameManager>();
             TimeManager.SetUT( 0 );
 
             var assertMonoBeh = go.AddComponent<AssertMonoBehaviour>();
@@ -99,9 +72,11 @@ namespace HSP_Tests_PlayMode
         [UnityTest]
         public IEnumerator RequestReferenceFrameSwitch_ReferenceFrameUpdatesAfterPhysicsProcessing()
         {
+            PlayerLoopManager.Initialize( BucketHandling.IncludeThrow );
+
             GameObject go = new GameObject();
             TimeManager timeManager = go.AddComponent<TimeManager>();
-            SceneReferenceFrameManager sman = go.AddComponent<SceneReferenceFrameManager>();
+            GameplaySceneReferenceFrameManager sman = go.AddComponent<GameplaySceneReferenceFrameManager>();
             TimeManager.SetUT( 0 );
 
             var assertMonoBeh = go.AddComponent<AssertMonoBehaviour>();
@@ -129,7 +104,7 @@ namespace HSP_Tests_PlayMode
 
             assertMonoBeh.Enable();
 
-            yield return new WaitForSeconds( 0.1f );
+            yield return new WaitForSeconds( 1.1f );
 
             UnityEngine.Object.DestroyImmediate( go );
         }
@@ -137,9 +112,11 @@ namespace HSP_Tests_PlayMode
         [UnityTest]
         public IEnumerator TargetObject_Moving_RequestsSwitchWhenExceedingBounds()
         {
+            PlayerLoopManager.Initialize( BucketHandling.IncludeThrow );
+
             GameObject go = new GameObject();
             TimeManager timeManager = go.AddComponent<TimeManager>();
-            SceneReferenceFrameManager sman = go.AddComponent<SceneReferenceFrameManager>();
+            GameplaySceneReferenceFrameManager sman = go.AddComponent<GameplaySceneReferenceFrameManager>();
             TimeManager.SetUT( 0 );
 
             var assertMonoBeh = go.AddComponent<AssertMonoBehaviour>();
@@ -150,13 +127,14 @@ namespace HSP_Tests_PlayMode
             sman.MaxRelativeVelocity = 1000000f;
 
             var mockTarget = new MockReferenceFrameTransform();
+            mockTarget.SceneReferenceFrameProvider = new GameplaySceneReferenceFrameProvider(); // Mock needs provider for Position setter
             Vector3Dbl expectedAbsolutePosition = new Vector3Dbl( 1000, 2000, 3000 );
             Vector3Dbl expectedAbsoluteVelocity = new Vector3Dbl( 10, 20, 30 );
-            mockTarget.AbsolutePosition = expectedAbsolutePosition;
-            mockTarget.AbsoluteVelocity = expectedAbsoluteVelocity;
+            mockTarget.SetAbsolutePosition( expectedAbsolutePosition );
+            mockTarget.SetAbsoluteVelocity( expectedAbsoluteVelocity );
 
             // Set initial position within bounds
-            mockTarget.Position = new Vector3( 50, 0, 0 );
+            mockTarget.SetPosition( new Vector3( 50, 0, 0 ) );
             sman.targetObject = mockTarget;
             Assert.That( sman.IsSwitchRequested, Is.False );
 
@@ -164,7 +142,7 @@ namespace HSP_Tests_PlayMode
 
             Assert.That( sman.IsSwitchRequested, Is.False );
 
-            mockTarget.Position = new Vector3( 150, 0, 0 ); // Simulate movement (mock transform) by updating position manually.
+            mockTarget.SetPosition( new Vector3( 150, 0, 0 ) ); // Simulate movement (mock transform) by updating position manually.
 
             bool fixedUpdateRan = false;
             assertMonoBeh.AddAssert( AssertMonoBehaviour.Step.FixedUpdate, () => true, isOneShot: true, ( frameInfo ) =>
@@ -188,29 +166,32 @@ namespace HSP_Tests_PlayMode
 
             UnityEngine.Object.DestroyImmediate( go );
         }
-        
+
         [Test]
         public void TargetObject_SetWithinPositionBounds_DoesNotRequestSwitch()
         {
+            PlayerLoopManager.Initialize( BucketHandling.IncludeThrow );
+
             GameObject go = new GameObject();
             TimeManager timeManager = go.AddComponent<TimeManager>();
-            SceneReferenceFrameManager sman = go.AddComponent<SceneReferenceFrameManager>();
+            GameplaySceneReferenceFrameManager sman = go.AddComponent<GameplaySceneReferenceFrameManager>();
             TimeManager.SetUT( 0 );
 
             sman.MaxRelativePosition = 100f;
             sman.MaxRelativeVelocity = 1000000f;
 
             var mockTarget = new MockReferenceFrameTransform();
-            mockTarget.AbsolutePosition = new Vector3Dbl( 0, 0, 0 );
-            mockTarget.AbsoluteVelocity = new Vector3Dbl( 0, 0, 0 );
+            mockTarget.SceneReferenceFrameProvider = new GameplaySceneReferenceFrameProvider();
+            mockTarget.SetAbsolutePosition( new Vector3Dbl( 0, 0, 0 ) );
+            mockTarget.SetAbsoluteVelocity( new Vector3Dbl( 0, 0, 0 ) );
 
             // Test position within bounds.
-            mockTarget.Position = new Vector3( 50, 0, 0 );
+            mockTarget.SetPosition( new Vector3( 50, 0, 0 ) );
             sman.targetObject = mockTarget;
             Assert.That( sman.IsSwitchRequested, Is.False, "No switch should be requested when position is within bounds" );
 
             // Test position exactly at bounds.
-            mockTarget.Position = new Vector3( 100, 0, 0 );
+            mockTarget.SetPosition( new Vector3( 100, 0, 0 ) );
             sman.targetObject = mockTarget;
             Assert.That( sman.IsSwitchRequested, Is.False, "No switch should be requested when position is exactly at bounds" );
 
@@ -220,9 +201,11 @@ namespace HSP_Tests_PlayMode
         [UnityTest]
         public IEnumerator TargetObject_SetExceedingPositionBounds_RequestsSwitch()
         {
+            PlayerLoopManager.Initialize( BucketHandling.IncludeThrow );
+
             GameObject go = new GameObject();
             TimeManager timeManager = go.AddComponent<TimeManager>();
-            SceneReferenceFrameManager sman = go.AddComponent<SceneReferenceFrameManager>();
+            GameplaySceneReferenceFrameManager sman = go.AddComponent<GameplaySceneReferenceFrameManager>();
             TimeManager.SetUT( 0 );
 
             var assertMonoBeh = go.AddComponent<AssertMonoBehaviour>();
@@ -233,12 +216,13 @@ namespace HSP_Tests_PlayMode
             sman.MaxRelativeVelocity = 1000000f;
 
             var mockTarget = new MockReferenceFrameTransform();
+            mockTarget.SceneReferenceFrameProvider = new GameplaySceneReferenceFrameProvider();
             Vector3Dbl expectedAbsolutePosition = new Vector3Dbl( 1000, 2000, 3000 );
             Vector3Dbl expectedAbsoluteVelocity = new Vector3Dbl( 10, 20, 30 );
-            mockTarget.AbsolutePosition = expectedAbsolutePosition;
-            mockTarget.AbsoluteVelocity = expectedAbsoluteVelocity;
+            mockTarget.SetAbsolutePosition( expectedAbsolutePosition );
+            mockTarget.SetAbsoluteVelocity( expectedAbsoluteVelocity );
 
-            mockTarget.Position = new Vector3( 150, 0, 0 );
+            mockTarget.SetPosition( new Vector3( 150, 0, 0 ) );
             sman.targetObject = mockTarget;
 
             // Switch requested immediately, but actually switched after the next physics step.
@@ -270,25 +254,28 @@ namespace HSP_Tests_PlayMode
         [Test]
         public void TargetObject_SetWithinVelocityBounds_DoesNotRequestSwitch()
         {
+            PlayerLoopManager.Initialize( BucketHandling.IncludeThrow );
+
             GameObject go = new GameObject();
             TimeManager timeManager = go.AddComponent<TimeManager>();
-            SceneReferenceFrameManager sman = go.AddComponent<SceneReferenceFrameManager>();
+            GameplaySceneReferenceFrameManager sman = go.AddComponent<GameplaySceneReferenceFrameManager>();
             TimeManager.SetUT( 0 );
 
             sman.MaxRelativePosition = 1000000f;
             sman.MaxRelativeVelocity = 50f;
 
             var mockTarget = new MockReferenceFrameTransform();
-            mockTarget.AbsolutePosition = new Vector3Dbl( 0, 0, 0 );
-            mockTarget.AbsoluteVelocity = new Vector3Dbl( 0, 0, 0 );
+            mockTarget.SceneReferenceFrameProvider = new GameplaySceneReferenceFrameProvider();
+            mockTarget.SetAbsolutePosition( new Vector3Dbl( 0, 0, 0 ) );
+            mockTarget.SetAbsoluteVelocity( new Vector3Dbl( 0, 0, 0 ) );
 
             // Test velocity within bounds.
-            mockTarget.Velocity = new Vector3( 0, 0, 25 );
+            mockTarget.SetVelocity( new Vector3( 0, 0, 25 ) );
             sman.targetObject = mockTarget;
             Assert.That( sman.IsSwitchRequested, Is.False, "No switch should be requested when velocity is within bounds" );
 
             // Test velocity exactly at bounds.
-            mockTarget.Velocity = new Vector3( 0, 0, 50 );
+            mockTarget.SetVelocity( new Vector3( 0, 0, 50 ) );
             sman.targetObject = mockTarget;
             Assert.That( sman.IsSwitchRequested, Is.False, "No switch should be requested when velocity is exactly at bounds" );
 
@@ -298,9 +285,11 @@ namespace HSP_Tests_PlayMode
         [UnityTest]
         public IEnumerator TargetObject_SetExceedingVelocityBounds_RequestsSwitch()
         {
+            PlayerLoopManager.Initialize( BucketHandling.IncludeThrow );
+
             GameObject go = new GameObject();
             TimeManager timeManager = go.AddComponent<TimeManager>();
-            SceneReferenceFrameManager sman = go.AddComponent<SceneReferenceFrameManager>();
+            GameplaySceneReferenceFrameManager sman = go.AddComponent<GameplaySceneReferenceFrameManager>();
             TimeManager.SetUT( 0 );
 
             var assertMonoBeh = go.AddComponent<AssertMonoBehaviour>();
@@ -311,13 +300,14 @@ namespace HSP_Tests_PlayMode
             sman.MaxRelativeVelocity = 50f;
 
             var mockTarget = new MockReferenceFrameTransform();
+            mockTarget.SceneReferenceFrameProvider = new GameplaySceneReferenceFrameProvider();
             Vector3Dbl expectedAbsolutePosition = new Vector3Dbl( 500, 1000, 1500 );
             Vector3Dbl expectedAbsoluteVelocity = new Vector3Dbl( 5, 10, 15 );
-            mockTarget.AbsolutePosition = expectedAbsolutePosition;
-            mockTarget.AbsoluteVelocity = expectedAbsoluteVelocity;
+            mockTarget.SetAbsolutePosition( expectedAbsolutePosition );
+            mockTarget.SetAbsoluteVelocity( expectedAbsoluteVelocity );
 
             // Test velocity exceeding bounds.
-            mockTarget.Velocity = new Vector3( 0, 0, 75 );
+            mockTarget.SetVelocity( new Vector3( 0, 0, 75 ) );
             sman.targetObject = mockTarget;
 
             Assert.That( sman.IsSwitchRequested, Is.True );
@@ -348,9 +338,11 @@ namespace HSP_Tests_PlayMode
         [Test]
         public void RequestReferenceFrameSwitch_MismatchingUT_ThrowsArgumentException()
         {
+            PlayerLoopManager.Initialize( BucketHandling.IncludeThrow );
+
             GameObject go = new GameObject();
             TimeManager timeManager = go.AddComponent<TimeManager>();
-            SceneReferenceFrameManager sman = go.AddComponent<SceneReferenceFrameManager>();
+            GameplaySceneReferenceFrameManager sman = go.AddComponent<GameplaySceneReferenceFrameManager>();
             TimeManager.SetUT( 100.0 );
 
             IReferenceFrame mismatchedFrame = new CenteredReferenceFrame( 200.0, Vector3Dbl.zero );
@@ -373,9 +365,11 @@ namespace HSP_Tests_PlayMode
         [Test]
         public void RequestReferenceFrameSwitch_MatchingUT_DoesntThrow()
         {
+            PlayerLoopManager.Initialize( BucketHandling.IncludeThrow );
+
             GameObject go = new GameObject();
             TimeManager timeManager = go.AddComponent<TimeManager>();
-            SceneReferenceFrameManager sman = go.AddComponent<SceneReferenceFrameManager>();
+            GameplaySceneReferenceFrameManager sman = go.AddComponent<GameplaySceneReferenceFrameManager>();
             TimeManager.SetUT( 100.0 );
 
             IReferenceFrame validFrame = new CenteredReferenceFrame( 100.0, Vector3Dbl.zero );
@@ -391,9 +385,11 @@ namespace HSP_Tests_PlayMode
         [Test]
         public void IsSwitchRequested_NoSwitchQueued_ReturnsCorrectValue()
         {
+            PlayerLoopManager.Initialize( BucketHandling.IncludeThrow );
+
             GameObject go = new GameObject();
             TimeManager timeManager = go.AddComponent<TimeManager>();
-            SceneReferenceFrameManager sman = go.AddComponent<SceneReferenceFrameManager>();
+            GameplaySceneReferenceFrameManager sman = go.AddComponent<GameplaySceneReferenceFrameManager>();
             TimeManager.SetUT( 0 );
 
             Assert.That( sman.IsSwitchRequested, Is.False, "IsSwitchRequested should be false when no switch is queued" );

@@ -20,8 +20,8 @@ namespace HSP.Vanilla.UI.Components
             }
             else
             {
-                CelestialBody closestBody = CelestialBodyManager.GetClosest( activeObj.AbsolutePosition );
-                Vector3Dbl bodySpacePosition = closestBody.ReferenceFrameTransform.CenteredInertialReferenceFrame().InverseTransformPosition( activeObj.AbsolutePosition );
+                CelestialBody closestBody = CelestialBodyManager.GetClosest( activeObj.GetAbsolutePosition() );
+                Vector3Dbl bodySpacePosition = closestBody.ReferenceFrameTransform.CenteredInertialReferenceFrame().InverseTransformPosition( activeObj.GetAbsolutePosition() );
 
                 double alt = bodySpacePosition.magnitude - closestBody.Radius;
 

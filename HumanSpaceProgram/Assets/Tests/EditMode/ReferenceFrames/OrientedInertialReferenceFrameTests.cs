@@ -1,16 +1,11 @@
 ﻿using HSP.ReferenceFrames;
-using HSP_Tests.NUnit;
 using NUnit.Framework;
-using System.Collections.Generic;
 using UnityEngine;
 
-namespace HSP_Tests_EditMode
+namespace HSP_Tests_EditMode.ReferenceFrames
 {
     public class OrientedInertialReferenceFrameTests
     {
-        static IEqualityComparer<Vector3Dbl> vector3DblApproxComparer = new Vector3DblApproximateComparer( 1e-12 );
-        static IEqualityComparer<QuaternionDbl> quaternionDblApproxComparer = new QuaternionDblApproximateComparer( 1e-12 );
-
         [Test]
         public void Constructor___SetsCorrectValues()
         {
@@ -60,7 +55,7 @@ namespace HSP_Tests_EditMode
         {
             var rotation = QuaternionDbl.AngleAxis( 30.0, Vector3Dbl.up );
             var frame = new OrientedInertialReferenceFrame( 0.0, new Vector3Dbl( 1.0, 2.0, 3.0 ), rotation, new Vector3Dbl( 0.1, 0.2, 0.3 ) );
-            ReferenceFrameTestHelpers.AssertRoundTripAccuracy( frame, "OrientedInertialReferenceFrame" );
+            ReferenceFrameTestUtils.AssertRoundTripAccuracy( frame, "OrientedInertialReferenceFrame" );
         }
 
         [Test]
@@ -68,7 +63,7 @@ namespace HSP_Tests_EditMode
         {
             var rotation = QuaternionDbl.AngleAxis( 45.0, Vector3Dbl.up );
             var frame = new OrientedInertialReferenceFrame( 0.0, Vector3Dbl.zero, rotation, new Vector3Dbl( 1.0, 2.0, 3.0 ) );
-            ReferenceFrameTestHelpers.AssertTimeEvolution( frame, 100.0, "OrientedInertialReferenceFrame" );
+            ReferenceFrameTestUtils.AssertTimeEvolution( frame, 100.0, "OrientedInertialReferenceFrame" );
         }
 
         [Test]
@@ -79,8 +74,8 @@ namespace HSP_Tests_EditMode
             var frame2 = new OrientedInertialReferenceFrame( 0.0, Vector3Dbl.zero, rotation, new Vector3Dbl( 1.0, 2.0, 3.0 ) );
             var frame3 = new OrientedInertialReferenceFrame( 0.0, Vector3Dbl.zero, rotation, new Vector3Dbl( 1.0, 2.0, 4.0 ) );
 
-            ReferenceFrameTestHelpers.AssertEqualityMethods( frame1, frame2, true, "OrientedInertialReferenceFrame" );
-            ReferenceFrameTestHelpers.AssertEqualityMethods( frame1, frame3, false, "OrientedInertialReferenceFrame" );
+            ReferenceFrameTestUtils.AssertEqualityMethods( frame1, frame2, true, "OrientedInertialReferenceFrame" );
+            ReferenceFrameTestUtils.AssertEqualityMethods( frame1, frame3, false, "OrientedInertialReferenceFrame" );
         }
     }
 }

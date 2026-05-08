@@ -1,5 +1,6 @@
 using HSP.CelestialBodies;
 using HSP.Input;
+using HSP.ReferenceFrames;
 using UnityEngine;
 using UnityPlus.Input;
 

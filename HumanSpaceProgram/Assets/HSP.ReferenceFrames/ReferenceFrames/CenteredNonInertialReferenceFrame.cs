@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityPlus.Serialization;
 using UnityPlus.Serialization.Descriptors;
@@ -38,7 +37,7 @@ namespace HSP.ReferenceFrames
             this._velocity = velocity;
             this._angularVelocity = angularVelocity;
         }
-        
+
         public CenteredNonInertialReferenceFrame( double referenceUT, Vector3Dbl center, Vector3Dbl velocity, Vector3Dbl angularVelocity, Vector3Dbl acceleration, Vector3Dbl angularAcceleration )
         {
             this.ReferenceUT = referenceUT;
@@ -54,112 +53,104 @@ namespace HSP.ReferenceFrames
         public IReferenceFrame AtUT( double ut )
         {
             double deltaTime = ut - ReferenceUT;
+            if( deltaTime == 0 )
+                return this;
 
-            // new pos/rot consist of the component due to existing velocity and the component due to constant acceleration.
-            var newPos = _position
-                + (_velocity * deltaTime)
-                + (0.5 * _acceleration * (deltaTime * deltaTime));
+            Vector3Dbl newPos = _position;
+            Vector3Dbl newVelocity = _velocity;
+            Vector3Dbl newAngularVelocity = _angularVelocity;
 
             var angVelMag = _angularVelocity.magnitude;
             var angAccMag = _angularAcceleration.magnitude;
             var hasAngularMotion = (angVelMag > 1e-12) || (angAccMag > 1e-12);
 
-            Vector3Dbl newVelocity = _velocity + (_acceleration * deltaTime);
-            Vector3Dbl newAngularVelocity = _angularVelocity + (_angularAcceleration * deltaTime);
-
             if( hasAngularMotion )
             {
-                var newRot = QuaternionDbl.identity;
-                if( angVelMag > 1e-12 )
-                {
-                    var angVelRot = QuaternionDbl.AngleAxis( angVelMag * deltaTime * 57.29577951308232, _angularVelocity );
-                    newRot = angVelRot * newRot;
-                }
-                if( angAccMag > 1e-12 )
-                {
-                    var angAccRot = QuaternionDbl.AngleAxis( 0.5 * angAccMag * (deltaTime * deltaTime) * 57.29577951308232, _angularAcceleration );
-                    newRot = angAccRot * newRot;
-                }
-
+                QuaternionDbl newRot = QuaternionDbl.identity;
+                Integrate( ref newPos, ref newRot, ref newVelocity, ref newAngularVelocity, _acceleration, _angularAcceleration, deltaTime );
                 return new OrientedNonInertialReferenceFrame( ut, newPos, newRot, newVelocity, newAngularVelocity, _acceleration, _angularAcceleration );
             }
             else
             {
-                return new CenteredNonInertialReferenceFrame( ut, newPos, newVelocity, _acceleration );
+                Integrate( ref newPos, ref newVelocity, ref newAngularVelocity, _acceleration, _angularAcceleration, deltaTime );
+                return new CenteredNonInertialReferenceFrame( ut, newPos, newVelocity, newAngularVelocity, _acceleration, _angularAcceleration );
             }
         }
 
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        private static void Integrate(
+            ref Vector3Dbl position, ref QuaternionDbl rotation,
+            ref Vector3Dbl velocity, ref Vector3Dbl angularVelocity,
+            in Vector3Dbl acceleration, in Vector3Dbl angularAcceleration,
+            double deltaTime )
+        {
+            if( deltaTime == 0 ) 
+                return;
 
-        public Vector3Dbl TransformPosition( Vector3Dbl localPosition )
-        {
-            return Vector3Dbl.Add( localPosition, _position );
-        }
-        public Vector3Dbl InverseTransformPosition( Vector3Dbl globalPosition )
-        {
-            return Vector3Dbl.Subtract( globalPosition, _position );
-        }
+            // 1. Position integration
+            position += (velocity * deltaTime) + (0.5 * acceleration * (deltaTime * deltaTime));
 
+            // 2. Rotation integration
+            var angVelMag = angularVelocity.magnitude;
+            if( angVelMag > 1e-12 )
+            {
+                var angVelRot = QuaternionDbl.AngleAxis( angVelMag * deltaTime * 57.29577951308232, angularVelocity );
+                rotation = angVelRot * rotation;
+            }
 
-        public Vector3 TransformDirection( Vector3 localDirection )
-        {
-            return localDirection;
-        }
-        public Vector3 InverseTransformDirection( Vector3 globalDirection )
-        {
-            return globalDirection;
-        }
+            var angAccMag = angularAcceleration.magnitude;
+            if( angAccMag > 1e-12 )
+            {
+                var angAccRot = QuaternionDbl.AngleAxis( 0.5 * angAccMag * (deltaTime * deltaTime) * 57.29577951308232, angularAcceleration );
+                rotation = angAccRot * rotation;
+            }
 
-
-        public QuaternionDbl TransformRotation( QuaternionDbl localRotation )
-        {
-            return localRotation;
-        }
-        public QuaternionDbl InverseTransformRotation( QuaternionDbl globalRotation )
-        {
-            return globalRotation;
-        }
-
-
-        public Vector3Dbl TransformVelocity( Vector3Dbl localVelocity )
-        {
-            return Vector3Dbl.Add( localVelocity, _velocity );
-        }
-        public Vector3Dbl InverseTransformVelocity( Vector3Dbl globalVelocity )
-        {
-            return Vector3Dbl.Subtract( globalVelocity, _velocity );
+            // 3. Velocity integration
+            velocity += acceleration * deltaTime;
+            angularVelocity += angularAcceleration * deltaTime;
         }
 
-
-        public Vector3Dbl TransformAcceleration( Vector3Dbl localAcceleration )
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        private static void Integrate(
+            ref Vector3Dbl position,
+            ref Vector3Dbl velocity, ref Vector3Dbl angularVelocity,
+            in Vector3Dbl acceleration, in Vector3Dbl angularAcceleration,
+            double deltaTime )
         {
-            return Vector3Dbl.Add( localAcceleration, _acceleration );
-        }
+            if( deltaTime == 0 ) 
+                return;
 
-        public Vector3Dbl InverseTransformAcceleration( Vector3Dbl globalAcceleration )
-        {
-            return Vector3Dbl.Subtract( globalAcceleration, _acceleration );
+            position += (velocity * deltaTime) + (0.5 * acceleration * (deltaTime * deltaTime));
+            velocity += acceleration * deltaTime;
+            angularVelocity += angularAcceleration * deltaTime;
         }
 
 
-        public Vector3Dbl TransformAngularVelocity( Vector3Dbl localAngularVelocity )
+        public KinematicState TransformState( in KinematicState localState )
         {
-            return Vector3Dbl.Add( localAngularVelocity, _angularVelocity );
-        }
-        public Vector3Dbl InverseTransformAngularVelocity( Vector3Dbl globalAngularVelocity )
-        {
-            return Vector3Dbl.Subtract( globalAngularVelocity, _angularVelocity );
-        }
-
-
-        public Vector3Dbl TransformAngularAcceleration( Vector3Dbl localAngularAcceleration )
-        {
-            return Vector3Dbl.Add( localAngularAcceleration, _angularAcceleration );
-        }
-        public Vector3Dbl InverseTransformAngularAcceleration( Vector3Dbl globalAngularAcceleration )
-        {
-            return Vector3Dbl.Subtract( globalAngularAcceleration, _angularAcceleration );
+            return new KinematicState( null )
+            {
+                Position = Vector3Dbl.Add( localState.Position, _position ),
+                Rotation = localState.Rotation,
+                Velocity = Vector3Dbl.Add( localState.Velocity, _velocity ),
+                AngularVelocity = Vector3Dbl.Add( localState.AngularVelocity, _angularVelocity ),
+                Acceleration = Vector3Dbl.Add( localState.Acceleration, _acceleration ),
+                AngularAcceleration = Vector3Dbl.Add( localState.AngularAcceleration, _angularAcceleration )
+            };
         }
 
+        public KinematicState InverseTransformState( in KinematicState globalState )
+        {
+            return new KinematicState( this )
+            {
+                Position = Vector3Dbl.Subtract( globalState.Position, _position ),
+                Rotation = globalState.Rotation,
+                Velocity = Vector3Dbl.Subtract( globalState.Velocity, _velocity ),
+                AngularVelocity = Vector3Dbl.Subtract( globalState.AngularVelocity, _angularVelocity ),
+                Acceleration = Vector3Dbl.Subtract( globalState.Acceleration, _acceleration ),
+                AngularAcceleration = Vector3Dbl.Subtract( globalState.AngularAcceleration, _angularAcceleration )
+            };
+        }
 
         public Vector3Dbl GetTangentialVelocity( Vector3Dbl localPosition )
         {
@@ -194,17 +185,21 @@ namespace HSP.ReferenceFrames
             return result;
         }
 
+        public override string ToString()
+        {
+            return $"CenteredNonInertialReferenceFrame( UT={ReferenceUT}, Pos={Position}, Vel={Velocity}, AngVel={AngularVelocity}, Acc={Acceleration}, AngAcc={AngularAcceleration} )";
+        }
+
         public bool Equals( IReferenceFrame other )
         {
             if( other == null )
                 return false;
 
-            return other.TransformPosition( Vector3Dbl.zero ) == this._position
-                && other.TransformRotation( QuaternionDbl.identity ) == QuaternionDbl.identity
-                && other.TransformVelocity( Vector3Dbl.zero ) == this._velocity
-                && other.TransformAngularVelocity( Vector3Dbl.zero ) == this._angularVelocity
-                && other.TransformAcceleration( Vector3Dbl.zero ) == this._acceleration
-                && other.TransformAngularAcceleration( Vector3Dbl.zero ) == this._angularAcceleration;
+            var state = KinematicState.AbsoluteIdentity;
+            var otherState = other.TransformState( state );
+            var thisState = this.TransformState( state );
+
+            return otherState.Equals( thisState );
         }
 
         public bool EqualsIgnoreUT( IReferenceFrame other )
@@ -214,12 +209,11 @@ namespace HSP.ReferenceFrames
 
             IReferenceFrame otherNormalizedUT = other.AtUT( this.ReferenceUT );
 
-            return otherNormalizedUT.TransformPosition( Vector3Dbl.zero ) == this._position
-                && otherNormalizedUT.TransformRotation( QuaternionDbl.identity ) == QuaternionDbl.identity
-                && otherNormalizedUT.TransformVelocity( Vector3Dbl.zero ) == this._velocity
-                && otherNormalizedUT.TransformAngularVelocity( Vector3Dbl.zero ) == this._angularVelocity
-                && otherNormalizedUT.TransformAcceleration( Vector3Dbl.zero ) == this._acceleration
-                && otherNormalizedUT.TransformAngularAcceleration( Vector3Dbl.zero ) == this._angularAcceleration;
+            var state = KinematicState.AbsoluteIdentity;
+            var otherState = otherNormalizedUT.TransformState( state );
+            var thisState = this.TransformState( state );
+
+            return otherState.Equals( thisState );
         }
 
 

@@ -1,16 +1,11 @@
 ﻿using HSP.ReferenceFrames;
-using HSP_Tests.NUnit;
 using NUnit.Framework;
-using System.Collections.Generic;
 using UnityEngine;
 
-namespace HSP_Tests_EditMode
+namespace HSP_Tests_EditMode.ReferenceFrames
 {
     public class OrientedNonInertialReferenceFrameTests
     {
-        static IEqualityComparer<Vector3Dbl> vector3DblApproxComparer = new Vector3DblApproximateComparer( 1e-12 );
-        static IEqualityComparer<QuaternionDbl> quaternionDblApproxComparer = new QuaternionDblApproximateComparer( 1e-12 );
-
         [Test]
         public void Constructor___SetsCorrectValues()
         {
@@ -124,7 +119,7 @@ namespace HSP_Tests_EditMode
         {
             var rotation = QuaternionDbl.AngleAxis( 30.0, Vector3Dbl.up );
             var frame = new OrientedNonInertialReferenceFrame( 0.0, new Vector3Dbl( 1.0, 2.0, 3.0 ), rotation, new Vector3Dbl( 0.1, 0.2, 0.3 ), new Vector3Dbl( 0.01, 0.02, 0.03 ), new Vector3Dbl( 0.001, 0.002, 0.003 ), new Vector3Dbl( 0.0001, 0.0002, 0.0003 ) );
-            ReferenceFrameTestHelpers.AssertRoundTripAccuracy( frame, "OrientedNonInertialReferenceFrame" );
+            ReferenceFrameTestUtils.AssertRoundTripAccuracy( frame, "OrientedNonInertialReferenceFrame" );
         }
 
         [Test]
@@ -132,7 +127,7 @@ namespace HSP_Tests_EditMode
         {
             var rotation = QuaternionDbl.AngleAxis( 45.0, Vector3Dbl.up );
             var frame = new OrientedNonInertialReferenceFrame( 0.0, Vector3Dbl.zero, rotation, Vector3Dbl.zero, Vector3Dbl.zero, Vector3Dbl.zero, Vector3Dbl.zero );
-            ReferenceFrameTestHelpers.AssertTimeEvolution( frame, 100.0, "OrientedNonInertialReferenceFrame" );
+            ReferenceFrameTestUtils.AssertTimeEvolution( frame, 100.0, "OrientedNonInertialReferenceFrame" );
         }
 
         [Test]
@@ -143,8 +138,8 @@ namespace HSP_Tests_EditMode
             var frame2 = new OrientedNonInertialReferenceFrame( 0.0, Vector3Dbl.zero, rotation, Vector3Dbl.zero, Vector3Dbl.zero, Vector3Dbl.zero, Vector3Dbl.zero );
             var frame3 = new OrientedNonInertialReferenceFrame( 0.0, Vector3Dbl.zero, rotation, Vector3Dbl.zero, new Vector3Dbl( 0.1, 0.0, 0.0 ), Vector3Dbl.zero, Vector3Dbl.zero );
 
-            ReferenceFrameTestHelpers.AssertEqualityMethods( frame1, frame2, true, "OrientedNonInertialReferenceFrame" );
-            ReferenceFrameTestHelpers.AssertEqualityMethods( frame1, frame3, false, "OrientedNonInertialReferenceFrame" );
+            ReferenceFrameTestUtils.AssertEqualityMethods( frame1, frame2, true, "OrientedNonInertialReferenceFrame" );
+            ReferenceFrameTestUtils.AssertEqualityMethods( frame1, frame3, false, "OrientedNonInertialReferenceFrame" );
         }
     }
 }

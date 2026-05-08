@@ -41,7 +41,7 @@ namespace HSP.Vanilla.Trajectories
                 if( _referenceFrameTransform.IsUnityNull() )
                 {
                     _referenceFrameTransform = this.GetComponent<IReferenceFrameTransform>();
-                    _referenceFrameTransform.OnAnyValueChanged += OnValueChanged;
+                    _referenceFrameTransform.OnStateChanged += OnValueChanged;
                 }
                 return _referenceFrameTransform;
             }
@@ -165,7 +165,7 @@ namespace HSP.Vanilla.Trajectories
 
         private bool HasCollidedWithSomething() => this.PhysicsTransform.IsColliding;
 
-        private bool HadForcesApplied() => this.ReferenceFrameTransform.AbsoluteAcceleration != Vector3Dbl.zero;
+        private bool HadForcesApplied() => this.ReferenceFrameTransform.GetAbsoluteAcceleration() != Vector3Dbl.zero;
 
         private bool _hadValuesChangedByHand;
 
@@ -173,13 +173,13 @@ namespace HSP.Vanilla.Trajectories
         {
             RequestForcedResynchronization();
             _referenceFrameTransform = this.GetComponent<IReferenceFrameTransform>(); // The assignment is needed, otherwise the event will also be added (again) by the getter.
-            _referenceFrameTransform.OnAnyValueChanged += OnValueChanged;
+            _referenceFrameTransform.OnStateChanged += OnValueChanged;
             TryRegister();
         }
 
         void OnDisable()
         {
-            _referenceFrameTransform.OnAnyValueChanged -= OnValueChanged;
+            _referenceFrameTransform.OnStateChanged -= OnValueChanged;
             TryUnregister();
         }
 

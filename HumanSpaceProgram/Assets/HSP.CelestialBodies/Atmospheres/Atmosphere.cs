@@ -87,7 +87,7 @@ namespace HSP.CelestialBodies.Atmospheres
             var altitude = Math.Clamp( bodySpacePos.magnitude - this.CelestialBody.Radius, 0, Height );
             double P = SurfacePressure * Math.Exp( -altitude / ScaleHeight );
 
-            Vector3 sceneWindVelocity = (Vector3)sceneFrame.InverseTransformVelocity( this.CelestialBody.ReferenceFrameTransform.AbsoluteVelocity + frame.GetTangentialVelocity( bodySpacePos ) );
+            Vector3 sceneWindVelocity = (Vector3)sceneFrame.InverseTransformVelocity( this.CelestialBody.ReferenceFrameTransform.GetAbsoluteVelocity() + frame.GetTangentialVelocity( bodySpacePos ) );
 
             return new AtmosphereData( SpecificGasConstant, P, SurfaceTemperature, sceneWindVelocity );
         }
@@ -116,7 +116,7 @@ namespace HSP.CelestialBodies.Atmospheres
 
             foreach( var atmosphere in Atmosphere._activeAtmospheres )
             {
-                double distSq = (atmosphere.CelestialBody.ReferenceFrameTransform.Position - point).sqrMagnitude;
+                double distSq = (atmosphere.CelestialBody.ReferenceFrameTransform.GetPosition() - point).sqrMagnitude;
                 if( distSq < closestDistanceSq )
                 {
                     closest = atmosphere;

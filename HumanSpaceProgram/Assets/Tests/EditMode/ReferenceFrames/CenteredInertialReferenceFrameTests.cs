@@ -1,17 +1,11 @@
 ﻿using HSP.ReferenceFrames;
-using HSP_Tests.NUnit;
 using NUnit.Framework;
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 
-namespace HSP_Tests_EditMode
+namespace HSP_Tests_EditMode.ReferenceFrames
 {
     public class CenteredInertialReferenceFrameTests
     {
-        static IEqualityComparer<Vector3Dbl> vector3DblApproxComparer = new Vector3DblApproximateComparer( 1e-12 );
-        static IEqualityComparer<QuaternionDbl> quaternionDblApproxComparer = new QuaternionDblApproximateComparer( 1e-12 );
-
         [Test]
         public void AtUt___WorksCorrectly()
         {
@@ -71,14 +65,14 @@ namespace HSP_Tests_EditMode
         public void AllTransforms___RoundTripAccuracy()
         {
             var frame = new CenteredInertialReferenceFrame( 0.0, new Vector3Dbl( 1.0, 2.0, 3.0 ), new Vector3Dbl( 0.1, 0.2, 0.3 ) );
-            ReferenceFrameTestHelpers.AssertRoundTripAccuracy( frame, "CenteredInertialReferenceFrame" );
+            ReferenceFrameTestUtils.AssertRoundTripAccuracy( frame, "CenteredInertialReferenceFrame" );
         }
 
         [Test]
         public void TimeEvolution___PreservesProperties()
         {
             var frame = new CenteredInertialReferenceFrame( 0.0, Vector3Dbl.zero, new Vector3Dbl( 1.0, 2.0, 3.0 ) );
-            ReferenceFrameTestHelpers.AssertTimeEvolution( frame, 100.0, "CenteredInertialReferenceFrame" );
+            ReferenceFrameTestUtils.AssertTimeEvolution( frame, 100.0, "CenteredInertialReferenceFrame" );
         }
 
         [Test]
@@ -88,49 +82,49 @@ namespace HSP_Tests_EditMode
             var frame2 = new CenteredInertialReferenceFrame( 0.0, Vector3Dbl.zero, new Vector3Dbl( 1.0, 2.0, 3.0 ) );
             var frame3 = new CenteredInertialReferenceFrame( 0.0, Vector3Dbl.zero, new Vector3Dbl( 1.0, 2.0, 4.0 ) );
 
-            ReferenceFrameTestHelpers.AssertEqualityMethods( frame1, frame2, true, "CenteredInertialReferenceFrame" );
-            ReferenceFrameTestHelpers.AssertEqualityMethods( frame1, frame3, false, "CenteredInertialReferenceFrame" );
+            ReferenceFrameTestUtils.AssertEqualityMethods( frame1, frame2, true, "CenteredInertialReferenceFrame" );
+            ReferenceFrameTestUtils.AssertEqualityMethods( frame1, frame3, false, "CenteredInertialReferenceFrame" );
         }
 
-        [Test]
-        public void TIME()
-        {/// <summary>
-         /// Calculates burn time to achieve a given delta-v using Tsiolkovsky rocket equation.
-         /// </summary>
-         /// <param name="deltaV">Desired change in velocity (m/s)</param>
-         /// <param name="initialMass">Initial mass of the rocket (kg)</param>
-         /// <param name="thrust">Constant engine thrust (N)</param>
-         /// <param name="exhaustVelocity">Effective exhaust velocity (m/s)</param>
-         /// <returns>Burn time in seconds</returns>
-            double CalculateBurnTime( double deltaV, double initialMass, double thrust, double exhaustVelocity )
-            {
-                if( initialMass <= 0 )
-                    throw new ArgumentException( "Initial mass must be positive." );
-                if( thrust <= 0 )
-                    throw new ArgumentException( "Thrust must be positive." );
-                if( exhaustVelocity <= 0 )
-                    throw new ArgumentException( "Exhaust velocity must be positive." );
-                if( deltaV < 0 )
-                    throw new ArgumentException( "Delta-v cannot be negative." );
+        //[Test]
+        //public void TIME()
+        //{/// <summary>
+        // /// Calculates burn time to achieve a given delta-v using Tsiolkovsky rocket equation.
+        // /// </summary>
+        // /// <param name="deltaV">Desired change in velocity (m/s)</param>
+        // /// <param name="initialMass">Initial mass of the rocket (kg)</param>
+        // /// <param name="thrust">Constant engine thrust (N)</param>
+        // /// <param name="exhaustVelocity">Effective exhaust velocity (m/s)</param>
+        // /// <returns>Burn time in seconds</returns>
+        //    double CalculateBurnTime( double deltaV, double initialMass, double thrust, double exhaustVelocity )
+        //    {
+        //        if( initialMass <= 0 )
+        //            throw new ArgumentException( "Initial mass must be positive." );
+        //        if( thrust <= 0 )
+        //            throw new ArgumentException( "Thrust must be positive." );
+        //        if( exhaustVelocity <= 0 )
+        //            throw new ArgumentException( "Exhaust velocity must be positive." );
+        //        if( deltaV < 0 )
+        //            throw new ArgumentException( "Delta-v cannot be negative." );
 
-                // Compute final mass after burn using the rocket equation
-                double finalMass = initialMass * Math.Exp( -deltaV / exhaustVelocity );
+        //        // Compute final mass after burn using the rocket equation
+        //        double finalMass = initialMass * Math.Exp( -deltaV / exhaustVelocity );
 
-                // Mass flow rate (kg/s)
-                double massFlowRate = thrust / exhaustVelocity;
+        //        // Mass flow rate (kg/s)
+        //        double massFlowRate = thrust / exhaustVelocity;
 
-                // Burn time = mass used / mass flow rate
-                double burnTime = (initialMass - finalMass) / massFlowRate;
+        //        // Burn time = mass used / mass flow rate
+        //        double burnTime = (initialMass - finalMass) / massFlowRate;
 
-                return burnTime / (31556952); // to years
-            }
+        //        return burnTime / (31556952); // to years
+        //    }
 
-            //time = CalculateBurnTime( 5000, 1_000_000, 5_000_000, 4_000 );
+        //    //time = CalculateBurnTime( 5000, 1_000_000, 5_000_000, 4_000 );
 
-            Debug.Log( CalculateBurnTime( 5000, 1600, 0.1, 40_000 ) );
-            Debug.Log( CalculateBurnTime( 7500, 1600, 0.1, 40_000 ) );
-            Debug.Log( CalculateBurnTime( 10000, 1600, 0.1, 40_000 ) );
-            Debug.Log( CalculateBurnTime( 10000, 1600, 0.1, 40_000 ) );
-        }
+        //    Debug.Log( CalculateBurnTime( 5000, 1600, 0.1, 40_000 ) );
+        //    Debug.Log( CalculateBurnTime( 7500, 1600, 0.1, 40_000 ) );
+        //    Debug.Log( CalculateBurnTime( 10000, 1600, 0.1, 40_000 ) );
+        //    Debug.Log( CalculateBurnTime( 10000, 1600, 0.1, 40_000 ) );
+        //}
     }
 }

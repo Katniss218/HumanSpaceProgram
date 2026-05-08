@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityPlus.Serialization;
 using UnityPlus.Serialization.Descriptors;
 
-namespace HSP.Vanilla
+namespace HSP.Vanilla.ReferenceFrames
 {
     /// <remarks>
     /// A physics transform that is pinned to a fixed pos/rot in the local coordinate system of a celestial body.

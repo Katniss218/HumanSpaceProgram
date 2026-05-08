@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HSP.ReferenceFrames;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -60,7 +61,7 @@ namespace HSP.CelestialBodies.Atmospheres
             material.SetTexture( Shader.PropertyToID( "_texgsfs" ), ColorRenderTextureGetter.Invoke() );
             material.SetTexture( Shader.PropertyToID( "_DepthBuffer" ), DepthRenderTextureGetter.Invoke(), RenderTextureSubElement.Depth );
 
-            material.SetVector( Shader.PropertyToID( "_Center" ), CelestialBody.ReferenceFrameTransform.Position );
+            material.SetVector( Shader.PropertyToID( "_Center" ), CelestialBody.ReferenceFrameTransform.GetPosition() );
             material.SetVector( Shader.PropertyToID( "_SunDirection" ), -light.transform.forward );
             material.SetVector( Shader.PropertyToID( "_ScatteringWavelengths" ), new Vector3( 675, 530, 400 ) );
             material.SetFloat( Shader.PropertyToID( "_ScatteringStrength" ), 128 );

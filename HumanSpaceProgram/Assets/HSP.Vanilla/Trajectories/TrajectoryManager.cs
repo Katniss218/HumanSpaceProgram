@@ -1,4 +1,5 @@
-﻿using HSP.Time;
+﻿using HSP.ReferenceFrames;
+using HSP.Time;
 using HSP.Vanilla.Trajectories;
 using System.Collections.Generic;
 using UnityEngine;
@@ -157,7 +158,7 @@ namespace HSP.Trajectories
             public void Run()
             {
 #warning TODO - this is buggy and a mess. new playerloop should hopefully make the ordering more controllable, so we can refactor this.
-                return;
+                
                 if( !instanceExists )
                 {
                     return;
@@ -198,18 +199,18 @@ namespace HSP.Trajectories
                     {
                         instance._posAndVelCache[trajectoryTransform] = (stateVector.AbsolutePosition, stateVector.AbsoluteVelocity, Vector3Dbl.zero);
                         //trajectoryTransform.SuppressValueChanged(); // for some reason, suppressing it here makes engines not work right.
-                        trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity = stateVector.AbsoluteVelocity;
+                        trajectoryTransform.ReferenceFrameTransform.SetAbsoluteVelocity(stateVector.AbsoluteVelocity);
                         //trajectoryTransform.AllowValueChanged();
                     }
                     else
                     {
                         // If the transform is synchronized, make the velocity what it should be to make it move to the target location.
                         // This - at least in theory - should make PhysX happier, because the position is not being reset, in turn resetting some physics scene stuff.
-                        Vector3Dbl interpolatedVel = (stateVector.AbsolutePosition - trajectoryTransform.ReferenceFrameTransform.AbsolutePosition) / TimeManager.FixedDeltaTime;
+                        Vector3Dbl interpolatedVel = (stateVector.AbsolutePosition - trajectoryTransform.ReferenceFrameTransform.GetAbsolutePosition()) / TimeManager.FixedDeltaTime;
                         instance._posAndVelCache[trajectoryTransform] = (stateVector.AbsolutePosition, stateVector.AbsoluteVelocity, interpolatedVel);
 
                         trajectoryTransform.SuppressValueChanged();
-                        trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity = interpolatedVel;
+                        trajectoryTransform.ReferenceFrameTransform.SetAbsoluteVelocity(interpolatedVel);
                         trajectoryTransform.AllowValueChanged();
                     }
                 }
@@ -221,7 +222,6 @@ namespace HSP.Trajectories
         {
             public void Run()
             {
-                return;
                 if( !instanceExists )
                     return;
 
@@ -229,10 +229,10 @@ namespace HSP.Trajectories
                 {
                     var (_, vel, interpolatedVel) = instance._posAndVelCache[trajectoryTransform];
 
-                    if( !trajectoryTransform.TrajectoryNeedsUpdating() || trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity == interpolatedVel )
+                    if( !trajectoryTransform.TrajectoryNeedsUpdating() || trajectoryTransform.ReferenceFrameTransform.GetAbsoluteVelocity() == interpolatedVel )
                     {
                         trajectoryTransform.SuppressValueChanged();
-                        trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity = vel;
+                        trajectoryTransform.ReferenceFrameTransform.SetAbsoluteVelocity(vel);
                         trajectoryTransform.AllowValueChanged();
                     }
                 }

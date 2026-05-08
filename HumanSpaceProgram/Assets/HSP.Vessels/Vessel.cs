@@ -157,10 +157,10 @@ namespace HSP.Vessels
             {
                 SetPhysicsObjectParameters(); // this full recalc every frame should be replaced by update-based approach.
 
-                if( this.ReferenceFrameTransform.Position.magnitude > 1e5 )
+                if( this.ReferenceFrameTransform.GetPosition().magnitude > 1e5 )
                     this._rootPart.gameObject.SetActive( false );
             }
-            if( !this._rootPart.gameObject.activeSelf && this.ReferenceFrameTransform.Position.magnitude <= 1e5 )
+            if( !this._rootPart.gameObject.activeSelf && this.ReferenceFrameTransform.GetPosition().magnitude <= 1e5 )
             {
                 this._rootPart.gameObject.SetActive( true );
             }

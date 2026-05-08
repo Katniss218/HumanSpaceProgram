@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HSP.ReferenceFrames;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -15,7 +16,7 @@ namespace HSP.CelestialBodies
             int i = 0;
             foreach( var body in CelestialBodyManager.CelestialBodies )
             {
-                Vector3Dbl toBody = body.ReferenceFrameTransform.AbsolutePosition - absolutePosition;
+                Vector3Dbl toBody = body.ReferenceFrameTransform.GetAbsolutePosition() - absolutePosition;
 
                 double distanceSq = toBody.sqrMagnitude;
                 if( distanceSq == 0.0 )
@@ -40,7 +41,7 @@ namespace HSP.CelestialBodies
             Vector3Dbl accSum = Vector3Dbl.zero;
             foreach( var body in CelestialBodyManager.CelestialBodies )
             {
-                Vector3Dbl toBody = body.ReferenceFrameTransform.AbsolutePosition - absolutePosition;
+                Vector3Dbl toBody = body.ReferenceFrameTransform.GetAbsolutePosition() - absolutePosition;
 
                 double distanceSq = toBody.sqrMagnitude;
                 if( distanceSq == 0.0 )

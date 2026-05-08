@@ -1,6 +1,7 @@
 ﻿using HSP.CelestialBodies;
 using HSP.CelestialBodies.Atmospheres;
 using HSP.CelestialBodies.Surfaces;
+using HSP.ReferenceFrames;
 using HSP.Trajectories;
 using HSP.Trajectories.AccelerationProviders;
 using HSP.Trajectories.TrajectoryIntegrators;
@@ -177,7 +178,7 @@ namespace HSP._DevUtils
             comp.IsAttractor = true;
             comp.Integrator = new VerletIntegrator();
             comp.SetAccelerationProviders( new NBodyAccelerationProvider() );
-            comp.ReferenceFrameTransform.AbsoluteVelocity = airfVel;
+            comp.ReferenceFrameTransform.SetAbsoluteVelocity( airfVel );
             //comp.TrajectoryIntegrator = new NewtonianOrbit( Time.TimeManager.UT, airfPos, airfVel, Vector3Dbl.zero, cb.Mass );
             return cb;
         }
@@ -193,7 +194,7 @@ namespace HSP._DevUtils
             comp.IsAttractor = false;
             comp.Integrator = new VerletIntegrator();
             comp.SetAccelerationProviders( new NBodyAccelerationProvider() );
-            comp.ReferenceFrameTransform.AbsoluteVelocity = airfVel;
+            comp.ReferenceFrameTransform.SetAbsoluteVelocity( airfVel );
             //comp.TrajectoryIntegrator = new NewtonianOrbit( Time.TimeManager.UT, airfPos, airfVel, Vector3Dbl.zero, cb.Mass );
             return cb;
         }
@@ -240,8 +241,8 @@ namespace HSP._DevUtils
 
 
 
-            CelestialBodyManager.Get( "sun" ).ReferenceFrameTransform.AbsoluteAngularVelocity = new Vector3Dbl( 0, -1, 0 );
-            CelestialBodyManager.Get( "main" ).ReferenceFrameTransform.AbsoluteAngularVelocity = new Vector3Dbl( 0, -7.2921159e-5, 0 );
+            CelestialBodyManager.Get( "sun" ).ReferenceFrameTransform.SetAbsoluteAngularVelocity( new Vector3Dbl( 0, -1, 0 ) );
+            CelestialBodyManager.Get( "main" ).ReferenceFrameTransform.SetAbsoluteAngularVelocity( new Vector3Dbl( 0, -7.2921159e-5, 0 ) );
         }
     }
 }

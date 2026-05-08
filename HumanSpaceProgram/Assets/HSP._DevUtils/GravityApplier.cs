@@ -1,4 +1,5 @@
 ﻿using HSP.CelestialBodies;
+using HSP.ReferenceFrames;
 using HSP.SceneManagement;
 using HSP.Vanilla.Scenes.GameplayScene;
 using HSP.Vessels;
@@ -12,7 +13,7 @@ namespace HSP._DevUtils
 
         void FixedUpdate()
         {
-            Vector3Dbl airfGravityForce = GravityUtils.GetNBodyGravityForce( Vessel.ReferenceFrameTransform.AbsolutePosition, Vessel.PhysicsTransform.Mass );
+            Vector3Dbl airfGravityForce = GravityUtils.GetNBodyGravityForce( Vessel.ReferenceFrameTransform.GetAbsolutePosition(), Vessel.PhysicsTransform.Mass );
             Vessel.PhysicsTransform.AddForce( (Vector3)airfGravityForce );
         }
 

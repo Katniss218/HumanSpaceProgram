@@ -1,4 +1,5 @@
-﻿using HSP.SceneManagement;
+﻿using HSP.ReferenceFrames;
+using HSP.SceneManagement;
 using UnityEngine;
 
 namespace HSP.CelestialBodies
@@ -43,8 +44,10 @@ namespace HSP.CelestialBodies
 
             HSPEvent.EventManager.TryInvoke( HSPEvent_ON_CELESTIAL_BODY_CREATED.ID, celestialBody );
 
-            celestialBody.ReferenceFrameTransform.AbsolutePosition = absolutePosition;
-            celestialBody.ReferenceFrameTransform.AbsoluteRotation = absoluteRotation;
+            celestialBody.ReferenceFrameTransform.SetAbsoluteState(
+                position: absolutePosition,
+                rotation: absoluteRotation
+            );
 
             return celestialBody;
         }

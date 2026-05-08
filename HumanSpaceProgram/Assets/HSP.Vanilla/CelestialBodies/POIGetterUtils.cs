@@ -1,9 +1,7 @@
 ﻿using HSP.CelestialBodies;
 using HSP.ReferenceFrames;
 using HSP.SceneManagement;
-using HSP.Vanilla.Scenes.DesignScene;
 using HSP.Vanilla.Scenes.GameplayScene;
-using HSP.Vanilla.Scenes.GameplayScene.Cameras;
 using HSP.Vanilla.Scenes.MapScene;
 using HSP.Vessels;
 using System.Collections.Generic;
@@ -21,7 +19,7 @@ namespace HSP.Vanilla.CelestialBodies
     {
         public IEnumerable<Vector3Dbl> GetPOIs()
         {
-            return VesselManager.LoadedVessels.Select( v => v.ReferenceFrameTransform.AbsolutePosition );
+            return VesselManager.LoadedVessels.Select( v => v.ReferenceFrameTransform.GetAbsolutePosition() );
         }
 
 

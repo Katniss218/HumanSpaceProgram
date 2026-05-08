@@ -84,19 +84,19 @@ namespace HSP._DevUtils
 
                 bodyI++;
 
-                Debug.Log( body.ReferenceFrameTransform.AbsoluteVelocity );
-
                 if( !wasFired )
                 {
                     CelestialBody cb = VanillaPlanetarySystemFactory.CreateCB( "moon2", new Vector3Dbl( 150_200_000_000, 0, 0 ), new Vector3Dbl( 0, -129749.1543788567, 0 ), QuaternionDbl.identity );
                     body = cb;
 
                     var vessel = VesselManager.LoadedVessels.Skip( 1 ).First();
-                    vessel.ReferenceFrameTransform.AbsolutePosition = body.ReferenceFrameTransform.AbsolutePosition + new Vector3Dbl( body.Radius + 200_000, 0, 0 );
-                    vessel.ReferenceFrameTransform.AbsoluteVelocity = body.ReferenceFrameTransform.AbsoluteVelocity + new Vector3Dbl( 0, 8500, 0 );
+                    vessel.ReferenceFrameTransform.SetAbsoluteState(
+                        position: body.ReferenceFrameTransform.GetAbsolutePosition() + new Vector3Dbl( body.Radius + 200_000, 0, 0 ),
+                        velocity: body.ReferenceFrameTransform.GetAbsoluteVelocity() + new Vector3Dbl( 0, 8500, 0 )
+                    );
 
                     GameplaySceneReferenceFrameManager.RequestSceneReferenceFrameSwitch( new CenteredInertialReferenceFrame( TimeManager.UT,
-                        GameplaySceneReferenceFrameManager.TargetObject.AbsolutePosition, GameplaySceneReferenceFrameManager.TargetObject.AbsoluteVelocity ) );
+                        GameplaySceneReferenceFrameManager.TargetObject.GetAbsolutePosition(), GameplaySceneReferenceFrameManager.TargetObject.GetAbsoluteVelocity() ) );
                 }
                 wasFired = true;
             }
@@ -141,9 +141,9 @@ namespace HSP._DevUtils
 
                 Vector3 bottomBoundPos = v2.GetBottomPosition();
                 Vector3Dbl closestBoundAirf = GameplaySceneReferenceFrameManager.ReferenceFrame.TransformPosition( bottomBoundPos );
-                Vector3Dbl closestBoundToVesselAirf = v2.ReferenceFrameTransform.AbsolutePosition - closestBoundAirf;
+                Vector3Dbl closestBoundToVesselAirf = v2.ReferenceFrameTransform.GetAbsolutePosition() - closestBoundAirf;
                 Vector3Dbl airfPos = spawnerPosAirf + closestBoundToVesselAirf;
-                v2.ReferenceFrameTransform.AbsolutePosition = airfPos;
+                v2.ReferenceFrameTransform.SetAbsolutePosition( airfPos );
             }
             //if( UnityEngine.Input.GetKeyDown( KeyCode.F5 ) )
             //{

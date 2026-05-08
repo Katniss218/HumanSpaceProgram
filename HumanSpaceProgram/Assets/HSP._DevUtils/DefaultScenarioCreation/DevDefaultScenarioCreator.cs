@@ -70,7 +70,7 @@ namespace HSP._DevUtils
         //
         //
         //
-        
+
         private static Vector3 GetLocalPositionRelativeToRoot( Transform target )
         {
             Vector3 relativePosition = target.localPosition;
@@ -97,20 +97,22 @@ namespace HSP._DevUtils
 
             FLaunchSiteMarker launchSiteSpawner = launchSite.gameObject.GetComponentInChildren<FLaunchSiteMarker>();
             Vector3Dbl zeroPosAirf = GameplaySceneReferenceFrameManager.ReferenceFrame.TransformPosition( Vector3Dbl.zero );
-            Vector3Dbl spawnerPosAirf = launchSite.ReferenceFrameTransform.AbsolutePosition + GetLocalPositionRelativeToRoot( launchSiteSpawner.transform );
+            Vector3Dbl spawnerPosAirf = launchSite.ReferenceFrameTransform.GetAbsolutePosition() + GetLocalPositionRelativeToRoot( launchSiteSpawner.transform );
             QuaternionDbl spawnerRotAirf = GameplaySceneReferenceFrameManager.ReferenceFrame.TransformRotation( launchSiteSpawner.transform.rotation );
 
             var vessel = CreateDummyVessel( zeroPosAirf, spawnerRotAirf ); // position is temp.
 
             Vector3 bottomBoundPos = vessel.GetBottomPosition();
             Vector3Dbl closestBoundAirf = GameplaySceneReferenceFrameManager.ReferenceFrame.TransformPosition( bottomBoundPos );
-            Vector3Dbl closestBoundToVesselAirf = vessel.ReferenceFrameTransform.AbsolutePosition - closestBoundAirf;
+            Vector3Dbl closestBoundToVesselAirf = vessel.ReferenceFrameTransform.GetAbsolutePosition() - closestBoundAirf;
             Vector3Dbl airfPos = spawnerPosAirf + closestBoundToVesselAirf;
 
-            Vector3Dbl airfVel = launchSite.ReferenceFrameTransform.AbsoluteVelocity;
+            Vector3Dbl airfVel = launchSite.ReferenceFrameTransform.GetAbsoluteVelocity();
 
-            vessel.ReferenceFrameTransform.AbsolutePosition = airfPos;
-            vessel.ReferenceFrameTransform.AbsoluteVelocity = airfVel;
+            vessel.ReferenceFrameTransform.SetAbsoluteState(
+                position: airfPos,
+                velocity: airfVel
+            );
             return vessel;
         }
 
@@ -140,12 +142,12 @@ namespace HSP._DevUtils
             Substance sbsOX = AssetRegistry.Get<Substance>( "Vanilla::Assets/substances/lox" );
 
             var tankSmallTank = tankP.GetComponent<FResourceContainer_FlowTank>();
-            tankSmallTank.Contents = new SubstanceStateCollection() 
+            tankSmallTank.Contents = new SubstanceStateCollection()
             {
                 { sbsF, tankSmallTank.MaxVolume * sbsF.GetDensityAtSTP() * 0.95f }
             };
             var tankLargeTank = tankL1.GetComponent<FResourceContainer_FlowTank>();
-            tankLargeTank.Contents = new SubstanceStateCollection() 
+            tankLargeTank.Contents = new SubstanceStateCollection()
             {
                 { sbsOX, tankLargeTank.MaxVolume * sbsOX.GetDensityAtSTP() * 0.95f }
             };

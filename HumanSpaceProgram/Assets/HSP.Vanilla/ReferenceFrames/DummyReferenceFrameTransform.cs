@@ -1,6 +1,8 @@
 ﻿using HSP.ReferenceFrames;
 using System;
 using UnityEngine;
+using UnityPlus.Serialization;
+using UnityPlus.Serialization.Descriptors;
 
 namespace HSP.Vanilla.ReferenceFrames
 {
@@ -24,65 +26,86 @@ namespace HSP.Vanilla.ReferenceFrames
             }
         }
 
-        public Vector3 Position
+        private KinematicState _cachedState;
+        private IReferenceFrame _cachedSceneReferenceFrame = null;
+        private double _cachedAtUT = -1;
+
+        public KinematicState GetState( IReferenceFrame requestedFrame )
         {
-            get => transform.position; set
-            {
-                transform.position = value;
-            }
+            RecalculateCacheIfNeeded();
+            return _cachedState.InFrame( requestedFrame );
         }
 
-        public Vector3Dbl AbsolutePosition
+        public ref readonly KinematicState GetStateRef( out IReferenceFrame referenceFrame )
         {
-            get => SceneReferenceFrameProvider.GetSceneReferenceFrame().TransformPosition( transform.position );
-            set
-            {
-                transform.position = (Vector3)SceneReferenceFrameProvider.GetSceneReferenceFrame().InverseTransformPosition( value );
-                OnAbsolutePositionChanged?.Invoke();
-                OnAnyValueChanged?.Invoke();
-            }
+            RecalculateCacheIfNeeded();
+            referenceFrame = null;
+            return ref _cachedState;
         }
 
-        public Quaternion Rotation
+        public void SetState( in KinematicState state )
         {
-            get => transform.rotation; set
-            {
-                transform.rotation = value;
-            }
+            var absoluteState = state.InFrame( null );
+            ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( SceneReferenceFrameProvider.GetSceneReferenceFrame(), transform, null, absoluteState.Position );
+            ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( SceneReferenceFrameProvider.GetSceneReferenceFrame(), transform, null, absoluteState.Rotation );
+            MakeCacheInvalid();
+            OnStateChanged?.Invoke();
         }
 
-        public QuaternionDbl AbsoluteRotation
+        public void ModifyState( IReferenceFrame requestedFrame, KinematicStateMutator mutator )
         {
-            get => SceneReferenceFrameProvider.GetSceneReferenceFrame().TransformRotation( transform.rotation );
-            set
+            RecalculateCacheIfNeeded();
+            if( requestedFrame == null )
             {
-                transform.rotation = (Quaternion)SceneReferenceFrameProvider.GetSceneReferenceFrame().InverseTransformRotation( value );
-                OnAbsoluteRotationChanged?.Invoke();
-                OnAnyValueChanged?.Invoke();
+                mutator( ref _cachedState );
             }
+            else
+            {
+                var localState = _cachedState.InFrame( requestedFrame );
+                mutator( ref localState );
+                _cachedState = localState.InFrame( null );
+            }
+            ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( SceneReferenceFrameProvider.GetSceneReferenceFrame(), transform, null, _cachedState.Position );
+            ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( SceneReferenceFrameProvider.GetSceneReferenceFrame(), transform, null, _cachedState.Rotation );
+            MakeCacheInvalid();
+            OnStateChanged?.Invoke();
         }
 
-        public Vector3 Velocity { get => Vector3.zero; set { } }
+        protected void RecalculateCacheIfNeeded()
+        {
+            if( IsCacheValid() )
+                return;
 
-        public Vector3Dbl AbsoluteVelocity { get => SceneReferenceFrameProvider.GetSceneReferenceFrame().TransformVelocity( Vector3.zero ); set { } }
+            RecalculateCache( SceneReferenceFrameProvider.GetSceneReferenceFrame() );
+            MakeCacheValid();
+        }
 
-        public Vector3 AngularVelocity { get => Vector3.zero; set { } }
+        protected void RecalculateCache( IReferenceFrame sceneFrame )
+        {
+            _cachedState = new KinematicState(
+                null,
+                sceneFrame.TransformPosition( transform.position ),
+                sceneFrame.TransformRotation( transform.rotation ),
+                sceneFrame.TransformVelocity( Vector3.zero ),
+                sceneFrame.TransformAngularVelocity( Vector3.zero ),
+                Vector3Dbl.zero,
+                Vector3Dbl.zero
+            );
+            _cachedSceneReferenceFrame = sceneFrame;
+        }
 
-        public Vector3Dbl AbsoluteAngularVelocity { get => SceneReferenceFrameProvider.GetSceneReferenceFrame().TransformAngularVelocity( Vector3.zero ); set { } }
+        protected bool IsCacheValid() => _cachedSceneReferenceFrame != null
+            && HSP.Time.TimeManager.UT == _cachedAtUT
+            && SceneReferenceFrameProvider.GetSceneReferenceFrame().EqualsIgnoreUT( _cachedSceneReferenceFrame );
 
-        public Vector3 Acceleration => Vector3.zero;
+        protected void MakeCacheValid()
+        {
+            _cachedAtUT = HSP.Time.TimeManager.UT;
+        }
 
-        public Vector3Dbl AbsoluteAcceleration => Vector3Dbl.zero;
+        protected void MakeCacheInvalid() => _cachedAtUT = -1;
 
-        public Vector3 AngularAcceleration => Vector3.zero;
-
-        public Vector3Dbl AbsoluteAngularAcceleration => Vector3Dbl.zero;
-
-        public event Action OnAbsolutePositionChanged;
-        public event Action OnAbsoluteRotationChanged;
-        public event Action OnAbsoluteVelocityChanged;
-        public event Action OnAbsoluteAngularVelocityChanged;
-        public event Action OnAnyValueChanged;
+        public event Action OnStateChanged;
 
         public void OnSceneReferenceFrameSwitch( SceneReferenceFrameManager.ReferenceFrameSwitchData data )
         {
@@ -101,6 +124,17 @@ namespace HSP.Vanilla.ReferenceFrames
         void OnDisable()
         {
             _sceneReferenceFrameProvider?.UnsubscribeIfSubscribed( this );
+        }
+
+        [MapsInheritingFrom( typeof( DummyReferenceFrameTransform ) )]
+        public static IDescriptor DummyReferenceFrameTransformMapping()
+        {
+            return new MemberwiseDescriptor<DummyReferenceFrameTransform>()
+                .WithMember( "scene_reference_frame_provider", o => o.SceneReferenceFrameProvider )
+                .WithMember( "absolute_position", o => o.GetAbsolutePosition(), ( o, v ) => o.SetAbsolutePosition( v ) )
+                .WithMember( "absolute_rotation", o => o.GetAbsoluteRotation(), ( o, v ) => o.SetAbsoluteRotation( v ) )
+                .WithMember( "absolute_velocity", o => o.GetAbsoluteVelocity(), ( o, v ) => o.SetAbsoluteVelocity( v ) )
+                .WithMember( "absolute_angular_velocity", o => o.GetAbsoluteAngularVelocity(), ( o, v ) => o.SetAbsoluteAngularVelocity( v ) );
         }
     }
 }

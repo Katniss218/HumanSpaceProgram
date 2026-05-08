@@ -1,16 +1,11 @@
 ﻿using HSP.ReferenceFrames;
-using HSP_Tests.NUnit;
 using NUnit.Framework;
-using System.Collections.Generic;
 using UnityEngine;
 
-namespace HSP_Tests_EditMode
+namespace HSP_Tests_EditMode.ReferenceFrames
 {
     public class CenteredReferenceFrameTests
     {
-        static IEqualityComparer<Vector3Dbl> vector3DblApproxComparer = new Vector3DblApproximateComparer( 1e-12 );
-        static IEqualityComparer<QuaternionDbl> quaternionDblApproxComparer = new QuaternionDblApproximateComparer( 1e-12 );
-
         [Test]
         public void Constructor___SetsCorrectValues()
         {
@@ -62,14 +57,14 @@ namespace HSP_Tests_EditMode
         public void AllTransforms___RoundTripAccuracy()
         {
             var frame = new CenteredReferenceFrame( 0.0, new Vector3Dbl( 1.0, 2.0, 3.0 ) );
-            ReferenceFrameTestHelpers.AssertRoundTripAccuracy( frame, "CenteredReferenceFrame" );
+            ReferenceFrameTestUtils.AssertRoundTripAccuracy( frame, "CenteredReferenceFrame" );
         }
 
         [Test]
         public void TimeEvolution___PreservesProperties()
         {
             var frame = new CenteredReferenceFrame( 0.0, new Vector3Dbl( 1.0, 2.0, 3.0 ) );
-            ReferenceFrameTestHelpers.AssertTimeEvolution( frame, 100.0, "CenteredReferenceFrame" );
+            ReferenceFrameTestUtils.AssertTimeEvolution( frame, 100.0, "CenteredReferenceFrame" );
         }
 
         [Test]
@@ -79,8 +74,8 @@ namespace HSP_Tests_EditMode
             var frame2 = new CenteredReferenceFrame( 0.0, new Vector3Dbl( 1.0, 2.0, 3.0 ) );
             var frame3 = new CenteredReferenceFrame( 0.0, new Vector3Dbl( 1.0, 2.0, 4.0 ) );
 
-            ReferenceFrameTestHelpers.AssertEqualityMethods( frame1, frame2, true, "CenteredReferenceFrame" );
-            ReferenceFrameTestHelpers.AssertEqualityMethods( frame1, frame3, false, "CenteredReferenceFrame" );
+            ReferenceFrameTestUtils.AssertEqualityMethods( frame1, frame2, true, "CenteredReferenceFrame" );
+            ReferenceFrameTestUtils.AssertEqualityMethods( frame1, frame3, false, "CenteredReferenceFrame" );
         }
     }
 }

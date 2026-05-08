@@ -6,10 +6,12 @@ namespace HSP.Trajectories
     {
         public static TrajectoryStateVector GetBodyState( this ITrajectoryTransform self )
         {
+            var state = self.ReferenceFrameTransform.GetState( null ); // Get state in absolute frame
+
             return new TrajectoryStateVector(
-                self.ReferenceFrameTransform.AbsolutePosition,
-                self.ReferenceFrameTransform.AbsoluteVelocity,
-                self.ReferenceFrameTransform.AbsoluteAcceleration,
+                state.Position,
+                state.Velocity,
+                state.Acceleration,
                 self.PhysicsTransform.Mass
                 );
         }

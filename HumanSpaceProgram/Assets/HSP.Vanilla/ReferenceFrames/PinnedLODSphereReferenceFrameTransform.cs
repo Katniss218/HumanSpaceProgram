@@ -1,4 +1,5 @@
 ﻿using HSP.CelestialBodies.Surfaces;
+using HSP.ReferenceFrames;
 using UnityEngine;
 using UnityPlus.Serialization;
 using UnityPlus.Serialization.Descriptors;
@@ -19,11 +20,11 @@ namespace HSP.Vanilla.ReferenceFrames
 
         protected override void FixedUpdate()
         {
-            Vector3 scenePosition = this.Position;
+            Vector3 scenePosition = this.GetPosition();
             // TODO - Potentially needs a synchronized approach to prevent flickering. Verify that this can't be fixed by better handling of float precision or fixing any potential bugs in the pinned transform.
             if( scenePosition.magnitude > MaxPosition )
             {
-                this.Position = Vector3.zero;
+                this.SetPosition( Vector3.zero );
                 LODQuad.ResetPositionAndRotationAll( _quadSphere );
             }
 

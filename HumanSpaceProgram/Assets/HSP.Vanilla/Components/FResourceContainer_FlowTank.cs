@@ -90,7 +90,7 @@ namespace HSP.Vanilla.Components
                 Transform reference = vessel.ReferenceTransform;
                 INonInertialReferenceFrame vesselFrame = vessel.ReferenceFrameTransform.NonInertialReferenceFrame();
                 Vector3Dbl localPosition = (Vector3Dbl)reference.InverseTransformPoint( this.transform.position );
-                Vector3Dbl gravityAbsolute = GravityUtils.GetNBodyGravityAcceleration( vessel.ReferenceFrameTransform.AbsolutePosition );
+                Vector3Dbl gravityAbsolute = GravityUtils.GetNBodyGravityAcceleration( vessel.ReferenceFrameTransform.GetAbsolutePosition() );
                 Vector3Dbl gravityLocal = vesselFrame.InverseTransformDirection( (Vector3)gravityAbsolute );
                 Vector3Dbl fictitiousAccel = vesselFrame.GetFicticiousAcceleration( localPosition, Vector3Dbl.zero );
                 Vector3Dbl frameAngularVelocity = -vesselFrame.InverseTransformAngularVelocity( Vector3Dbl.zero );

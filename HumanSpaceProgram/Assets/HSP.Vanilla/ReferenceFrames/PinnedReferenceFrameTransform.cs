@@ -6,7 +6,7 @@ using UnityPlus.Serialization;
 using UnityPlus.Serialization.Descriptors;
 using Ctx = UnityPlus.Serialization.Ctx;
 
-namespace HSP.Vanilla
+namespace HSP.Vanilla.ReferenceFrames
 {
     /// <remarks>
     /// A physics transform that is pinned to a fixed pos/rot in the local coordinate system of a celestial body.
@@ -40,16 +40,9 @@ namespace HSP.Vanilla
             set
             {
                 _referenceTransform = value;
-                if( value != null )
-                {
-                    MakeCacheInvalid();
-                    ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( SceneReferenceFrameProvider.GetSceneReferenceFrame(), transform, _rb, AbsolutePosition );
-                    ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( SceneReferenceFrameProvider.GetSceneReferenceFrame(), transform, _rb, AbsoluteRotation );
-                    SetPositionAndRotation();
-                    OnAbsolutePositionChanged?.Invoke();
-                    OnAbsoluteRotationChanged?.Invoke();
-                    OnAnyValueChanged?.Invoke();
-                }
+                MakeCacheInvalid();
+                SetPositionAndRotation();
+                OnStateChanged?.Invoke();
             }
         }
 
@@ -60,10 +53,8 @@ namespace HSP.Vanilla
             {
                 _referencePosition = value;
                 MakeCacheInvalid();
-                ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( SceneReferenceFrameProvider.GetSceneReferenceFrame(), transform, _rb, AbsolutePosition );
                 SetPositionAndRotation();
-                OnAbsolutePositionChanged?.Invoke();
-                OnAnyValueChanged?.Invoke();
+                OnStateChanged?.Invoke();
             }
         }
 
@@ -74,10 +65,8 @@ namespace HSP.Vanilla
             {
                 _referenceRotation = value;
                 MakeCacheInvalid();
-                ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( SceneReferenceFrameProvider.GetSceneReferenceFrame(), transform, _rb, AbsoluteRotation );
                 SetPositionAndRotation();
-                OnAbsoluteRotationChanged?.Invoke();
-                OnAnyValueChanged?.Invoke();
+                OnStateChanged?.Invoke();
             }
         }
 
@@ -87,134 +76,99 @@ namespace HSP.Vanilla
             _referencePosition = referencePosition;
             _referenceRotation = referenceRotation;
             MakeCacheInvalid();
-            ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( SceneReferenceFrameProvider.GetSceneReferenceFrame(), transform, _rb, AbsolutePosition );
-            ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( SceneReferenceFrameProvider.GetSceneReferenceFrame(), transform, _rb, AbsoluteRotation );
-            OnAbsolutePositionChanged?.Invoke();
-            OnAbsoluteRotationChanged?.Invoke();
-            OnAnyValueChanged?.Invoke();
+            SetPositionAndRotation();
+            OnStateChanged?.Invoke();
         }
 
 
-        public Vector3 Position
+        private KinematicState _state = KinematicState.GetIdentity();
+
+        public KinematicState GetState( IReferenceFrame requestedFrame )
         {
-            get
-            {
-                return _rb.position; // rb.position should be correct, since it's updated during unityphysics step
-            }
-            set
-            {
-                Vector3Dbl absolutePosition = SceneReferenceFrameProvider.GetSceneReferenceFrame().TransformPosition( value );
-                ReferencePosition = _referenceTransform.OrientedReferenceFrame().InverseTransformPosition( absolutePosition );
-            }
+            RecalculateCacheIfNeeded();
+            return _state.InFrame( requestedFrame );
         }
 
-        public Vector3Dbl AbsolutePosition
+        public ref readonly KinematicState GetStateRef( out IReferenceFrame referenceFrame )
         {
-            get
-            {
-                RecalculateCacheIfNeeded();
-                return _cachedAbsolutePosition;
-            }
-            set
-            {
-                ReferencePosition = _referenceTransform.OrientedReferenceFrame().InverseTransformPosition( value );
-            }
+            RecalculateCacheIfNeeded();
+            referenceFrame = null;
+            return ref _state;
         }
 
-        public Quaternion Rotation
+        public void SetState( in KinematicState state )
         {
-            get
-            {
-                return _rb.rotation; // rb.rotation should be correct, since it's updated during unityphysics step
-            }
-            set
-            {
-                QuaternionDbl absoluteRotation = SceneReferenceFrameProvider.GetSceneReferenceFrame().TransformRotation( value );
-                ReferenceRotation = _referenceTransform.OrientedReferenceFrame().InverseTransformRotation( absoluteRotation );
-            }
+            _state = state.InFrame( null );
+            ReferencePosition = _referenceTransform == null ? _state.Position : _referenceTransform.OrientedReferenceFrame().InverseTransformPosition( _state.Position );
+            ReferenceRotation = _referenceTransform == null ? _state.Rotation : _referenceTransform.OrientedReferenceFrame().InverseTransformRotation( _state.Rotation );
+            MakeCacheValid();
+            OnStateChanged?.Invoke();
         }
 
-        public QuaternionDbl AbsoluteRotation
+        public void ModifyState( IReferenceFrame requestedFrame, KinematicStateMutator mutator )
         {
-            get
+            RecalculateCacheIfNeeded();
+            if( requestedFrame == null )
             {
-                RecalculateCacheIfNeeded();
-                return _cachedAbsoluteRotation;
+                mutator( ref _state );
             }
-            set
+            else
             {
-                ReferenceRotation = _referenceTransform.OrientedReferenceFrame().InverseTransformRotation( value );
+                var localState = _state.InFrame( requestedFrame );
+                mutator( ref localState );
+                _state = localState.InFrame( null );
             }
+            ReferencePosition = _referenceTransform == null ? _state.Position : _referenceTransform.OrientedReferenceFrame().InverseTransformPosition( _state.Position );
+            ReferenceRotation = _referenceTransform == null ? _state.Rotation : _referenceTransform.OrientedReferenceFrame().InverseTransformRotation( _state.Rotation );
+            MakeCacheValid();
+            OnStateChanged?.Invoke();
         }
 
-
-        public Vector3 Velocity
+        protected void RecalculateCacheIfNeeded()
         {
-            get
-            {
-                RecalculateCacheIfNeeded();
-                return _cachedVelocity;
-            }
-            set { }
+            if( IsCacheValid() )
+                return;
+
+            RecalculateCache( SceneReferenceFrameProvider.GetSceneReferenceFrame() );
+            MakeCacheValid();
         }
 
-        public Vector3Dbl AbsoluteVelocity
+        protected void RecalculateCache( IReferenceFrame sceneReferenceFrame )
         {
-            get
+            IReferenceFrame bodyFrame = _referenceTransform == null
+                ? new CenteredReferenceFrame( TimeManager.UT, Vector3Dbl.zero )
+                : _referenceTransform.NonInertialReferenceFrame(); // Needs to be a non-inertial frame to have angular velocity.
+
+            _state.Position = bodyFrame.TransformPosition( _referencePosition );
+            _state.Rotation = bodyFrame.TransformRotation( _referenceRotation );
+            _state.Velocity = bodyFrame.TransformVelocity( Vector3Dbl.zero );
+            _state.AngularVelocity = bodyFrame.TransformAngularVelocity( Vector3Dbl.zero );
+
+            if( bodyFrame is INonInertialReferenceFrame nirf )
             {
-                RecalculateCacheIfNeeded();
-                return _cachedAbsoluteVelocity;
+                _state.Velocity += nirf.GetTangentialVelocity( _referencePosition );
             }
-            set { }
+
+            _state.Acceleration = bodyFrame.TransformAcceleration( Vector3Dbl.zero );
+            _state.AngularAcceleration = bodyFrame.TransformAngularAcceleration( Vector3Dbl.zero );
+            _cachedSceneReferenceFrame = sceneReferenceFrame;
         }
 
-        public Vector3 AngularVelocity
-        {
-            get
-            {
-                RecalculateCacheIfNeeded();
-                return _cachedAngularVelocity;
-            }
-            set { }
-        }
-
-        public Vector3Dbl AbsoluteAngularVelocity
-        {
-            get
-            {
-                RecalculateCacheIfNeeded();
-                return _cachedAbsoluteAngularVelocity;
-            }
-            set { }
-        }
-
-        public Vector3 Acceleration => _cachedAcceleration;
-        public Vector3Dbl AbsoluteAcceleration => _cachedAbsoluteAcceleration;
-        public Vector3 AngularAcceleration => _cachedAngularAcceleration;
-        public Vector3Dbl AbsoluteAngularAcceleration => _cachedAbsoluteAngularAcceleration;
-
-        /// <summary> The scene frame in which the cached values are expressed. </summary>
         IReferenceFrame _cachedSceneReferenceFrame;
-        IReferenceFrame _cachedBodyReferenceFrame;
-        Vector3Dbl _cachedAbsolutePosition;
-        QuaternionDbl _cachedAbsoluteRotation = QuaternionDbl.identity;
-        Vector3 _cachedVelocity;
-        Vector3Dbl _cachedAbsoluteVelocity;
-        Vector3 _cachedAngularVelocity;
-        Vector3Dbl _cachedAbsoluteAngularVelocity;
-        Vector3 _cachedAcceleration;
-        Vector3Dbl _cachedAbsoluteAcceleration;
-        Vector3 _cachedAngularAcceleration;
-        Vector3Dbl _cachedAbsoluteAngularAcceleration;
+        double _lastCachedUT = -1;
 
-        Vector3Dbl _absoluteAccelerationSum = Vector3.zero;
-        Vector3Dbl _absoluteAngularAccelerationSum = Vector3.zero;
+        protected virtual bool IsCacheValid() => _cachedSceneReferenceFrame != null
+            && TimeManager.UT == _lastCachedUT
+            && SceneReferenceFrameProvider.GetSceneReferenceFrame().EqualsIgnoreUT( _cachedSceneReferenceFrame );
 
-        public event Action OnAbsolutePositionChanged;
-        public event Action OnAbsoluteRotationChanged;
-        public event Action OnAbsoluteVelocityChanged;
-        public event Action OnAbsoluteAngularVelocityChanged;
-        public event Action OnAnyValueChanged;
+        protected virtual void MakeCacheValid()
+        {
+            _lastCachedUT = TimeManager.UT;
+        }
+
+        protected virtual void MakeCacheInvalid() => _lastCachedUT = -1;
+
+        public event Action OnStateChanged;
 
         //
 
@@ -301,50 +255,6 @@ namespace HSP.Vanilla
             _rb.rotation = rot;
             transform.rotation = rot;
         }
-
-        private void RecalculateCacheIfNeeded()
-        {
-            if( IsCacheValid() )
-                return;
-
-            RecalculateCache( SceneReferenceFrameProvider.GetSceneReferenceFrame() );
-        }
-
-        private void RecalculateCache( IReferenceFrame sceneReferenceFrame )
-        {
-            IReferenceFrame bodyFrame = _referenceTransform == null
-                ? new CenteredReferenceFrame( TimeManager.UT, Vector3Dbl.zero )
-                : _referenceTransform.NonInertialReferenceFrame(); // Needs to be a non-inertial frame to have angular velocity.
-
-            _cachedAbsolutePosition = bodyFrame.TransformPosition( _referencePosition );
-            _cachedAbsoluteRotation = bodyFrame.TransformRotation( _referenceRotation );
-            _cachedAbsoluteVelocity = bodyFrame.TransformVelocity( Vector3Dbl.zero );
-            _cachedAbsoluteAngularVelocity = bodyFrame.TransformAngularVelocity( Vector3Dbl.zero );
-
-            if( bodyFrame is INonInertialReferenceFrame nirf )
-            {
-                _cachedAbsoluteVelocity += nirf.GetTangentialVelocity( _referencePosition );
-            }
-
-            _cachedVelocity = (Vector3)sceneReferenceFrame.InverseTransformVelocity( _cachedAbsoluteVelocity );
-            _cachedAngularVelocity = (Vector3)sceneReferenceFrame.InverseTransformAngularVelocity( _cachedAbsoluteAngularVelocity );
-
-            _cachedAbsoluteAcceleration = bodyFrame.TransformAcceleration( Vector3Dbl.zero );
-            _cachedAbsoluteAngularAcceleration = bodyFrame.TransformAngularAcceleration( Vector3Dbl.zero );
-            _cachedAcceleration = (Vector3)sceneReferenceFrame.InverseTransformAcceleration( _cachedAbsoluteAcceleration );
-            _cachedAngularAcceleration = (Vector3)sceneReferenceFrame.InverseTransformAngularAcceleration( _cachedAbsoluteAngularAcceleration );
-            _cachedSceneReferenceFrame = sceneReferenceFrame;
-            _cachedBodyReferenceFrame = bodyFrame;
-        }
-
-        // Exact comparison of the axes catches the most cases (and it's gonna be set to match exactly so it's okay)
-        // Vector3's `==` operator does approximate comparison.
-        private bool IsCacheValid() => false;// SceneReferenceFrameManager.ReferenceFrame.EqualsIgnoreUT( _cachedSceneReferenceFrame )
-                                             // && _referenceBody.OrientedInertialReferenceFrame.EqualsIgnoreUT( _cachedBodyReferenceFrame );
-
-        //private void MakeCacheValid() => ; cache validates itself when the frames are set
-
-        private void MakeCacheInvalid() => _cachedBodyReferenceFrame = null;
 
         protected virtual void Awake()
         {

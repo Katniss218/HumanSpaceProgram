@@ -3,6 +3,8 @@ using UnityEngine;
 
 namespace HSP.ReferenceFrames
 {
+    public delegate void KinematicStateMutator( ref KinematicState state );
+
     public interface IReferenceFrameTransform : IComponent, IReferenceFrameSwitchResponder
     {
         /// <summary>
@@ -11,78 +13,31 @@ namespace HSP.ReferenceFrames
         ISceneReferenceFrameProvider SceneReferenceFrameProvider { get; set; }
 
         /// <summary>
-        /// Gets or sets the *scene space* position.
+        /// Gets the current state measured in the requested reference frame.
         /// </summary>
-        Vector3 Position { get; set; }
-        /// <summary>
-        /// Gets or sets the position.
-        /// </summary>
-        Vector3Dbl AbsolutePosition { get; set; }
+        KinematicState GetState( IReferenceFrame requestedFrame );
 
         /// <summary>
-        /// Gets or sets the *scene space* rotation.
+        /// Returns direct read-only access to the internal state (measured in the returned reference frame).
+        /// This avoids a struct copy (160 bytes) and is preferred for performance-critical logic.
         /// </summary>
-        Quaternion Rotation { get; set; }
-        /// <summary>
-        /// Gets or sets the rotation.
-        /// </summary>
-        QuaternionDbl AbsoluteRotation { get; set; }
+        ref readonly KinematicState GetStateRef( out IReferenceFrame referenceFrame );
 
         /// <summary>
-        /// Gets or sets the *scene space* velocity, in [m/s].
+        /// Sets the current state to the specified value.
         /// </summary>
-        Vector3 Velocity { get; set; }
-        /// <summary>
-        /// Gets or sets the velocity, in [m/s].
-        /// </summary>
-        Vector3Dbl AbsoluteVelocity { get; set; }
+        void SetState( in KinematicState state );
 
         /// <summary>
-        /// Gets or sets the *scene-space* angular velocity, in [Rad/s].
+        /// Modifies the current state in-place using a mutator function, expressed in the requested reference frame.
         /// </summary>
-        Vector3 AngularVelocity { get; set; }
-        /// <summary>
-        /// Gets or sets the angular velocity, in [Rad/s].
-        /// </summary>
-        Vector3Dbl AbsoluteAngularVelocity { get; set; }
+        /// <param name="mutator">A function that takes a reference to the current state and modifies it.</param>
+        /// <param name="referenceFrame">The reference frame in which the mutator function will express the state.</param>
+        void ModifyState( IReferenceFrame referenceFrame, KinematicStateMutator mutator );
 
         /// <summary>
-        /// Gets the *scene-space* acceleration at this instant, in [m/s^2].
+        /// Invoked when the state is set or modified.
         /// </summary>
-        Vector3 Acceleration { get; }
-        /// <summary>
-        /// Gets the acceleration at this instant, in [m/s^2].
-        /// </summary>
-        Vector3Dbl AbsoluteAcceleration { get; }
-
-        /// <summary>
-        /// Gets the *scene-space* angular acceleration at this instant, in [Rad/s^2].
-        /// </summary>
-        Vector3 AngularAcceleration { get; }
-        /// <summary>
-        /// Gets the angular acceleration at this instant, in [Rad/s^2].
-        /// </summary>
-        Vector3Dbl AbsoluteAngularAcceleration { get; }
-
-        /// <summary>
-        /// Invoked when the absolute position property is set.
-        /// </summary>
-        event Action OnAbsolutePositionChanged;
-        /// <summary>
-        /// Invoked when the absolute rotation is set.
-        /// </summary>
-        event Action OnAbsoluteRotationChanged;
-        /// <summary>
-        /// Invoked when the absolute velocity is set.
-        /// </summary>
-        event Action OnAbsoluteVelocityChanged;
-        /// <summary>
-        /// Invoked when the absolute angular velocity is set.
-        /// </summary>
-        event Action OnAbsoluteAngularVelocityChanged;
-        /// <summary>
-        /// Invoked when any of the primary values (pos/rot/vel/angvel) are set.
-        /// </summary>
-        event Action OnAnyValueChanged;
+        event Action OnStateChanged;
     }
 }

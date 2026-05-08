@@ -5,66 +5,81 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.TestTools;
 
-namespace HSP_Tests_PlayMode
+namespace HSP_Tests_PlayMode.ReferenceFrames
 {
+    public class MockReferenceFrameTransform : IReferenceFrameTransform
+    {
+        public ISceneReferenceFrameProvider SceneReferenceFrameProvider { get; set; }
+
+        private KinematicState _state = KinematicState.GetIdentity();
+
+        public KinematicState GetState( IReferenceFrame requestedFrame )
+        {
+            return _state.InFrame( requestedFrame );
+        }
+
+        public ref readonly KinematicState GetStateRef( out IReferenceFrame referenceFrame )
+        {
+            referenceFrame = null;
+            return ref _state;
+        }
+
+        public void SetState( in KinematicState state )
+        {
+            _state = state.InFrame( null );
+            OnStateChanged?.Invoke();
+        }
+
+        public void ModifyState( IReferenceFrame requestedFrame, KinematicStateMutator mutator )
+        {
+            if( requestedFrame == null )
+            {
+                mutator( ref _state );
+            }
+            else
+            {
+                var localState = _state.InFrame( requestedFrame );
+                mutator( ref localState );
+                _state = localState.InFrame( null );
+            }
+            OnStateChanged?.Invoke();
+        }
+
+        public Transform transform => null;
+        public GameObject gameObject => null;
+
+        public event Action OnStateChanged;
+
+        public void OnSceneReferenceFrameSwitch( SceneReferenceFrameManager.ReferenceFrameSwitchData data )
+        {
+        }
+    }
+
+    public class MockSceneReferenceFrameProvider : ISceneReferenceFrameProvider
+    {
+        public IReferenceFrame SceneReferenceFrame { get; set; }
+
+        public IReferenceFrame GetSceneReferenceFrame()
+        {
+            return SceneReferenceFrame;
+        }
+
+        public void SubscribeIfNotSubscribed( IReferenceFrameSwitchResponder responder )
+        {
+            // Mock implementation - do nothing
+        }
+
+        public void UnsubscribeIfSubscribed( IReferenceFrameSwitchResponder responder )
+        {
+            // Mock implementation - do nothing
+        }
+    }
+
     public class IReferenceFrameTransform_ExTests
     {
         private static IEqualityComparer<Vector3Dbl> vector3DblApproxComparer = new Vector3DblApproximateComparer( 0.0001 );
         private static IEqualityComparer<QuaternionDbl> quaternionDblApproxComparer = new QuaternionDblApproximateComparer( 0.0001 );
-
-        private class MockReferenceFrameTransform : IReferenceFrameTransform
-        {
-            public ISceneReferenceFrameProvider SceneReferenceFrameProvider { get; set; }
-            public Vector3 Position { get; set; }
-            public Vector3Dbl AbsolutePosition { get; set; }
-            public Quaternion Rotation { get; set; }
-            public QuaternionDbl AbsoluteRotation { get; set; }
-            public Vector3 Velocity { get; set; }
-            public Vector3Dbl AbsoluteVelocity { get; set; }
-            public Vector3 AngularVelocity { get; set; }
-            public Vector3Dbl AbsoluteAngularVelocity { get; set; }
-            public Vector3 Acceleration { get; set; }
-            public Vector3Dbl AbsoluteAcceleration { get; set; }
-            public Vector3 AngularAcceleration { get; set; }
-            public Vector3Dbl AbsoluteAngularAcceleration { get; set; }
-
-            public Transform transform => throw new NotImplementedException();
-
-            public GameObject gameObject => throw new NotImplementedException();
-
-            public event Action OnAbsolutePositionChanged;
-            public event Action OnAbsoluteRotationChanged;
-            public event Action OnAbsoluteVelocityChanged;
-            public event Action OnAbsoluteAngularVelocityChanged;
-            public event Action OnAnyValueChanged;
-
-            public void OnSceneReferenceFrameSwitch( SceneReferenceFrameManager.ReferenceFrameSwitchData data )
-            {
-                // Mock implementation - do nothing
-            }
-        }
-
-        private class MockSceneReferenceFrameProvider : ISceneReferenceFrameProvider
-        {
-            public IReferenceFrame SceneReferenceFrame { get; set; }
-
-            public IReferenceFrame GetSceneReferenceFrame()
-            {
-                return SceneReferenceFrame;
-            }
-
-            public void SubscribeIfNotSubscribed( IReferenceFrameSwitchResponder responder )
-            {
-                // Mock implementation - do nothing
-            }
-
-            public void UnsubscribeIfSubscribed( IReferenceFrameSwitchResponder responder )
-            {
-                // Mock implementation - do nothing
-            }
-        }
 
         [SetUp]
         public void Setup()
@@ -81,7 +96,7 @@ namespace HSP_Tests_PlayMode
 
             var mockTransform = new MockReferenceFrameTransform();
             mockTransform.SceneReferenceFrameProvider = mockProvider;
-            mockTransform.AbsolutePosition = new Vector3Dbl( 100, 200, 300 );
+            mockTransform.SetAbsolutePosition( new Vector3Dbl( 100, 200, 300 ) );
 
             // Act
             IReferenceFrame result = mockTransform.CenteredReferenceFrame();
@@ -89,7 +104,7 @@ namespace HSP_Tests_PlayMode
             // Assert
             Assert.That( result, Is.InstanceOf<CenteredReferenceFrame>() );
             Assert.That( result.ReferenceUT, Is.EqualTo( TimeManager.UT ) );
-            Assert.That( result.TransformPosition( Vector3Dbl.zero ), Is.EqualTo( mockTransform.AbsolutePosition ).Using( vector3DblApproxComparer ) );
+            Assert.That( result.TransformPosition( Vector3Dbl.zero ), Is.EqualTo( mockTransform.GetAbsolutePosition() ).Using( vector3DblApproxComparer ) );
         }
 
         [Test]
@@ -101,8 +116,8 @@ namespace HSP_Tests_PlayMode
 
             var mockTransform = new MockReferenceFrameTransform();
             mockTransform.SceneReferenceFrameProvider = mockProvider;
-            mockTransform.AbsolutePosition = new Vector3Dbl( 100, 200, 300 );
-            mockTransform.AbsoluteVelocity = new Vector3Dbl( 10, 20, 30 );
+            mockTransform.SetAbsolutePosition( new Vector3Dbl( 100, 200, 300 ) );
+            mockTransform.SetAbsoluteVelocity( new Vector3Dbl( 10, 20, 30 ) );
 
             // Act
             IReferenceFrame result = mockTransform.CenteredInertialReferenceFrame();
@@ -110,8 +125,8 @@ namespace HSP_Tests_PlayMode
             // Assert
             Assert.That( result, Is.InstanceOf<CenteredInertialReferenceFrame>() );
             Assert.That( result.ReferenceUT, Is.EqualTo( TimeManager.UT ) );
-            Assert.That( result.TransformPosition( Vector3Dbl.zero ), Is.EqualTo( mockTransform.AbsolutePosition ).Using( vector3DblApproxComparer ) );
-            Assert.That( result.TransformVelocity( Vector3Dbl.zero ), Is.EqualTo( mockTransform.AbsoluteVelocity ).Using( vector3DblApproxComparer ) );
+            Assert.That( result.TransformPosition( Vector3Dbl.zero ), Is.EqualTo( mockTransform.GetAbsolutePosition() ).Using( vector3DblApproxComparer ) );
+            Assert.That( result.TransformVelocity( Vector3Dbl.zero ), Is.EqualTo( mockTransform.GetAbsoluteVelocity() ).Using( vector3DblApproxComparer ) );
         }
 
         [Test]
@@ -123,8 +138,8 @@ namespace HSP_Tests_PlayMode
 
             var mockTransform = new MockReferenceFrameTransform();
             mockTransform.SceneReferenceFrameProvider = mockProvider;
-            mockTransform.AbsolutePosition = new Vector3Dbl( 100, 200, 300 );
-            mockTransform.AbsoluteRotation = QuaternionDbl.Euler( 45, 90, 135 );
+            mockTransform.SetAbsolutePosition( new Vector3Dbl( 100, 200, 300 ) );
+            mockTransform.SetAbsoluteRotation( QuaternionDbl.Euler( 45, 90, 135 ) );
 
             // Act
             IReferenceFrame result = mockTransform.OrientedReferenceFrame();
@@ -132,8 +147,8 @@ namespace HSP_Tests_PlayMode
             // Assert
             Assert.That( result, Is.InstanceOf<OrientedReferenceFrame>() );
             Assert.That( result.ReferenceUT, Is.EqualTo( TimeManager.UT ) );
-            Assert.That( result.TransformPosition( Vector3Dbl.zero ), Is.EqualTo( mockTransform.AbsolutePosition ).Using( vector3DblApproxComparer ) );
-            Assert.That( result.TransformRotation( QuaternionDbl.identity ), Is.EqualTo( mockTransform.AbsoluteRotation ).Using( quaternionDblApproxComparer ) );
+            Assert.That( result.TransformPosition( Vector3Dbl.zero ), Is.EqualTo( mockTransform.GetAbsolutePosition() ).Using( vector3DblApproxComparer ) );
+            Assert.That( result.TransformRotation( QuaternionDbl.identity ), Is.EqualTo( mockTransform.GetAbsoluteRotation() ).Using( quaternionDblApproxComparer ) );
         }
 
         [Test]
@@ -145,9 +160,9 @@ namespace HSP_Tests_PlayMode
 
             var mockTransform = new MockReferenceFrameTransform();
             mockTransform.SceneReferenceFrameProvider = mockProvider;
-            mockTransform.AbsolutePosition = new Vector3Dbl( 100, 200, 300 );
-            mockTransform.AbsoluteRotation = QuaternionDbl.Euler( 45, 90, 135 );
-            mockTransform.AbsoluteVelocity = new Vector3Dbl( 10, 20, 30 );
+            mockTransform.SetAbsolutePosition( new Vector3Dbl( 100, 200, 300 ) );
+            mockTransform.SetAbsoluteRotation( QuaternionDbl.Euler( 45, 90, 135 ) );
+            mockTransform.SetAbsoluteVelocity( new Vector3Dbl( 10, 20, 30 ) );
 
             // Act
             IReferenceFrame result = mockTransform.OrientedInertialReferenceFrame();
@@ -155,9 +170,9 @@ namespace HSP_Tests_PlayMode
             // Assert
             Assert.That( result, Is.InstanceOf<OrientedInertialReferenceFrame>() );
             Assert.That( result.ReferenceUT, Is.EqualTo( TimeManager.UT ) );
-            Assert.That( result.TransformPosition( Vector3Dbl.zero ), Is.EqualTo( mockTransform.AbsolutePosition ).Using( vector3DblApproxComparer ) );
-            Assert.That( result.TransformRotation( QuaternionDbl.identity ), Is.EqualTo( mockTransform.AbsoluteRotation ).Using( quaternionDblApproxComparer ) );
-            Assert.That( result.TransformVelocity( Vector3Dbl.zero ), Is.EqualTo( mockTransform.AbsoluteVelocity ).Using( vector3DblApproxComparer ) );
+            Assert.That( result.TransformPosition( Vector3Dbl.zero ), Is.EqualTo( mockTransform.GetAbsolutePosition() ).Using( vector3DblApproxComparer ) );
+            Assert.That( result.TransformRotation( QuaternionDbl.identity ), Is.EqualTo( mockTransform.GetAbsoluteRotation() ).Using( quaternionDblApproxComparer ) );
+            Assert.That( result.TransformVelocity( Vector3Dbl.zero ), Is.EqualTo( mockTransform.GetAbsoluteVelocity() ).Using( vector3DblApproxComparer ) );
         }
 
         [Test]
@@ -169,12 +184,12 @@ namespace HSP_Tests_PlayMode
 
             var mockTransform = new MockReferenceFrameTransform();
             mockTransform.SceneReferenceFrameProvider = mockProvider;
-            mockTransform.AbsolutePosition = new Vector3Dbl( 100, 200, 300 );
-            mockTransform.AbsoluteRotation = QuaternionDbl.Euler( 45, 90, 135 );
-            mockTransform.AbsoluteVelocity = new Vector3Dbl( 10, 20, 30 );
-            mockTransform.AbsoluteAngularVelocity = new Vector3Dbl( 1, 2, 3 );
-            mockTransform.AbsoluteAcceleration = new Vector3Dbl( 5, 10, 15 );
-            mockTransform.AbsoluteAngularAcceleration = new Vector3Dbl( 0.5, 1.0, 1.5 );
+            mockTransform.SetAbsolutePosition( new Vector3Dbl( 100, 200, 300 ) );
+            mockTransform.SetAbsoluteRotation( QuaternionDbl.Euler( 45, 90, 135 ) );
+            mockTransform.SetAbsoluteVelocity( new Vector3Dbl( 10, 20, 30 ) );
+            mockTransform.SetAbsoluteAngularVelocity( new Vector3Dbl( 1, 2, 3 ) );
+            mockTransform.SetAbsoluteAcceleration( new Vector3Dbl( 5, 10, 15 ) );
+            mockTransform.SetAbsoluteAngularAcceleration( new Vector3Dbl( 0.5, 1.0, 1.5 ) );
 
             // Act
             INonInertialReferenceFrame result = mockTransform.NonInertialReferenceFrame();
@@ -182,12 +197,12 @@ namespace HSP_Tests_PlayMode
             // Assert
             Assert.That( result, Is.InstanceOf<OrientedNonInertialReferenceFrame>() );
             Assert.That( result.ReferenceUT, Is.EqualTo( TimeManager.UT ) );
-            Assert.That( result.TransformPosition( Vector3Dbl.zero ), Is.EqualTo( mockTransform.AbsolutePosition ).Using( vector3DblApproxComparer ) );
-            Assert.That( result.TransformRotation( QuaternionDbl.identity ), Is.EqualTo( mockTransform.AbsoluteRotation ).Using( quaternionDblApproxComparer ) );
-            Assert.That( result.TransformVelocity( Vector3Dbl.zero ), Is.EqualTo( mockTransform.AbsoluteVelocity ).Using( vector3DblApproxComparer ) );
-            Assert.That( result.TransformAngularVelocity( Vector3Dbl.zero ), Is.EqualTo( mockTransform.AbsoluteAngularVelocity ).Using( vector3DblApproxComparer ) );
-            Assert.That( result.TransformAcceleration( Vector3Dbl.zero ), Is.EqualTo( mockTransform.AbsoluteAcceleration ).Using( vector3DblApproxComparer ) );
-            Assert.That( result.TransformAngularAcceleration( Vector3Dbl.zero ), Is.EqualTo( mockTransform.AbsoluteAngularAcceleration ).Using( vector3DblApproxComparer ) );
+            Assert.That( result.TransformPosition( Vector3Dbl.zero ), Is.EqualTo( mockTransform.GetAbsolutePosition() ).Using( vector3DblApproxComparer ) );
+            Assert.That( result.TransformRotation( QuaternionDbl.identity ), Is.EqualTo( mockTransform.GetAbsoluteRotation() ).Using( quaternionDblApproxComparer ) );
+            Assert.That( result.TransformVelocity( Vector3Dbl.zero ), Is.EqualTo( mockTransform.GetAbsoluteVelocity() ).Using( vector3DblApproxComparer ) );
+            Assert.That( result.TransformAngularVelocity( Vector3Dbl.zero ), Is.EqualTo( mockTransform.GetAbsoluteAngularVelocity() ).Using( vector3DblApproxComparer ) );
+            Assert.That( result.TransformAcceleration( Vector3Dbl.zero ), Is.EqualTo( mockTransform.GetAbsoluteAcceleration() ).Using( vector3DblApproxComparer ) );
+            Assert.That( result.TransformAngularAcceleration( Vector3Dbl.zero ), Is.EqualTo( mockTransform.GetAbsoluteAngularAcceleration() ).Using( vector3DblApproxComparer ) );
         }
 
         [Test]
@@ -200,7 +215,7 @@ namespace HSP_Tests_PlayMode
 
             var mockTransform = new MockReferenceFrameTransform();
             mockTransform.SceneReferenceFrameProvider = mockProvider;
-            mockTransform.AbsolutePosition = new Vector3Dbl( 100, 200, 300 );
+            mockTransform.SetAbsolutePosition( new Vector3Dbl( 100, 200, 300 ) );
 
             // Act
             IReferenceFrame result = mockTransform.CenteredReferenceFrame();
@@ -218,8 +233,8 @@ namespace HSP_Tests_PlayMode
 
             var mockTransform = new MockReferenceFrameTransform();
             mockTransform.SceneReferenceFrameProvider = mockProvider;
-            mockTransform.AbsolutePosition = new Vector3Dbl( 100, 200, 300 );
-            mockTransform.AbsoluteVelocity = Vector3Dbl.zero;
+            mockTransform.SetAbsolutePosition( new Vector3Dbl( 100, 200, 300 ) );
+            mockTransform.SetAbsoluteVelocity( Vector3Dbl.zero );
 
             // Act
             IReferenceFrame result = mockTransform.CenteredInertialReferenceFrame();
@@ -238,8 +253,8 @@ namespace HSP_Tests_PlayMode
 
             var mockTransform = new MockReferenceFrameTransform();
             mockTransform.SceneReferenceFrameProvider = mockProvider;
-            mockTransform.AbsolutePosition = new Vector3Dbl( 100, 200, 300 );
-            mockTransform.AbsoluteRotation = QuaternionDbl.identity;
+            mockTransform.SetAbsolutePosition( new Vector3Dbl( 100, 200, 300 ) );
+            mockTransform.SetAbsoluteRotation( QuaternionDbl.identity );
 
             // Act
             IReferenceFrame result = mockTransform.OrientedReferenceFrame();
@@ -258,18 +273,18 @@ namespace HSP_Tests_PlayMode
 
             var mockTransform = new MockReferenceFrameTransform();
             mockTransform.SceneReferenceFrameProvider = mockProvider;
-            mockTransform.AbsolutePosition = new Vector3Dbl( -100, 0, 500 );
-            mockTransform.AbsoluteRotation = QuaternionDbl.Euler( 180, 270, 45 );
-            mockTransform.AbsoluteVelocity = new Vector3Dbl( -5, 10, -15 );
+            mockTransform.SetAbsolutePosition( new Vector3Dbl( -100, 0, 500 ) );
+            mockTransform.SetAbsoluteRotation( QuaternionDbl.Euler( 180, 270, 45 ) );
+            mockTransform.SetAbsoluteVelocity( new Vector3Dbl( -5, 10, -15 ) );
 
             // Act
             IReferenceFrame result = mockTransform.OrientedInertialReferenceFrame();
 
             // Assert
             Assert.That( result, Is.InstanceOf<OrientedInertialReferenceFrame>() );
-            Assert.That( result.TransformPosition( Vector3Dbl.zero ), Is.EqualTo( mockTransform.AbsolutePosition ).Using( vector3DblApproxComparer ) );
-            Assert.That( result.TransformRotation( QuaternionDbl.identity ), Is.EqualTo( mockTransform.AbsoluteRotation ).Using( quaternionDblApproxComparer ) );
-            Assert.That( result.TransformVelocity( Vector3Dbl.zero ), Is.EqualTo( mockTransform.AbsoluteVelocity ).Using( vector3DblApproxComparer ) );
+            Assert.That( result.TransformPosition( Vector3Dbl.zero ), Is.EqualTo( mockTransform.GetAbsolutePosition() ).Using( vector3DblApproxComparer ) );
+            Assert.That( result.TransformRotation( QuaternionDbl.identity ), Is.EqualTo( mockTransform.GetAbsoluteRotation() ).Using( quaternionDblApproxComparer ) );
+            Assert.That( result.TransformVelocity( Vector3Dbl.zero ), Is.EqualTo( mockTransform.GetAbsoluteVelocity() ).Using( vector3DblApproxComparer ) );
         }
 
         [Test]
@@ -281,12 +296,12 @@ namespace HSP_Tests_PlayMode
 
             var mockTransform = new MockReferenceFrameTransform();
             mockTransform.SceneReferenceFrameProvider = mockProvider;
-            mockTransform.AbsolutePosition = new Vector3Dbl( 100, 200, 300 );
-            mockTransform.AbsoluteRotation = QuaternionDbl.Euler( 45, 90, 135 );
-            mockTransform.AbsoluteVelocity = new Vector3Dbl( 10, 20, 30 );
-            mockTransform.AbsoluteAngularVelocity = new Vector3Dbl( 1, 2, 3 );
-            mockTransform.AbsoluteAcceleration = Vector3Dbl.zero;
-            mockTransform.AbsoluteAngularAcceleration = Vector3Dbl.zero;
+            mockTransform.SetAbsolutePosition( new Vector3Dbl( 100, 200, 300 ) );
+            mockTransform.SetAbsoluteRotation( QuaternionDbl.Euler( 45, 90, 135 ) );
+            mockTransform.SetAbsoluteVelocity( new Vector3Dbl( 10, 20, 30 ) );
+            mockTransform.SetAbsoluteAngularVelocity( new Vector3Dbl( 1, 2, 3 ) );
+            mockTransform.SetAbsoluteAcceleration( Vector3Dbl.zero );
+            mockTransform.SetAbsoluteAngularAcceleration( Vector3Dbl.zero );
 
             // Act
             INonInertialReferenceFrame result = mockTransform.NonInertialReferenceFrame();

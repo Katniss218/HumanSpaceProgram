@@ -15,9 +15,10 @@ namespace HSP.Vanilla.Scenes.AlwaysLoadedScene
         public const string ADD_SCREENSHOT_MANAGER = HSPEvent.NAMESPACE_HSP + ".add_screenshot_manager";
         public const string ADD_AUDIO_EFFECT_MANAGER = HSPEvent.NAMESPACE_HSP + ".add_audio_effect_manager";
         public const string ADD_PARTICLE_EFFECT_MANAGER = HSPEvent.NAMESPACE_HSP + ".add_particle_effect_manager";
+        public const string INITIALIZE_PLAYER_LOOP_MANAGER = HSPEvent.NAMESPACE_HSP + ".bc60724a-ed22-492d-b7e4-c7e76c37cd2c";
         public const string LOAD_MAIN_MENU = HSPEvent.NAMESPACE_HSP + ".load_main_menu";
 
-        [HSPEventListener( HSPEvent_STARTUP_IMMEDIATELY.ID, "bc60724a-ed22-492d-b7e4-c7e76c37cd2c" )]
+        [HSPEventListener( HSPEvent_STARTUP_IMMEDIATELY.ID, INITIALIZE_PLAYER_LOOP_MANAGER )]
         private static void InitializePlayerLoopManager()
         {
             PlayerLoopManager.Initialize( BucketHandling.IncludeThrow );

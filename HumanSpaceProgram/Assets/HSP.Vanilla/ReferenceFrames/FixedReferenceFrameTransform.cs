@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityPlus.Serialization;
 using UnityPlus.Serialization.Descriptors;
 
-namespace HSP.Vanilla
+namespace HSP.Vanilla.ReferenceFrames
 {
     /// <summary>
     /// A physics transform that is fixed to a point in space and doesn't move (in the absolute frame).
@@ -29,147 +29,61 @@ namespace HSP.Vanilla
             }
         }
 
-        Vector3Dbl _absolutePosition = Vector3Dbl.zero;
-        QuaternionDbl _absoluteRotation = QuaternionDbl.identity;
+        private KinematicState _state = KinematicState.GetIdentity();
 
-        public Vector3 Position
+        public KinematicState GetState( IReferenceFrame requestedFrame )
         {
-            get
+            RecalculateCacheIfNeeded();
+            return _state.InFrame( requestedFrame );
+        }
+
+        public ref readonly KinematicState GetStateRef( out IReferenceFrame referenceFrame )
+        {
+            RecalculateCacheIfNeeded();
+            referenceFrame = null;
+            return ref _state;
+        }
+
+        public void SetState( in KinematicState state )
+        {
+            _state = state.InFrame( null );
+            // Force velocities and accelerations to zero for 'fixed' transform
+            _state = new KinematicState( null, _state.Position, _state.Rotation, Vector3Dbl.zero, Vector3Dbl.zero, Vector3Dbl.zero, Vector3Dbl.zero );
+
+            ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( SceneReferenceFrameProvider.GetSceneReferenceFrame(), transform, _rb, _state.Position );
+            ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( SceneReferenceFrameProvider.GetSceneReferenceFrame(), transform, _rb, _state.Rotation );
+            MakeCacheValid();
+            OnStateChanged?.Invoke();
+        }
+
+        public void ModifyState( IReferenceFrame requestedFrame, KinematicStateMutator mutator )
+        {
+            RecalculateCacheIfNeeded();
+            if( requestedFrame == null )
             {
-                RecalculateCacheIfNeeded();
-                return _rb.position;
+                mutator( ref _state );
             }
-            set
+            else
             {
-                this._absolutePosition = SceneReferenceFrameProvider.GetSceneReferenceFrame().TransformPosition( value );
-                MakeCacheInvalid();
-                ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( SceneReferenceFrameProvider.GetSceneReferenceFrame(), transform, _rb, _absolutePosition );
-                OnAbsolutePositionChanged?.Invoke();
-                OnAnyValueChanged?.Invoke();
+                var localState = _state.InFrame( requestedFrame );
+                mutator( ref localState );
+                _state = localState.InFrame( null );
             }
+            // Force velocities and accelerations to zero for 'fixed' transform
+            _state = new KinematicState( null, _state.Position, _state.Rotation, Vector3Dbl.zero, Vector3Dbl.zero, Vector3Dbl.zero, Vector3Dbl.zero );
+
+            ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( SceneReferenceFrameProvider.GetSceneReferenceFrame(), transform, _rb, _state.Position );
+            ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( SceneReferenceFrameProvider.GetSceneReferenceFrame(), transform, _rb, _state.Rotation );
+            MakeCacheValid();
+            OnStateChanged?.Invoke();
         }
 
-        public Vector3Dbl AbsolutePosition
-        {
-            get => _absolutePosition;
-            set
-            {
-                _absolutePosition = value;
-                MakeCacheInvalid();
-                ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( SceneReferenceFrameProvider.GetSceneReferenceFrame(), transform, _rb, value );
-                OnAbsolutePositionChanged?.Invoke();
-                OnAnyValueChanged?.Invoke();
-            }
-        }
-
-        public Quaternion Rotation
-        {
-            get
-            {
-                RecalculateCacheIfNeeded();
-                return _rb.rotation;
-            }
-            set
-            {
-                this._absoluteRotation = SceneReferenceFrameProvider.GetSceneReferenceFrame().TransformRotation( value );
-                MakeCacheInvalid();
-                ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( SceneReferenceFrameProvider.GetSceneReferenceFrame(), transform, _rb, _absoluteRotation );
-                OnAbsoluteRotationChanged?.Invoke();
-                OnAnyValueChanged?.Invoke();
-            }
-        }
-
-        public QuaternionDbl AbsoluteRotation
-        {
-            get => _absoluteRotation;
-            set
-            {
-                _absoluteRotation = value;
-                MakeCacheInvalid();
-                ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( SceneReferenceFrameProvider.GetSceneReferenceFrame(), transform, _rb, value );
-                OnAbsoluteRotationChanged?.Invoke();
-                OnAnyValueChanged?.Invoke();
-            }
-        }
-
-
-        public Vector3 Velocity
-        {
-            get
-            {
-                RecalculateCacheIfNeeded();
-                return _cachedVelocity;
-            }
-            set { } // 'Fixed' is always stationary, so it makes no sense to 'set' it to anything.
-        }
-
-        public Vector3Dbl AbsoluteVelocity
-        {
-            get => Vector3Dbl.zero;
-            set { } // 'Fixed' is always stationary, so it makes no sense to 'set' it to anything.
-        }
-
-        public Vector3 AngularVelocity
-        {
-            get
-            {
-                RecalculateCacheIfNeeded();
-                return _cachedAngularVelocity;
-            }
-            set { } // 'Fixed' is always stationary, so it makes no sense to 'set' it to anything.
-        }
-
-        public Vector3Dbl AbsoluteAngularVelocity
-        {
-            get => Vector3Dbl.zero;
-            set { } // 'Fixed' is always stationary, so it makes no sense to 'set' it to anything.
-        }
-
-        public Vector3 Acceleration
-        {
-            get
-            {
-                RecalculateCacheIfNeeded();
-                return _cachedAcceleration;
-            }
-        }
-
-        public Vector3Dbl AbsoluteAcceleration
-        {
-            get => Vector3Dbl.zero;
-        }
-
-        public Vector3 AngularAcceleration
-        {
-            get
-            {
-                RecalculateCacheIfNeeded();
-                return _cachedAngularAcceleration;
-            }
-        }
-
-        public Vector3Dbl AbsoluteAngularAcceleration
-        {
-            get => Vector3Dbl.zero;
-        }
-
-        Vector3 _oldPosition;
+        Vector3 _lastCachedPosition;
 
         /// <summary> The scene frame in which the cached values are expressed. </summary>
         IReferenceFrame _cachedSceneReferenceFrame;
-        //Vector3 _cachedPosition;
-        //Quaternion _cachedRotation;
-        Vector3 _cachedVelocity;
-        Vector3 _cachedAngularVelocity;
-        Vector3 _cachedAcceleration;
-        Vector3 _cachedAngularAcceleration;
 
-
-        public event Action OnAbsolutePositionChanged;
-        public event Action OnAbsoluteRotationChanged;
-        public event Action OnAbsoluteVelocityChanged;
-        public event Action OnAbsoluteAngularVelocityChanged;
-        public event Action OnAnyValueChanged;
+        public event Action OnStateChanged;
 
         //
         //
@@ -243,44 +157,30 @@ namespace HSP.Vanilla
             return; // 'Fixed' is always stationary.
         }
 
-        private void MoveScenePositionAndRotation( IReferenceFrame sceneReferenceFrame )
-        {
-            var pos = (Vector3)sceneReferenceFrame.InverseTransformPosition( _absolutePosition );
-            var rot = (Quaternion)sceneReferenceFrame.InverseTransformRotation( _absoluteRotation );
-            _rb.Move( pos, rot );
-            _cachedSceneReferenceFrame = sceneReferenceFrame;
-        }
-
-        /// <summary>
-        /// Checks if the cacheable values need to be recalculated, and recalculates them if needed.
-        /// </summary>
-        private void RecalculateCacheIfNeeded()
+        protected void RecalculateCacheIfNeeded()
         {
             if( IsCacheValid() )
                 return;
 
-            MoveScenePositionAndRotation( SceneReferenceFrameProvider.GetSceneReferenceFrame() );
             RecalculateCache( SceneReferenceFrameProvider.GetSceneReferenceFrame() );
             MakeCacheValid();
         }
 
-        private void RecalculateCache( IReferenceFrame sceneReferenceFrame )
+        protected void RecalculateCache( IReferenceFrame sceneReferenceFrame )
         {
-            _cachedVelocity = (Vector3)sceneReferenceFrame.InverseTransformVelocity( AbsoluteVelocity );
-            _cachedAngularVelocity = (Vector3)sceneReferenceFrame.InverseTransformAngularVelocity( AbsoluteAngularVelocity );
-            _cachedAcceleration = (Vector3)sceneReferenceFrame.InverseTransformAcceleration( AbsoluteAcceleration );
-            _cachedAngularAcceleration = (Vector3)sceneReferenceFrame.InverseTransformAngularAcceleration( AbsoluteAngularAcceleration );
+            var pos = (Vector3)sceneReferenceFrame.InverseTransformPosition( _state.Position );
+            var rot = (Quaternion)sceneReferenceFrame.InverseTransformRotation( _state.Rotation );
+            _rb.Move( pos, rot );
             _cachedSceneReferenceFrame = sceneReferenceFrame;
         }
 
-        // Exact comparison of the axes catches the most cases (and it's gonna be set to match exactly so it's okay)
-        // Vector3's `==` operator does approximate comparison.
-        private bool IsCacheValid() => (_rb.position.x == _oldPosition.x && _rb.position.y == _oldPosition.y && _rb.position.z == _oldPosition.z)
+        protected bool IsCacheValid() => _cachedSceneReferenceFrame != null
+            && (_rb.position.x == _lastCachedPosition.x && _rb.position.y == _lastCachedPosition.y && _rb.position.z == _lastCachedPosition.z)
             && SceneReferenceFrameProvider.GetSceneReferenceFrame().EqualsIgnoreUT( _cachedSceneReferenceFrame );
 
-        private void MakeCacheValid() => _oldPosition = _rb.position;
+        protected void MakeCacheValid() => _lastCachedPosition = _rb.position;
 
-        private void MakeCacheInvalid() => _oldPosition = -_rb.position + new Vector3( 1234.56789f, 12345678.9f, 1.23456789f );
+        protected void MakeCacheInvalid() => _lastCachedPosition = -_rb.position + new Vector3( 1234.56789f, 12345678.9f, 1.23456789f );
 
         void Awake()
         {
@@ -302,14 +202,14 @@ namespace HSP.Vanilla
 
         void FixedUpdate()
         {
-            MoveScenePositionAndRotation( SceneReferenceFrameProvider.GetSceneReferenceFrame().AtUT( TimeManager.UT ) ); // Move, because the scene might be moving, and move ensures that the body is swept instead of teleported.
+            RecalculateCache( SceneReferenceFrameProvider.GetSceneReferenceFrame().AtUT( TimeManager.UT ) ); // Move, because the scene might be moving, and move ensures that the body is swept instead of teleported.
         }
 
         public void OnSceneReferenceFrameSwitch( SceneReferenceFrameManager.ReferenceFrameSwitchData data )
         {
-            ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( data.NewFrame, transform, _rb, _absolutePosition );
-            ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( data.NewFrame, transform, _rb, _absoluteRotation );
-            RecalculateCache( data.NewFrame );
+            ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( data.NewFrame, transform, _rb, _state.Position );
+            ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( data.NewFrame, transform, _rb, _state.Rotation );
+            // RecalculateCache handles updates, however we don't need it because properties compute on the fly
         }
 
         void OnEnable()
@@ -354,8 +254,8 @@ namespace HSP.Vanilla
 
                 .WithMember( "DO_NOT_TOUCH", o => true, ( o, value ) => o._rb.isKinematic = true )
 
-                .WithMember( "absolute_position", o => o.AbsolutePosition )
-                .WithMember( "absolute_rotation", o => o.AbsoluteRotation );
+                .WithMember( "absolute_position", o => o.GetAbsolutePosition(), ( o, v ) => o.SetAbsolutePosition( v ) )
+                .WithMember( "absolute_rotation", o => o.GetAbsoluteRotation(), ( o, v ) => o.SetAbsoluteRotation( v ) );
         }
     }
 }

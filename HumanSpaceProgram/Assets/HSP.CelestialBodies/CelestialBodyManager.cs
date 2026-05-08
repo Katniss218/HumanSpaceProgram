@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HSP.ReferenceFrames;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -25,7 +26,7 @@ namespace HSP.CelestialBodies
             CelestialBody closestBody = null;
             foreach( CelestialBody body in instance._celestialBodies.Values )
             {
-                double sqrDst = (body.ReferenceFrameTransform.AbsolutePosition - absolutePosition).sqrMagnitude;
+                double sqrDst = (body.ReferenceFrameTransform.GetAbsolutePosition() - absolutePosition).sqrMagnitude;
                 if( sqrDst < closestSqr )
                 {
                     closestBody = body;

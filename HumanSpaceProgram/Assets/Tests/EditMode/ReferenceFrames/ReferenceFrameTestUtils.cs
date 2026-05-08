@@ -2,15 +2,15 @@ using HSP.ReferenceFrames;
 using NUnit.Framework;
 using UnityEngine;
 
-namespace HSP_Tests_EditMode
+namespace HSP_Tests_EditMode.ReferenceFrames
 {
     /// <summary>
     /// Helper methods for comprehensive reference frame testing
     /// </summary>
-    public static class ReferenceFrameTestHelpers
+    public static class ReferenceFrameTestUtils
     {
         private const double PRECISION_TOLERANCE = 1e-12;
-        private const double PRECISION_TOLERANCE_DIR = 1e-6;
+        private const double PRECISION_TOLERANCE_DIR = 1e-6; // e-12 is too precise for directions.
 
         public static void AssertRoundTripAccuracy( IReferenceFrame frame, string frameType )
         {

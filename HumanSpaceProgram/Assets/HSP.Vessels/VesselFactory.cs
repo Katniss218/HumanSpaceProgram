@@ -1,4 +1,5 @@
-﻿using HSP.SceneManagement;
+﻿using HSP.ReferenceFrames;
+using HSP.SceneManagement;
 using UnityEngine;
 
 namespace HSP.Vessels
@@ -33,10 +34,12 @@ namespace HSP.Vessels
 
             HSPEvent.EventManager.TryInvoke( HSPEvent_ON_VESSEL_CREATED.ID, vessel );
 
-            vessel.ReferenceFrameTransform.AbsolutePosition = absolutePosition;
-            vessel.ReferenceFrameTransform.AbsoluteRotation = absoluteRotation;
-            vessel.ReferenceFrameTransform.AbsoluteVelocity = absoluteVelocity;
-            vessel.ReferenceFrameTransform.AbsoluteAngularVelocity = absoluteAngularVelocity;
+            vessel.ReferenceFrameTransform.SetAbsoluteState(
+                position: absolutePosition,
+                rotation: absoluteRotation,
+                velocity: absoluteVelocity,
+                angularVelocity: absoluteAngularVelocity
+            );
 
             return vessel;
         }

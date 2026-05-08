@@ -1,6 +1,4 @@
-﻿
-using HSP.Time;
-using System;
+﻿using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityPlus.Serialization;
 using UnityPlus.Serialization.Descriptors;
@@ -65,104 +63,78 @@ namespace HSP.ReferenceFrames
         public IReferenceFrame AtUT( double ut )
         {
             double deltaTime = ut - ReferenceUT;
+            if( deltaTime == 0 )
+                return this;
 
-            // new pos/rot consist of the component due to existing velocity and the component due to constant acceleration.
-            var newPos = _position
-                + (_velocity * deltaTime)
-                + (0.5 * _acceleration * (deltaTime * deltaTime));
-
-            var newRot = _rotation;
-
-            var angVelMag = _angularVelocity.magnitude;
-            if( angVelMag > 1e-12 )
-            {
-                var angVelRot = QuaternionDbl.AngleAxis( angVelMag * deltaTime * 57.29577951308232, _angularVelocity );
-                newRot = angVelRot * newRot;
-            }
-            var angAccMag = _angularAcceleration.magnitude;
-            if( angAccMag > 1e-12 )
-            {
-                var angAccRot = QuaternionDbl.AngleAxis( 0.5 * angAccMag * (deltaTime * deltaTime) * 57.29577951308232, _angularAcceleration );
-                newRot = angAccRot * newRot;
-            }
-
-            Vector3Dbl newVelocity = _velocity + (_acceleration * deltaTime);
-            Vector3Dbl newAngularVelocity = _angularVelocity + (_angularAcceleration * deltaTime);
+            Vector3Dbl newPos = _position;
+            QuaternionDbl newRot = _rotation;
+            Vector3Dbl newVelocity = _velocity;
+            Vector3Dbl newAngularVelocity = _angularVelocity;
+            Integrate( ref newPos, ref newRot, ref newVelocity, ref newAngularVelocity, _acceleration, _angularAcceleration, deltaTime );
 
             return new OrientedNonInertialReferenceFrame( ut, newPos, newRot, newVelocity, newAngularVelocity, _acceleration, _angularAcceleration );
         }
 
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        private static void Integrate(
+            ref Vector3Dbl position, ref QuaternionDbl rotation,
+            ref Vector3Dbl velocity, ref Vector3Dbl angularVelocity,
+            in Vector3Dbl acceleration, in Vector3Dbl angularAcceleration,
+            double deltaTime )
+        {
+            if( deltaTime == 0 )
+                return;
 
-        public Vector3Dbl TransformPosition( Vector3Dbl localPosition )
-        {
-            return Vector3Dbl.Add( _rotation * localPosition, _position );
-        }
-        public Vector3Dbl InverseTransformPosition( Vector3Dbl globalPosition )
-        {
-            return _inverseRotation * Vector3Dbl.Subtract( globalPosition, _position );
-        }
+            // 1. Position integration (using existing velocity and constant acceleration)
+            position += (velocity * deltaTime) + (0.5 * acceleration * (deltaTime * deltaTime));
 
+            // 2. Rotation integration (using existing angular velocity and constant angular acceleration)
+            var angVelMag = angularVelocity.magnitude;
+            if( angVelMag > 1e-12 )
+            {
+                var angVelRot = QuaternionDbl.AngleAxis( angVelMag * deltaTime * 57.29577951308232, angularVelocity );
+                rotation = angVelRot * rotation;
+            }
 
-        public Vector3 TransformDirection( Vector3 localDirection )
-        {
-            return (Vector3)(_rotation * localDirection);
-        }
-        public Vector3 InverseTransformDirection( Vector3 absoluteDirection )
-        {
-            return (Vector3)(_inverseRotation * absoluteDirection);
-        }
+            var angAccMag = angularAcceleration.magnitude;
+            if( angAccMag > 1e-12 )
+            {
+                var angAccRot = QuaternionDbl.AngleAxis( 0.5 * angAccMag * (deltaTime * deltaTime) * 57.29577951308232, angularAcceleration );
+                rotation = angAccRot * rotation;
+            }
 
-
-        public QuaternionDbl TransformRotation( QuaternionDbl localRotation )
-        {
-            return _rotation * localRotation;
-        }
-        public QuaternionDbl InverseTransformRotation( QuaternionDbl airfRotation )
-        {
-            return _inverseRotation * airfRotation;
-        }
-
-
-        public Vector3Dbl TransformVelocity( Vector3Dbl localVelocity )
-        {
-            return Vector3Dbl.Add( _rotation * localVelocity, _velocity );
-        }
-        public Vector3Dbl InverseTransformVelocity( Vector3Dbl globalVelocity )
-        {
-            return _inverseRotation * Vector3Dbl.Subtract( globalVelocity, _velocity );
+            // 3. Velocity integration (constant acceleration)
+            velocity += acceleration * deltaTime;
+            angularVelocity += angularAcceleration * deltaTime;
         }
 
 
-        public Vector3Dbl TransformAcceleration( Vector3Dbl localAcceleration )
+
+        public KinematicState TransformState( in KinematicState localState )
         {
-            return Vector3Dbl.Add( _rotation * localAcceleration, _acceleration );
+            return new KinematicState( null )
+            {
+                Position = Vector3Dbl.Add( _rotation * localState.Position, _position ),
+                Rotation = _rotation * localState.Rotation,
+                Velocity = Vector3Dbl.Add( _rotation * localState.Velocity, _velocity ),
+                AngularVelocity = Vector3Dbl.Add( _rotation * localState.AngularVelocity, _angularVelocity ),
+                Acceleration = Vector3Dbl.Add( _rotation * localState.Acceleration, _acceleration ),
+                AngularAcceleration = Vector3Dbl.Add( _rotation * localState.AngularAcceleration, _angularAcceleration )
+            };
         }
 
-        public Vector3Dbl InverseTransformAcceleration( Vector3Dbl globalAcceleration )
+        public KinematicState InverseTransformState( in KinematicState globalState )
         {
-            return _inverseRotation * Vector3Dbl.Subtract( globalAcceleration, _acceleration );
+            return new KinematicState( this )
+            {
+                Position = _inverseRotation * Vector3Dbl.Subtract( globalState.Position, _position ),
+                Rotation = _inverseRotation * globalState.Rotation,
+                Velocity = _inverseRotation * Vector3Dbl.Subtract( globalState.Velocity, _velocity ),
+                AngularVelocity = _inverseRotation * Vector3Dbl.Subtract( globalState.AngularVelocity, _angularVelocity ),
+                Acceleration = _inverseRotation * Vector3Dbl.Subtract( globalState.Acceleration, _acceleration ),
+                AngularAcceleration = _inverseRotation * Vector3Dbl.Subtract( globalState.AngularAcceleration, _angularAcceleration )
+            };
         }
-
-
-        public Vector3Dbl TransformAngularVelocity( Vector3Dbl localAngularVelocity )
-        {
-            return Vector3Dbl.Add( _rotation * localAngularVelocity, _angularVelocity );
-        }
-        public Vector3Dbl InverseTransformAngularVelocity( Vector3Dbl globalAngularVelocity )
-        {
-            return _inverseRotation * Vector3Dbl.Subtract( globalAngularVelocity, _angularVelocity );
-        }
-
-
-        public Vector3Dbl TransformAngularAcceleration( Vector3Dbl localAngularAcceleration )
-        {
-            return Vector3Dbl.Add( _rotation * localAngularAcceleration, _angularAcceleration );
-        }
-        public Vector3Dbl InverseTransformAngularAcceleration( Vector3Dbl globalAngularAcceleration )
-        {
-            return _inverseRotation * Vector3Dbl.Subtract( globalAngularAcceleration, _angularAcceleration );
-        }
-
 
         public Vector3Dbl GetTangentialVelocity( Vector3Dbl localPosition )
         {
@@ -200,17 +172,21 @@ namespace HSP.ReferenceFrames
             return result;
         }
 
+        public override string ToString()
+        {
+            return $"OrientedNonInertialReferenceFrame( UT={ReferenceUT}, Pos={Position}, Rot={Rotation}, Vel={Velocity}, AngVel={AngularVelocity}, Acc={Acceleration}, AngAcc={AngularAcceleration} )";
+        }
+
         public bool Equals( IReferenceFrame other )
         {
             if( other == null )
                 return false;
 
-            return other.TransformPosition( Vector3Dbl.zero ) == this._position
-                && other.TransformRotation( QuaternionDbl.identity ) == this._rotation
-                && other.TransformVelocity( Vector3Dbl.zero ) == this._velocity
-                && other.TransformAngularVelocity( Vector3Dbl.zero ) == this._angularVelocity
-                && other.TransformAcceleration( Vector3Dbl.zero ) == this._acceleration
-                && other.TransformAngularAcceleration( Vector3Dbl.zero ) == this._angularAcceleration;
+            var state = KinematicState.AbsoluteIdentity;
+            var otherState = other.TransformState( state );
+            var thisState = this.TransformState( state );
+
+            return otherState.Equals( thisState );
         }
         public bool EqualsIgnoreUT( IReferenceFrame other )
         {
@@ -219,12 +195,11 @@ namespace HSP.ReferenceFrames
 
             IReferenceFrame otherNormalizedUT = other.AtUT( this.ReferenceUT );
 
-            return otherNormalizedUT.TransformPosition( Vector3Dbl.zero ) == this._position
-                && otherNormalizedUT.TransformRotation( QuaternionDbl.identity ) == this._rotation
-                && otherNormalizedUT.TransformVelocity( Vector3Dbl.zero ) == this._velocity
-                && otherNormalizedUT.TransformAngularVelocity( Vector3Dbl.zero ) == this._angularVelocity
-                && otherNormalizedUT.TransformAcceleration( Vector3Dbl.zero ) == this._acceleration
-                && otherNormalizedUT.TransformAngularAcceleration( Vector3Dbl.zero ) == this._angularAcceleration;
+            var state = KinematicState.AbsoluteIdentity;
+            var otherState = otherNormalizedUT.TransformState( state );
+            var thisState = this.TransformState( state );
+
+            return otherState.Equals( thisState );
         }
 
         [MapsInheritingFrom( typeof( OrientedNonInertialReferenceFrame ) )]

@@ -1,4 +1,5 @@
 ﻿using HSP.CelestialBodies;
+using HSP.ReferenceFrames;
 using HSP.Vessels;
 using System.Linq;
 using UnityEngine;
@@ -90,8 +91,8 @@ namespace HSP.Vanilla.UI.Components
                     return;
 
 #warning TODO - get currently most influential body
-                Vector3 forward = (Vector3)CelestialBodyManager.Get( "main" ).ReferenceFrameTransform.AbsoluteRotation.GetForwardAxis();
-                Vector3 gravity = -GravityUtils.GetNBodyGravityAcceleration( activeVessel.ReferenceFrameTransform.AbsolutePosition ).NormalizeToVector3();
+                Vector3 forward = (Vector3)CelestialBodyManager.Get( "main" ).ReferenceFrameTransform.GetAbsoluteRotation().GetForwardAxis();
+                Vector3 gravity = -GravityUtils.GetNBodyGravityAcceleration( activeVessel.ReferenceFrameTransform.GetAbsolutePosition() ).NormalizeToVector3();
                 forward = Vector3.ProjectOnPlane( forward, gravity );
                 NavballOrientation = Quaternion.LookRotation( forward, gravity );
                 VesselOrientation = (Quaternion)SelectedControlFrameManager.GetAbsoluteRotation( fallback: activeVessel.ReferenceTransform );

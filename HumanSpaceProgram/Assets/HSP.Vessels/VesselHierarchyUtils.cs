@@ -166,8 +166,8 @@ namespace HSP.Vessels
             Vessel newVessel = VesselFactory.CreatePartless( HSPSceneManager.GetScene( oldVessel.gameObject ),
                 partPosAirf,
                 sceneFrame.TransformRotation( partToSplit.transform.rotation ),
-                oldVessel.ReferenceFrameTransform.AbsoluteVelocity + vesselFrame.GetTangentialVelocity( partPosInVesselSpace ),
-                oldVessel.ReferenceFrameTransform.AbsoluteAngularVelocity );
+                oldVessel.ReferenceFrameTransform.GetAbsoluteVelocity() + vesselFrame.GetTangentialVelocity( partPosInVesselSpace ),
+                oldVessel.ReferenceFrameTransform.GetAbsoluteAngularVelocity() );
 
             partToSplit.SetParent( newVessel.transform );
             newVessel.RootPart = partToSplit;
