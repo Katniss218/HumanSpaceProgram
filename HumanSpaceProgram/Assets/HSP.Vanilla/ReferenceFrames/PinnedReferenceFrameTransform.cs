@@ -152,14 +152,30 @@ namespace HSP.Vanilla.ReferenceFrames
             _state.Acceleration = bodyFrame.TransformAcceleration( Vector3Dbl.zero );
             _state.AngularAcceleration = bodyFrame.TransformAngularAcceleration( Vector3Dbl.zero );
             _cachedSceneReferenceFrame = sceneReferenceFrame;
+
+            if( _referenceTransform != null )
+            {
+                _lastCachedRefPosition = _referenceTransform.GetAbsolutePosition();
+                _lastCachedRefRotation = _referenceTransform.GetAbsoluteRotation();
+            }
         }
 
+        Vector3Dbl _lastCachedRefPosition;
+        QuaternionDbl _lastCachedRefRotation;
         IReferenceFrame _cachedSceneReferenceFrame;
         double _lastCachedUT = -1;
 
         protected virtual bool IsCacheValid() => _cachedSceneReferenceFrame != null
             && TimeManager.UT == _lastCachedUT
-            && SceneReferenceFrameProvider.GetSceneReferenceFrame().EqualsIgnoreUT( _cachedSceneReferenceFrame );
+            && SceneReferenceFrameProvider.GetSceneReferenceFrame().EqualsIgnoreUT( _cachedSceneReferenceFrame )
+            && (_referenceTransform == null
+                || (_lastCachedRefPosition.x == _referenceTransform.GetAbsolutePosition().x
+                    && _lastCachedRefPosition.y == _referenceTransform.GetAbsolutePosition().y
+                    && _lastCachedRefPosition.z == _referenceTransform.GetAbsolutePosition().z
+                    && _lastCachedRefRotation.x == _referenceTransform.GetAbsoluteRotation().x
+                    && _lastCachedRefRotation.y == _referenceTransform.GetAbsoluteRotation().y
+                    && _lastCachedRefRotation.z == _referenceTransform.GetAbsoluteRotation().z
+                    && _lastCachedRefRotation.w == _referenceTransform.GetAbsoluteRotation().w));
 
         protected virtual void MakeCacheValid()
         {

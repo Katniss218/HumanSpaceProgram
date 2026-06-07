@@ -17,6 +17,14 @@ namespace HSP_Tests_PlayMode.ReferenceFrames
     {
         private static IEqualityComparer<Vector3Dbl> vector3DblApproxComparer = new Vector3DblApproximateComparer( 0.0001 );
 
+        private struct TestFrameState
+        {
+            public IReferenceFrame ReferenceFrame;
+            public bool IsSwitchRequested;
+            public double UT;
+            public double OldUT;
+        }
+
         [UnityTest]
         public IEnumerator MovingReferenceFrame_PropagatesCorrectly()
         {
@@ -27,7 +35,7 @@ namespace HSP_Tests_PlayMode.ReferenceFrames
             GameplaySceneReferenceFrameManager sman = go.AddComponent<GameplaySceneReferenceFrameManager>();
             TimeManager.SetUT( 0 );
 
-            var assertMonoBeh = go.AddComponent<AssertMonoBehaviour>();
+            using var history = new HistoryRecorder( 5f );
 
             yield return new WaitForFixedUpdate();
 
@@ -37,37 +45,62 @@ namespace HSP_Tests_PlayMode.ReferenceFrames
             IReferenceFrame cif = new CenteredInertialReferenceFrame( TimeManager.UT, Vector3Dbl.zero, new Vector3Dbl( velocity, 0, 0 ) );
             sman.RequestReferenceFrameSwitch( cif );
 
-            assertMonoBeh.AddAssert( AssertMonoBehaviour.Step.FixedUpdate, ( frameInfo ) =>
+            history.Record<UnityPlus.PlayerLoop.Phases.FixedUpdate, TestFrameState>( () => new TestFrameState()
             {
-                // In fixed update, the frame is before it updates (updates during physics step), so we use oldUT here.
-                IReferenceFrame frame = sman.referenceFrame;
-                Vector3Dbl expectedPos = new Vector3Dbl( velocity * (TimeManager.OldUT - startUT), 0, 0 );
-
-                Assert.That( frame.TransformPosition( Vector3Dbl.zero ), Is.EqualTo( expectedPos ).Using( vector3DblApproxComparer ) );
+                ReferenceFrame = sman.referenceFrame,
+                UT = TimeManager.UT,
+                OldUT = TimeManager.OldUT
             } );
-            assertMonoBeh.AddAssert( AssertMonoBehaviour.Step.Update, ( frameInfo ) =>
+            history.Record<UnityPlus.PlayerLoop.Phases.Update, TestFrameState>( () => new TestFrameState()
             {
-                // In update, the frame is after it updates (updates during physics step), so we use UT here.
-                IReferenceFrame frame = sman.referenceFrame;
-                Vector3Dbl expectedPos = new Vector3Dbl( velocity * (TimeManager.UT - startUT), 0, 0 );
-
-                Assert.That( frame.TransformPosition( Vector3Dbl.zero ), Is.EqualTo( expectedPos ).Using( vector3DblApproxComparer ) );
+                ReferenceFrame = sman.referenceFrame,
+                UT = TimeManager.UT,
+                OldUT = TimeManager.OldUT
             } );
-            assertMonoBeh.AddAssert( AssertMonoBehaviour.Step.LateUpdate, ( frameInfo ) =>
+            history.Record<UnityPlus.PlayerLoop.Phases.LateUpdate, TestFrameState>( () => new TestFrameState()
             {
-                // In late update, the frame is after it updates (updates during physics step), so we use UT here.
-                IReferenceFrame frame = sman.referenceFrame;
-                Vector3Dbl expectedPos = new Vector3Dbl( velocity * (TimeManager.UT - startUT), 0, 0 );
-
-                Assert.That( frame.TransformPosition( Vector3Dbl.zero ), Is.EqualTo( expectedPos ).Using( vector3DblApproxComparer ) );
+                ReferenceFrame = sman.referenceFrame,
+                UT = TimeManager.UT,
+                OldUT = TimeManager.OldUT
             } );
-            assertMonoBeh.Enable();
 
             yield return new WaitForSeconds( 1 );
 
+            var track = history.GetHistory<TestFrameState>();
+            Assert.That( track, Is.Not.Empty );
+
+            foreach( var fu in track.InPhase<TestFrameState, UnityPlus.PlayerLoop.Phases.FixedUpdate>() )
+            {
+                Vector3Dbl expectedPos = new Vector3Dbl( velocity * (fu.Data.OldUT - startUT), 0, 0 );
+                fu.AssertState(
+                    d => d.ReferenceFrame.TransformPosition( Vector3Dbl.zero ),
+                    Is.EqualTo( expectedPos ).Using( vector3DblApproxComparer ),
+                    "ReferenceFrame.TransformPosition(Vector3Dbl.zero)"
+                );
+            }
+
+            foreach( var u in track.InPhase<TestFrameState, UnityPlus.PlayerLoop.Phases.Update>() )
+            {
+                Vector3Dbl expectedPos = new Vector3Dbl( velocity * (u.Data.UT - startUT), 0, 0 );
+                u.AssertState(
+                    d => d.ReferenceFrame.TransformPosition( Vector3Dbl.zero ),
+                    Is.EqualTo( expectedPos ).Using( vector3DblApproxComparer ),
+                    "ReferenceFrame.TransformPosition(Vector3Dbl.zero)"
+                );
+            }
+
+            foreach( var lu in track.InPhase<TestFrameState, UnityPlus.PlayerLoop.Phases.LateUpdate>() )
+            {
+                Vector3Dbl expectedPos = new Vector3Dbl( velocity * (lu.Data.UT - startUT), 0, 0 );
+                lu.AssertState(
+                    d => d.ReferenceFrame.TransformPosition( Vector3Dbl.zero ),
+                    Is.EqualTo( expectedPos ).Using( vector3DblApproxComparer ),
+                    "ReferenceFrame.TransformPosition(Vector3Dbl.zero)"
+                );
+            }
+
             UnityEngine.Object.DestroyImmediate( go );
         }
-
 
         [UnityTest]
         public IEnumerator RequestReferenceFrameSwitch_ReferenceFrameUpdatesAfterPhysicsProcessing()
@@ -79,7 +112,7 @@ namespace HSP_Tests_PlayMode.ReferenceFrames
             GameplaySceneReferenceFrameManager sman = go.AddComponent<GameplaySceneReferenceFrameManager>();
             TimeManager.SetUT( 0 );
 
-            var assertMonoBeh = go.AddComponent<AssertMonoBehaviour>();
+            using var history = new HistoryRecorder( 5f );
 
             yield return new WaitForFixedUpdate();
 
@@ -88,23 +121,21 @@ namespace HSP_Tests_PlayMode.ReferenceFrames
             IReferenceFrame newFrame = new CenteredReferenceFrame( TimeManager.UT, new Vector3Dbl( 100, 0, 0 ) );
             sman.RequestReferenceFrameSwitch( newFrame );
 
-            // Verify that the reference frame hasn't changed yet in FixedUpdate.
-            bool fixedUpdateRan = false;
-            assertMonoBeh.AddAssert( AssertMonoBehaviour.Step.FixedUpdate, () => true, isOneShot: true, ( frameInfo ) =>
+            history.Record<UnityPlus.PlayerLoop.Phases.FixedUpdate, TestFrameState>( () => new TestFrameState()
             {
-                fixedUpdateRan = true;
-                Assert.That( sman.referenceFrame, Is.EqualTo( initialFrame ) );
+                ReferenceFrame = sman.referenceFrame
             } );
-
-            // Verify that the reference frame has changed in Update (after physics step).
-            assertMonoBeh.AddAssert( AssertMonoBehaviour.Step.Update, () => fixedUpdateRan, isOneShot: true, ( frameInfo ) =>
+            history.Record<UnityPlus.PlayerLoop.Phases.Update, TestFrameState>( () => new TestFrameState()
             {
-                Assert.That( sman.referenceFrame, Is.EqualTo( newFrame ) );
+                ReferenceFrame = sman.referenceFrame
             } );
-
-            assertMonoBeh.Enable();
 
             yield return new WaitForSeconds( 1.1f );
+
+            history.AssertTimeline<TestFrameState>()
+                .StartingHere( d => d.ReferenceFrame, Is.EqualTo( initialFrame ), "ReferenceFrame" )
+                .NextFixedUpdate().Verify( d => d.ReferenceFrame, Is.EqualTo( initialFrame ), "ReferenceFrame" )
+                .NextUpdate().Verify( d => d.ReferenceFrame, Is.EqualTo( newFrame ), "ReferenceFrame" );
 
             UnityEngine.Object.DestroyImmediate( go );
         }
@@ -119,7 +150,7 @@ namespace HSP_Tests_PlayMode.ReferenceFrames
             GameplaySceneReferenceFrameManager sman = go.AddComponent<GameplaySceneReferenceFrameManager>();
             TimeManager.SetUT( 0 );
 
-            var assertMonoBeh = go.AddComponent<AssertMonoBehaviour>();
+            using var history = new HistoryRecorder( 5f );
 
             yield return new WaitForFixedUpdate();
 
@@ -127,14 +158,12 @@ namespace HSP_Tests_PlayMode.ReferenceFrames
             sman.MaxRelativeVelocity = 1000000f;
 
             var mockTarget = new MockReferenceFrameTransform();
-            mockTarget.SceneReferenceFrameProvider = new GameplaySceneReferenceFrameProvider(); // Mock needs provider for Position setter
-            Vector3Dbl expectedAbsolutePosition = new Vector3Dbl( 1000, 2000, 3000 );
+            mockTarget.SceneReferenceFrameProvider = new GameplaySceneReferenceFrameProvider();
+            Vector3Dbl expectedAbsolutePosition = new Vector3Dbl( 150, 0, 0 );
             Vector3Dbl expectedAbsoluteVelocity = new Vector3Dbl( 10, 20, 30 );
-            mockTarget.SetAbsolutePosition( expectedAbsolutePosition );
+            mockTarget.SetAbsolutePosition( new Vector3Dbl( 50, 0, 0 ) );
             mockTarget.SetAbsoluteVelocity( expectedAbsoluteVelocity );
 
-            // Set initial position within bounds
-            mockTarget.SetPosition( new Vector3( 50, 0, 0 ) );
             sman.targetObject = mockTarget;
             Assert.That( sman.IsSwitchRequested, Is.False );
 
@@ -142,27 +171,27 @@ namespace HSP_Tests_PlayMode.ReferenceFrames
 
             Assert.That( sman.IsSwitchRequested, Is.False );
 
-            mockTarget.SetPosition( new Vector3( 150, 0, 0 ) ); // Simulate movement (mock transform) by updating position manually.
+            mockTarget.SetAbsolutePosition( expectedAbsolutePosition );
 
-            bool fixedUpdateRan = false;
-            assertMonoBeh.AddAssert( AssertMonoBehaviour.Step.FixedUpdate, () => true, isOneShot: true, ( frameInfo ) =>
+            history.Record<UnityPlus.PlayerLoop.Phases.FixedUpdate, TestFrameState>( () => new TestFrameState()
             {
-                // switch not requested yet, but will be automatically if the position exceeds the bounds.
-                Assert.That( sman.IsSwitchRequested, Is.False );
-                fixedUpdateRan = true;
+                IsSwitchRequested = sman.IsSwitchRequested,
+                ReferenceFrame = sman.referenceFrame
             } );
-            assertMonoBeh.AddAssert( AssertMonoBehaviour.Step.Update, () => fixedUpdateRan, isOneShot: true, ( frameInfo ) =>
+            history.Record<UnityPlus.PlayerLoop.Phases.Update, TestFrameState>( () => new TestFrameState()
             {
-                Assert.That( sman.IsSwitchRequested, Is.False );
-
-                IReferenceFrame frame = sman.referenceFrame;
-                Assert.That( frame.TransformPosition( Vector3Dbl.zero ), Is.EqualTo( expectedAbsolutePosition ).Using( vector3DblApproxComparer ) );
-                Assert.That( frame.TransformVelocity( Vector3Dbl.zero ), Is.EqualTo( expectedAbsoluteVelocity ).Using( vector3DblApproxComparer ) );
+                IsSwitchRequested = sman.IsSwitchRequested,
+                ReferenceFrame = sman.referenceFrame
             } );
-            assertMonoBeh.Enable();
 
-            yield return new WaitForFixedUpdate();
-            yield return new WaitForSeconds( 0.1f );
+            yield return new WaitForSeconds( 1.1f );
+
+            history.AssertTimeline<TestFrameState>()
+                .StartingHere()
+                .NextFixedUpdate().Verify( d => d.IsSwitchRequested, Is.False, "IsSwitchRequested" )
+                .NextFixedUpdate().Verify( d => d.IsSwitchRequested, Is.False, "IsSwitchRequested" )
+                .Verify( d => d.ReferenceFrame.TransformPosition( Vector3Dbl.zero ), Is.EqualTo( expectedAbsolutePosition ).Using( vector3DblApproxComparer ), "ReferenceFrame.TransformPosition(Vector3Dbl.zero)" )
+                .Verify( d => d.ReferenceFrame.TransformVelocity( Vector3Dbl.zero ), Is.EqualTo( expectedAbsoluteVelocity ).Using( vector3DblApproxComparer ), "ReferenceFrame.TransformVelocity(Vector3Dbl.zero)" );
 
             UnityEngine.Object.DestroyImmediate( go );
         }
@@ -182,16 +211,13 @@ namespace HSP_Tests_PlayMode.ReferenceFrames
 
             var mockTarget = new MockReferenceFrameTransform();
             mockTarget.SceneReferenceFrameProvider = new GameplaySceneReferenceFrameProvider();
-            mockTarget.SetAbsolutePosition( new Vector3Dbl( 0, 0, 0 ) );
-            mockTarget.SetAbsoluteVelocity( new Vector3Dbl( 0, 0, 0 ) );
 
-            // Test position within bounds.
-            mockTarget.SetPosition( new Vector3( 50, 0, 0 ) );
+            mockTarget.SetAbsolutePosition( new Vector3Dbl( 50, 0, 0 ) );
+            mockTarget.SetAbsoluteVelocity( new Vector3Dbl( 0, 0, 0 ) );
             sman.targetObject = mockTarget;
             Assert.That( sman.IsSwitchRequested, Is.False, "No switch should be requested when position is within bounds" );
 
-            // Test position exactly at bounds.
-            mockTarget.SetPosition( new Vector3( 100, 0, 0 ) );
+            mockTarget.SetAbsolutePosition( new Vector3Dbl( 100, 0, 0 ) );
             sman.targetObject = mockTarget;
             Assert.That( sman.IsSwitchRequested, Is.False, "No switch should be requested when position is exactly at bounds" );
 
@@ -208,7 +234,7 @@ namespace HSP_Tests_PlayMode.ReferenceFrames
             GameplaySceneReferenceFrameManager sman = go.AddComponent<GameplaySceneReferenceFrameManager>();
             TimeManager.SetUT( 0 );
 
-            var assertMonoBeh = go.AddComponent<AssertMonoBehaviour>();
+            using var history = new HistoryRecorder( 5f );
 
             yield return new WaitForFixedUpdate();
 
@@ -222,31 +248,29 @@ namespace HSP_Tests_PlayMode.ReferenceFrames
             mockTarget.SetAbsolutePosition( expectedAbsolutePosition );
             mockTarget.SetAbsoluteVelocity( expectedAbsoluteVelocity );
 
-            mockTarget.SetPosition( new Vector3( 150, 0, 0 ) );
             sman.targetObject = mockTarget;
 
-            // Switch requested immediately, but actually switched after the next physics step.
             Assert.That( sman.IsSwitchRequested, Is.True );
 
-            bool fixedUpdateRan = false;
-            assertMonoBeh.AddAssert( AssertMonoBehaviour.Step.FixedUpdate, () => true, isOneShot: true, ( frameInfo ) =>
+            history.Record<UnityPlus.PlayerLoop.Phases.FixedUpdate, TestFrameState>( () => new TestFrameState()
             {
-                Assert.That( sman.IsSwitchRequested, Is.True );
-                fixedUpdateRan = true;
+                IsSwitchRequested = sman.IsSwitchRequested,
+                ReferenceFrame = sman.referenceFrame
             } );
-            assertMonoBeh.AddAssert( AssertMonoBehaviour.Step.Update, () => fixedUpdateRan, isOneShot: true, ( frameInfo ) =>
+            history.Record<UnityPlus.PlayerLoop.Phases.Update, TestFrameState>( () => new TestFrameState()
             {
-                Assert.That( sman.IsSwitchRequested, Is.False );
-
-                IReferenceFrame frame = sman.referenceFrame;
-                Assert.That( frame.TransformPosition( Vector3Dbl.zero ), Is.EqualTo( expectedAbsolutePosition ).Using( vector3DblApproxComparer ) );
-                Assert.That( frame.TransformVelocity( Vector3Dbl.zero ), Is.EqualTo( expectedAbsoluteVelocity ).Using( vector3DblApproxComparer ) );
+                IsSwitchRequested = sman.IsSwitchRequested,
+                ReferenceFrame = sman.referenceFrame
             } );
 
-            assertMonoBeh.Enable();
+            yield return new WaitForSeconds( 1.1f );
 
-            yield return new WaitForFixedUpdate();
-            yield return new WaitForSeconds( 0.1f );
+            history.AssertTimeline<TestFrameState>()
+                .StartingHere()
+                .NextFixedUpdate().Verify( d => d.IsSwitchRequested, Is.True, "IsSwitchRequested" )
+                .NextFixedUpdate().Verify( d => d.IsSwitchRequested, Is.False, "IsSwitchRequested" )
+                .Verify( d => d.ReferenceFrame.TransformPosition( Vector3Dbl.zero ), Is.EqualTo( expectedAbsolutePosition ).Using( vector3DblApproxComparer ), "ReferenceFrame.TransformPosition(Vector3Dbl.zero)" )
+                .Verify( d => d.ReferenceFrame.TransformVelocity( Vector3Dbl.zero ), Is.EqualTo( expectedAbsoluteVelocity ).Using( vector3DblApproxComparer ), "ReferenceFrame.TransformVelocity(Vector3Dbl.zero)" );
 
             UnityEngine.Object.DestroyImmediate( go );
         }
@@ -266,16 +290,13 @@ namespace HSP_Tests_PlayMode.ReferenceFrames
 
             var mockTarget = new MockReferenceFrameTransform();
             mockTarget.SceneReferenceFrameProvider = new GameplaySceneReferenceFrameProvider();
-            mockTarget.SetAbsolutePosition( new Vector3Dbl( 0, 0, 0 ) );
-            mockTarget.SetAbsoluteVelocity( new Vector3Dbl( 0, 0, 0 ) );
 
-            // Test velocity within bounds.
-            mockTarget.SetVelocity( new Vector3( 0, 0, 25 ) );
+            mockTarget.SetAbsolutePosition( new Vector3Dbl( 0, 0, 0 ) );
+            mockTarget.SetAbsoluteVelocity( new Vector3Dbl( 0, 0, 25 ) );
             sman.targetObject = mockTarget;
             Assert.That( sman.IsSwitchRequested, Is.False, "No switch should be requested when velocity is within bounds" );
 
-            // Test velocity exactly at bounds.
-            mockTarget.SetVelocity( new Vector3( 0, 0, 50 ) );
+            mockTarget.SetAbsoluteVelocity( new Vector3Dbl( 0, 0, 50 ) );
             sman.targetObject = mockTarget;
             Assert.That( sman.IsSwitchRequested, Is.False, "No switch should be requested when velocity is exactly at bounds" );
 
@@ -292,7 +313,7 @@ namespace HSP_Tests_PlayMode.ReferenceFrames
             GameplaySceneReferenceFrameManager sman = go.AddComponent<GameplaySceneReferenceFrameManager>();
             TimeManager.SetUT( 0 );
 
-            var assertMonoBeh = go.AddComponent<AssertMonoBehaviour>();
+            using var history = new HistoryRecorder( 5f );
 
             yield return new WaitForFixedUpdate();
 
@@ -302,35 +323,33 @@ namespace HSP_Tests_PlayMode.ReferenceFrames
             var mockTarget = new MockReferenceFrameTransform();
             mockTarget.SceneReferenceFrameProvider = new GameplaySceneReferenceFrameProvider();
             Vector3Dbl expectedAbsolutePosition = new Vector3Dbl( 500, 1000, 1500 );
-            Vector3Dbl expectedAbsoluteVelocity = new Vector3Dbl( 5, 10, 15 );
+            Vector3Dbl expectedAbsoluteVelocity = new Vector3Dbl( 0, 0, 75 );
             mockTarget.SetAbsolutePosition( expectedAbsolutePosition );
             mockTarget.SetAbsoluteVelocity( expectedAbsoluteVelocity );
 
-            // Test velocity exceeding bounds.
-            mockTarget.SetVelocity( new Vector3( 0, 0, 75 ) );
             sman.targetObject = mockTarget;
 
             Assert.That( sman.IsSwitchRequested, Is.True );
 
-            bool fixedUpdateRan = false;
-            assertMonoBeh.AddAssert( AssertMonoBehaviour.Step.FixedUpdate, () => true, isOneShot: true, ( frameInfo ) =>
+            history.Record<UnityPlus.PlayerLoop.Phases.FixedUpdate, TestFrameState>( () => new TestFrameState()
             {
-                Assert.That( sman.IsSwitchRequested, Is.True );
-                fixedUpdateRan = true;
+                IsSwitchRequested = sman.IsSwitchRequested,
+                ReferenceFrame = sman.referenceFrame
             } );
-            assertMonoBeh.AddAssert( AssertMonoBehaviour.Step.Update, () => fixedUpdateRan, isOneShot: true, ( frameInfo ) =>
+            history.Record<UnityPlus.PlayerLoop.Phases.Update, TestFrameState>( () => new TestFrameState()
             {
-                Assert.That( sman.IsSwitchRequested, Is.False );
-
-                IReferenceFrame frame = sman.referenceFrame;
-                Assert.That( frame.TransformPosition( Vector3Dbl.zero ), Is.EqualTo( expectedAbsolutePosition ).Using( vector3DblApproxComparer ) );
-                Assert.That( frame.TransformVelocity( Vector3Dbl.zero ), Is.EqualTo( expectedAbsoluteVelocity ).Using( vector3DblApproxComparer ) );
+                IsSwitchRequested = sman.IsSwitchRequested,
+                ReferenceFrame = sman.referenceFrame
             } );
 
-            assertMonoBeh.Enable();
+            yield return new WaitForSeconds( 1.1f );
 
-            yield return new WaitForFixedUpdate();
-            yield return new WaitForSeconds( 0.1f );
+            history.AssertTimeline<TestFrameState>()
+                .StartingHere()
+                .NextFixedUpdate().Verify( d => d.IsSwitchRequested, Is.True, "IsSwitchRequested" )
+                .NextFixedUpdate().Verify( d => d.IsSwitchRequested, Is.False, "IsSwitchRequested" )
+                .Verify( d => d.ReferenceFrame.TransformPosition( Vector3Dbl.zero ), Is.EqualTo( expectedAbsolutePosition ).Using( vector3DblApproxComparer ), "ReferenceFrame.TransformPosition(Vector3Dbl.zero)" )
+                .Verify( d => d.ReferenceFrame.TransformVelocity( Vector3Dbl.zero ), Is.EqualTo( expectedAbsoluteVelocity ).Using( vector3DblApproxComparer ), "ReferenceFrame.TransformVelocity(Vector3Dbl.zero)" );
 
             UnityEngine.Object.DestroyImmediate( go );
         }
