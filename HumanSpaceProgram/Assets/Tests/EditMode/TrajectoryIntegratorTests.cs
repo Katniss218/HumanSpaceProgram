@@ -76,7 +76,7 @@ namespace HSP_Tests_EditMode
         }
 
         TrajectoryStateVector[] RunIntegratorSteps( TrajectoryStateVector centralState, TrajectoryStateVector initialState, ITrajectoryIntegrator integrator, ITrajectoryStepProvider[] providers, double duration, double step,
-            double[] sampleTimes, Ephemeris2 ephemeris )
+            double[] sampleTimes, Ephemeris ephemeris )
         {
             var currentStates = new TrajectoryStateVector[2] { centralState, initialState };
             var nextStates = new TrajectoryStateVector[2] { centralState, initialState };
@@ -101,8 +101,8 @@ namespace HSP_Tests_EditMode
                 while( sampleIndex < sampleTimes.Length && ut >= sampleTimes[sampleIndex] - tolerance )
                 {
                     samplePoints[sampleIndex] = VectorInterpolationUtils.CubicHermite(
-                        new Ephemeris2.Sample( ut - step, currentStates[1], false, Ephemeris2.SampleType.Continuous ),
-                        new Ephemeris2.Sample( ut, nextStates[1], false, Ephemeris2.SampleType.Continuous ),
+                        new Ephemeris.Sample( ut - step, currentStates[1], false, Ephemeris.SampleType.Continuous ),
+                        new Ephemeris.Sample( ut, nextStates[1], false, Ephemeris.SampleType.Continuous ),
                         sampleTimes[sampleIndex] );
                     sampleIndex++;
                 }
@@ -321,7 +321,7 @@ namespace HSP_Tests_EditMode
             for( int j = 0; j < sampleTimes.Length; j++ )
                 sampleTimes[j] *= period;
 
-            Ephemeris2 ephemeris = new Ephemeris2( 1000, 0.01 );
+            Ephemeris ephemeris = new Ephemeris( 1000, 0.01 );
 
             var providers = new ITrajectoryStepProvider[] { new CentralAttractorProvider( 0 ) };
 

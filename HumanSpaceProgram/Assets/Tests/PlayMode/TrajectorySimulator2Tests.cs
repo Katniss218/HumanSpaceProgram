@@ -78,7 +78,7 @@ namespace HSP_Tests_PlayMode
             yield return new WaitForFixedUpdate();
 
             var (manager, _, _, _) = CreateTestScene();
-            TrajectorySimulator2 sut = new TrajectorySimulator2( 0.5, 10 );
+            TrajectorySimulator sut = new TrajectorySimulator( 0.5, 10 );
 
             ITrajectoryTransform obj = CreateObject( new GameplaySceneReferenceFrameProvider(), true );
 
@@ -100,7 +100,7 @@ namespace HSP_Tests_PlayMode
             yield return new WaitForFixedUpdate();
 
             var (manager, _, _, _) = CreateTestScene();
-            TrajectorySimulator2 sut = new TrajectorySimulator2( 0.5, 10 );
+            TrajectorySimulator sut = new TrajectorySimulator( 0.5, 10 );
 
             ITrajectoryTransform a = CreateObject( new GameplaySceneReferenceFrameProvider(), true );
             ITrajectoryTransform b = CreateObject( new GameplaySceneReferenceFrameProvider(), false );
@@ -131,7 +131,7 @@ namespace HSP_Tests_PlayMode
             yield return new WaitForFixedUpdate();
 
             var (manager, _, _, _) = CreateTestScene();
-            TrajectorySimulator2 sut = new TrajectorySimulator2( 0.5, 10 );
+            TrajectorySimulator sut = new TrajectorySimulator( 0.5, 10 );
 
             ITrajectoryTransform obj = CreateObject( new GameplaySceneReferenceFrameProvider(), true );
 
@@ -154,7 +154,7 @@ namespace HSP_Tests_PlayMode
             yield return new WaitForFixedUpdate();
 
             var (manager, _, _, _) = CreateTestScene();
-            TrajectorySimulator2 sut = new TrajectorySimulator2( 0.5, 10 );
+            TrajectorySimulator sut = new TrajectorySimulator( 0.5, 10 );
 
             ITrajectoryTransform obj = CreateObject( new GameplaySceneReferenceFrameProvider(), true );
 
@@ -178,7 +178,7 @@ namespace HSP_Tests_PlayMode
             yield return new WaitForFixedUpdate();
 
             var (manager, _, _, _) = CreateTestScene();
-            TrajectorySimulator2 sut = new TrajectorySimulator2( 0.5, 10 );
+            TrajectorySimulator sut = new TrajectorySimulator( 0.5, 10 );
 
             ITrajectoryTransform a = CreateObject( new GameplaySceneReferenceFrameProvider(), true );
             ITrajectoryTransform b = CreateObject( new GameplaySceneReferenceFrameProvider(), true );
@@ -212,7 +212,7 @@ namespace HSP_Tests_PlayMode
             yield return new WaitForFixedUpdate();
 
             var (manager, _, _, _) = CreateTestScene();
-            TrajectorySimulator2 sut = new TrajectorySimulator2( 0.5, 10 );
+            TrajectorySimulator sut = new TrajectorySimulator( 0.5, 10 );
 
             ITrajectoryTransform obj = CreateObject( new GameplaySceneReferenceFrameProvider(), true );
 
@@ -243,7 +243,7 @@ namespace HSP_Tests_PlayMode
             yield return new WaitForFixedUpdate();
 
             var (manager, _, _, _) = CreateTestScene();
-            TrajectorySimulator2 sut = new TrajectorySimulator2( 0.5, 10 );
+            TrajectorySimulator sut = new TrajectorySimulator( 0.5, 10 );
 
             ITrajectoryTransform obj = CreateObject( new GameplaySceneReferenceFrameProvider(), true );
 
@@ -267,7 +267,7 @@ namespace HSP_Tests_PlayMode
             yield return new WaitForFixedUpdate();
 
             var (manager, _, _, _) = CreateTestScene();
-            TrajectorySimulator2 sut = new TrajectorySimulator2( 0.5, 10 );
+            TrajectorySimulator sut = new TrajectorySimulator( 0.5, 10 );
 
             ITrajectoryTransform obj = CreateObject( new GameplaySceneReferenceFrameProvider(), true );
 
@@ -299,7 +299,7 @@ namespace HSP_Tests_PlayMode
             yield return new WaitForFixedUpdate();
 
             var (manager, _, _, _) = CreateTestScene();
-            TrajectorySimulator2 sut = new TrajectorySimulator2( 0.5, 10 );
+            TrajectorySimulator sut = new TrajectorySimulator( 0.5, 10 );
 
             ITrajectoryTransform obj = CreateObject( new GameplaySceneReferenceFrameProvider(), true );
 
@@ -325,7 +325,7 @@ namespace HSP_Tests_PlayMode
             yield return new WaitForFixedUpdate();
 
             var (manager, _, _, _) = CreateTestScene();
-            TrajectorySimulator2 sut = new TrajectorySimulator2( 0.5, 10 );
+            TrajectorySimulator sut = new TrajectorySimulator( 0.5, 10 );
 
             ITrajectoryTransform obj = CreateObject( new GameplaySceneReferenceFrameProvider(), true );
 
@@ -357,7 +357,7 @@ namespace HSP_Tests_PlayMode
             yield return new WaitForFixedUpdate();
 
             var (manager, _, _, _) = CreateTestScene();
-            TrajectorySimulator2 sut = new TrajectorySimulator2( 0.5, 10 );
+            TrajectorySimulator sut = new TrajectorySimulator( 0.5, 10 );
 
             ITrajectoryTransform obj = CreateObject( new GameplaySceneReferenceFrameProvider(), true );
 
@@ -383,7 +383,7 @@ namespace HSP_Tests_PlayMode
             yield return new WaitForFixedUpdate();
 
             var (manager, _, _, _) = CreateTestScene();
-            TrajectorySimulator2 sut = new TrajectorySimulator2( 0.5, 10 );
+            TrajectorySimulator sut = new TrajectorySimulator( 0.5, 10 );
 
             ITrajectoryTransform obj = CreateObject( new GameplaySceneReferenceFrameProvider(), true );
 
@@ -418,7 +418,7 @@ namespace HSP_Tests_PlayMode
             yield return new WaitForFixedUpdate();
 
             var (manager, _, _, _) = CreateTestScene();
-            TrajectorySimulator2 sut = new TrajectorySimulator2( 0.5, 10 );
+            TrajectorySimulator sut = new TrajectorySimulator( 0.5, 10 );
 
             ITrajectoryTransform obj = CreateObject( new GameplaySceneReferenceFrameProvider(), true );
 
@@ -452,7 +452,7 @@ namespace HSP_Tests_PlayMode
             yield return new WaitForFixedUpdate();
 
             var (manager, _, _, _) = CreateTestScene();
-            TrajectorySimulator2 sut = new TrajectorySimulator2( 0.5, 10 );
+            TrajectorySimulator sut = new TrajectorySimulator( 0.5, 10 );
 
             var provider = new GameplaySceneReferenceFrameProvider();
             ITrajectoryTransform obj = CreateObject( provider, true );
@@ -493,7 +493,7 @@ namespace HSP_Tests_PlayMode
             yield return new WaitForFixedUpdate();
 
             var (manager, _, _, _) = CreateTestScene();
-            TrajectorySimulator2 sut = new TrajectorySimulator2( 0.5, 10 );
+            TrajectorySimulator sut = new TrajectorySimulator( 0.5, 10 );
             sut.SetInitialTime( TimeManager.UT );
 
             var provider = new GameplaySceneReferenceFrameProvider();
@@ -520,7 +520,7 @@ namespace HSP_Tests_PlayMode
             yield return new WaitForFixedUpdate();
 
             var (manager, _, _, _) = CreateTestScene();
-            TrajectorySimulator2 sut = new TrajectorySimulator2( 0.5, 10 );
+            TrajectorySimulator sut = new TrajectorySimulator( 0.5, 10 );
             sut.SetInitialTime( TimeManager.UT );
 
             var provider = new GameplaySceneReferenceFrameProvider();
@@ -551,7 +551,7 @@ namespace HSP_Tests_PlayMode
             yield return new WaitForFixedUpdate();
 
             var (manager, _, _, _) = CreateTestScene();
-            TrajectorySimulator2 sut = new TrajectorySimulator2( 0.5, 10 );
+            TrajectorySimulator sut = new TrajectorySimulator( 0.5, 10 );
             sut.SetInitialTime( TimeManager.UT );
 
             var provider = new GameplaySceneReferenceFrameProvider();

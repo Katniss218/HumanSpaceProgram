@@ -9,7 +9,7 @@ namespace HSP.Trajectories
         /// Performs linear interpolation of the state vectors inside the two samples. <br/>
         /// Continuous in position.
         /// </summary>
-        public static TrajectoryStateVector Lerp( in Ephemeris2.Sample s1, in Ephemeris2.Sample s2, double ut )
+        public static TrajectoryStateVector Lerp( in Ephemeris.Sample s1, in Ephemeris.Sample s2, double ut )
         {
             double dt = s2.ut - s1.ut;
             double t = (ut - s1.ut) / dt;
@@ -21,7 +21,7 @@ namespace HSP.Trajectories
         /// Performs cubic hermite interpolation of the state vectors inside the two samples. <br/>
         /// Continuous in position and velocity.
         /// </summary>
-        public static TrajectoryStateVector CubicHermite( in Ephemeris2.Sample s1, in Ephemeris2.Sample s2, double ut )
+        public static TrajectoryStateVector CubicHermite( in Ephemeris.Sample s1, in Ephemeris.Sample s2, double ut )
         {
             double dt = s2.ut - s1.ut;
             double t = (ut - s1.ut) / dt;
@@ -43,7 +43,7 @@ namespace HSP.Trajectories
         /// Performs quintic hermite interpolation of the state vectors inside the two samples. <br/>
         /// Continuous in position, velocity, and acceleration.
         /// </summary>
-        public static TrajectoryStateVector QuinticHermite( in Ephemeris2.Sample s1, in Ephemeris2.Sample s2, double ut )
+        public static TrajectoryStateVector QuinticHermite( in Ephemeris.Sample s1, in Ephemeris.Sample s2, double ut )
         {
             double dt = s2.ut - s1.ut;
             double t = (ut - s1.ut) / dt;

@@ -16,7 +16,7 @@ namespace HSP_Tests_EditMode
         public void Insertion_1___IsCorrect()
         {
             // Arrange
-            Ephemeris2 sut = new Ephemeris2( 10, maxError: 0, double.PositiveInfinity );
+            Ephemeris sut = new Ephemeris( 10, maxError: 0, double.PositiveInfinity );
 
             // Act
             sut.InsertAdaptive( 0, new TrajectoryStateVector( new Vector3Dbl( 0, 0, 0 ), new Vector3Dbl( 0, 0, 0 ), new Vector3Dbl( 0, 0, 0 ), 1000.0 ) );
@@ -31,7 +31,7 @@ namespace HSP_Tests_EditMode
         public void Insertion_2___IsCorrect()
         {
             // Arrange
-            Ephemeris2 sut = new Ephemeris2( 10, maxError: 0, double.PositiveInfinity );
+            Ephemeris sut = new Ephemeris( 10, maxError: 0, double.PositiveInfinity );
 
             // Act
             sut.InsertAdaptive( 0, new TrajectoryStateVector( new Vector3Dbl( 0, 0, 0 ), new Vector3Dbl( 0, 0, 0 ), new Vector3Dbl( 0, 0, 0 ), 1000.0 ) );
@@ -47,7 +47,7 @@ namespace HSP_Tests_EditMode
         public void Insertion_Three___IsCorrect()
         {
             // Arrange
-            Ephemeris2 sut = new Ephemeris2( 10, maxError: 0, double.PositiveInfinity );
+            Ephemeris sut = new Ephemeris( 10, maxError: 0, double.PositiveInfinity );
 
             // Act
             sut.InsertAdaptive( 0, new TrajectoryStateVector( new Vector3Dbl( 0, 0, 0 ), new Vector3Dbl( 0, 0, 0 ), new Vector3Dbl( 0, 0, 0 ), 1000.0 ) );
@@ -66,7 +66,7 @@ namespace HSP_Tests_EditMode
             const int initial = 10;
             const int count = 45;
             // Arrange
-            Ephemeris2 sut = new Ephemeris2( initial, maxError: 0, double.PositiveInfinity );
+            Ephemeris sut = new Ephemeris( initial, maxError: 0, double.PositiveInfinity );
 
             // Act
             double step = 1.0;
@@ -86,7 +86,7 @@ namespace HSP_Tests_EditMode
             const int max = 10;
             const int count = 20;
             // Arrange
-            Ephemeris2 sut = new Ephemeris2( max, maxError: 0, max );
+            Ephemeris sut = new Ephemeris( max, maxError: 0, max );
 
             // Act
             double step = 1.0;
@@ -107,7 +107,7 @@ namespace HSP_Tests_EditMode
             const int max = 10;
             const int count = 20;
             // Arrange
-            Ephemeris2 sut = new Ephemeris2( max, maxError: 0, max );
+            Ephemeris sut = new Ephemeris( max, maxError: 0, max );
 
             // Act
             double step = -1.0; // Decreasing ut.
@@ -127,7 +127,7 @@ namespace HSP_Tests_EditMode
             const int max = 10;
             const int count = 200; // Overflow multiple times.
             // Arrange
-            Ephemeris2 sut = new Ephemeris2( max, maxError: 0, max );
+            Ephemeris sut = new Ephemeris( max, maxError: 0, max );
 
             // Act
             double step = 1.0;
@@ -147,7 +147,7 @@ namespace HSP_Tests_EditMode
         public void Evaluate_2___IsCorrect()
         {
             // Arrange
-            Ephemeris2 sut = new Ephemeris2( 10, maxError: 0, double.PositiveInfinity );
+            Ephemeris sut = new Ephemeris( 10, maxError: 0, double.PositiveInfinity );
             var expecteds = new TrajectoryStateVector( new Vector3Dbl( 0, 0, 0 ), new Vector3Dbl( 0, 0, 0 ), new Vector3Dbl( 0, 0, 0 ), 1000.0 );
             var expected = new TrajectoryStateVector( new Vector3Dbl( 0.5, 0.5, 0.5 ), new Vector3Dbl( 0.5, 0.5, 0.5 ), new Vector3Dbl( 0, 0, 0 ), 1000.0 );
             var expectede = new TrajectoryStateVector( new Vector3Dbl( 1, 1, 1 ), new Vector3Dbl( 1, 1, 1 ), new Vector3Dbl( 0, 0, 0 ), 1000.0 );
@@ -168,7 +168,7 @@ namespace HSP_Tests_EditMode
             const int max = 10;
             const int count = 20;
             // Arrange
-            Ephemeris2 sut = new Ephemeris2( max, maxError: 0, double.PositiveInfinity );
+            Ephemeris sut = new Ephemeris( max, maxError: 0, double.PositiveInfinity );
             var expecteds = new TrajectoryStateVector( new Vector3Dbl( 10, 10, 10 ), new Vector3Dbl( 10, 10, 10 ), new Vector3Dbl( 0, 0, 0 ), 1000.0 );
             var expected = new TrajectoryStateVector( new Vector3Dbl( 15.7, 15.7, 15.7 ), new Vector3Dbl( 15.7, 15.7, 15.7 ), new Vector3Dbl( 0, 0, 0 ), 1000.0 );
             var expectede = new TrajectoryStateVector( new Vector3Dbl( 19, 19, 19 ), new Vector3Dbl( 19, 19, 19 ), new Vector3Dbl( 0, 0, 0 ), 1000.0 );
@@ -191,11 +191,11 @@ namespace HSP_Tests_EditMode
             // Arrange
 
             // Act
-            var error = Ephemeris2.CalculateError(
+            var error = Ephemeris.CalculateError(
                 new TrajectoryStateVector( new Vector3Dbl( 1, 2, 3 ), new Vector3Dbl( 4, 5, 6 ), new Vector3Dbl( 7, 8, 9 ), 10.0 ),
                 new TrajectoryStateVector( new Vector3Dbl( 1, 2, 3 ), new Vector3Dbl( 4, 5, 6 ), new Vector3Dbl( 7, 8, 9 ), 10.0 )
             );
-            var error2 = Ephemeris2.CalculateError(
+            var error2 = Ephemeris.CalculateError(
                 new TrajectoryStateVector( new Vector3Dbl( 0, 0, 0 ), new Vector3Dbl( 0, 0, 0 ), new Vector3Dbl( 0, 0, 0 ), 0 ),
                 new TrajectoryStateVector( new Vector3Dbl( 0, 0, 0 ), new Vector3Dbl( 0, 0, 0 ), new Vector3Dbl( 0, 0, 0 ), 0 )
             );
@@ -210,7 +210,7 @@ namespace HSP_Tests_EditMode
             // Arrange
 
             // Act
-            var error = Ephemeris2.CalculateError(
+            var error = Ephemeris.CalculateError(
                 new TrajectoryStateVector( new Vector3Dbl( 1, 1, 1 ), new Vector3Dbl( 1, 1, 1 ), new Vector3Dbl( 1, 1, 1 ), 1.0 ),
                 new TrajectoryStateVector( new Vector3Dbl( 1.01, 1.01, 1.01 ), new Vector3Dbl( 1.01, 1.01, 1.01 ), new Vector3Dbl( 1.01, 1.01, 1.01 ), 1.01 )
             );
@@ -224,7 +224,7 @@ namespace HSP_Tests_EditMode
             // Arrange
 
             // Act
-            var error = Ephemeris2.CalculateError(
+            var error = Ephemeris.CalculateError(
                 new TrajectoryStateVector( new Vector3Dbl( 1, 1, 1 ), new Vector3Dbl( 1, 1, 1 ), new Vector3Dbl( 1, 1, 1 ), 1.0 ),
                 new TrajectoryStateVector( new Vector3Dbl( -1, -1, -1 ), new Vector3Dbl( -1, -1, -1 ), new Vector3Dbl( -1, -1, -1 ), -1.0 )
             );
@@ -238,7 +238,7 @@ namespace HSP_Tests_EditMode
             // Arrange
 
             // Act
-            var error = Ephemeris2.CalculateError(
+            var error = Ephemeris.CalculateError(
                 new TrajectoryStateVector( new Vector3Dbl( 1, 0, 0 ), new Vector3Dbl( 0, 1, 0 ), new Vector3Dbl( 0, 0, 1 ), 0 ),
                 new TrajectoryStateVector( new Vector3Dbl( 0, 1, 0 ), new Vector3Dbl( 0, 0, 1 ), new Vector3Dbl( 1, 0, 0 ), 0 )
             );
@@ -252,11 +252,11 @@ namespace HSP_Tests_EditMode
             // Arrange
 
             // Act
-            var error = Ephemeris2.CalculateError(
+            var error = Ephemeris.CalculateError(
                 new TrajectoryStateVector( new Vector3Dbl( 1, 0, 0 ), new Vector3Dbl( 0, 1, 0 ), new Vector3Dbl( 0, 0, 1 ), 0 ),
                 new TrajectoryStateVector( new Vector3Dbl( 2, 0, 0 ), new Vector3Dbl( 0, 2, 0 ), new Vector3Dbl( 0, 0, 2 ), 0 )
             );
-            var error2 = Ephemeris2.CalculateError(
+            var error2 = Ephemeris.CalculateError(
                 new TrajectoryStateVector( new Vector3Dbl( 10, 0, 0 ), new Vector3Dbl( 0, 10, 0 ), new Vector3Dbl( 0, 0, 10 ), 0 ),
                 new TrajectoryStateVector( new Vector3Dbl( 20, 0, 0 ), new Vector3Dbl( 0, 20, 0 ), new Vector3Dbl( 0, 0, 20 ), 0 )
             );
@@ -271,19 +271,19 @@ namespace HSP_Tests_EditMode
             // Arrange
 
             // Act
-            var error4 = Ephemeris2.CalculateError(
+            var error4 = Ephemeris.CalculateError(
                 new TrajectoryStateVector( new Vector3Dbl( 0, 0, 0 ), new Vector3Dbl( 0, 0, 0 ), new Vector3Dbl( 0, 0, 0 ), 0.0 ),
                 new TrajectoryStateVector( new Vector3Dbl( 1e12, 1e12, 1e12 ), new Vector3Dbl( 1e12, 1e12, 1e12 ), new Vector3Dbl( 1e12, 1e12, 1e12 ), 1e12 )
             );
-            var error3 = Ephemeris2.CalculateError(
+            var error3 = Ephemeris.CalculateError(
                 new TrajectoryStateVector( new Vector3Dbl( 0, 0, 0 ), new Vector3Dbl( 0, 0, 0 ), new Vector3Dbl( 0, 0, 0 ), 0.0 ),
                 new TrajectoryStateVector( new Vector3Dbl( 10000, 10000, 10000 ), new Vector3Dbl( 10000, 10000, 10000 ), new Vector3Dbl( 10000, 10000, 10000 ), 10000.0 )
             );
-            var error2 = Ephemeris2.CalculateError(
+            var error2 = Ephemeris.CalculateError(
                 new TrajectoryStateVector( new Vector3Dbl( 0, 0, 0 ), new Vector3Dbl( 0, 0, 0 ), new Vector3Dbl( 0, 0, 0 ), 0.0 ),
                 new TrajectoryStateVector( new Vector3Dbl( 10, 10, 10 ), new Vector3Dbl( 10, 10, 10 ), new Vector3Dbl( 10, 10, 10 ), 10.0 )
             );
-            var error = Ephemeris2.CalculateError(
+            var error = Ephemeris.CalculateError(
                 new TrajectoryStateVector( new Vector3Dbl( 0, 0, 0 ), new Vector3Dbl( 0, 0, 0 ), new Vector3Dbl( 0, 0, 0 ), 0.0 ),
                 new TrajectoryStateVector( new Vector3Dbl( 1, 1, 1 ), new Vector3Dbl( 1, 1, 1 ), new Vector3Dbl( 1, 1, 1 ), 1.0 )
             );
@@ -299,11 +299,11 @@ namespace HSP_Tests_EditMode
             // Arrange
 
             // Act
-            var error2 = Ephemeris2.CalculateError(
+            var error2 = Ephemeris.CalculateError(
                 new TrajectoryStateVector( new Vector3Dbl( 5, 5, 5 ), new Vector3Dbl( 0, 0, 0 ), new Vector3Dbl( 1, 1, 1 ), 1.0 ),
                 new TrajectoryStateVector( new Vector3Dbl( 5, 5, 5 ), new Vector3Dbl( 1, 1, 1 ), new Vector3Dbl( 1, 1, 1 ), 1.0 )
             );
-            var error = Ephemeris2.CalculateError(
+            var error = Ephemeris.CalculateError(
                 new TrajectoryStateVector( new Vector3Dbl( 555555555, 555555555, 555555555 ), new Vector3Dbl( 0, 0, 0 ), new Vector3Dbl( 1, 1, 1 ), 1.0 ),
                 new TrajectoryStateVector( new Vector3Dbl( 555555555, 555555555, 555555555 ), new Vector3Dbl( 1, 1, 1 ), new Vector3Dbl( 1, 1, 1 ), 1.0 )
             );
@@ -318,41 +318,41 @@ namespace HSP_Tests_EditMode
             // Arrange
 
             // Act
-            var error1 = Ephemeris2.CalculateError(
+            var error1 = Ephemeris.CalculateError(
                 new TrajectoryStateVector( new Vector3Dbl( 0, 0, 0 ), new Vector3Dbl( 0, 0, 0 ), new Vector3Dbl( 0, 0, 0 ), 0.0 ),
                 new TrajectoryStateVector( new Vector3Dbl( 1, 1, 1 ), new Vector3Dbl( 1, 1, 1 ), new Vector3Dbl( 1, 1, 1 ), 1000.0 )
             );
             Debug.Log( "Error1: " + error1 );
-            var error2 = Ephemeris2.CalculateError(
+            var error2 = Ephemeris.CalculateError(
                 new TrajectoryStateVector( new Vector3Dbl( 0, 0, 0 ), new Vector3Dbl( 0, 0, 0 ), new Vector3Dbl( 0, 0, 0 ), 0.0 ),
                 new TrajectoryStateVector( new Vector3Dbl( 0, 0, 0 ), new Vector3Dbl( 0, 0, 0 ), new Vector3Dbl( 0, 0, 0 ), 0.0 )
             );
             Debug.Log( "Error2: " + error2 );
-            var error3 = Ephemeris2.CalculateError(
+            var error3 = Ephemeris.CalculateError(
                 new TrajectoryStateVector( new Vector3Dbl( 1, 2, 3 ), new Vector3Dbl( 4, 5, 6 ), new Vector3Dbl( 7, 8, 9 ), 10.0 ),
                 new TrajectoryStateVector( new Vector3Dbl( 1, 2, 3 ), new Vector3Dbl( 4, 5, 6 ), new Vector3Dbl( 7, 8, 9 ), 10.0 )
             );
             Debug.Log( "Error3: " + error3 );
-            var error4 = Ephemeris2.CalculateError(
+            var error4 = Ephemeris.CalculateError(
                 new TrajectoryStateVector( new Vector3Dbl( 1, 1, 1 ), new Vector3Dbl( 1, 1, 1 ), new Vector3Dbl( 1, 1, 1 ), 1.0 ),
                 new TrajectoryStateVector( new Vector3Dbl( 1.01, 1.01, 1.01 ), new Vector3Dbl( 1.01, 1.01, 1.01 ), new Vector3Dbl( 1.01, 1.01, 1.01 ), 1.01 )
             );
             Debug.Log( "Error4: " + error4 );
-            var error5 = Ephemeris2.CalculateError(
+            var error5 = Ephemeris.CalculateError(
                 new TrajectoryStateVector( new Vector3Dbl( 1, 1, 1 ), new Vector3Dbl( 1, 1, 1 ), new Vector3Dbl( 1, 1, 1 ), 1.0 ),
                 new TrajectoryStateVector( new Vector3Dbl( -1, -1, -1 ), new Vector3Dbl( -1, -1, -1 ), new Vector3Dbl( -1, -1, -1 ), -1.0 )
             );
             Debug.Log( "Error5: " + error5 );
-            var error6 = Ephemeris2.CalculateError(
+            var error6 = Ephemeris.CalculateError(
                 new TrajectoryStateVector( new Vector3Dbl( 0, 0, 0 ), new Vector3Dbl( 0, 0, 0 ), new Vector3Dbl( 0, 0, 0 ), 0.0 ),
                 new TrajectoryStateVector( new Vector3Dbl( 10, 10, 10 ), new Vector3Dbl( 10, 10, 10 ), new Vector3Dbl( 10, 10, 10 ), 10.0 )
             );
             Debug.Log( "Error6: " + error6 );
-            var error7 = Ephemeris2.CalculateError(
+            var error7 = Ephemeris.CalculateError(
                 new TrajectoryStateVector( new Vector3Dbl( 949999999985.37, 3074493.32, 0.00 ), new Vector3Dbl( -0.05, 9749.15, 0.00 ), new Vector3Dbl( 0, 0, 0 ), 5.96999991261919E+24 ),
                 new TrajectoryStateVector( new Vector3Dbl( 876902719663.86, 299443237356.88, 51040.40 ), new Vector3Dbl( -4632.00, 8980.11, 0.00 ), new Vector3Dbl( 0, 0, 0 ), 5.96999991261919E+24 )
             );
-            error7 = Ephemeris2.CalculateError(
+            error7 = Ephemeris.CalculateError(
                 new TrajectoryStateVector( new Vector3Dbl( 949999999985.37, 3074493.32, 0.00 ), new Vector3Dbl( -0.05, 9749.15, 0.00 ), new Vector3Dbl( 0, 0, 0 ), 5.96999991261919E+24 ),
                 new TrajectoryStateVector( new Vector3Dbl( 896902719663.86, 199443237356.88, 51040.40 ), new Vector3Dbl( -1632.00, 9180.11, 0.00 ), new Vector3Dbl( 0, 0, 0 ), 5.96999991261919E+24 )
             );

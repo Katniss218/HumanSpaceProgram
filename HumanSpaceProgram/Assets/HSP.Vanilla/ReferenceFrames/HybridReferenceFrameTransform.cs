@@ -69,7 +69,6 @@ namespace HSP.Vanilla.ReferenceFrames
         // absolute space simulation variables
 
         private KinematicState _state = KinematicState.AbsoluteIdentity;
-        private KinematicState _requestedState = KinematicState.AbsoluteIdentity;
 
         //
 
@@ -101,22 +100,24 @@ namespace HSP.Vanilla.ReferenceFrames
         public void SetState( in KinematicState state )
         {
             _state = state.InFrame( null );
-            _requestedState = _state;
+            var sceneFrame = SceneReferenceFrameProvider.GetSceneReferenceFrame();
             if( _isSceneSpace )
             {
-                var scenePos = SceneReferenceFrameProvider.GetSceneReferenceFrame().InverseTransformPosition( _state.Position );
-                if( _isSceneSpace && (Math.Abs( scenePos.x ) > PositionRange || Math.Abs( scenePos.y ) > PositionRange || Math.Abs( scenePos.z ) > PositionRange) )
+                var scenePos = sceneFrame.InverseTransformPosition( _state.Position );
+                if( Math.Abs( scenePos.x ) > PositionRange || Math.Abs( scenePos.y ) > PositionRange || Math.Abs( scenePos.z ) > PositionRange )
                 {
-                    SwitchToAbsoluteMode();
-                }
-                else
-                {
-                    ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( SceneReferenceFrameProvider.GetSceneReferenceFrame(), transform, _rb, _state.Position );
-                    ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( SceneReferenceFrameProvider.GetSceneReferenceFrame(), transform, _rb, _state.Rotation );
-                    ReferenceFrameTransformUtils.SetSceneVelocityFromAbsolute( SceneReferenceFrameProvider.GetSceneReferenceFrame(), _rb, _state.Velocity );
-                    ReferenceFrameTransformUtils.SetSceneAngularVelocityFromAbsolute( SceneReferenceFrameProvider.GetSceneReferenceFrame(), _rb, _state.AngularVelocity );
+                    SwitchToAbsoluteMode( true );
                 }
             }
+
+            ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( sceneFrame, transform, _rb, _state.Position );
+            ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( sceneFrame, transform, _rb, _state.Rotation );
+            if( _isSceneSpace )
+            {
+                ReferenceFrameTransformUtils.SetSceneVelocityFromAbsolute( sceneFrame, _rb, _state.Velocity );
+                ReferenceFrameTransformUtils.SetSceneAngularVelocityFromAbsolute( sceneFrame, _rb, _state.AngularVelocity );
+            }
+
             MakeCacheValid();
             OnStateChanged?.Invoke();
         }
@@ -134,23 +135,25 @@ namespace HSP.Vanilla.ReferenceFrames
                 mutator( ref localState );
                 _state = localState.InFrame( null );
             }
-            _requestedState = _state;
 
+            var sceneFrame = SceneReferenceFrameProvider.GetSceneReferenceFrame();
             if( _isSceneSpace )
             {
-                var scenePos = SceneReferenceFrameProvider.GetSceneReferenceFrame().InverseTransformPosition( _state.Position );
-                if( _isSceneSpace && (Math.Abs( scenePos.x ) > PositionRange || Math.Abs( scenePos.y ) > PositionRange || Math.Abs( scenePos.z ) > PositionRange) )
+                var scenePos = sceneFrame.InverseTransformPosition( _state.Position );
+                if( Math.Abs( scenePos.x ) > PositionRange || Math.Abs( scenePos.y ) > PositionRange || Math.Abs( scenePos.z ) > PositionRange )
                 {
-                    SwitchToAbsoluteMode();
-                }
-                else
-                {
-                    ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( SceneReferenceFrameProvider.GetSceneReferenceFrame(), transform, _rb, _state.Position );
-                    ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( SceneReferenceFrameProvider.GetSceneReferenceFrame(), transform, _rb, _state.Rotation );
-                    ReferenceFrameTransformUtils.SetSceneVelocityFromAbsolute( SceneReferenceFrameProvider.GetSceneReferenceFrame(), _rb, _state.Velocity );
-                    ReferenceFrameTransformUtils.SetSceneAngularVelocityFromAbsolute( SceneReferenceFrameProvider.GetSceneReferenceFrame(), _rb, _state.AngularVelocity );
+                    SwitchToAbsoluteMode( true );
                 }
             }
+
+            ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( sceneFrame, transform, _rb, _state.Position );
+            ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( sceneFrame, transform, _rb, _state.Rotation );
+            if( _isSceneSpace )
+            {
+                ReferenceFrameTransformUtils.SetSceneVelocityFromAbsolute( sceneFrame, _rb, _state.Velocity );
+                ReferenceFrameTransformUtils.SetSceneAngularVelocityFromAbsolute( sceneFrame, _rb, _state.AngularVelocity );
+            }
+
             MakeCacheValid();
             OnStateChanged?.Invoke();
         }
@@ -343,18 +346,18 @@ namespace HSP.Vanilla.ReferenceFrames
             }
         }
 
-        private void SwitchToAbsoluteMode()
+        private void SwitchToAbsoluteMode( bool keepCurrentState = false )
         {
-            IReferenceFrame sceneReferenceFrame = SceneReferenceFrameProvider.GetSceneReferenceFrame();
+            if( !keepCurrentState )
+            {
+                IReferenceFrame sceneReferenceFrame = SceneReferenceFrameProvider.GetSceneReferenceFrame();
 
-            _state.Velocity = sceneReferenceFrame.TransformVelocity( _rb.velocity );
-            _state.Position = sceneReferenceFrame.TransformPosition( _rb.position );
-            _requestedState.Position = _state.Position + (_state.Velocity * TimeManager.FixedDeltaTime);
+                _state.Velocity = sceneReferenceFrame.TransformVelocity( _rb.velocity );
+                _state.Position = sceneReferenceFrame.TransformPosition( _rb.position );
 
-            _state.AngularVelocity = sceneReferenceFrame.TransformAngularVelocity( _rb.angularVelocity );
-            _state.Rotation = sceneReferenceFrame.TransformRotation( _rb.rotation );
-            QuaternionDbl deltaRotation = QuaternionDbl.AngleAxis( _state.AngularVelocity.magnitude * TimeManager.FixedDeltaTime * 57.29577951308232, _state.AngularVelocity );
-            _requestedState.Rotation = deltaRotation * _state.Rotation;
+                _state.AngularVelocity = sceneReferenceFrame.TransformAngularVelocity( _rb.angularVelocity );
+                _state.Rotation = sceneReferenceFrame.TransformRotation( _rb.rotation );
+            }
 
             _isSceneSpace = false;
             _rb.isKinematic = true;
@@ -369,8 +372,8 @@ namespace HSP.Vanilla.ReferenceFrames
 
             _rb.velocity = (Vector3)sceneReferenceFrame.InverseTransformVelocity( _state.Velocity );
             _rb.angularVelocity = (Vector3)sceneReferenceFrame.InverseTransformAngularVelocity( _state.AngularVelocity );
-            Vector3 requestedPos = (Vector3)sceneReferenceFrame.InverseTransformPosition( _requestedState.Position );
-            Quaternion requestedRot = (Quaternion)sceneReferenceFrame.InverseTransformRotation( _requestedState.Rotation );
+            Vector3 requestedPos = (Vector3)sceneReferenceFrame.InverseTransformPosition( _state.Position );
+            Quaternion requestedRot = (Quaternion)sceneReferenceFrame.InverseTransformRotation( _state.Rotation );
 
             // set values immediately so that the returned AbsolutePosition is correct immediately after exiting this method.
             _rb.position = requestedPos;
@@ -534,12 +537,12 @@ namespace HSP.Vanilla.ReferenceFrames
                         var vel = t._state.Velocity + t._state.Acceleration * TimeManager.FixedDeltaTime;
                         var angvel = t._state.AngularVelocity + t._state.AngularAcceleration * TimeManager.FixedDeltaTime;
 
-                        t._requestedState.Position = t._state.Position + vel * TimeManager.FixedDeltaTime;
+                        t._state.Position = t._state.Position + vel * TimeManager.FixedDeltaTime;
                         QuaternionDbl deltaRotation = QuaternionDbl.AngleAxis( angvel.magnitude * TimeManager.FixedDeltaTime * 57.29577951308232, angvel );
-                        t._requestedState.Rotation = deltaRotation * t._state.Rotation;
+                        t._state.Rotation = deltaRotation * t._state.Rotation;
 
-                        var requestedPos = (Vector3)sceneReferenceFrameAfterPhysicsProcessing.InverseTransformPosition( t._requestedState.Position );
-                        var requestedRot = (Quaternion)sceneReferenceFrameAfterPhysicsProcessing.InverseTransformRotation( t._requestedState.Rotation );
+                        var requestedPos = (Vector3)sceneReferenceFrameAfterPhysicsProcessing.InverseTransformPosition( t._state.Position );
+                        var requestedRot = (Quaternion)sceneReferenceFrameAfterPhysicsProcessing.InverseTransformRotation( t._state.Rotation );
 
                         t._rb.Move( requestedPos, requestedRot );
                     }
@@ -567,9 +570,6 @@ namespace HSP.Vanilla.ReferenceFrames
 
                     t._state.Acceleration = Vector3Dbl.zero;
                     t._state.AngularAcceleration = Vector3Dbl.zero;
-
-                    t._state.Position = t._requestedState.Position;
-                    t._state.Rotation = t._requestedState.Rotation;
                 }
             }
         }

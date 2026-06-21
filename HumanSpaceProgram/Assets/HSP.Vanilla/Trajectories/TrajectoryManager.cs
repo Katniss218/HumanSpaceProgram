@@ -15,10 +15,10 @@ namespace HSP.Trajectories
     {
         private const int SIMULATOR_INDEX = 0;
         private const int PREDICTION_SIMULATOR_INDEX = 1;
-        public static TrajectorySimulator2 Simulator => instance._simulators[SIMULATOR_INDEX];
-        public static TrajectorySimulator2 PredictionSimulator => instance._simulators[PREDICTION_SIMULATOR_INDEX];
+        public static TrajectorySimulator Simulator => instance._simulators[SIMULATOR_INDEX];
+        public static TrajectorySimulator PredictionSimulator => instance._simulators[PREDICTION_SIMULATOR_INDEX];
 
-        private TrajectorySimulator2[] _simulators;
+        private TrajectorySimulator[] _simulators;
 #warning TODO - long ephemerides seem to clamp their tails to precision related to their head.
         private double _flightPlanDuration = 365 * 86400 * 1.05;
         public static double FlightPlanDuration
@@ -37,6 +37,7 @@ namespace HSP.Trajectories
         private HashSet<TrajectoryTransform> _transforms = new();
 
         private Dictionary<TrajectoryTransform, (Vector3Dbl pos, Vector3Dbl vel, Vector3Dbl interpolatedVel)> _posAndVelCache = new();
+        private Dictionary<TrajectoryTransform, bool> _needsUpdatingCache = new();
 
         /// <summary>
         /// Tries to add the specified trajectory to the simulation as an attractor.
@@ -122,8 +123,8 @@ namespace HSP.Trajectories
             {
                 _simulators = new[]
                 {
-                    new TrajectorySimulator2( 0.5, 50 ),
-                    new TrajectorySimulator2( FlightPlanDuration / 15000.0, (int)(FlightPlanDuration / 5000) )
+                    new TrajectorySimulator( 0.5, 50 ),
+                    new TrajectorySimulator( FlightPlanDuration / 15000.0, (int)(FlightPlanDuration / 5000) )
                 };
                 _simulators[SIMULATOR_INDEX].MaxStepSize = 20;
                 _simulators[SIMULATOR_INDEX].SetEphemerisParameters( 0.01, TimeManager.FixedDeltaTime, 20 );
@@ -157,8 +158,6 @@ namespace HSP.Trajectories
         {
             public void Run()
             {
-#warning TODO - this is buggy and a mess. new playerloop should hopefully make the ordering more controllable, so we can refactor this.
-                
                 if( !instanceExists )
                 {
                     return;
@@ -166,9 +165,15 @@ namespace HSP.Trajectories
 
                 instance.EnsureSimulatorsExist();
 
+                instance._needsUpdatingCache.Clear();
                 foreach( var trajectoryTransform in instance._transforms )
                 {
-                    if( trajectoryTransform.TrajectoryNeedsUpdating() )
+                    instance._needsUpdatingCache[trajectoryTransform] = trajectoryTransform.TrajectoryNeedsUpdating();
+                }
+
+                foreach( var trajectoryTransform in instance._transforms )
+                {
+                    if( instance._needsUpdatingCache[trajectoryTransform] )
                     {
                         foreach( var simulator in instance._simulators )
                         {
@@ -185,9 +190,7 @@ namespace HSP.Trajectories
                 {
                     instance._simulators[PREDICTION_SIMULATOR_INDEX].SetInitialTime( TimeManager.OldUT );
                 }
-#warning TODO - the first evaluation starts at 0 and simulates to 0 + deltaTime + duration
-                // start = 0.2 - 0.2
-                // end = 0.2 + duration
+
                 instance._simulators[SIMULATOR_INDEX].Simulate( TimeManager.UT );
                 instance._simulators[PREDICTION_SIMULATOR_INDEX].Simulate( TimeManager.OldUT + FlightPlanDuration );
 
@@ -195,12 +198,10 @@ namespace HSP.Trajectories
                 {
                     TrajectoryStateVector stateVector = Simulator.GetCurrentStateVector( trajectoryTransform );
 
-                    if( trajectoryTransform.TrajectoryNeedsUpdating() )
+                    if( instance._needsUpdatingCache[trajectoryTransform] )
                     {
                         instance._posAndVelCache[trajectoryTransform] = (stateVector.AbsolutePosition, stateVector.AbsoluteVelocity, Vector3Dbl.zero);
-                        //trajectoryTransform.SuppressValueChanged(); // for some reason, suppressing it here makes engines not work right.
-                        trajectoryTransform.ReferenceFrameTransform.SetAbsoluteVelocity(stateVector.AbsoluteVelocity);
-                        //trajectoryTransform.AllowValueChanged();
+                        trajectoryTransform.ReferenceFrameTransform.SetAbsoluteVelocity( stateVector.AbsoluteVelocity );
                     }
                     else
                     {
@@ -210,7 +211,7 @@ namespace HSP.Trajectories
                         instance._posAndVelCache[trajectoryTransform] = (stateVector.AbsolutePosition, stateVector.AbsoluteVelocity, interpolatedVel);
 
                         trajectoryTransform.SuppressValueChanged();
-                        trajectoryTransform.ReferenceFrameTransform.SetAbsoluteVelocity(interpolatedVel);
+                        trajectoryTransform.ReferenceFrameTransform.SetAbsoluteVelocity( interpolatedVel );
                         trajectoryTransform.AllowValueChanged();
                     }
                 }
@@ -227,12 +228,18 @@ namespace HSP.Trajectories
 
                 foreach( var trajectoryTransform in instance._transforms )
                 {
-                    var (_, vel, interpolatedVel) = instance._posAndVelCache[trajectoryTransform];
+                    if( !instance._posAndVelCache.TryGetValue( trajectoryTransform, out var cache ) )
+                        continue;
 
-                    if( !trajectoryTransform.TrajectoryNeedsUpdating() || trajectoryTransform.ReferenceFrameTransform.GetAbsoluteVelocity() == interpolatedVel )
+                    var (_, vel, interpolatedVel) = cache;
+
+                    if( !instance._needsUpdatingCache.TryGetValue( trajectoryTransform, out bool needsUpdating ) )
+                        needsUpdating = false;
+
+                    if( !needsUpdating && !trajectoryTransform.PhysicsTransform.IsColliding )
                     {
                         trajectoryTransform.SuppressValueChanged();
-                        trajectoryTransform.ReferenceFrameTransform.SetAbsoluteVelocity(vel);
+                        trajectoryTransform.ReferenceFrameTransform.SetAbsoluteVelocity( vel );
                         trajectoryTransform.AllowValueChanged();
                     }
                 }

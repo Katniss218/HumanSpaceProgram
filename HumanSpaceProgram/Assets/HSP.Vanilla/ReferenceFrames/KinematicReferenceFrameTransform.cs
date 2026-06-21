@@ -30,7 +30,6 @@ namespace HSP.Vanilla.ReferenceFrames
         }
 
         private KinematicState _state = KinematicState.AbsoluteIdentity;
-        private KinematicState _requestedState = KinematicState.AbsoluteIdentity;
 
         public ref readonly KinematicState GetStateRef( out IReferenceFrame referenceFrame )
         {
@@ -48,10 +47,10 @@ namespace HSP.Vanilla.ReferenceFrames
         public void SetState( in KinematicState state )
         {
             _state = state.InFrame( null );
-            _requestedState = _state;
+            var sceneFrame = SceneReferenceFrameProvider.GetSceneReferenceFrame();
+            ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( sceneFrame, transform, _rb, _state.Position );
+            ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( sceneFrame, transform, _rb, _state.Rotation );
             MakeCacheValid();
-            ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( SceneReferenceFrameProvider.GetSceneReferenceFrame(), transform, _rb, _state.Position );
-            ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( SceneReferenceFrameProvider.GetSceneReferenceFrame(), transform, _rb, _state.Rotation );
             OnStateChanged?.Invoke();
         }
 
@@ -69,10 +68,10 @@ namespace HSP.Vanilla.ReferenceFrames
                 _state = localState.InFrame( null );
             }
 
-            _requestedState = _state;
+            var sceneFrame = SceneReferenceFrameProvider.GetSceneReferenceFrame();
+            ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( sceneFrame, transform, _rb, _state.Position );
+            ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( sceneFrame, transform, _rb, _state.Rotation );
             MakeCacheValid();
-            ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( SceneReferenceFrameProvider.GetSceneReferenceFrame(), transform, _rb, _state.Position );
-            ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( SceneReferenceFrameProvider.GetSceneReferenceFrame(), transform, _rb, _state.Rotation );
             OnStateChanged?.Invoke();
         }
 
@@ -291,12 +290,12 @@ namespace HSP.Vanilla.ReferenceFrames
                     var vel = t._state.Velocity + t._state.Acceleration * TimeManager.FixedDeltaTime;
                     var angvel = t._state.AngularVelocity + t._state.AngularAcceleration * TimeManager.FixedDeltaTime;
 
-                    t._requestedState.Position = t._state.Position + vel * TimeManager.FixedDeltaTime;
+                    t._state.Position = t._state.Position + vel * TimeManager.FixedDeltaTime;
                     QuaternionDbl deltaRotation = QuaternionDbl.AngleAxis( angvel.magnitude * TimeManager.FixedDeltaTime * 57.29577951308232, angvel );
-                    t._requestedState.Rotation = deltaRotation * t._state.Rotation;
+                    t._state.Rotation = deltaRotation * t._state.Rotation;
 
-                    var requestedPos = (Vector3)sceneReferenceFrameAfterPhysicsProcessing.InverseTransformPosition( t._requestedState.Position );
-                    var requestedRot = (Quaternion)sceneReferenceFrameAfterPhysicsProcessing.InverseTransformRotation( t._requestedState.Rotation );
+                    var requestedPos = (Vector3)sceneReferenceFrameAfterPhysicsProcessing.InverseTransformPosition( t._state.Position );
+                    var requestedRot = (Quaternion)sceneReferenceFrameAfterPhysicsProcessing.InverseTransformRotation( t._state.Rotation );
 
                     t._rb.Move( requestedPos, requestedRot );
                 }
@@ -316,9 +315,6 @@ namespace HSP.Vanilla.ReferenceFrames
 
                     t._state.Acceleration = Vector3Dbl.zero;
                     t._state.AngularAcceleration = Vector3Dbl.zero;
-
-                    t._state.Position = t._requestedState.Position;
-                    t._state.Rotation = t._requestedState.Rotation;
                 }
             }
         }
