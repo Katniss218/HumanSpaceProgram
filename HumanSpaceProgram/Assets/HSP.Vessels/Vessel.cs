@@ -18,13 +18,30 @@ namespace HSP.Vessels
         public const string ID = HSPEvent.NAMESPACE_HSP + ".vessel_destroyed.after";
     }
 
-    public static class HSPEvent_AFTER_VESSEL_HIERARCHY_CHANGED
+    public static class HSPEvent_AFTER_VESSEL_SPLIT
     {
-#warning TODO - maybe remove the dependency on hspevent.eventmanager and make this type-safe? 
-        // (by having a separate event for each... event. And getting rid of the eventmanager completely)
-        // It would also need some marker attribute on the events to tell the HSPEventListener attribute where to add the listeners.
+        public const string ID = HSPEvent.NAMESPACE_HSP + ".vessel_split.after";
+        public struct Data
+        {
+            public Vessel OldVessel;
+            public Vessel NewVessel;
+            public VesselPart SplitRoot;
+        }
+    }
 
-        public const string ID = HSPEvent.NAMESPACE_HSP + ".vessel_hierachy_changed";
+    public static class HSPEvent_AFTER_VESSEL_MERGE
+    {
+        public const string ID = HSPEvent.NAMESPACE_HSP + ".vessel_merge.after";
+        public struct Data
+        {
+            public Vessel RemainingVessel;
+            public Vessel MergedVessel;
+        }
+    }
+
+    public static class HSPEvent_AFTER_VESSEL_STATE_CHANGED
+    {
+        public const string ID = "caa42be2-5b08-4a27-a35e-bec2b7aca5e3";
     }
 
     /// <summary>
@@ -103,6 +120,9 @@ namespace HSP.Vessels
 
         public Action OnAfterRecalculateParts;
 
+        VesselIsland[] _islands; // cache
+        VesselAttachmentGraph _attachGraph; // cache
+
 #warning TODO - Accumulatable values - https://github.com/Katniss218/HumanSpaceProgram/issues/19
         /*
         private struct Entry
@@ -169,6 +189,11 @@ namespace HSP.Vessels
 
             // There's also multi-scene physics, which apparently might be used to put the origin of the simulation at 2 different vessels, and have their positions accuratly updated???
             // doesn't seem like that to me reading the docs tho, but idk.
+        }
+
+        public void RebuildIslands()
+        {
+            // needs to handle when islands already exist, and correctly loop over all the parts and reassign them to new islands.
         }
 
         public void RecalculatePartCache()

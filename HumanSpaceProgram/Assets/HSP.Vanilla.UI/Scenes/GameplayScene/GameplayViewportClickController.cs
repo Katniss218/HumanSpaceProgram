@@ -61,7 +61,7 @@ namespace HSP.Vanilla.UI.Scenes.GameplayScene
                 clickedPart = redirectComponent.Target;
             }
 
-            if( FPart.GetPart( clickedPart ) == null )
+            if( VesselPart.GetPart( clickedPart ) == null )
             {
                 return false;
             }

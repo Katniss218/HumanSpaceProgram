@@ -7,8 +7,13 @@ using UnityPlus.Serialization.Descriptors;
 
 namespace HSP.Vanilla.Components
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class FVesselSeparator : MonoBehaviour
     {
+        public FAttachNode NodeToSeparate;
+
         bool _hasSeparated = false;
 
         [NamedControl( "Separate", "Connect this to the sequencer, or a controller's separation output." )]
@@ -20,7 +25,11 @@ namespace HSP.Vanilla.Components
                 return;
             }
 
-            VesselHierarchyUtils.SetParent( this.transform, null );
+            if( NodeToSeparate != null && NodeToSeparate.ConnectedNode != null )
+            {
+                VesselHierarchyUtils.Detach( NodeToSeparate, NodeToSeparate.ConnectedNode );
+            }
+
             _hasSeparated = true;
         }
 
@@ -34,7 +43,8 @@ namespace HSP.Vanilla.Components
         {
             return new MemberwiseDescriptor<FVesselSeparator>()
                 .WithMember( "separate", o => o.Separate )
-                .WithMember( "has_separated", o => o._hasSeparated );
+                .WithMember( "has_separated", o => o._hasSeparated )
+                .WithMember( "node_to_separate", o => o.NodeToSeparate );
         }
     }
 }

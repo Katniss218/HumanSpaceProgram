@@ -98,7 +98,7 @@ namespace HSP.Vanilla.UI.Components
             {
                 throw new ArgumentNullException( nameof( referencePart ), $"Can't create a part window for a nonexistent part." );
             }
-            PartMetadata part = FPart.GetPart( referencePart );
+            PartMetadata part = VesselPart.GetPart( referencePart );
             if( part == null )
             {
                 throw new ArgumentNullException( nameof( referencePart ), $"Can't create a part window for an object that can't be mapped to a {nameof( PartMetadata )}." );

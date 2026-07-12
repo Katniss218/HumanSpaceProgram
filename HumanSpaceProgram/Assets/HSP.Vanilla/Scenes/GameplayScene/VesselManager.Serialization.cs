@@ -1,10 +1,8 @@
-using HSP.CelestialBodies;
 using HSP.SceneManagement;
 using HSP.Timelines;
 using HSP.Vessels;
 using System;
 using System.IO;
-using System.Linq;
 using UnityEngine;
 using UnityPlus.Serialization;
 using UnityPlus.Serialization.Formats;
@@ -33,7 +31,9 @@ namespace HSP.Vanilla.Scenes.GameplayScene
             int i = 0;
             foreach( var vessel in VesselManager.LoadedVessels )
             {
-                var dataHandler = new FileSerializedDataHandler( Path.Combine( vesselsPath, $"{i}", "gameobjects.json" ), JsonFormat.Instance );
+                var vesselDataHandler = new FileSerializedDataHandler( Path.Combine( vesselsPath, $"{i}", "_vessel.json" ), JsonFormat.Instance );
+                var partsDataHandler = new FileSerializedDataHandler( Path.Combine( vesselsPath, $"{i}", "parts.json" ), JsonFormat.Instance ); // gameobjects
+                var graphDataHandler = new FileSerializedDataHandler( Path.Combine( vesselsPath, $"{i}", "graph.json" ), JsonFormat.Instance );
 
                 try
                 {
@@ -67,7 +67,10 @@ namespace HSP.Vanilla.Scenes.GameplayScene
 
             foreach( var dir in Directory.GetDirectories( vesselsPath ) )
             {
-                var dataHandler = new FileSerializedDataHandler( Path.Combine( dir, "gameobjects.json" ), JsonFormat.Instance );
+                var vesselDataHandler = new FileSerializedDataHandler( Path.Combine( dir, "_vessel.json" ), JsonFormat.Instance );
+                var partsDataHandler = new FileSerializedDataHandler( Path.Combine( dir, "parts.json" ), JsonFormat.Instance ); // gameobjects
+                var graphDataHandler = new FileSerializedDataHandler( Path.Combine( dir, "graph.json" ), JsonFormat.Instance );
+
                 var data = dataHandler.Read();
 
                 try
