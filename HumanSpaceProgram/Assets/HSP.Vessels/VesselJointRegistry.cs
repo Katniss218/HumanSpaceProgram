@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace HSP.Vessels
 {
-    internal class VesselJointRegistry
+    public static class VesselJointRegistry
     {
         private static readonly Dictionary<(Type, Type), Func<FAttachNode, FAttachNode, ConfigurableJoint>> _factories = new();
 

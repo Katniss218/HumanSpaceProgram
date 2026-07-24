@@ -1,4 +1,5 @@
 ﻿using HSP.ReferenceFrames;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace HSP.Vessels
@@ -12,5 +13,7 @@ namespace HSP.Vessels
         public Transform ReferenceTransform { get; }
         public IPhysicsTransform PhysicsTransform { get; }
         public IReferenceFrameTransform ReferenceFrameTransform { get; }
+        public IReadonlyVesselAttachmentGraph Attachments { get; }
+        public IReadOnlyList<IReadonlyVesselIsland> Islands { get; }
     }
 }

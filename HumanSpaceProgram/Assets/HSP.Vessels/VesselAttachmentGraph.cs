@@ -2,16 +2,27 @@
 
 namespace HSP.Vessels
 {
-    public struct AttachmentEdge
-    {
-        public VesselPart Target;
-        public bool IsRigid;
-    }
-
-    public class VesselAttachmentGraph
+    public class VesselAttachmentGraph : IReadonlyVesselAttachmentGraph
     {
         // Adjacency list for undirected graph
         private Dictionary<VesselPart, List<AttachmentEdge>> _adjacencyList = new();
+
+        public IReadOnlyCollection<VesselPart> Nodes => _adjacencyList.Keys;
+
+        public bool HasNode( VesselPart part )
+        {
+            return _adjacencyList.ContainsKey( part );
+        }
+
+        public IReadOnlyList<AttachmentEdge> GetEdges( VesselPart part )
+        {
+            if( _adjacencyList.TryGetValue( part, out var list ) )
+            {
+                return list;
+            }
+
+            return System.Array.Empty<AttachmentEdge>();
+        }
 
         public void AddNode( VesselPart part )
         {
@@ -32,8 +43,8 @@ namespace HSP.Vessels
 
         public List<VesselIsland> DetectIslands()
         {
-            var islands = new List<VesselIsland>();
-            var visited = new HashSet<VesselPart>();
+            List<VesselIsland> islands = new();
+            HashSet<VesselPart> visited = new();
 
             foreach( var node in _adjacencyList.Keys )
             {

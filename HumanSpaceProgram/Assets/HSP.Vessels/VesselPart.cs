@@ -12,7 +12,15 @@ namespace HSP.Vessels
     /// </summary>
     public class VesselPart : MonoBehaviour
     {
-        [field: SerializeField]
+#warning TODO - something needs to set the vessel.
+        /// <summary>
+        /// Gets or sets the vessel that this part belongs to. 
+        /// </summary>
+        public Vessel Vessel { get; internal set; }
+
+        /// <summary>
+        /// The ID of this part type (not instance).
+        /// </summary>
         public NamespacedID PartID { get; set; }
 
         public static PartMetadata GetPart( Transform obj )
@@ -33,7 +41,7 @@ namespace HSP.Vessels
         }
 
         [MapsInheritingFrom( typeof( VesselPart ) )]
-        public static IDescriptor FPartMapping()
+        public static IDescriptor VesselPartMapping()
         {
             return new MemberwiseDescriptor<VesselPart>()
                 .WithMember( "part_id", o => o.PartID );

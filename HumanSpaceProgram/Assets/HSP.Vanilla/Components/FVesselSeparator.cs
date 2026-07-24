@@ -25,9 +25,9 @@ namespace HSP.Vanilla.Components
                 return;
             }
 
-            if( NodeToSeparate != null && NodeToSeparate.ConnectedNode != null )
+            if( NodeToSeparate != null )
             {
-                VesselHierarchyUtils.Detach( NodeToSeparate, NodeToSeparate.ConnectedNode );
+                VesselHierarchyUtils.Detach( NodeToSeparate );
             }
 
             _hasSeparated = true;

@@ -90,7 +90,7 @@ namespace HSP.Vessels
 
             if( vesselA == vesselB )
             {
-                vesselA.Graph.AddLink( nodeA, nodeB );
+                vesselA.Attachments.AddLink( nodeA, nodeB );
                 vesselA.RebuildIslands();
             }
             else
@@ -105,7 +105,7 @@ namespace HSP.Vessels
                 Vector3Dbl posB = mergedVessel.ReferenceFrameTransform.GetAbsolutePosition();
                 QuaternionDbl rotB = mergedVessel.ReferenceFrameTransform.GetAbsoluteRotation();
 
-                foreach( var part in mergedVessel.Graph.GetAllParts() )
+                foreach( var part in mergedVessel.Attachments.GetAllParts() )
                 {
                     Vector3 localPosB = GetLocalPosRelative( part.transform, mergedVessel.transform );
                     Quaternion localRotB = GetLocalRotRelative( part.transform, mergedVessel.transform );
@@ -120,11 +120,11 @@ namespace HSP.Vessels
                     part.transform.localPosition = (Vector3)localPartPosA;
                     part.transform.localRotation = (Quaternion)localPartRotA;
 
-                    remainingVessel.Graph.AddNode( part );
+                    remainingVessel.Attachments.AddNode( part );
                 }
 
-                remainingVessel.Graph.MergeGraph( mergedVessel.Graph );
-                remainingVessel.Graph.AddLink( nodeA, nodeB );
+                remainingVessel.Attachments.MergeGraph( mergedVessel.Attachments );
+                remainingVessel.Attachments.AddLink( nodeA, nodeB );
 
                 HSPEvent.EventManager.TryInvoke( HSPEvent_AFTER_VESSEL_MERGE.ID, new HSPEvent_AFTER_VESSEL_MERGE.Data
                 {
@@ -140,17 +140,22 @@ namespace HSP.Vessels
             }
         }
 
-        public static void Detach( FAttachNode nodeA, FAttachNode nodeB )
+        public static void Detach( FAttachNode nodeA )
         {
-            if( nodeA == null || nodeB == null ) return;
+#warning TODO - we only use a single node input, get the connected node dynamically.
+            //             var nodeB = NodeToSeparate.Part.Vessel.Attachments.Get( NodeToSeparate );
+
+            if( nodeA == null || nodeB == null )
+                return;
 
             Vessel vessel = nodeA.Part.GetVessel();
-            if( vessel != nodeB.Part.GetVessel() ) return; // Not in the same vessel
+            if( vessel != nodeB.Part.GetVessel() ) 
+                return; // Not in the same vessel
 
-            vessel.Graph.RemoveLink( nodeA, nodeB );
+            vessel.Attachments.RemoveLink( nodeA, nodeB );
 
             // Check if graph split
-            var connectedComponents = vessel.Graph.GetConnectedComponents();
+            var connectedComponents = vessel.Attachments.GetConnectedComponents();
 
             if( connectedComponents.Count > 1 )
             {
@@ -163,7 +168,7 @@ namespace HSP.Vessels
                     CreateVesselFromSplit( vessel, splitParts );
                 }
 
-                vessel.Graph.RetainOnly( primaryComponent );
+                vessel.Attachments.RetainOnly( primaryComponent );
 
                 if( vessel.RootPart != null && !primaryComponent.Contains( vessel.RootPart.GetComponent<VesselPart>() ) )
                 {
@@ -215,18 +220,18 @@ namespace HSP.Vessels
                 part.transform.localPosition = preciseLocalPos;
                 part.transform.localRotation = preciseLocalRot;
 
-                newVessel.Graph.AddNode( part );
+                newVessel.Attachments.AddNode( part );
             }
 
             foreach( var part in splitParts )
             {
-                foreach( var link in oldVessel.Graph.GetLinksForPart( part ) )
+                foreach( var link in oldVessel.Attachments.GetLinksForPart( part ) )
                 {
                     if( splitParts.Contains( link.NodeA.Part ) && splitParts.Contains( link.NodeB.Part ) )
                     {
-                        if( !newVessel.Graph.ContainsLink( link ) )
+                        if( !newVessel.Attachments.ContainsLink( link ) )
                         {
-                            newVessel.Graph.AddLink( link.NodeA, link.NodeB );
+                            newVessel.Attachments.AddLink( link.NodeA, link.NodeB );
                         }
                     }
                 }

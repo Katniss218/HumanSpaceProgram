@@ -123,6 +123,9 @@ namespace HSP.Vessels
         VesselIsland[] _islands; // cache
         VesselAttachmentGraph _attachGraph; // cache
 
+        public IReadonlyVesselAttachmentGraph Attachments => _attachGraph;
+        public IReadOnlyList<IReadonlyVesselIsland> Islands => _islands;
+
 #warning TODO - Accumulatable values - https://github.com/Katniss218/HumanSpaceProgram/issues/19
         /*
         private struct Entry
