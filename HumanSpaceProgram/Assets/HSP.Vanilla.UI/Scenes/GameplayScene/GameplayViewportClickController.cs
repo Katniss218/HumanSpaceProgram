@@ -2,7 +2,6 @@
 using HSP.Vanilla.Scenes.GameplayScene;
 using HSP.Vanilla.UI.Components;
 using HSP.Vessels;
-using HSP.Vessels.Components;
 using UnityEngine;
 using UnityPlus.Input;
 using UnityPlus.UILib;
@@ -49,19 +48,14 @@ namespace HSP.Vanilla.UI.Scenes.GameplayScene
                 return false;
             }
 
-            Transform clickedPart = hit.collider.transform;
-            if( clickedPart.GetVessel() == null )
+            Transform clickedTransform = hit.collider.transform;
+            if( clickedTransform.GetVessel() == null )
             {
                 return false;
             }
 
-            TransformRedirect redirectComponent = clickedPart.GetComponent<TransformRedirect>();
-            if( redirectComponent != null && redirectComponent.Target != null )
-            {
-                clickedPart = redirectComponent.Target;
-            }
-
-            if( VesselPart.GetPart( clickedPart ) == null )
+            VesselPart clickedPart = VesselPart.GetPart( clickedTransform );
+            if( clickedPart == null )
             {
                 return false;
             }

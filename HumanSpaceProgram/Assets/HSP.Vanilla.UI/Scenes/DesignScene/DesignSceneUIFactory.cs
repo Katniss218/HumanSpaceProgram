@@ -144,10 +144,6 @@ namespace HSP.Vanilla.UI.Scenes.DesignScene
             {
                 DesignSceneToolManager.UseTool<RotateTool>();
             } );
-            UIButton rerootButton = uiPanel.AddButton( new UILayoutInfo( UIAnchor.BottomLeft, (96, 0), (30, 30) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/toolicon_reroot" ), () =>
-            {
-                DesignSceneToolManager.UseTool<RerootTool>();
-            } );
         }
 
         [HSPEventListener( HSPEvent_AFTER_DESIGN_SCENE_TOOL_CHANGED.ID, UPDATE_SELECTED_TOOL )]
@@ -175,10 +171,6 @@ namespace HSP.Vanilla.UI.Scenes.DesignScene
                 if( toolType == typeof( RotateTool ) )
                 {
                     UIText t = _toolOptionsPanel.AddStdText( new UILayoutInfo( UIFill.Fill() ), "rotate" );
-                }
-                if( toolType == typeof( RerootTool ) )
-                {
-                    UIText t = _toolOptionsPanel.AddStdText( new UILayoutInfo( UIFill.Fill() ), "reroot" );
                 }
             }
         }

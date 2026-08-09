@@ -1,6 +1,5 @@
 ﻿using HSP.Content.Vessels.Serialization;
-using System;
-using UnityEngine;
+using HSP.Vessels;
 using UnityPlus.Serialization;
 
 namespace HSP.Content.Vessels
@@ -20,6 +19,6 @@ namespace HSP.Content.Vessels
         /// Instantiates the gameobject hierarchy of this specific part from the original source.
         /// </summary>
         /// <returns>The root game object of the instantiated hierarchy.</returns>
-        public abstract GameObject Load( IForwardReferenceMap refMap );
+        public abstract Vessel Load( IForwardReferenceMap refMap );
     }
 }

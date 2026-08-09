@@ -1,5 +1,7 @@
 ﻿using HSP.ResourceFlow;
 using HSP.Vessels;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityPlus.Serialization;
 using UnityPlus.Serialization.Descriptors;
@@ -22,7 +24,7 @@ namespace HSP.Vanilla.ResourceFlow
 
         void OnEnable()
         {
-            if( _vessel != null && _vessel.RootPart != null )
+            if( _vessel != null && _vessel.Parts.Any() )
             {
                 BuildAndRegisterNetwork();
             }
@@ -37,9 +39,10 @@ namespace HSP.Vanilla.ResourceFlow
 
         private void BuildAndRegisterNetwork()
         {
-            if( _vessel.RootPart != null )
+            if( _vessel.Parts.Any() )
             {
-                _snapshot = FlowNetworkBuilder.CreateFromGameObject( _vessel.RootPart.gameObject ).BuildSnapshot();
+                IEnumerable<IBuildsFlowNetwork> buildsFlowNetworks = null;// @@todo - implement this.
+                _snapshot = FlowNetworkBuilder.Create( buildsFlowNetworks ).BuildSnapshot();
                 FlowNetworkManager.Register( _snapshot );
             }
         }

@@ -76,7 +76,7 @@ namespace HSP.Vanilla
                 if( e.oldRootPart == null )
                     return;
 
-                if( FAnchor.IsAnchored( e.v.RootPart ) )
+                if( FAnchor.HasAnchor( e.v ) )
                 {
                     PinnedCelestialBodyReferenceFrameTransform ppo = e.oldRootPart.GetVessel().GetComponent<PinnedCelestialBodyReferenceFrameTransform>();
                     e.v.Pin( ppo.ReferenceBody, ppo.ReferencePosition, ppo.ReferenceRotation );

@@ -65,8 +65,6 @@ namespace HSP.ResourceFlow
             public double SpecificEnthalpy; // J/kg
         }
 
-        public GameObject RootObject { get; }
-
         public IReadOnlyList<FlowPipe> Pipes => _pipes;
 
         public IReadOnlyList<IResourceProducer> Producers => _producers;
@@ -121,9 +119,8 @@ namespace HSP.ResourceFlow
 
         private bool _disposed;
 
-        public FlowNetworkSnapshot( GameObject rootObject, IReadOnlyDictionary<object, object> owner, IBuildsFlowNetwork[] flowBuilders, List<IResourceProducer> producers, List<IResourceConsumer> consumers, List<FlowPipe> pipes )
+        public FlowNetworkSnapshot( IReadOnlyDictionary<object, object> owner, IBuildsFlowNetwork[] flowBuilders, List<IResourceProducer> producers, List<IResourceConsumer> consumers, List<FlowPipe> pipes )
         {
-            RootObject = rootObject;
             _owner = owner;
             _applyTo = flowBuilders;
             _producers = producers;

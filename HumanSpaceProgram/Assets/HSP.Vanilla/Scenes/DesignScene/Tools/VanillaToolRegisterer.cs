@@ -11,7 +11,6 @@ namespace HSP.Vanilla.Scenes.DesignScene.Tools
             DesignSceneToolManager.RegisterTool<PickTool>();
             DesignSceneToolManager.RegisterTool<TranslateTool>();
             DesignSceneToolManager.RegisterTool<RotateTool>();
-            DesignSceneToolManager.RegisterTool<RerootTool>();
         }
     }
 }

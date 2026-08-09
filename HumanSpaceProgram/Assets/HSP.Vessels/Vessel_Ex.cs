@@ -4,18 +4,6 @@ namespace HSP.Vessels
 {
     public static class Vessel_Ex
     {
-        public static bool IsRootOfVessel( this Transform part )
-        {
-            if( part.root != part.parent )
-                return false;
-
-            Vessel v = part.parent.GetComponent<Vessel>();
-            if( v == null )
-                return false;
-
-            return v.RootPart == part;
-        }
-
         /// <summary>
         /// Gets the <see cref="Vessel"/> attached to this transform.
         /// </summary>

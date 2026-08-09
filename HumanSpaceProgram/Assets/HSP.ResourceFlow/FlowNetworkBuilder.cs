@@ -21,26 +21,15 @@ namespace HSP.ResourceFlow
 
         public IReadOnlyDictionary<object, object> Owner => _inverseOwner;
 
-        // --- Data from GameObject discovery ---
-        private GameObject _rootObject;
         private IBuildsFlowNetwork[] _components = Array.Empty<IBuildsFlowNetwork>();
 
-        public static FlowNetworkBuilder CreateFromGameObject( GameObject obj )
+        public static FlowNetworkBuilder Create( IEnumerable<IBuildsFlowNetwork> components )
         {
-            // return the flow network for this object and its children.
-
-            // iterate over all descendants and collect their pipes. collect the tanks that these pipes connect to.
-            // - No point solving tanks that don't matter.
-            // - Also don't solve pipes that are closed.
-
-            // iterate over gameobjects that implement this.
-            if( obj == null )
+            if( components == null || !components.Any() )
                 return null;
 
             FlowNetworkBuilder builder = new FlowNetworkBuilder();
-            builder._rootObject = obj;
-
-            builder._components = obj.GetComponentsInChildren<IBuildsFlowNetwork>( true );
+            builder._components = components.ToArray();
 
             List<IBuildsFlowNetwork> retryList = null;
             foreach( var comp in builder._components )
@@ -88,7 +77,7 @@ namespace HSP.ResourceFlow
 
         public FlowNetworkSnapshot BuildSnapshot()
         {
-            return new FlowNetworkSnapshot( _rootObject, Owner, _components, Producers.ToList(), Consumers.ToList(), Pipes.ToList() );
+            return new FlowNetworkSnapshot( Owner, _components, Producers.ToList(), Consumers.ToList(), Pipes.ToList() );
         }
 
         public bool TryAddFlowObj( object owner, object flowObj )

@@ -1,6 +1,7 @@
 ﻿using HSP.Content;
 using HSP.Content.Vessels;
 using HSP.Content.Vessels.Serialization;
+using HSP.Vessels;
 using System;
 using System.IO;
 using UnityEngine;
@@ -34,7 +35,7 @@ namespace HSP.Vanilla.Content.AssetLoaders
             return partMeta;
         }
 
-        public override GameObject Load( IForwardReferenceMap refMap )
+        public override Vessel Load( IForwardReferenceMap refMap )
         {
             string filePath = VesselMetadata.GetRootDirectory( _vesselId );
 

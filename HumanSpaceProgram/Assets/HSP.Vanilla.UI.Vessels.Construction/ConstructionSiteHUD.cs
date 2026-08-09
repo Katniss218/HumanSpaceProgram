@@ -99,8 +99,18 @@ namespace HSP.Vanilla.UI.Vessels.Construction
 
         void LateUpdate()
         {
+            if( ConstructionSite == null || ConstructionSite.Parts.Count == 0 )
+            {
+                if( gameObject.activeSelf )
+                    gameObject.SetActive( false );
+                return;
+            }
+
+            if( !gameObject.activeSelf )
+                gameObject.SetActive( true );
+
             (float current, float total) = ConstructionSite.GetBuildPoints();
-            float percent = current / total;
+            float percent = total > 0.0f ? current / total : 0.0f;
             // needs a simple fill image UI component
             _progressImage.fillAmount = percent;
             _statusIcon.Sprite = GetStatusSprite();

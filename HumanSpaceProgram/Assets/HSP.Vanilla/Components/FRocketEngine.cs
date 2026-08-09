@@ -4,6 +4,7 @@ using HSP.ResourceFlow;
 using HSP.Time;
 using HSP.Vessels;
 using System;
+using System.Linq;
 using UnityEngine;
 using UnityPlus.Serialization;
 using UnityPlus.Serialization.Descriptors;
@@ -270,7 +271,7 @@ namespace HSP.Vanilla.Components
             }
 
             Vessel vessel = this.transform.GetVessel();
-            if( vessel == null || vessel.RootPart == null )
+            if( vessel == null || !vessel.Parts.Any() )
             {
                 return BuildFlowResult.Retry;
             }

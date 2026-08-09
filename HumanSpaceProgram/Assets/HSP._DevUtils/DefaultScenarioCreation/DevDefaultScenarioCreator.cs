@@ -59,12 +59,15 @@ namespace HSP._DevUtils
             launchSite.gameObject.name = "launchsite";
             launchSite.Pin( body, localPos, Quaternion.FromToRotation( Vector3.up, localPos.normalized ) );
 
-            GameObject root = DontInstantiateLocal( PartRegistry.Load( (NamespacedID)"Vanilla::testlaunchsite" ), launchSite.transform, Vector3.zero, Quaternion.identity );
-            launchSite.RootPart = root.transform;
+            if( PartRegistry.TryLoad( (NamespacedID)"Vanilla::testlaunchsite", out var partGraph ) )
+            {
+                GameObject root = DontInstantiateLocal( partGraph, launchSite.transform, Vector3.zero, Quaternion.identity );
+                launchSite.RootPart = root.transform;
 
-            var vessel = CreateVessel( launchSite );
+                var vessel = CreateVessel( launchSite );
 
-            ActiveVesselManager.ActiveObject = vessel.RootPart.GetVessel().gameObject.transform;
+                ActiveVesselManager.ActiveObject = vessel.RootPart.GetVessel().gameObject.transform;
+            }
         }
 
         //

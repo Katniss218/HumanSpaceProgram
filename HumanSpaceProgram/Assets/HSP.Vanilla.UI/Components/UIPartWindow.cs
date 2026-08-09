@@ -1,6 +1,6 @@
 ﻿using HSP.Content.Vessels.Serialization;
 using HSP.UI;
-using HSP.Vessels.Components;
+using HSP.Vessels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,15 +31,15 @@ namespace HSP.Vanilla.UI.Components
         /// The part that is currently referenced by this part window.
         /// </summary>
         [field: SerializeField]
-        public Transform ReferencePart { get; private set; }
+        public VesselPart ReferencePart { get; private set; }
 
         IUIElementContainer _list;
         WindowRelationHighlight _relationHighlighter;
 
-        public void SetPart( Transform referencePart )
+        public void SetPart( VesselPart referencePart )
         {
             this.ReferencePart = referencePart;
-            this._relationHighlighter.ReferenceTransform = referencePart;
+            this._relationHighlighter.ReferenceTransform = referencePart.transform;
             ReDraw();
         }
 
@@ -69,7 +69,7 @@ namespace HSP.Vanilla.UI.Components
         /// <summary>
         /// Checks if there is a part window being displayed for the specified transform.
         /// </summary>
-        public static bool ExistsFor( Transform referencePart )
+        public static bool ExistsFor( VesselPart referencePart )
         {
             // Remove destroyed windows, and windows referencing destroyed parts (if any leaked out) from the list.
             _activePartWindows = _activePartWindows.Where( pw => pw != null && pw.ReferencePart != null ).ToList();
@@ -90,7 +90,7 @@ namespace HSP.Vanilla.UI.Components
         }
 
         /// <param name="referencePart">The transform that will serve as the root for the part window.</param>
-        public static T Create<T>( UICanvas parent, UILayoutInfo layout, Transform referencePart ) where T : UIPartWindow
+        public static T Create<T>( UICanvas parent, UILayoutInfo layout, VesselPart referencePart ) where T : UIPartWindow
         {
             // Note that this method shouldn't handle any redirecting,
             // so if you invoke it with the transform of a collider that doesn't have any functionalities attached, it will not show anything.
@@ -98,7 +98,7 @@ namespace HSP.Vanilla.UI.Components
             {
                 throw new ArgumentNullException( nameof( referencePart ), $"Can't create a part window for a nonexistent part." );
             }
-            PartMetadata part = VesselPart.GetPart( referencePart );
+            PartMetadata part = referencePart.GetPartMetadata();
             if( part == null )
             {
                 throw new ArgumentNullException( nameof( referencePart ), $"Can't create a part window for an object that can't be mapped to a {nameof( PartMetadata )}." );
@@ -137,7 +137,7 @@ namespace HSP.Vanilla.UI.Components
 
     public static class UIPartWindow_Ex
     {
-        public static UIPartWindow AddPartWindow( this UICanvas parent, UILayoutInfo layout, Transform referencePart )
+        public static UIPartWindow AddPartWindow( this UICanvas parent, UILayoutInfo layout, VesselPart referencePart )
         {
             return UIPartWindow.Create<UIPartWindow>( parent, layout, referencePart );
         }

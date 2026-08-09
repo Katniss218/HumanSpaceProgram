@@ -1,20 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace HSP.Vessels
 {
     public static class VesselJointRegistry
     {
-        private static readonly Dictionary<(Type, Type), Func<FAttachNode, FAttachNode, ConfigurableJoint>> _factories = new();
+        private static readonly Dictionary<(Type, Type), Func<FAttachNode, FAttachNode, UnityEngine.Joint>> _factories = new();
 
-        public static void RegisterHandler<T1, T2>( Func<FAttachNode, FAttachNode, ConfigurableJoint> factory )
+        public static void RegisterHandler<T1, T2>( Func<FAttachNode, FAttachNode, UnityEngine.Joint> factory )
             where T1 : FAttachNode
             where T2 : FAttachNode
         {
-            if(factory == null)
-                throw new ArgumentNullException( nameof(factory) );
-            // TODO - type-check the actual delegate arguments.
+            if( factory == null )
+                throw new ArgumentNullException( nameof( factory ) );
+            // @@todo - type-check the actual delegate arguments.
 
 
 
@@ -48,7 +47,7 @@ namespace HSP.Vessels
                 }
             }
 
-            Debug.LogWarning( $"No joint factory registered for {nodeA.GetType().Name} and {nodeB.GetType().Name}" );
+            UnityEngine.Debug.LogWarning( $"No joint factory registered for {nodeA.GetType().Name} and {nodeB.GetType().Name}" );
             return null;
         }
 

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -47,7 +47,7 @@ namespace HSP.Vessels.Construction
     /// <summary>
     /// Represents a "part" (hierarchy of gameobjects) that can be in various stages of construction.
     /// </summary>
-    public class FConstructible : MonoBehaviour
+    public class FConstructible : FComponent
     {
         [SerializeField]
         private float _buildPoints;
@@ -103,20 +103,20 @@ namespace HSP.Vessels.Construction
 
         void OnAfterBuildPointsChanged()
         {
-            //if( !_isGhost && this.BuildPercent < 1.0f )
-            //{
-            //    RunOriginalToGhost();
-            //    var vessel = this.transform.GetVessel();
-            //    if( vessel != null )
-            //        vessel.RecalculatePartCache();
-            //}
-            //else if( _isGhost && this.BuildPercent == 1.0f )
-            //{
-            //    RunGhostToOriginal();
-            //    var vessel = this.transform.GetVessel();
-            //    if( vessel != null )
-            //        vessel.RecalculatePartCache();
-            //}
+            if( !_isGhost && this.BuildPercent < 1.0f )
+            {
+                RunOriginalToGhost();
+                var vessel = this.transform.GetVessel();
+                if( vessel != null )
+                    vessel.RecalculatePartCache();
+            }
+            else if( _isGhost && this.BuildPercent == 1.0f )
+            {
+                RunGhostToOriginal();
+                var vessel = this.transform.GetVessel();
+                if( vessel != null )
+                    vessel.RecalculatePartCache();
+            }
         }
 
         private void RunOriginalToGhost()
@@ -145,6 +145,29 @@ namespace HSP.Vessels.Construction
             OnAfterBuildPointsChanged();
         }
 
+
+        private static void CollectComponentsRecursive<T>( Transform current, List<T> result ) where T : Component
+        {
+            current.GetComponents( result );
+
+            foreach( Transform child in current )
+            {
+                CollectComponentsRecursive( child, result );
+            }
+        }
+
+        private static List<T> GetComponentsInHierarchy<T>( Transform root ) where T : Component
+        {
+            var result = new List<T>();
+            CollectComponentsRecursive( root, result );
+            return result;
+        }
+
+        private IEnumerable<Component> GetGovernedComponents()
+        {
+            return GetComponentsInHierarchy<Component>( this.transform );
+        }
+
         /// <summary>
         /// Caches the current state of the vessel.
         /// </summary>
@@ -157,27 +180,22 @@ namespace HSP.Vessels.Construction
 
             _cachedRefStore.Clear();
 
-            // this entire thing could be ran once per entire vessel and cached until something is added/removed from it.
-            AncestralMap<FConstructible> partMap = AncestralMap<FConstructible>.Create( transform );
-            if( partMap.TryGetValue( this, out var ourPartsTransforms ) )
+            IEnumerable<Component> comps = GetGovernedComponents();
+
+            foreach( var comp in comps )
             {
-                IEnumerable<Component> comps = ourPartsTransforms.SelectMany( t => t.GetComponents() );
+                SerializedData originalToGhost = SerializationUnit.Serialize<Component>( typeof( Contexts.Ctx.Ghost ), comp, _cachedRefStore );
+                if( originalToGhost == null ) // Only cache what can be ghosted - should probably be signified differently than == null, but it works for now.
+                    continue;
+                SerializedData ghostToOriginal = SerializationUnit.Serialize<Component>( typeof( Ctx.Value ), comp, _cachedRefStore );
 
-                foreach( var comp in comps )
+                // TODO - remove keys from revObj, that aren't present in forwardObj.
+                /*if( originalToGhost is SerializedObject forwardObj && ghostToOriginal is SerializedObject revObj )
                 {
-                    SerializedData originalToGhost = SerializationUnit.Serialize<Component>( typeof( Contexts.Ctx.Ghost ), comp, _cachedRefStore );
-                    if( originalToGhost == null ) // Only cache what can be ghosted - should probably be signified differently than == null, but it works for now.
-                        continue;
-                    SerializedData ghostToOriginal = SerializationUnit.Serialize<Component>( typeof( Ctx.Value ), comp, _cachedRefStore );
 
-                    // TODO - remove keys from revObj, that aren't present in forwardObj.
-                    /*if( originalToGhost is SerializedObject forwardObj && ghostToOriginal is SerializedObject revObj )
-                    {
+                }*/
 
-                    }*/
-
-                    _cachedData.Add( comp, (originalToGhost, ghostToOriginal) );
-                }
+                _cachedData.Add( comp, (originalToGhost, ghostToOriginal) );
             }
         }
 

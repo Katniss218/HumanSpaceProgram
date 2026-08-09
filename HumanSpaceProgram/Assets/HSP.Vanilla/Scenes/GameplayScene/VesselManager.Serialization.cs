@@ -38,7 +38,7 @@ namespace HSP.Vanilla.Scenes.GameplayScene
                 try
                 {
                     var data = SerializationUnit.Serialize( vessel.gameObject, TimelineManager.RefStore );
-                    dataHandler.Write( data );
+                    //dataHandler.Write( data );
                 }
                 catch( UPSSerializationException ex )
                 {
@@ -71,7 +71,7 @@ namespace HSP.Vanilla.Scenes.GameplayScene
                 var partsDataHandler = new FileSerializedDataHandler( Path.Combine( dir, "parts.json" ), JsonFormat.Instance ); // gameobjects
                 var graphDataHandler = new FileSerializedDataHandler( Path.Combine( dir, "graph.json" ), JsonFormat.Instance );
 
-                var data = dataHandler.Read();
+                SerializedData data = null;// dataHandler.Read();
 
                 try
                 {

@@ -1,6 +1,7 @@
 using HSP.ReferenceFrames;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityPlus.Serialization;
 using UnityPlus.Serialization.Descriptors;
@@ -23,9 +24,16 @@ namespace HSP.Vessels
         public const string ID = HSPEvent.NAMESPACE_HSP + ".vessel_split.after";
         public struct Data
         {
+            /// <summary>
+            /// The original vessel from which parts were split.
+            /// </summary>
             public Vessel OldVessel;
+            /// <summary>
+            /// The new vessel created from the split.
+            /// </summary>
             public Vessel NewVessel;
-            public VesselPart SplitRoot;
+
+            public IReadOnlyList<VesselPart> SplitParts;
         }
     }
 
@@ -34,12 +42,23 @@ namespace HSP.Vessels
         public const string ID = HSPEvent.NAMESPACE_HSP + ".vessel_merge.after";
         public struct Data
         {
+            /// <summary>
+            /// The vessel that survived the merge.
+            /// </summary>
             public Vessel RemainingVessel;
+            /// <summary>
+            /// The vessel that was merged into RemainingVessel and destroyed.
+            /// </summary>
             public Vessel MergedVessel;
+
+            /// <summary>
+            /// The list of parts that were merged into RemainingVessel.
+            /// </summary>
+            public IReadOnlyList<VesselPart> MergedParts;
         }
     }
 
-    public static class HSPEvent_AFTER_VESSEL_STATE_CHANGED
+    public static class HSPEvent_AFTER_VESSEL_HIERARCHY_CHANGED
     {
         public const string ID = "caa42be2-5b08-4a27-a35e-bec2b7aca5e3";
     }
@@ -58,26 +77,6 @@ namespace HSP.Vessels
         {
             get => _displayName;
             set { _displayName = value; this.gameObject.name = value; }
-        }
-
-        [SerializeField]
-        Transform _rootPart;
-        public Transform RootPart
-        {
-            get => _rootPart;
-            set
-            {
-                var oldRootPart = _rootPart;
-                if( _rootPart != null )
-                    _rootPart.SetParent( null, true );
-                _rootPart = value;
-                if( value != null )
-                    value.SetParent( this.transform, true );
-
-                HSPEvent.EventManager.TryInvoke( HSPEvent_AFTER_VESSEL_HIERARCHY_CHANGED.ID, (this, oldRootPart, value) );
-
-                RecalculatePartCache();
-            }
         }
 
         IPhysicsTransform _physicsTransform;
@@ -106,41 +105,17 @@ namespace HSP.Vessels
 
         // the active vessel has also glithed out and accelerated to the speed of light at least once after jettisonning the side tanks on the pad.
 
-        [field: SerializeField]
-        int PartCount { get; set; } = 0;
-
         // parts with xyz could be modified to be an array, and that array has its callbacks.
         // on separation, parts are recalced fully, but when a part itself changes, that part updates the vessel via the delegate.
 
-        [SerializeField]
-        IHasMass[] _partsWithMass;
+        VesselPart[] _parts;
+        VesselIsland[] _islands;
+        VesselAttachmentGraph _attachments;
 
-        [SerializeField]
-        Collider[] _partsWithCollider; // TODO - this probably should be a dictionary with type as input, for modding support.
+        public IReadonlyVesselAttachmentGraph Attachments => _attachments;
+        public IEnumerable<IReadonlyVesselIsland> Islands => _islands;
 
-        public Action OnAfterRecalculateParts;
-
-        VesselIsland[] _islands; // cache
-        VesselAttachmentGraph _attachGraph; // cache
-
-        public IReadonlyVesselAttachmentGraph Attachments => _attachGraph;
-        public IReadOnlyList<IReadonlyVesselIsland> Islands => _islands;
-
-#warning TODO - Accumulatable values - https://github.com/Katniss218/HumanSpaceProgram/issues/19
-        /*
-        private struct Entry
-        {
-            // something to recalculate from scratch.
-            // something to recalculate a single value (responds to messages sent by compatible components).
-            /// <summary>
-            /// True if the value can be adjusted and doesn't have to be recalculated from scratch every time.
-            /// </summary>
-            bool IsTweakable;
-        }
-
-        Dictionary<NamespacedIdentifier, object> _cache;
-        Dictionary<NamespacedIdentifier, Entry> _cachedProps;
-        */
+        public IEnumerable<VesselPart> Parts => _parts;
 
         // mass and colliders
 
@@ -151,8 +126,7 @@ namespace HSP.Vessels
 
         void Start()
         {
-            RecalculatePartCache();
-            //SetPhysicsObjectParameters();
+            this.RecalculatePartCache();
             this.gameObject.SetLayer( (int)Layer.PART_OBJECT, true );
 
             HSPEvent.EventManager.TryInvoke( HSPEvent_AFTER_VESSEL_CREATED.ID, this );
@@ -175,18 +149,18 @@ namespace HSP.Vessels
 
         void FixedUpdate()
         {
-            // Toggle the vessel active if within 'physics range'
-            if( this._rootPart.gameObject.activeSelf )
-            {
-                SetPhysicsObjectParameters(); // this full recalc every frame should be replaced by update-based approach.
+            //if( this._rootPart.gameObject.activeSelf )
+            //{
+            //    this.SetPhysicsObjectParameters(); // this full recalc every frame should be replaced by update-based approach.
 
-                if( this.ReferenceFrameTransform.GetPosition().magnitude > 1e5 )
-                    this._rootPart.gameObject.SetActive( false );
-            }
-            if( !this._rootPart.gameObject.activeSelf && this.ReferenceFrameTransform.GetPosition().magnitude <= 1e5 )
-            {
-                this._rootPart.gameObject.SetActive( true );
-            }
+            //    if( this.ReferenceFrameTransform.GetPosition().magnitude > 1e5 )
+            //        this._rootPart.gameObject.SetActive( false );
+            //}
+            //if( !this._rootPart.gameObject.activeSelf && this.ReferenceFrameTransform.GetPosition().magnitude <= 1e5 )
+            //{
+            //    this._rootPart.gameObject.SetActive( true );
+            //}
+            // Replace with vessel unloading (though externally to this class).
 
             // ---------------------
 
@@ -194,98 +168,142 @@ namespace HSP.Vessels
             // doesn't seem like that to me reading the docs tho, but idk.
         }
 
+        private Transform GetOrCreateIslandTransform( int index )
+        {
+            string islandName = $"Island_{index}";
+            Transform child = this.transform.Find( islandName );
+            if( child == null )
+            {
+                GameObject islandGO = new GameObject( islandName );
+                child = islandGO.transform;
+                child.SetParent( this.transform, false );
+            }
+            return child;
+        }
+
+        private void CleanupExtraIslandTransforms( int activeCount )
+        {
+            for( int i = this.transform.childCount - 1; i >= 0; i-- )
+            {
+                Transform child = this.transform.GetChild( i );
+                if( child.name.StartsWith( "Island_" ) )
+                {
+                    if( int.TryParse( child.name.Substring( 7 ), out int index ) )
+                    {
+                        if( index >= activeCount )
+                        {
+                            while( child.childCount > 0 )
+                            {
+                                child.GetChild( 0 ).SetParent( this.transform, true );
+                            }
+                            Destroy( child.gameObject );
+                        }
+                    }
+                }
+            }
+        }
+
         public void RebuildIslands()
         {
-            // needs to handle when islands already exist, and correctly loop over all the parts and reassign them to new islands.
+            if( _attachments == null )
+            {
+                _islands = Array.Empty<VesselIsland>();
+                CleanupExtraIslandTransforms( 0 );
+                return;
+            }
+
+            var detectedIslands = VesselAttachmentGraph.DetectIslands( _attachments );
+            _islands = detectedIslands.ToArray();
+
+            for( int i = 0; i < _islands.Length; i++ )
+            {
+                var island = _islands[i];
+                Transform islandTransform = GetOrCreateIslandTransform( i );
+                foreach( var part in island.Parts )
+                {
+                    if( part != null && part.transform.parent != islandTransform )
+                    {
+                        part.transform.SetParent( islandTransform, true );
+                    }
+                }
+            }
+
+            CleanupExtraIslandTransforms( _islands.Length );
+        }
+
+        public void SetGraph( VesselAttachmentGraph graph, VesselPart[] newParts = null )
+        {
+            _attachments = graph;
+            _parts = graph != null ? graph.Nodes.ToArray() : Array.Empty<VesselPart>();
+
+            foreach( var part in _parts )
+            {
+                if( part != null )
+                {
+                    part.Vessel = this;
+                }
+            }
+
+            RebuildIslands();
+            RecalculatePartCache();
         }
 
         public void RecalculatePartCache()
         {
-            if( RootPart == null )
-            {
-                PartCount = 0;
-                _partsWithMass = new IHasMass[] { };
-                _partsWithCollider = new Collider[] { };
-                OnAfterRecalculateParts?.Invoke();
-                return;
-            }
+            //if( _parts == null )
+            //{
+            //    _partsWithMass = new IHasMass[] { };
+            //    _partsWithCollider = new Collider[] { };
+            //    return;
+            //}
 
-            int count = 0;
-            Stack<Transform> stack = new Stack<Transform>();
-            stack.Push( RootPart );
-
-            while( stack.Count > 0 )
-            {
-                Transform part = stack.Pop();
-                count++;
-
-                foreach( Transform childPart in part )
-                {
-                    stack.Push( childPart );
-                }
-            }
-
-            PartCount = count;
-            _partsWithMass = this.GetComponentsInChildren<IHasMass>(); // GetComponentsInChildren might be slower than custom methods? (needs testing)
-            _partsWithCollider = this.GetComponentsInChildren<Collider>(); // GetComponentsInChildren might be slower than custom methods? (needs testing)
-            OnAfterRecalculateParts?.Invoke();
+            //_partsWithMass = this.GetComponentsInChildren<IHasMass>(); // GetComponentsInChildren might be slower than custom methods? (needs testing)
+            //_partsWithCollider = this.GetComponentsInChildren<Collider>(); // GetComponentsInChildren might be slower than custom methods? (needs testing)
         }
 
         /// <summary>
         /// Returns the local space center of mass, and the mass [kg] itself.
         /// </summary>
-        private (Vector3 localCenterOfMass, float mass, Matrix3x3 inertia) RecalculateMass()
-        {
-            Vector3 centerOfMass = Vector3.zero;
-            float mass = 0;
+        //private (Vector3 localCenterOfMass, float mass, Matrix3x3 inertia) RecalculateMass()
+        //{
+        //    Vector3 centerOfMass = Vector3.zero;
+        //    float mass = 0;
 
-            List<(float, Vector3)> masses = new();
+        //    List<(float, Vector3)> masses = new();
 
-            foreach( var massivePart in this._partsWithMass )
-            {
-                Vector3 vesselSpacePosition = this.transform.InverseTransformPoint( massivePart.transform.position );
-                centerOfMass += vesselSpacePosition * massivePart.Mass; // potentially precision issues if vessel is far away from origin.
-                mass += massivePart.Mass;
-                masses.Add( (massivePart.Mass, vesselSpacePosition) );
-            }
-            if( mass > 0 )
-            {
-                centerOfMass /= mass;
-            }
-            Matrix3x3 inertia = InertiaUtils.CalculateInertiaTensor( masses );
-            return (centerOfMass, mass, inertia);
-        }
+        //    foreach( var massivePart in this._partsWithMass )
+        //    {
+        //        Vector3 vesselSpacePosition = this.transform.InverseTransformPoint( massivePart.transform.position );
+        //        centerOfMass += vesselSpacePosition * massivePart.Mass; // potentially precision issues if vessel is far away from origin.
+        //        mass += massivePart.Mass;
+        //        masses.Add( (massivePart.Mass, vesselSpacePosition) );
+        //    }
+        //    if( mass > 0 )
+        //    {
+        //        centerOfMass /= mass;
+        //    }
+        //    Matrix3x3 inertia = InertiaUtils.CalculateInertiaTensor( masses );
+        //    return (centerOfMass, mass, inertia);
+        //}
 
-        void SetPhysicsObjectParameters()
-        {
-            (Vector3 comLocal, float mass, Matrix3x3 inertia) = this.RecalculateMass();
-            this.PhysicsTransform.LocalCenterOfMass = comLocal;
-            this.PhysicsTransform.Mass = mass;
-            //var x = this.PhysicsObject.MomentOfInertiaTensor;
+        //void SetPhysicsObjectParameters()
+        //{
+        //    //(Vector3 comLocal, float mass, Matrix3x3 inertia) = this.RecalculateMass();
+        //    this.PhysicsTransform.LocalCenterOfMass = comLocal;
+        //    this.PhysicsTransform.Mass = mass;
+        //    //var x = this.PhysicsObject.MomentOfInertiaTensor;
 
-            // disabled for now. needs a better calculation of moments of inertia
-            //this.PhysicsObject.MomentOfInertiaTensor = inertia; // this is around an order of magnitude too small in each direction, but that might be because we're assuming point masses.
-        }
+        //    // disabled for now. needs a better calculation of moments of inertia
+        //    //this.PhysicsObject.MomentOfInertiaTensor = inertia; // this is around an order of magnitude too small in each direction, but that might be because we're assuming point masses.
+        //}
 
         /// <summary>
         /// Calculates the scene world-space point at the very bottom of the vessel. Useful when placing it at launchsites and such.
         /// </summary>
         public Vector3 GetBottomPosition()
         {
-            Vector3 dir = this.transform.position - (this.transform.up * 500f); // can bug out for large vessels. need to take the point relative to the center and size of the currently checked collider.
-            Vector3 min = this.transform.position;
-            float minDist = float.MaxValue;
-            foreach( var collider in _partsWithCollider )
-            {
-                Vector3 closestBound = collider.ClosestPointOnBounds( dir );
-                float dst = Vector3.Distance( dir, closestBound );
-                if( dst < minDist )
-                {
-                    minDist = dst;
-                    min = closestBound;
-                }
-            }
-            return min;
+            throw new NotImplementedException();
+            // TODO - compute bounds when attaching parts?
         }
 
 
@@ -334,9 +352,7 @@ namespace HSP.Vessels
         public static IDescriptor VesselMapping()
         {
             return new MemberwiseDescriptor<Vessel>()
-                .WithMember( "display_name", o => o.DisplayName )
-                .WithMember( "root_part", typeof( Ctx.Ref ), o => o._rootPart )
-                .WithMember( "on_after_recalculate_parts", o => o.OnAfterRecalculateParts );
+                .WithMember( "display_name", o => o.DisplayName );
         }
     }
 }

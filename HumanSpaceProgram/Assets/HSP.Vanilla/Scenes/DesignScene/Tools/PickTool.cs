@@ -1,5 +1,4 @@
-﻿using HSP.Input;
-using HSP.Vanilla.Components;
+using HSP.Input;
 using HSP.Vessels;
 using System.Linq;
 using UnityEngine;
@@ -11,208 +10,242 @@ namespace HSP.Vanilla.Scenes.DesignScene.Tools
     /// Allows to detach and attach parts.
     /// </summary>
     public class PickTool : DesignSceneTool
-	{
-		Transform _heldPart = null;
+    {
+        Vessel _heldPartGraph = null; // @@INFO - In-world part graphs don't exist 'outside' vessels, thus this is a vessel.
 
-		Vector3 _heldClickOffset;
-		Quaternion _heldRotation;
+        Vector3 _heldOffset;
+        Quaternion _heldRotation;
 
-		FAttachNode.SnappingCandidate? _currentSnap = null;
+        FAttachNode.SnappingCandidate? _currentSnap = null;
 
-		public bool AngleSnappingEnabled = true;
-		public float AngleSnappingInterval = 22.5f;
+        public bool AngleSnappingEnabled = true;
+        public float AngleSnappingInterval = 22.5f;
 
-		private Ray _currentFrameCursorRay;
-		private Transform _currentFrameHitObject;
-		private RaycastHit _currentFrameHit;
+        private Ray _currentFrameCursorRay;
+        private VesselPart _currentFrameHitPart;
+        private RaycastHit _currentFrameHit;
 
-		/// <summary>
-		/// Sets the held part, destroys the previously held part (if any).
-		/// </summary>
-		public void SetHeldPart( Transform value, Vector3 clickOffset )
-		{
-			if( _heldPart == value )
-				return;
-			if( _heldPart != null )
-				Destroy( _heldPart.gameObject );
+        /// <summary>
+        /// Sets the held part graph, destroys the previously held part graph (if any).
+        /// </summary>
+        public void SetHeldPart( Vessel value, Vector3 clickOffset, Quaternion clickRotation )
+        {
+            if( _heldPartGraph == value )
+                return;
+            if( _heldPartGraph != null )
+                VesselFactory.Destroy( _heldPartGraph );
 
-			_heldPart = value;
-			_heldPart.gameObject.SetLayer( (int)Layer.VESSEL_DESIGN_HELD, true );
+            _heldPartGraph = value;
+            _heldPartGraph.gameObject.SetLayer( (int)Layer.VESSEL_DESIGN_HELD, true );
 
-			_heldClickOffset = clickOffset;
-			_heldRotation = value.rotation; // KSP takes into account whether the orientation was changed using the WASDQE keys.
-		}
+            _heldOffset = clickOffset;
+            _heldRotation = clickRotation; // KSP takes into account whether the orientation was changed using the WASDQE keys.
+        }
 
-		void Update()
-		{
-			if( UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject() )
-				return;
+        void Update()
+        {
+            if( UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject() )
+                return;
 
-			_currentFrameCursorRay = SceneCamera.GetCamera<DesignSceneM>().ScreenPointToRay( UnityEngine.Input.mousePosition );
+            _currentFrameCursorRay = SceneCamera.GetCamera<DesignSceneM>().ScreenPointToRay( UnityEngine.Input.mousePosition );
 
-			if( Physics.Raycast( _currentFrameCursorRay, out _currentFrameHit, 8192, 1 << (int)Layer.PART_OBJECT ) )
-			{
-				_currentFrameHitObject = TransformRedirect.TryRedirect( _currentFrameHit.collider.transform );
-			}
-			else
-			{
-				_currentFrameHitObject = null;
-			}
+            if( Physics.Raycast( _currentFrameCursorRay, out _currentFrameHit, 8192, 1 << (int)Layer.PART_OBJECT )
+             && DesignVesselManager.TryGetPart( _currentFrameHit.collider.transform, out var part ) )
+            {
+                _currentFrameHitPart = part;
+            }
+            else
+            {
+                _currentFrameHitPart = null;
+            }
 
-			if( _heldPart != null )
-			{
-				PositionHeldPart();
-			}
-		}
+            if( _heldPartGraph != null )
+            {
+                PositionHeldPart();
+            }
+        }
 
-		void OnEnable()
-		{
+        void OnEnable()
+        {
             HierarchicalInputManager.AddAction( Input.InputChannel.PRIMARY_UP, InputChannelPriority.MEDIUM, Input_MouseClick );
-		}
+        }
 
-		void OnDisable() // if tool switched while action is performed.
-		{
+        void OnDisable() // if tool switched while action is performed.
+        {
             HierarchicalInputManager.RemoveAction( Input.InputChannel.PRIMARY_UP, Input_MouseClick );
-			if( _heldPart != null )
-			{
-				PlacePart();
-			}
-		}
+            if( _heldPartGraph != null )
+            {
+                PlacePart();
+            }
+        }
 
-		private bool Input_MouseClick( float value )
-		{
-			if( UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject() )
-				return false;
+        private bool Input_MouseClick( float value )
+        {
+            if( UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject() )
+                return false;
 
-			if( _heldPart == null )
-			{
-				TryPickUpPart();
+            if( _heldPartGraph == null )
+            {
+                TryPickUpPart();
 
-				if( _heldPart != null )
-				{
-					PositionHeldPart();
-					return true;
-				}
-			}
-			else
-			{
-				PositionHeldPart();
-				PlacePart();
-				return true;
-			}
-			return false;
-		}
+                if( _heldPartGraph != null )
+                {
+                    PositionHeldPart();
+                    return true;
+                }
+            }
+            else
+            {
+                PositionHeldPart();
+                PlacePart();
+                return true;
+            }
+            return false;
+        }
 
-		private void TryPickUpPart()
-		{
-			if( _currentFrameHitObject != null )
-			{
-				if( DesignVesselManager.TryDetach( _currentFrameHitObject ) )
-				{
-					SetHeldPart( _currentFrameHitObject, _currentFrameHit.point - _currentFrameHitObject.position );
-				}
-			}
-		}
+        private void TryPickUpPart()
+        {
+            if( _currentFrameHitPart != null )
+            {
+                var oldVessel = _currentFrameHitPart.Vessel;
+                bool wasDesignObject = (oldVessel == DesignVesselManager.DesignObject);
+                if( VesselHierarchyUtils.TryDetach( _currentFrameHitPart ) )
+                {
+                    // _currentFrameHitPart.Vessel is now a (new) loose vessel, we can hold it.
+                    var newVessel = _currentFrameHitPart.Vessel;
+                    if( oldVessel == newVessel )
+                    {
+                        // The whole vessel was picked up.
+                        if( wasDesignObject )
+                        {
+                            DesignVesselManager.ClearDesignObject();
+                        }
+                        else
+                        {
+                            DesignVesselManager.RemoveLoosePart( newVessel );
+                        }
+                    }
 
-		private void PlacePart()
-		{
+                    SetHeldPart( newVessel, _currentFrameHit.point - _currentFrameHitPart.transform.position, _currentFrameHitPart.transform.rotation );
+                }
+            }
+        }
+
+        private void PlacePart()
+        {
             if( _currentSnap != null )
-			{
-				Transform newRoot = VesselHierarchyUtils.ReRoot( _currentSnap.Value.snappedNode.transform.parent );
-				_heldPart = newRoot;
-				// Node-attach (object is already positioned).
-				if( DesignVesselManager.TryAttach( _heldPart, _currentSnap.Value.targetNode.transform.parent ) )
-				{
-					_heldPart.gameObject.SetLayer( (int)Layer.PART_OBJECT, true );
-					_heldPart = null;
-					_currentSnap = null;
-				}
+            {
+                // Node-attach (object is already positioned).
+                _heldPartGraph.gameObject.SetLayer( (int)Layer.PART_OBJECT, true );
 
-				return;
-			}
+                var targetVessel = _currentSnap.Value.targetNode.Part.Vessel;
+                VesselHierarchyUtils.Attach( _currentSnap.Value );
 
-			// Surface-attach (object is already positioned).
-			if( _currentFrameHitObject != null )
-			{
-				if( DesignVesselManager.TryAttach( _heldPart, _currentFrameHitObject ) )
-				{
-					_heldPart.gameObject.SetLayer( (int)Layer.PART_OBJECT, true );
-					_heldPart = null;
-					_currentSnap = null;
-					return;
-				}
-			}
+                if( DesignVesselManager.DesignObject == null )
+                {
+                    DesignVesselManager.SetDesignObject( targetVessel );
+                    DesignVesselManager.RemoveLoosePart( targetVessel );
+                }
 
-			// Place as a ghost loose part (object is already positioned).
-			if( DesignVesselManager.TryAttach( _heldPart, null ) )
-			{
-				_heldPart.gameObject.SetLayer( (int)Layer.PART_OBJECT, true );
-				_heldPart = null;
-				_currentSnap = null;
-			}
-		}
+                _heldPartGraph = null;
+                _currentSnap = null;
+                return;
+            }
 
-		private void PositionHeldPart()
-		{
-			if( !UnityEngine.Input.GetKey( KeyCode.LeftAlt ) )
-			{
-				// Snap to surface of other parts.
+            // Surface-attach (object is already positioned).
+            if( _currentFrameHitPart != null )
+            {
+                _heldPartGraph.gameObject.SetLayer( (int)Layer.PART_OBJECT, true );
 
-				if( _currentFrameHitObject != null )
-				{
-					if( DesignVesselManager.CanHaveChildren( _currentFrameHitObject ) )
-					{
-						Vector3 newPos = _currentFrameHit.point;
-						if( AngleSnappingEnabled )
-						{
-							Vector3 projectedPoint = Vector3.ProjectOnPlane( (_currentFrameHitObject.position - _currentFrameHit.point), _currentFrameHitObject.up ).normalized;
-							float angle = Vector3.SignedAngle( _currentFrameHitObject.right, projectedPoint, _currentFrameHitObject.up );
+                var targetVessel = _currentFrameHitPart.Vessel;
+                VesselHierarchyUtils.SurfaceAttach( _heldPartGraph.Parts.First(), _currentFrameHitPart );
 
-							float roundedAngle = AngleSnappingInterval * Mathf.Round( angle / AngleSnappingInterval );
+                if( DesignVesselManager.DesignObject == null )
+                {
+                    DesignVesselManager.SetDesignObject( targetVessel );
+                    DesignVesselManager.RemoveLoosePart( targetVessel );
+                }
 
-							Quaternion rotation = Quaternion.AngleAxis( roundedAngle + 180, _currentFrameHitObject.up ); // angle + 180 appears to be needed, for some reason.
+                _heldPartGraph = null;
+                _currentSnap = null;
+                return;
+            }
 
-							newPos = rotation * (_currentFrameHitObject.right * Vector3.Distance( _currentFrameHit.point, _currentFrameHitObject.position )) // position relative to (0,0,0)
-								+ _currentFrameHitObject.position                                                                                            // translate from (0,0,0) to the part
-								+ new Vector3( 0, (_currentFrameHit.point.y - _currentFrameHitObject.position.y), 0 );                                       // translate vertically from the part to to the cursor
-						}
+            // Place as a ghost loose part (object is already positioned).
+            _heldPartGraph.gameObject.SetLayer( (int)Layer.PART_OBJECT, true );
 
-						_heldPart.rotation = Quaternion.LookRotation( _currentFrameHit.normal, _currentFrameHitObject.up ) * _heldRotation;
-						_heldPart.position = newPos; // todo - use surface attach node when available.
-						return;
-					}
-				}
-			}
+            if( DesignVesselManager.DesignObject == null )
+            {
+                DesignVesselManager.SetDesignObject( _heldPartGraph );
+            }
+            else
+            {
+                DesignVesselManager.AddLoosePart( _heldPartGraph );
+            }
 
-			Plane viewPlane = new Plane( SceneCamera.GetCamera<DesignSceneM>().transform.forward, (_heldPart.position + _heldClickOffset) );
-			if( viewPlane.Raycast( _currentFrameCursorRay, out float intersectionDistance ) )
-			{
-				Vector3 planePoint = _currentFrameCursorRay.GetPoint( intersectionDistance );
+            _heldPartGraph = null;
+            _currentSnap = null;
+        }
 
-				// Reset the position/rotation before snapping to prevent the previous snapping from affecting what nodes will snap.
-				// It should always snap "as if the part is at the cursor", not wherever it was snapped to previously.
-				_heldPart.position = planePoint - _heldClickOffset;
-				_heldPart.rotation = _heldRotation;
+        private void PositionHeldPart()
+        {
+            if( !UnityEngine.Input.GetKey( KeyCode.LeftAlt ) )
+            {
+                // Snap to surface of other parts.
 
-				TrySnappingHeldPartToAttachmentNode( viewPlane.normal );
-			}
-		}
+                if( _currentFrameHitPart != null )
+                {
+                    Transform currentFrameHitTransform = _currentFrameHitPart.transform;
+                    Vector3 newPos = _currentFrameHit.point;
+                    if( AngleSnappingEnabled )
+                    {
+                        Vector3 projectedPoint = Vector3.ProjectOnPlane( (currentFrameHitTransform.position - _currentFrameHit.point), currentFrameHitTransform.up ).normalized;
+                        float angle = Vector3.SignedAngle( currentFrameHitTransform.right, projectedPoint, currentFrameHitTransform.up );
 
-		private void TrySnappingHeldPartToAttachmentNode( Vector3 viewDirection )
-		{
-			FAttachNode[] heldNodes = _heldPart.GetComponentsInChildren<FAttachNode>();
-			FAttachNode[] targetNodes = DesignVesselManager.GetAttachableRoots().GetComponentsInChildren<FAttachNode>().Where( n => n.transform.root != _heldPart ).ToArray();
+                        float roundedAngle = AngleSnappingInterval * Mathf.Round( angle / AngleSnappingInterval );
 
-			FAttachNode.SnappingCandidate? nodePair = FAttachNode.GetBestSnappingNodePair( heldNodes, targetNodes, viewDirection );
-			if( nodePair != null )
-			{
-				FAttachNode.SnapTo( _heldPart, nodePair.Value.snappedNode, nodePair.Value.targetNode );
-				_currentSnap = nodePair;
-			}
-			else
-			{
-				_currentSnap = null;
-			}
-		}
-	}
+                        Quaternion rotation = Quaternion.AngleAxis( roundedAngle + 180, currentFrameHitTransform.up ); // angle + 180 appears to be needed, for some reason.
+
+                        newPos = rotation * (currentFrameHitTransform.right * Vector3.Distance( _currentFrameHit.point, currentFrameHitTransform.position )) // position relative to (0,0,0)
+                            + currentFrameHitTransform.position                                                                                            // translate from (0,0,0) to the part
+                            + new Vector3( 0, (_currentFrameHit.point.y - currentFrameHitTransform.position.y), 0 );                                       // translate vertically from the part to to the cursor
+                    }
+
+                    _heldPartGraph.transform.rotation = Quaternion.LookRotation( _currentFrameHit.normal, currentFrameHitTransform.up ) * _heldRotation;
+                    _heldPartGraph.transform.position = newPos; // todo - use surface attach node when available.
+                    return;
+                }
+            }
+
+            Plane viewPlane = new Plane( SceneCamera.GetCamera<DesignSceneM>().transform.forward, (_heldPartGraph.transform.position + _heldOffset) );
+            if( viewPlane.Raycast( _currentFrameCursorRay, out float intersectionDistance ) )
+            {
+                Vector3 planePoint = _currentFrameCursorRay.GetPoint( intersectionDistance );
+
+                // Reset the position/rotation before snapping to prevent the previous snapping from affecting what nodes will snap.
+                // It should always snap "as if the part is at the cursor", not wherever it was snapped to previously.
+                _heldPartGraph.transform.position = planePoint - _heldOffset;
+                _heldPartGraph.transform.rotation = _heldRotation;
+
+                TrySnappingHeldPartToAttachmentNode( viewPlane.normal );
+            }
+        }
+
+        private void TrySnappingHeldPartToAttachmentNode( Vector3 viewDirection )
+        {
+            FAttachNode[] heldNodes = _heldPartGraph.GetComponentsInChildren<FAttachNode>();
+            FAttachNode[] targetNodes = FAttachNode.GetAttachNodes( DesignVesselManager.DesignObject ).ToArray();
+
+            FAttachNode.SnappingCandidate? nodePair = FAttachNode.GetBestSnappingNodePair( heldNodes, targetNodes, viewDirection );
+            if( nodePair != null )
+            {
+                FAttachNode.SnapTo( _heldPartGraph.transform, nodePair.Value.snappedNode, nodePair.Value.targetNode );
+                _currentSnap = nodePair;
+            }
+            else
+            {
+                _currentSnap = null;
+            }
+        }
+    }
 }

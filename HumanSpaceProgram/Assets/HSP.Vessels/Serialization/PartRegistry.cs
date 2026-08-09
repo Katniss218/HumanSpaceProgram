@@ -1,4 +1,5 @@
 ﻿using HSP.Content.Vessels.Serialization;
+using HSP.Vessels;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -97,20 +98,6 @@ namespace HSP.Content.Vessels
         /// <summary>
         /// Loads a specified registered part metadata from its source.
         /// </summary>
-        [Obsolete( "Use TryLoadMetadata." )]
-        public static PartMetadata LoadMetadata( NamespacedID namespacedPartId )
-        {
-            if( _registry.TryGetValue( namespacedPartId, out PartFactory factory ) )
-            {
-                return factory.LoadMetadata();
-            }
-
-            return null;
-        }
-
-        /// <summary>
-        /// Loads a specified registered part metadata from its source.
-        /// </summary>
         public static bool TryLoadMetadata( NamespacedID namespacedPartId, out PartMetadata metadata )
         {
             if( _registry.TryGetValue( namespacedPartId, out PartFactory factory ) )
@@ -134,54 +121,21 @@ namespace HSP.Content.Vessels
         /// <summary>
         /// Loads a specified registered unity hierarchy from its source.
         /// </summary>
-        [Obsolete( "Use TryLoad." )]
-        public static GameObject Load( NamespacedID namespacedPartId )
+        public static bool TryLoad( NamespacedID namespacedPartId, out Vessel partGraph )
         {
-            if( _registry.TryGetValue( namespacedPartId, out PartFactory factory ) )
-            {
-                return factory.Load( new ForwardReferenceStore() );
-            }
-
-            return null;
-        }
-        
-        /// <summary>
-        /// Loads a specified registered unity hierarchy from its source.
-        /// </summary>
-        [Obsolete( "Use TryLoad." )]
-        public static GameObject Load( NamespacedID namespacedPartId, IForwardReferenceMap refMap )
-        {
-            if( refMap == null )
-            {
-                throw new ArgumentNullException( nameof( refMap ), $"Reference map can't be null." );
-            }
-
-            if( _registry.TryGetValue( namespacedPartId, out PartFactory factory ) )
-            {
-                return factory.Load( refMap );
-            }
-
-            return null;
+            return TryLoad( namespacedPartId, new ForwardReferenceStore(), out partGraph );
         }
 
         /// <summary>
         /// Loads a specified registered unity hierarchy from its source.
         /// </summary>
-        public static bool TryLoad( NamespacedID namespacedPartId, out GameObject gameObject )
-        {
-            return TryLoad( namespacedPartId, new ForwardReferenceStore(), out gameObject );
-        }
-
-        /// <summary>
-        /// Loads a specified registered unity hierarchy from its source.
-        /// </summary>
-        public static bool TryLoad( NamespacedID namespacedPartId, IForwardReferenceMap refMap, out GameObject gameObject )
+        public static bool TryLoad( NamespacedID namespacedPartId, IForwardReferenceMap refMap, out Vessel partGraph )
         {
             if( _registry.TryGetValue( namespacedPartId, out PartFactory factory ) )
             {
                 try
                 {
-                    gameObject = factory.Load( refMap );
+                    partGraph = factory.Load( refMap );
                     return true;
                 }
                 catch( Exception ex )
@@ -191,7 +145,7 @@ namespace HSP.Content.Vessels
                 }
             }
 
-            gameObject = null;
+            partGraph = null;
             return false;
         }
     }

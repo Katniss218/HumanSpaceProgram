@@ -9,6 +9,9 @@ namespace HSP.Vessels
         void BackgroundUpdate();
     }
 
+    /// <summary>
+    /// The base class for all custom functions that can be added to a vessel part.
+    /// </summary>
     public abstract class FComponent : ISimulatable
     {
         public VesselPart Part { get; internal set; }

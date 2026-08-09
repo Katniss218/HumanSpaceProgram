@@ -2,6 +2,8 @@
 using HSP.SceneManagement;
 using HSP.Time;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityPlus.Serialization;
@@ -22,48 +24,73 @@ namespace HSP.Vessels.Construction
     public static class FConstructionSite_Transform_Ex
     {
         /// <summary>
-        /// Gets the <see cref="FConstructionSite"/> that is constructing this transform.
+        /// Gets the <see cref="FConstructionSite"/> of the specified vessel.
         /// </summary>
-        /// <returns>The construction site. Null if the transform is not under construction/deconstruction.</returns>
-        public static FConstructionSite GetConstructionSite( this Transform part )
+        public static FConstructionSite GetConstructionSite( this Vessel vessel )
         {
-            FConstructionSite site = part.GetComponent<FConstructionSite>();
-            while( site == null )
-            {
-                part = part.parent;
-                if( part == null )
-                    break;
-                site = part.GetComponent<FConstructionSite>();
-            }
-            return site;
+            if( vessel == null ) return null;
+            return vessel.GetComponent<FConstructionSite>();
+        }
+
+        /// <summary>
+        /// Gets the <see cref="FConstructionSite"/> for the vessel containing this part.
+        /// </summary>
+        public static FConstructionSite GetConstructionSite( this VesselPart part )
+        {
+            if( part == null ) return null;
+            Vessel vessel = part.transform.GetVessel();
+            return vessel != null ? vessel.GetComponent<FConstructionSite>() : null;
+        }
+
+        /// <summary>
+        /// Gets the <see cref="FConstructionSite"/> for the vessel containing this transform.
+        /// </summary>
+        public static FConstructionSite GetConstructionSite( this Transform partTransform )
+        {
+            if( partTransform == null ) return null;
+            Vessel vessel = partTransform.GetComponentInParent<Vessel>();
+            return vessel != null ? vessel.GetComponent<FConstructionSite>() : null;
         }
 
         /// <summary>
         /// Gets the <see cref="FConstructionSite"/> that is constructing this constructible.
         /// </summary>
-        /// <returns>The construction site corresponding to this constructible. Null if the transform is not under construction/deconstruction.</returns>
-        public static FConstructionSite GetConstructionSite( this FConstructible part )
+        public static FConstructionSite GetConstructionSite( this FConstructible constructible )
         {
-            return GetConstructionSite( part.transform );
+            if( constructible == null ) return null;
+            return GetConstructionSite( constructible.transform );
         }
 
         /// <summary>
-        /// Checks whether a given transform is a descendant of a construction site.
+        /// Checks whether a given transform belongs to a construction site's under-construction parts.
         /// </summary>
         public static bool IsUnderConstruction( this Transform part )
         {
-            if( part == null )
-                return false;
+            if( part == null ) return false;
+            VesselPart vesselPart = part.GetComponentInParent<VesselPart>();
+            if( vesselPart != null )
+                return vesselPart.IsUnderConstruction();
 
-            return part.GetConstructionSite() != null;
+            FConstructionSite site = part.GetConstructionSite();
+            return site != null && site.ContainsTransform( part );
         }
 
         /// <summary>
-        /// Checks whether a given constructible belongs to a construction site.
+        /// Checks whether a given part belongs to a construction site's under-construction parts.
+        /// </summary>
+        public static bool IsUnderConstruction( this VesselPart part )
+        {
+            if( part == null ) return false;
+            FConstructionSite site = part.GetConstructionSite();
+            return site != null && site.ContainsPart( part );
+        }
+
+        /// <summary>
+        /// Checks whether a given constructible belongs to a construction site's under-construction parts.
         /// </summary>
         public static bool IsUnderConstruction( this FConstructible part )
         {
-            return IsUnderConstruction( part.transform );
+            return part != null && part.transform.IsUnderConstruction();
         }
 
         /// <summary>
@@ -71,27 +98,29 @@ namespace HSP.Vessels.Construction
         /// </summary>
         public static bool IsUnderOngoingConstruction( this Transform part )
         {
-            if( part == null )
-                return false;
-
             FConstructionSite site = part.GetConstructionSite();
-            if( site == null )
-                return false;
-
-            return site.State != ConstructionState.NotStarted;
+            return site != null && site.State != ConstructionState.NotStarted;
         }
 
         /// <summary>
-        /// Checks whether a given part belongs to a construction site, and that the construction has started.
+        /// Checks whether a given constructible belongs to a construction site, and that the construction/deconstruction has started.
         /// </summary>
         public static bool IsUnderOngoingConstruction( this FConstructible part )
         {
-            return IsUnderOngoingConstruction( part.transform );
+            return part.transform.IsUnderOngoingConstruction();
+        }
+
+        /// <summary>
+        /// Checks whether a given part belongs to a construction site, and that the construction/deconstruction has started.
+        /// </summary>
+        public static bool IsUnderOngoingConstruction( this VesselPart part )
+        {
+            return part.transform.IsUnderOngoingConstruction();
         }
     }
 
     /// <summary>
-    /// Manages the construction of its descendant <see cref="FConstructible"/>s.
+    /// Manages the construction of a set of <see cref="VesselPart"/>s and their <see cref="FConstructible"/>s.
     /// </summary>
     [DisallowMultipleComponent]
     public class FConstructionSite : MonoBehaviour
@@ -117,12 +146,139 @@ namespace HSP.Vessels.Construction
             }
         }
 
-        FConstructible[] _constructibles = new FConstructible[] { };
+        [SerializeField] List<VesselPart> _parts = new List<VesselPart>();
+        [SerializeField] List<FConstructible> _constructibles = new List<FConstructible>();
+
+        public IReadOnlyList<VesselPart> Parts => _parts;
+        public IReadOnlyList<FConstructible> Constructibles => _constructibles;
+
+        public bool ContainsPart( VesselPart part )
+        {
+            return part != null && _parts.Contains( part );
+        }
+
+        public bool ContainsConstructible( FConstructible constructible )
+        {
+            return constructible != null && _constructibles.Contains( constructible );
+        }
+
+        public bool ContainsTransform( Transform t )
+        {
+            if( t == null ) return false;
+            foreach( var part in _parts )
+            {
+                if( part != null && (part.transform == t || t.IsChildOf( part.transform )) )
+                    return true;
+            }
+            return false;
+        }
+
+        public void AddPart( VesselPart part )
+        {
+            if( part == null || _parts.Contains( part ) )
+                return;
+
+            _parts.Add( part );
+
+            var constructibles = part.GetComponentsInChildren<FConstructible>( true );
+            foreach( var c in constructibles )
+            {
+                if( !_constructibles.Contains( c ) )
+                {
+                    _constructibles.Add( c );
+                }
+            }
+        }
+
+        public void AddParts( IEnumerable<VesselPart> parts )
+        {
+            if( parts == null ) return;
+            foreach( var p in parts )
+            {
+                AddPart( p );
+            }
+        }
+
+        public bool RemovePart( VesselPart part )
+        {
+            if( part == null || !_parts.Contains( part ) )
+                return false;
+
+            _parts.Remove( part );
+
+            var constructibles = part.GetComponentsInChildren<FConstructible>( true );
+            foreach( var c in constructibles )
+            {
+                _constructibles.Remove( c );
+            }
+
+            if( _parts.Count == 0 )
+            {
+                State = ConstructionState.NotStarted;
+            }
+
+            return true;
+        }
+
+        public void RemoveParts( IEnumerable<VesselPart> parts )
+        {
+            if( parts == null ) return;
+            foreach( var p in parts.ToList() )
+            {
+                RemovePart( p );
+            }
+        }
+
+        public void SetUnderConstruction( VesselPart part, bool underConstruction = true )
+        {
+            if( underConstruction )
+                AddPart( part );
+            else
+                RemovePart( part );
+        }
+
+        public void SetUnderConstruction( IEnumerable<VesselPart> parts, bool underConstruction = true )
+        {
+            if( underConstruction )
+                AddParts( parts );
+            else
+                RemoveParts( parts );
+        }
+
+        public void MergeWith( FConstructionSite otherSite )
+        {
+            if( otherSite == null || otherSite == this )
+                return;
+
+            AddParts( otherSite._parts );
+            if( otherSite.State != ConstructionState.NotStarted && this.State == ConstructionState.NotStarted )
+            {
+                this.State = otherSite.State;
+            }
+
+            otherSite._parts.Clear();
+            otherSite._constructibles.Clear();
+            otherSite.State = ConstructionState.NotStarted;
+        }
+
+        public void InitializeWith( IEnumerable<VesselPart> parts, float buildSpeed, ConstructionState state )
+        {
+            _parts.Clear();
+            _constructibles.Clear();
+            this.BuildSpeed = buildSpeed;
+            this.State = state;
+            AddParts( parts );
+        }
+
+        public void CopyFrom( FConstructionSite source )
+        {
+            if( source == null ) return;
+            InitializeWith( source.Parts, source.BuildSpeed, source.State );
+        }
 
         /// <summary>
         /// Calculates the sum of current build points and max build points of all constructibles of this construction site.
         /// </summary>
-        /// <returns>The calculated sum.</returns>
         public (float current, float total) GetBuildPoints()
         {
             return (_constructibles.Sum( c => c.BuildPoints ), _constructibles.Sum( c => c.MaxBuildPoints ));
@@ -213,34 +369,37 @@ namespace HSP.Vessels.Construction
             if( State == ConstructionState.Constructing )
             {
                 inProgressConstructibles = _constructibles.Where( c => c.BuildPercent < 1.0f ).ToArray();
-                buildPointsDelta = (BuildSpeed / inProgressConstructibles.Length) * TimeManager.DeltaTime;
+                if( inProgressConstructibles.Length > 0 )
+                {
+                    buildPointsDelta = (BuildSpeed / inProgressConstructibles.Length) * TimeManager.DeltaTime;
+                }
             }
             else if( State == ConstructionState.Deconstructing )
             {
                 inProgressConstructibles = _constructibles.Where( c => c.BuildPercent > 0.0f ).ToArray();
-                buildPointsDelta = (-BuildSpeed / inProgressConstructibles.Length) * TimeManager.DeltaTime;
+                if( inProgressConstructibles.Length > 0 )
+                {
+                    buildPointsDelta = (-BuildSpeed / inProgressConstructibles.Length) * TimeManager.DeltaTime;
+                }
             }
 
             if( inProgressConstructibles != null )
             {
-                if( !inProgressConstructibles.Any() )
+                if( inProgressConstructibles.Length == 0 )
                 {
+                    var vessel = this.GetComponentInParent<Vessel>();
+
                     if( this.State == ConstructionState.Deconstructing )
                     {
-                        foreach( var constructible in _constructibles.ToArray() )
+                        foreach( var part in _parts.ToArray() )
                         {
-                            Destroy( constructible.gameObject );
+                            if( part != null ) Destroy( part.gameObject );
                         }
                     }
 
-                    var vessel = this.transform.GetVessel();
-
-                    if( this.State == ConstructionState.Deconstructing )
-                    {
-                        this.transform.SetParent( null ); // This stops the part object from including the deconstructed children when recalculating.
-                    }
-
-                    Destroy( this );
+                    _parts.Clear();
+                    _constructibles.Clear();
+                    this.State = ConstructionState.NotStarted;
 
                     if( vessel != null )
                     {
@@ -252,65 +411,26 @@ namespace HSP.Vessels.Construction
 
                 foreach( var constructible in inProgressConstructibles )
                 {
-                    buildPointsDelta *= constructible.GetBuildSpeedMultiplier();
-                    constructible.BuildPoints += Mathf.Clamp( buildPointsDelta, -constructible.BuildPoints, constructible.MaxBuildPoints - constructible.BuildPoints );
+                    float delta = buildPointsDelta * constructible.GetBuildSpeedMultiplier();
+                    constructible.BuildPoints += Mathf.Clamp( delta, -constructible.BuildPoints, constructible.MaxBuildPoints - constructible.BuildPoints );
                 }
             }
         }
 
         /// <summary>
-        /// Creates a new construction site with the specified vessel, or appends it to the specified parent
+        /// Tries to remove the specified part from construction.
         /// </summary>
-        /// <param name="ghostRoot"></param>
-        /// <param name="parent"></param>
-        /// <returns></returns>
-        /// <exception cref="InvalidOperationException"></exception>
-        public static FConstructionSite CreateOrAppend( SceneReferenceFrameManager sceneReferenceFrame, Transform ghostRoot, Transform parent )
-        {
-            // step 6. Player places the ghost.
-            // assume the position is already set.
-
-            if( ghostRoot.IsUnderOngoingConstruction() )
-            {
-                throw new InvalidOperationException( $"Can't add something that is under ongoing construction - it should be/have been already added." );
-            }
-
-            var sceneFrame = sceneReferenceFrame.referenceFrame;
-
-            if( parent == null )
-            {
-                Vessel vessel = VesselFactory.CreatePartless( HSPSceneManager.GetScene( ghostRoot.gameObject ),
-                    sceneFrame.TransformPosition( ghostRoot.position ),
-                    sceneFrame.TransformRotation( ghostRoot.rotation ),
-                    sceneFrame.TransformVelocity( Vector3Dbl.zero ),
-                    sceneFrame.TransformAngularVelocity( Vector3Dbl.zero ) );
-
-                vessel.RootPart = ghostRoot;
-                parent = vessel.gameObject.transform;
-            }
-            else
-            {
-                VesselHierarchyUtils.AttachLoose( ghostRoot, parent );
-            }
-
-            FConstructionSite constructionSite = ghostRoot.GetConstructionSite();
-            if( constructionSite == null )
-            {
-                constructionSite = ghostRoot.gameObject.AddComponent<FConstructionSite>();
-            }
-            constructionSite._constructibles = AncestralMap<FConstructible>.Create( constructionSite.transform ).Keys.ToArray();
-
-            ghostRoot.gameObject.SetLayer( (int)Layer.PART_OBJECT, true );
-            ghostRoot.transform.SetParent( parent );
-            return constructionSite;
-        }
-
-        /// <summary>
-        /// Tries to remove the specified part of the construction site from construction.
-        /// </summary>
-        /// <returns>True if the specified part was successfully unhooked.</returns>
         public static bool TryRemovePart( Transform ghostRoot )
         {
+            if( ghostRoot == null ) return false;
+            VesselPart part = ghostRoot.GetComponentInParent<VesselPart>() ?? ghostRoot.GetComponent<VesselPart>();
+            if( part == null ) return false;
+
+            FConstructionSite site = part.GetConstructionSite();
+            if( site != null )
+            {
+                return site.RemovePart( part );
+            }
             return false;
         }
 
@@ -319,7 +439,8 @@ namespace HSP.Vessels.Construction
         {
             return new MemberwiseDescriptor<FConstructionSite>()
                 .WithMember( "state", o => o.State )
-                .WithMember<object>( "constructibles", o => null, ( o, value ) => o._constructibles = AncestralMap<FConstructible>.Create( o.transform ).Keys.ToArray() )
+                .WithMember( "parts", o => o._parts )
+                .WithMember( "constructibles", o => o._constructibles )
                 .WithMember( "build_speed", o => o.BuildSpeed );
         }
     }

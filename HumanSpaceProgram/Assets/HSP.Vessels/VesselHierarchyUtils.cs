@@ -1,49 +1,44 @@
-﻿using HSP.ReferenceFrames;
+using HSP.ReferenceFrames;
 using HSP.SceneManagement;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace HSP.Vessels
 {
+    public struct VesselSubtreePhysicsState
+    {
+        public Vector3Dbl AbsoluteCoM;
+        public Vector3Dbl AbsoluteLinearVelocity;
+        public Vector3Dbl AbsoluteAngularVelocity;
+        public float TotalMass;
+    }
+
     /// <summary>
     /// Helper class responsible for changing the state of a part or vessel.
     /// </summary>
     public static class VesselHierarchyUtils
     {
-        private static Vector3 GetLocalPosRelative( Transform descendant, Transform ancestor )
+        private static (Vector3 pos, Quaternion rot) GetLocalPoseRelative( Transform descendant, Transform ancestor )
         {
-            if( descendant == ancestor ) return Vector3.zero;
+            if( descendant == ancestor ) return (Vector3.zero, Quaternion.identity);
 
             Vector3 localPos = Vector3.zero;
-            Transform current = descendant;
-
-            while( current != null && current != ancestor )
-            {
-                localPos = current.localPosition + current.localRotation * Vector3.Scale( current.localScale, localPos );
-                current = current.parent;
-            }
-
-            return localPos;
-        }
-
-        private static Quaternion GetLocalRotRelative( Transform descendant, Transform ancestor )
-        {
-            if( descendant == ancestor ) return Quaternion.identity;
-
             Quaternion localRot = Quaternion.identity;
             Transform current = descendant;
 
             while( current != null && current != ancestor )
             {
+                localPos = current.localPosition + current.localRotation * Vector3.Scale( current.localScale, localPos );
                 localRot = current.localRotation * localRot;
                 current = current.parent;
             }
 
-            return localRot;
+            return (localPos, localRot);
         }
 
-        private static (Vector3 localCoM, float totalMass) GetSubtreeLocalMassProperties( Vessel oldVessel, IEnumerable<VesselPart> parts )
+        private static (VesselSubtreePhysicsState state, Vector3 localCoM) GetSubtreePhysicsState( Vessel vessel, IEnumerable<VesselPart> parts )
         {
             float totalMass = 0;
             Vector3 localCoMAccumulator = Vector3.zero;
@@ -56,26 +51,68 @@ namespace HSP.Vessels
                     {
                         float m = massivePart.Mass;
                         totalMass += m;
-                        Vector3 partLocalPos = GetLocalPosRelative( comp.transform, oldVessel.transform );
+                        (Vector3 partLocalPos, _) = GetLocalPoseRelative( comp.transform, vessel.transform );
                         localCoMAccumulator += partLocalPos * m;
                     }
                 }
             }
 
+            Vector3 localCoM;
             if( totalMass <= 0 )
             {
                 Vector3 avgLocalPosAccumulator = Vector3.zero;
                 int count = 0;
                 foreach( var part in parts )
                 {
-                    avgLocalPosAccumulator += GetLocalPosRelative( part.transform, oldVessel.transform );
+                    (Vector3 partLocalPos, _) = GetLocalPoseRelative( part.transform, vessel.transform );
+                    avgLocalPosAccumulator += partLocalPos;
                     count++;
                 }
-                Vector3 avgLocalPos = count > 0 ? avgLocalPosAccumulator / count : Vector3.zero;
-                return (avgLocalPos, 0);
+                localCoM = count > 0 ? avgLocalPosAccumulator / count : Vector3.zero;
+            }
+            else
+            {
+                localCoM = localCoMAccumulator / totalMass;
             }
 
-            return (localCoMAccumulator / totalMass, totalMass);
+            Vector3Dbl oldAbsPos = vessel.ReferenceFrameTransform.GetAbsolutePosition();
+            QuaternionDbl oldAbsRot = vessel.ReferenceFrameTransform.GetAbsoluteRotation();
+            Vector3Dbl oldAbsVel = vessel.ReferenceFrameTransform.GetAbsoluteVelocity();
+            Vector3Dbl oldAbsAngVel = vessel.ReferenceFrameTransform.GetAbsoluteAngularVelocity();
+
+            Vector3Dbl absCoMPosition = oldAbsPos + oldAbsRot * (Vector3Dbl)localCoM;
+
+            Vector3Dbl oldCoMLocal = (Vector3Dbl)vessel.PhysicsTransform.LocalCenterOfMass;
+            Vector3Dbl relativePos = (Vector3Dbl)localCoM - oldCoMLocal;
+            Vector3Dbl relativePosWorld = oldAbsRot * relativePos;
+
+            Vector3Dbl linearVelAtNewCoM = oldAbsVel + Vector3Dbl.Cross( oldAbsAngVel, relativePosWorld );
+
+            var state = new VesselSubtreePhysicsState
+            {
+                AbsoluteCoM = absCoMPosition,
+                AbsoluteLinearVelocity = linearVelAtNewCoM,
+                AbsoluteAngularVelocity = oldAbsAngVel,
+                TotalMass = totalMass
+            };
+
+            return (state, localCoM);
+        }
+
+        public static void Attach( FAttachNode.SnappingCandidate candidate )
+        {
+            Attach( candidate.snappedNode, candidate.targetNode );
+        }
+
+        private class SurfaceAttachNode : FAttachNode { }
+
+        public static void SurfaceAttach( VesselPart partA, VesselPart partB )
+        {
+            //var dummyA = new SurfaceAttachNode();
+            //var dummyB = new SurfaceAttachNode();
+
+            //Attach( dummyA, dummyB );
+            throw new NotImplementedException();
         }
 
         public static void Attach( FAttachNode nodeA, FAttachNode nodeB )
@@ -85,132 +122,182 @@ namespace HSP.Vessels
                 throw new ArgumentNullException( "Nodes to attach cannot be null." );
             }
 
-            Vessel vesselA = nodeA.Part.GetVessel();
-            Vessel vesselB = nodeB.Part.GetVessel();
+            if( nodeA == nodeB )
+            {
+                throw new ArgumentException( "Nodes to attach cannot be the same node." );
+            }
 
+            VesselPart partA = nodeA.Part;
+            VesselPart partB = nodeB.Part;
+
+            if( partA == null || partB == null )
+                return;
+
+            Vessel vesselA = partA.Vessel;
+            Vessel vesselB = partB.Vessel;
+
+            VesselAttachmentGraph newGraph;
+            var graphA = vesselA.Attachments;
+            var graphB = vesselB.Attachments;
+            if( vesselA == null && vesselB == null )
+            {
+                Vessel newVessel = VesselFactory.CreatePartless( HSPSceneManager.GetScene( partA.gameObject ),
+                    partA.transform.position,
+                    partA.transform.rotation,
+                    Vector3Dbl.zero,
+                    Vector3Dbl.zero );
+
+                newGraph = VesselAttachmentGraph.Merge( graphA, graphB, partA, partB );
+
+                newVessel.SetGraph( newGraph );
+                return;
+            }
+            if( vesselA == null )
+            {
+                newGraph = VesselAttachmentGraph.Merge( graphA, vesselB.Attachments, partA, partB );
+                vesselB.SetGraph( newGraph );
+                return;
+            }
+            if( vesselB == null )
+            {
+                newGraph = VesselAttachmentGraph.Merge( vesselA.Attachments, graphB, partA, partB );
+                vesselA.SetGraph( newGraph );
+                return;
+            }
             if( vesselA == vesselB )
             {
-                vesselA.Attachments.AddLink( nodeA, nodeB );
-                vesselA.RebuildIslands();
+                newGraph = VesselAttachmentGraph.AddEdge( vesselA.Attachments, partA, partB );
+                vesselA.SetGraph( newGraph );
+                return;
             }
-            else
+
+            var mergedParts = vesselA.Parts.ToList();
+            newGraph = VesselAttachmentGraph.Merge( vesselB.Attachments, vesselA.Attachments, partB, partA );
+            vesselB.SetGraph( newGraph );
+
+            HSPEvent.EventManager.TryInvoke( HSPEvent_AFTER_VESSEL_MERGE.ID, new HSPEvent_AFTER_VESSEL_MERGE.Data()
             {
-                // Merge vessels (B into A)
-                Vessel mergedVessel = vesselB;
-                Vessel remainingVessel = vesselA;
+                RemainingVessel = vesselB,
+                MergedVessel = vesselA,
+                MergedParts = mergedParts
+            } );
 
-                Vector3Dbl posA = remainingVessel.ReferenceFrameTransform.GetAbsolutePosition();
-                QuaternionDbl rotA = remainingVessel.ReferenceFrameTransform.GetAbsoluteRotation();
-
-                Vector3Dbl posB = mergedVessel.ReferenceFrameTransform.GetAbsolutePosition();
-                QuaternionDbl rotB = mergedVessel.ReferenceFrameTransform.GetAbsoluteRotation();
-
-                foreach( var part in mergedVessel.Attachments.GetAllParts() )
-                {
-                    Vector3 localPosB = GetLocalPosRelative( part.transform, mergedVessel.transform );
-                    Quaternion localRotB = GetLocalRotRelative( part.transform, mergedVessel.transform );
-
-                    Vector3Dbl absPartPos = posB + rotB * (Vector3Dbl)localPosB;
-                    QuaternionDbl absPartRot = rotB * (QuaternionDbl)localRotB;
-
-                    Vector3Dbl localPartPosA = QuaternionDbl.Inverse( rotA ) * (absPartPos - posA);
-                    QuaternionDbl localPartRotA = QuaternionDbl.Inverse( rotA ) * absPartRot;
-
-                    part.transform.SetParent( remainingVessel.transform, false );
-                    part.transform.localPosition = (Vector3)localPartPosA;
-                    part.transform.localRotation = (Quaternion)localPartRotA;
-
-                    remainingVessel.Attachments.AddNode( part );
-                }
-
-                remainingVessel.Attachments.MergeGraph( mergedVessel.Attachments );
-                remainingVessel.Attachments.AddLink( nodeA, nodeB );
-
-                HSPEvent.EventManager.TryInvoke( HSPEvent_AFTER_VESSEL_MERGE.ID, new HSPEvent_AFTER_VESSEL_MERGE.Data
-                {
-                    RemainingVessel = remainingVessel,
-                    MergedVessel = mergedVessel
-                } );
-
-                // Delete the old vessel since it has no parts left
-                VesselFactory.Destroy( mergedVessel );
-
-                remainingVessel.RebuildIslands();
-                remainingVessel.RecalculatePartCache();
-            }
+            VesselFactory.Destroy( vesselA );
         }
 
         public static void Detach( FAttachNode nodeA )
         {
-#warning TODO - we only use a single node input, get the connected node dynamically.
-            //             var nodeB = NodeToSeparate.Part.Vessel.Attachments.Get( NodeToSeparate );
+            FAttachNode nodeB = null; // @@todo - get from graph.
 
             if( nodeA == null || nodeB == null )
                 return;
 
-            Vessel vessel = nodeA.Part.GetVessel();
-            if( vessel != nodeB.Part.GetVessel() ) 
-                return; // Not in the same vessel
+            Vessel vessel = nodeA.transform.GetVessel();
+            if( vessel != nodeB.transform.GetVessel() )
+                return;
 
-            vessel.Attachments.RemoveLink( nodeA, nodeB );
+            var newGraphs = VesselAttachmentGraph.RemoveEdge( vessel.Attachments, nodeA.transform.GetComponentInParent<VesselPart>(), nodeB.transform.GetComponentInParent<VesselPart>() );
 
-            // Check if graph split
-            var connectedComponents = vessel.Attachments.GetConnectedComponents();
-
-            if( connectedComponents.Count > 1 )
+            if( newGraphs.extraGraph == null )
             {
-                // Component 0 stays in the original vessel.
-                var primaryComponent = connectedComponents[0];
-
-                for( int i = 1; i < connectedComponents.Count; i++ )
-                {
-                    var splitParts = connectedComponents[i];
-                    CreateVesselFromSplit( vessel, splitParts );
-                }
-
-                vessel.Attachments.RetainOnly( primaryComponent );
-
-                if( vessel.RootPart != null && !primaryComponent.Contains( vessel.RootPart.GetComponent<VesselPart>() ) )
-                {
-                    foreach( var p in primaryComponent )
-                    {
-                        vessel.RootPart = p.transform;
-                        break;
-                    }
-                }
+                // Edge removal did not cause a split
+                vessel.SetGraph( newGraphs.graph );
             }
+            else
+            {
+                var remainingGraph = newGraphs.graph;
+                var splitGraph = newGraphs.extraGraph;
 
-            vessel.RebuildIslands();
-            vessel.RecalculatePartCache();
+                // First extract the parts for the new vessel to avoid them being deleted/modified
+                var splitParts = new HashSet<VesselPart>( splitGraph.Nodes );
+
+                // Set the remaining graph on the original vessel.
+                vessel.SetGraph( remainingGraph );
+
+                CreateVesselFromSplit( vessel, splitParts, splitGraph );
+            }
         }
 
-        private static void CreateVesselFromSplit( Vessel oldVessel, HashSet<VesselPart> splitParts )
+        public static bool TryDetach( VesselPart part )
         {
-            (Vector3 localCoM, float totalMass) = GetSubtreeLocalMassProperties( oldVessel, splitParts );
+            if( part == null || part.Vessel == null )
+                return false;
 
-            Vector3Dbl oldAbsPos = oldVessel.ReferenceFrameTransform.GetAbsolutePosition();
-            QuaternionDbl oldAbsRot = oldVessel.ReferenceFrameTransform.GetAbsoluteRotation();
-            Vector3Dbl oldAbsVel = oldVessel.ReferenceFrameTransform.GetAbsoluteVelocity();
-            Vector3Dbl oldAbsAngVel = oldVessel.ReferenceFrameTransform.GetAbsoluteAngularVelocity();
+            Vessel vessel = part.Vessel;
 
-            Vector3Dbl absCoMPosition = oldAbsPos + oldAbsRot * (Vector3Dbl)localCoM;
+            // Assume the first part in the vessel's Parts list is the root.
+            VesselPart rootPart = vessel.Parts.FirstOrDefault();
+            if( rootPart == null )
+                return false;
 
-            Vector3Dbl oldCoMLocal = (Vector3Dbl)oldVessel.PhysicsTransform.LocalCenterOfMass;
-            Vector3Dbl relativePos = (Vector3Dbl)localCoM - oldCoMLocal;
-            Vector3Dbl relativePosWorld = oldAbsRot * relativePos;
+            if( part == rootPart )
+            {
+                // The whole vessel is being picked up, no need to split.
+                return true;
+            }
 
-            Vector3Dbl linearVelAtNewCoM = oldAbsVel + Vector3Dbl.Cross( oldAbsAngVel, relativePosWorld );
+            // Create a directed graph from the root
+            var directedGraph = DirectedVesselAttachmentGraph.Create( vessel.Attachments, rootPart );
+
+            // Find the subgraph starting from the clicked part
+            var detachedParts = directedGraph.GetSubgraph( part );
+
+            // Remove edges connecting the detached subgraph from the rest of the graph
+            var newAdjacency = new Dictionary<VesselPart, List<AttachmentEdge>>();
+            foreach( var node in vessel.Attachments.Nodes )
+            {
+                newAdjacency[node] = new List<AttachmentEdge>( vessel.Attachments.GetEdges( node ) );
+            }
+
+            // Find edges that cross between the remaining parts and the detached parts, and remove them
+            var remainingParts = vessel.Attachments.Nodes.Except( detachedParts ).ToHashSet();
+
+            foreach( var detachedNode in detachedParts )
+            {
+                newAdjacency[detachedNode].RemoveAll( e => remainingParts.Contains( e.Target ) );
+            }
+            foreach( var remainingNode in remainingParts )
+            {
+                newAdjacency[remainingNode].RemoveAll( e => detachedParts.Contains( e.Target ) );
+            }
+
+            // The remaining graph is valid because we only cut edges between remaining and detached.
+            var remainingAdjacency = new Dictionary<VesselPart, List<AttachmentEdge>>();
+            foreach( var remainingNode in remainingParts )
+            {
+                remainingAdjacency[remainingNode] = newAdjacency[remainingNode];
+            }
+            var remainingGraph = VesselAttachmentGraph.CreateValidated( remainingAdjacency );
+
+            var detachedAdjacency = new Dictionary<VesselPart, List<AttachmentEdge>>();
+            foreach( var detachedNode in detachedParts )
+            {
+                detachedAdjacency[detachedNode] = newAdjacency[detachedNode];
+            }
+            var detachedGraph = VesselAttachmentGraph.CreateValidated( detachedAdjacency );
+
+            // Apply remaining graph to the original vessel
+            vessel.SetGraph( remainingGraph );
+
+            // Create a new vessel for the detached parts
+            CreateVesselFromSplit( vessel, detachedParts, detachedGraph );
+
+            return true;
+        }
+
+        private static void CreateVesselFromSplit( Vessel oldVessel, HashSet<VesselPart> splitParts, VesselAttachmentGraph splitGraph )
+        {
+            (VesselSubtreePhysicsState state, Vector3 localCoM) = GetSubtreePhysicsState( oldVessel, splitParts );
 
             Vessel newVessel = VesselFactory.CreatePartless( HSPSceneManager.GetScene( oldVessel.gameObject ),
-                absCoMPosition,
-                oldAbsRot,
-                linearVelAtNewCoM,
-                oldAbsAngVel );
+                state.AbsoluteCoM,
+                oldVessel.ReferenceFrameTransform.GetAbsoluteRotation(),
+                state.AbsoluteLinearVelocity,
+                state.AbsoluteAngularVelocity );
 
             foreach( var part in splitParts )
             {
-                Vector3 partLocalPos = GetLocalPosRelative( part.transform, oldVessel.transform );
-                Quaternion partLocalRot = GetLocalRotRelative( part.transform, oldVessel.transform );
+                (Vector3 partLocalPos, Quaternion partLocalRot) = GetLocalPoseRelative( part.transform, oldVessel.transform );
 
                 Vector3 preciseLocalPos = partLocalPos - localCoM;
                 Quaternion preciseLocalRot = partLocalRot;
@@ -219,43 +306,15 @@ namespace HSP.Vessels
 
                 part.transform.localPosition = preciseLocalPos;
                 part.transform.localRotation = preciseLocalRot;
-
-                newVessel.Attachments.AddNode( part );
             }
 
-            foreach( var part in splitParts )
-            {
-                foreach( var link in oldVessel.Attachments.GetLinksForPart( part ) )
-                {
-                    if( splitParts.Contains( link.NodeA.Part ) && splitParts.Contains( link.NodeB.Part ) )
-                    {
-                        if( !newVessel.Attachments.ContainsLink( link ) )
-                        {
-                            newVessel.Attachments.AddLink( link.NodeA, link.NodeB );
-                        }
-                    }
-                }
-            }
-
-            VesselPart arbitraryRoot = null;
-            foreach( var p in splitParts )
-            {
-                arbitraryRoot = p;
-                break;
-            }
-            if( arbitraryRoot != null )
-            {
-                newVessel.RootPart = arbitraryRoot.transform;
-            }
-
-            newVessel.RebuildIslands();
-            newVessel.RecalculatePartCache();
+            newVessel.SetGraph( splitGraph );
 
             HSPEvent.EventManager.TryInvoke( HSPEvent_AFTER_VESSEL_SPLIT.ID, new HSPEvent_AFTER_VESSEL_SPLIT.Data
             {
                 OldVessel = oldVessel,
                 NewVessel = newVessel,
-                SplitRoot = arbitraryRoot
+                SplitParts = splitParts.ToList()
             } );
         }
     }

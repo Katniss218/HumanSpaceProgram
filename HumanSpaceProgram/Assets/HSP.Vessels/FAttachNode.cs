@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -127,6 +127,12 @@ namespace HSP.Vessels
             // Match positions.
             Vector3 offset = snappedObject.transform.position - snappedNode.transform.position;
             snappedObject.position = targetNode.transform.position + offset;
+        }
+
+        public static IEnumerable<FAttachNode> GetAttachNodes( IVessel vessel )
+        {
+            if (vessel == null) return Enumerable.Empty<FAttachNode>();
+            return vessel.Parts.SelectMany( p => p.GetComponentsInChildren<FAttachNode>() );
         }
 
         [MapsInheritingFrom( typeof( FAttachNode ) )]

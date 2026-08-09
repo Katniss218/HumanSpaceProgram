@@ -1,4 +1,4 @@
-﻿using HSP.Content.Vessels;
+using HSP.Content.Vessels;
 using HSP.Content.Vessels.Serialization;
 using HSP.UI.Windows;
 using HSP.Vanilla.Scenes.DesignScene;
@@ -29,16 +29,25 @@ namespace HSP.Vanilla.UI.Scenes.DesignScene
                 return;
             }
 
+            Vessel newVessel = HSP.Vessels.VesselFactory.CreatePartless( HSP.SceneManagement.HSPSceneManager.GetScene( spawnedPart ), HSP.ReferenceFrames.Vector3Dbl.zero, HSP.ReferenceFrames.QuaternionDbl.identity, HSP.ReferenceFrames.Vector3Dbl.zero, HSP.ReferenceFrames.Vector3Dbl.zero );
+            spawnedPart.transform.SetParent( newVessel.transform, false );
+            spawnedPart.transform.localPosition = Vector3.zero;
+            spawnedPart.transform.localRotation = Quaternion.identity;
+            
+            HSP.Vessels.VesselPart part = spawnedPart.GetComponentInChildren<HSP.Vessels.VesselPart>();
+            if (part != null)
+            {
+                newVessel.SetGraph( HSP.Vessels.VesselAttachmentGraph.Create(part) );
+            }
+
             if( DesignVesselManager.DesignObject == null )
             {
-                spawnedPart.transform.localPosition = Vector3.zero;
-                spawnedPart.transform.localRotation = Quaternion.identity;
-                spawnedPart.SetLayer( (int)Layer.PART_OBJECT, true );
-                DesignVesselManager.TryAttachRoot( spawnedPart.transform );
+                newVessel.gameObject.SetLayer( (int)Layer.PART_OBJECT, true );
+                DesignVesselManager.SetDesignObject( newVessel );
             }
             else
             {
-                pickTool.SetHeldPart( spawnedPart.transform, Vector3.zero );
+                pickTool.SetHeldPart( newVessel, Vector3.zero, Quaternion.identity );
             }
         }
 

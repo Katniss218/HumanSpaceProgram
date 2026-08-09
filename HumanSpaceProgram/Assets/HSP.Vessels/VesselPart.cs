@@ -23,22 +23,20 @@ namespace HSP.Vessels
         /// </summary>
         public NamespacedID PartID { get; set; }
 
-        public static PartMetadata GetPart( Transform obj )
+        public PartMetadata GetPartMetadata()
         {
-            while( obj != null )
-            {
-                if( obj.HasComponent( out VesselPart part ) )
-                {
-                    if( PartRegistry.TryLoadMetadata( part.PartID, out var metadata ) )
-                        return metadata;
+            if( PartRegistry.TryLoadMetadata( this.PartID, out var metadata ) )
+                return metadata;
 
-                    Debug.LogError( $"Failed to load part metadata for FPart with part ID '{part.PartID}'." );
-                    return null;
-                }
-                obj = obj.parent;
-            }
+            Debug.LogError( $"Failed to load part metadata for FPart with part ID '{this.PartID}'." );
             return null;
         }
+
+        public static VesselPart GetPart( Transform obj )
+        {
+            return obj.GetComponentInParent<VesselPart>();
+        }
+
 
         [MapsInheritingFrom( typeof( VesselPart ) )]
         public static IDescriptor VesselPartMapping()

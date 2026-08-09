@@ -1,4 +1,4 @@
-﻿using HSP.Content.Vessels.Serialization;
+using HSP.Content.Vessels.Serialization;
 using HSP.Time;
 using HSP.Vessels;
 using System;
@@ -54,150 +54,54 @@ namespace HSP.Vanilla.Scenes.DesignScene
         /// </summary>
         public static Vessel DesignObject => instance._designObj;
 
+        public static void SetDesignObject( Vessel vessel )
+        {
+            instance._designObj = vessel;
+            ActiveVesselManager.ActiveObject = vessel?.transform;
+        }
+
+        public static void ClearDesignObject()
+        {
+            instance._designObj = null;
+            ActiveVesselManager.ActiveObject = null;
+        }
+
         /// <summary>
         /// Parts that are loosely dropped in the design scene, ghosted out.
         /// </summary>
-        private List<Transform> _looseParts = new List<Transform>();
+        private List<Vessel> _looseParts = new List<Vessel>();
+
+        public static void AddLoosePart( Vessel vessel )
+        {
+            if( vessel != null && !instance._looseParts.Contains( vessel ) )
+            {
+                instance._looseParts.Add( vessel );
+            }
+        }
+
+        public static void RemoveLoosePart( Vessel vessel )
+        {
+            if( vessel != null )
+            {
+                instance._looseParts.Remove( vessel );
+            }
+        }
 
         /// <summary>
         /// True if the object can be interacted with (picked up, moved, rotated, etc).
         /// </summary>
-        public static bool IsLooseOrPartOfDesignObject( Transform obj )
+        public static bool TryGetPart( Transform obj, out VesselPart part )
         {
-            if( obj == null )
+            part = VesselPart.GetPart( obj );
+            if( part == null )
                 return false;
 
-            if( instance._looseParts.Contains( obj.root ) )
+            if( DesignObject != null && part.Vessel == DesignObject )
                 return true;
-
-            if( instance._designObj != null && obj.IsChildOf( instance._designObj.transform ) )
+            if( instance._looseParts.Contains( part.Vessel ) )
                 return true;
 
             return false;
-        }
-
-        public static bool IsRootOfDesignObj( Transform obj )
-        {
-            if( instance._designObj == null )
-                return false;
-
-            return obj == instance._designObj.RootPart;
-        }
-        
-        public static bool HasRootOfDesignObj()
-        {
-            if( instance._designObj == null )
-                return false;
-
-            return instance._designObj.RootPart != null;
-        }
-
-        /// <summary>
-        /// Returns the root of every object that can have an object parented to it.
-        /// </summary>
-        public static IEnumerable<Transform> GetAttachableRoots()
-        {
-            if( instance._designObj == null )
-                return Enumerable.Empty<Transform>();
-
-            return instance._designObj.RootPart == null
-                ? new Transform[] { }
-                : new Transform[] { instance._designObj.RootPart };
-        }
-
-        /// <summary>
-        /// Checks whether an object can be parented to the specified object.
-        /// </summary>
-        public static bool CanHaveChildren( Transform parent )
-        {
-            if( parent == null )
-                return true;
-            if( instance._designObj == null )
-                return false;
-
-            return parent.root == instance._designObj.transform;
-        }
-
-        /// <summary>
-        /// Places the selected object as the child of the specified object (adds to the actionable parts).
-        /// </summary>
-        /// <param name="parent">The new parent, can be null, in which case, the part will be placed as a loose part.</param>
-        public static bool TryAttach( Transform obj, Transform parent )
-        {
-            if( IsLooseOrPartOfDesignObject( obj ) )
-            {
-                return false;
-            }
-            if( !CanHaveChildren( parent ) )
-            {
-                return false;
-            }
-
-            // Place as loose or as root of vessel.
-            if( parent == null )
-            {
-                if( !HasRootOfDesignObj() )
-                {
-                    return TryAttachRoot( obj );
-                }
-                instance._looseParts.Add( obj );
-            }
-
-            obj.SetParent( parent );
-            return true;
-        }
-
-        /// <summary>
-        /// Places the selected object as the new root of the design object.
-        /// </summary>
-        /// <remarks>
-        /// This will destroy the already existing root part, if any.
-        /// </remarks>
-        public static bool TryAttachRoot( Transform obj )
-        {
-            if( IsLooseOrPartOfDesignObject( obj ) )
-            {
-                return false;
-            }
-
-            if( instance._designObj != null )
-            {
-                VesselFactory.Destroy( instance._designObj );
-                instance._designObj = null;
-            }
-            instance._designObj = VesselFactory.CreatePartless( DesignSceneM.instance, Vector3Dbl.zero, QuaternionDbl.identity, Vector3Dbl.zero, Vector3Dbl.zero );
-            ActiveVesselManager.ActiveObject = instance._designObj.RootPart;
-            instance._designObj.RootPart = obj;
-            return true;
-        }
-
-        /// <summary>
-        /// Tries to pick up the specified object (unparents it, and removes from actionable objects).
-        /// </summary>
-        public static bool TryDetach( Transform obj )
-        {
-            if( !IsLooseOrPartOfDesignObject( obj ) )
-            {
-                return false;
-            }
-
-            if( IsRootOfDesignObj( obj ) )
-            {
-                DetachRoot();
-                return true;
-            }
-
-            instance._looseParts.Remove( obj ); // sometimes will do nothing, since the part might not be a loose part.
-            obj.SetParent( null );
-            return true;
-        }
-
-        private static void DetachRoot()
-        {
-            instance._designObj.RootPart = null;
-            VesselFactory.Destroy( instance._designObj );
-            ActiveVesselManager.ActiveObject = null;
-            instance._designObj = null;
         }
 
         /// <summary>
@@ -273,9 +177,8 @@ namespace HSP.Vanilla.Scenes.DesignScene
             HSPEvent.EventManager.TryInvoke( HSPEvent_BEFORE_DESIGN_SCENE_VESSEL_LOADED.ID, null );
             CurrentVesselMetadata = loadedVesselMetadata; // CurrentVesselMetadata should be set after invoking before load.
 
-            GameObject go = SerializationUnit.Deserialize<GameObject>( _designObjDataHandler.Read() );
+            // @@TODO - load the vessel from the 3-file state. Same as the gameplay load function.
 
-            DesignObject.RootPart = go.transform;
             HSPEvent.EventManager.TryInvoke( HSPEvent_AFTER_DESIGN_SCENE_VESSEL_LOADED.ID, null );
         }
 
@@ -283,10 +186,10 @@ namespace HSP.Vanilla.Scenes.DesignScene
 
         private static GameObject GetGameObject()
         {
-            if( DesignObject.RootPart == null )
+            if( DesignObject == null || !DesignObject.Parts.Any() )
                 throw new InvalidOperationException( $"Can't save, the design object is empty." );
 
-            return DesignObject.RootPart.gameObject;
+            return DesignObject.gameObject;
         }
     }
 }

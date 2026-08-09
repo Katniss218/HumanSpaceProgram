@@ -1,5 +1,6 @@
 ﻿using HSP.Input;
 using HSP.ViewportTools;
+using System.Linq;
 using UnityEngine;
 using UnityPlus.AssetManagement;
 using UnityPlus.Input;
@@ -64,9 +65,9 @@ namespace HSP.Vanilla.Scenes.DesignScene.Tools
             if( DesignVesselManager.DesignObject != null )
             {
                 CreateHandles();
-                var target = DesignVesselManager.DesignObject.RootPart;
-                _handles.Target = target;
-                _handles.transform.position = target.position;
+                var target = DesignVesselManager.DesignObject.Parts.First();
+                _handles.Target = target.transform;
+                _handles.transform.position = target.transform.position;
             }
         }
 
@@ -87,19 +88,13 @@ namespace HSP.Vanilla.Scenes.DesignScene.Tools
             {
                 Transform clickedObj = hitInfo.collider.transform;
 
-                TransformRedirect r = clickedObj.GetComponent<TransformRedirect>();
-                if( r != null && r.Target != null )
-                {
-                    clickedObj = r.Target;
-                }
-
-                if( DesignVesselManager.IsLooseOrPartOfDesignObject( clickedObj ) )
+                if( DesignVesselManager.TryGetPart( clickedObj, out var part ) )
                 {
                     if( _handles == null )
                         CreateHandles();
 
-                    _handles.Target = clickedObj;
-                    _handles.transform.position = clickedObj.position;
+                    _handles.Target = part.transform;
+                    _handles.transform.position = part.transform.position;
                     return true;
                 }
             }
