@@ -24,7 +24,7 @@ namespace HSP.Vanilla.ResourceFlow
 
         void OnEnable()
         {
-            if( _vessel != null && _vessel.Parts.Any() )
+            if( _vessel != null && _vessel.Parts != null && _vessel.Parts.Any() )
             {
                 BuildAndRegisterNetwork();
             }

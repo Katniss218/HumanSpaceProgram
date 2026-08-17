@@ -1,8 +1,11 @@
 using HSP.Content.Vessels;
 using HSP.Content.Vessels.Serialization;
+using HSP.SceneManagement;
 using HSP.UI.Windows;
 using HSP.Vanilla.Scenes.DesignScene;
 using HSP.Vanilla.Scenes.DesignScene.Tools;
+using HSP.Vessels;
+using HSP.Vessels.Serialization;
 using UnityEngine;
 using UnityPlus.AssetManagement;
 using UnityPlus.UILib;
@@ -16,12 +19,12 @@ namespace HSP.Vanilla.UI.Scenes.DesignScene
 
         void OnClick()
         {
-            // set current tool to pick tool.
-            // if vessel exists, add to pick tool
-            // otherwise, spawn a new vessel with that part as root.
+            // (always) set current tool to pick tool.
+            // if a vessel exists, add new new graph to the pick tool.
+            // otherwise, spawn a new vessel with that graph.
             PickTool pickTool = DesignSceneToolManager.UseTool<PickTool>();
 
-            if( !PartRegistry.TryLoad( _part.ID, out GameObject spawnedPart ) )
+            if( !VesselSerializationUtils.TryLoad( _part.Filepath, out IPartGraph partGraph ) )
             {
                 UICanvas canvas = DesignSceneM.Instance.GetWindowCanvas();
                 Debug.LogError( $"Failed to load part with ID '{_part.ID}' from part list." );
@@ -29,17 +32,8 @@ namespace HSP.Vanilla.UI.Scenes.DesignScene
                 return;
             }
 
-            Vessel newVessel = HSP.Vessels.VesselFactory.CreatePartless( HSP.SceneManagement.HSPSceneManager.GetScene( spawnedPart ), HSP.ReferenceFrames.Vector3Dbl.zero, HSP.ReferenceFrames.QuaternionDbl.identity, HSP.ReferenceFrames.Vector3Dbl.zero, HSP.ReferenceFrames.Vector3Dbl.zero );
-            spawnedPart.transform.SetParent( newVessel.transform, false );
-            spawnedPart.transform.localPosition = Vector3.zero;
-            spawnedPart.transform.localRotation = Quaternion.identity;
+            Vessel newVessel = VesselFactory.CreatePartless<Vessel>( DesignSceneM.Instance, Vector3Dbl.zero, QuaternionDbl.identity, Vector3Dbl.zero, Vector3Dbl.zero );
             
-            HSP.Vessels.VesselPart part = spawnedPart.GetComponentInChildren<HSP.Vessels.VesselPart>();
-            if (part != null)
-            {
-                newVessel.SetGraph( HSP.Vessels.VesselAttachmentGraph.Create(part) );
-            }
-
             if( DesignVesselManager.DesignObject == null )
             {
                 newVessel.gameObject.SetLayer( (int)Layer.PART_OBJECT, true );

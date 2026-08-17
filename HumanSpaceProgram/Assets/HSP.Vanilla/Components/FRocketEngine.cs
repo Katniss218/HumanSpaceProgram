@@ -60,7 +60,7 @@ namespace HSP.Vanilla.Components
     }
 
     [Serializable]
-    public class FRocketEngine : MonoBehaviour, IPropulsion, IBuildsFlowNetwork
+    public class FRocketEngine : FComponent, IPropulsion, IBuildsFlowNetwork
     {
         // Heuristic constants for back-calculating physics properties from gameplay stats.
         private const double NominalFullThrottleChamberPressure = 50e5;  // 50 bar
@@ -232,30 +232,32 @@ namespace HSP.Vanilla.Components
         internal EngineFeedSystem[] _feedSystems;
         private double[] _lastInflowDensities;
 
-        void Awake()
+        public FRocketEngine()
         {
-            SetThrottle ??= new ControlleeInput<float>( SetThrottleListener );
-            Ignite ??= new ControlleeInput( IgniteListener );
-            Shutdown ??= new ControlleeInput( ShutdownListener );
+            SetThrottle = new ControlleeInput<float>( SetThrottleListener );
+            Ignite = new ControlleeInput( IgniteListener );
+            Shutdown = new ControlleeInput( ShutdownListener );
+        }
 
-            // Initialize feed systems array based on inlets
-            if( Inlets != null )
+        private void EnsureFeedSystems()
+        {
+            if( _feedSystems == null && Inlets != null )
             {
                 _feedSystems = new EngineFeedSystem[Inlets.Length];
                 _lastInflowDensities = new double[Inlets.Length];
                 for( int i = 0; i < Inlets.Length; i++ )
                 {
                     _feedSystems[i] = new EngineFeedSystem();
-                    _feedSystems[i].Reset(); // TODO - handle the "current state" (engine might've been ignited).
+                    _feedSystems[i].Reset();
                 }
             }
         }
 
-        void FixedUpdate()
+        public override void FixedUpdate()
         {
             if( this.Thrust > 0.0f )
             {
-                Vessel vessel = this.transform.GetVessel();
+                Vessel vessel = this.Vessel as Vessel;
                 if( vessel != null )
                 {
                     vessel.PhysicsTransform.AddForceAtPosition( this.ThrustTransform.forward * this.Thrust, this.ThrustTransform.position );
@@ -265,13 +267,13 @@ namespace HSP.Vanilla.Components
 
         public BuildFlowResult BuildFlowNetwork( FlowNetworkBuilder c )
         {
+            EnsureFeedSystems();
             if( Inlets == null || Inlets.Length == 0 || _feedSystems == null )
             {
                 return BuildFlowResult.Finished;
             }
 
-            Vessel vessel = this.transform.GetVessel();
-            if( vessel == null || !vessel.Parts.Any() )
+            if( vessel == null || vessel.Parts == null || !vessel.Parts.Any() )
             {
                 return BuildFlowResult.Retry;
             }
@@ -299,6 +301,7 @@ namespace HSP.Vanilla.Components
 
         public void SynchronizeState( FlowNetworkSnapshot snapshot )
         {
+            EnsureFeedSystems();
             if( _feedSystems == null || Propellant == null || Propellant.PropellantMixture.IsEmpty() )
             {
                 if( _feedSystems != null )
@@ -342,6 +345,7 @@ namespace HSP.Vanilla.Components
 
         public void ApplySnapshot( FlowNetworkSnapshot snapshot )
         {
+            EnsureFeedSystems();
             if( _feedSystems == null )
             {
                 this.Inflow?.Clear();

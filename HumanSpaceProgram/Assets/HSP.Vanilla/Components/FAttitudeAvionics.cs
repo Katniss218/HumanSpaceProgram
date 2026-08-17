@@ -14,10 +14,8 @@ namespace HSP.Vanilla.Components
     /// <summary>
     /// Stability Assist (SAS) module.
     /// </summary>
-    public class FAttitudeAvionics : MonoBehaviour
+    public class FAttitudeAvionics : FComponent
 	{
-		private Vessel _vessel;
-
         // error in pitch, roll, yaw, in [Rad]
         [field: SerializeField]
         private Vector3Dbl _error0 = Vector3Dbl.zero;
@@ -117,7 +115,7 @@ namespace HSP.Vanilla.Components
 			TargetOrientation = _vessel.ReferenceTransform.rotation;
 		}
 
-		void FixedUpdate()
+		public override void FixedUpdate()
 		{
 			if( _vessel == null )
 				return;

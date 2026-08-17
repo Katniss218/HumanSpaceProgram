@@ -1,7 +1,7 @@
 ﻿using HSP.Vessels;
 using UnityEngine;
 
-namespace HSP.Trajectories.Components
+namespace HSP.Vanilla.Components
 {
     /// <summary>
     /// Specifies that this object should be anchored to the ground, instead of following its own trajectory in the world.
@@ -9,8 +9,9 @@ namespace HSP.Trajectories.Components
     [DisallowMultipleComponent]
     public class FAnchor : FComponent
     {
+
         /// <summary>
-        /// Checks if the object should be anchored.
+        /// Checks if the part graph should be anchored.
         /// </summary>
         public static bool HasAnchor( Vessel partGraph )
         {

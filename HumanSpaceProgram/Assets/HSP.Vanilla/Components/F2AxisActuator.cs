@@ -1,5 +1,6 @@
-﻿using HSP.ControlSystems;
+using HSP.ControlSystems;
 using HSP.ControlSystems.Controls;
+using HSP.Vessels;
 using UnityEngine;
 using UnityPlus.Serialization;
 using UnityPlus.Serialization.Descriptors;
@@ -7,7 +8,7 @@ using Ctx = UnityPlus.Serialization.Ctx;
 
 namespace HSP.Vanilla.Components
 {
-    public class F2AxisActuator : MonoBehaviour
+    public class F2AxisActuator : FComponent
     {
         /// <summary>
         /// The transform used as a reference (0,0) orientation.
@@ -62,15 +63,15 @@ namespace HSP.Vanilla.Components
             this.Y = xy.y;
         }
 
-        void Awake()
+        public F2AxisActuator()
         {
-            GetReferenceTransform ??= new ControlParameterOutput<Transform>( GetTransform );
-            SetX ??= new ControlleeInput<float>( SetXListener );
-            SetY ??= new ControlleeInput<float>( SetYListener );
-            SetXY ??= new ControlleeInput<Vector2>( SetXYListener );
+            GetReferenceTransform = new ControlParameterOutput<Transform>( GetTransform );
+            SetX = new ControlleeInput<float>( SetXListener );
+            SetY = new ControlleeInput<float>( SetYListener );
+            SetXY = new ControlleeInput<Vector2>( SetXYListener );
         }
 
-        void FixedUpdate()
+        public override void FixedUpdate()
         {
             if( XActuatorTransform != null )
             {

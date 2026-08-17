@@ -1,6 +1,7 @@
 ﻿using HSP.ControlSystems;
 using HSP.ControlSystems.Controls;
 using HSP.Input;
+using HSP.Vessels;
 using UnityEngine;
 using UnityPlus.Input;
 using UnityPlus.Serialization;
@@ -12,7 +13,7 @@ namespace HSP.Vanilla.Components
     /// <summary>
     /// Sends steering and throttle signals based on player input.
     /// </summary>
-    public class FPlayerInputAvionics : MonoBehaviour
+    public class FPlayerInputAvionics : FComponent
     {
         public FControlFrame ControlFrame { get; set; }
 
@@ -46,7 +47,7 @@ namespace HSP.Vanilla.Components
         [NamedControl( "Translation" )]
         public ControllerOutput<Vector3> OnSetTranslation = new();
 
-        void OnEnable()
+        public override void OnEnable()
         {
             HierarchicalInputManager.AddAction( InputChannel.GAMEPLAY_CONTROL_PITCH, InputChannelPriority.MEDIUM, Input_Pitch );
             HierarchicalInputManager.AddAction( InputChannel.GAMEPLAY_CONTROL_YAW, InputChannelPriority.MEDIUM, Input_Yaw );
@@ -56,7 +57,7 @@ namespace HSP.Vanilla.Components
             HierarchicalInputManager.AddAction( InputChannel.GAMEPLAY_CONTROL_THROTTLE_MIN, InputChannelPriority.MEDIUM, Input_CutThrottle );
         }
 
-        void OnDisable()
+        public override void OnDisable()
         {
             HierarchicalInputManager.RemoveAction( InputChannel.GAMEPLAY_CONTROL_PITCH, Input_Pitch );
             HierarchicalInputManager.RemoveAction( InputChannel.GAMEPLAY_CONTROL_YAW, Input_Yaw );

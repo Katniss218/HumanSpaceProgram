@@ -2,11 +2,11 @@
 using HSP.Content.Vessels;
 using HSP.Content.Vessels.Serialization;
 using HSP.Vessels;
+using HSP.Vessels.Serialization;
 using System;
 using System.IO;
 using UnityEngine;
 using UnityPlus.Serialization;
-using UnityPlus.Serialization.Formats;
 
 namespace HSP.Vanilla.Content.AssetLoaders
 {
@@ -35,14 +35,11 @@ namespace HSP.Vanilla.Content.AssetLoaders
             return partMeta;
         }
 
-        public override Vessel Load( IForwardReferenceMap refMap )
+        public override GameObject Load( IForwardReferenceMap refMap )
         {
             string filePath = VesselMetadata.GetRootDirectory( _vesselId );
-
-            var data = new FileSerializedDataHandler( Path.Combine( filePath, "gameobjects.json" ), JsonFormat.Instance )
-                .Read();
-
-            return SerializationUnit.Deserialize<GameObject>( data, refMap );
+            Vessel vessel = VesselSerializationUtils.Load( filePath, refMap );
+            return vessel != null ? vessel.gameObject : null;
         }
 
         public static void ReloadVesselsAsParts()

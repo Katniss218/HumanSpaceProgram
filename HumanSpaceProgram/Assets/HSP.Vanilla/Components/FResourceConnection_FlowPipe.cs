@@ -1,4 +1,5 @@
 ﻿using HSP.ResourceFlow;
+using HSP.Vessels;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -8,7 +9,7 @@ using Ctx = UnityPlus.Serialization.Ctx;
 
 namespace HSP.Vanilla.Components
 {
-    public class FResourceConnection_FlowPipe : MonoBehaviour, IBuildsFlowNetwork
+    public class FResourceConnection_FlowPipe : FComponent, IBuildsFlowNetwork
     {
         /// <summary>
         /// A multiplier for conductance, representing pipe type or losses from bends. [unitless]

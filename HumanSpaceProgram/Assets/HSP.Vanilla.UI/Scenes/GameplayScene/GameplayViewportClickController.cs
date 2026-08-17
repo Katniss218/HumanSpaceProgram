@@ -49,11 +49,6 @@ namespace HSP.Vanilla.UI.Scenes.GameplayScene
             }
 
             Transform clickedTransform = hit.collider.transform;
-            if( clickedTransform.GetVessel() == null )
-            {
-                return false;
-            }
-
             VesselPart clickedPart = VesselPart.GetPart( clickedTransform );
             if( clickedPart == null )
             {

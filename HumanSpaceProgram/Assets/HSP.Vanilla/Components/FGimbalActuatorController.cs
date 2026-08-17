@@ -10,7 +10,7 @@ namespace HSP.Vanilla.Components
     /// <summary>
     /// Controls a number of gimbal actuators.
     /// </summary>
-    public class FGimbalActuatorController : MonoBehaviour
+    public class FGimbalActuatorController : FComponent
     {
         public class Actuator2DGroup : ControlGroup
         {
@@ -49,19 +49,13 @@ namespace HSP.Vanilla.Components
             AttitudeCommand = attitude;
         }
 
-        void Awake()
+        public FGimbalActuatorController()
         {
-            SetAttitude ??= new ControlleeInput<Vector3>( SetAttitudeListener );
+            SetAttitude = new ControlleeInput<Vector3>( SetAttitudeListener );
         }
 
-        void FixedUpdate()
+        public override void FixedUpdate()
         {
-            Vessel vessel = this.transform.GetVessel();
-            if( vessel == null )
-            {
-                return;
-            }
-
             Vector3 worldSteering = vessel.ReferenceTransform.TransformDirection( AttitudeCommand );
 
             foreach( var actuator in Actuators2D )

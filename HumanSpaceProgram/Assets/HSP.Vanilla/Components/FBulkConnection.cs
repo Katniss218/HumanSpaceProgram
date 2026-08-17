@@ -14,7 +14,7 @@ namespace HSP.Vanilla.Components
     /// An object that connects two containers and calculates the resource flow between them.
     /// </summary>
     [Obsolete("Use FResourceConnection_FlowPipe instead.")]
-    public class FBulkConnection : MonoBehaviour
+    public class FBulkConnection : FComponent
     {
         /// <summary>
         /// Represents an inlet or outlet.
@@ -243,29 +243,25 @@ namespace HSP.Vanilla.Components
 
         Vector3 oldSceneAcceleration;
 
-        void FixedUpdate()
+        public override void FixedUpdate()
         {
             if( End1 == null || End2 == null )
             {
                 throw new InvalidOperationException( $"Both ends must exist" );
             }
 
-            Vessel vessel = this.transform.GetVessel();
-            if( vessel != null )
-            {
-                Vector3Dbl airfAcceleration = GravityUtils.GetNBodyGravityAcceleration( vessel.ReferenceFrameTransform.GetAbsolutePosition() );
-                Vector3 sceneAcceleration = vessel.ReferenceFrameTransform.SceneReferenceFrameProvider.GetSceneReferenceFrame().InverseTransformDirection( (Vector3)airfAcceleration );
-                Vector3 vesselAcceleration = vessel.ReferenceFrameTransform.GetAcceleration();
+            Vector3Dbl airfAcceleration = GravityUtils.GetNBodyGravityAcceleration( vessel.ReferenceFrameTransform.GetAbsolutePosition() );
+            Vector3 sceneAcceleration = vessel.ReferenceFrameTransform.SceneReferenceFrameProvider.GetSceneReferenceFrame().InverseTransformDirection( (Vector3)airfAcceleration );
+            Vector3 vesselAcceleration = vessel.ReferenceFrameTransform.GetAcceleration();
 
-                // acceleration due to external forces (gravity) minus the acceleration of the vessel.
-                sceneAcceleration -= vesselAcceleration;
+            // acceleration due to external forces (gravity) minus the acceleration of the vessel.
+            sceneAcceleration -= vesselAcceleration;
 #warning TODO - Each part should have its own acceleration (which includes centrifugal acceleration due to spinning vessel), that way if the vessel is spinning, it'll work correctly.
 
-                // this averaging fixes a situation where the thrust is 1, but the flow is 0, then the thrust is 0, but flow is 1, and it alternated like that.
-                FixedUpdate_Flow( (sceneAcceleration + oldSceneAcceleration) / 2 );
+            // this averaging fixes a situation where the thrust is 1, but the flow is 0, then the thrust is 0, but flow is 1, and it alternated like that.
+            FixedUpdate_Flow( (sceneAcceleration + oldSceneAcceleration) / 2 );
 
-                oldSceneAcceleration = sceneAcceleration;
-            }
+            oldSceneAcceleration = sceneAcceleration;
         }
 
         [MapsInheritingFrom( typeof( FBulkConnection ) )]

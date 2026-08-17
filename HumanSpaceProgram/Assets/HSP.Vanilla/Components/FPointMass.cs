@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using HSP.Vessels;
+using UnityEngine;
 using UnityPlus.Serialization;
 using UnityPlus.Serialization.Descriptors;
 
@@ -7,7 +8,7 @@ namespace HSP.Vanilla.Components
     /// <summary>
     /// Adds a point mass of the specified mass to the object.
     /// </summary>
-    public class FPointMass : MonoBehaviour, IHasMass
+    public class FPointMass : FComponent, IHasMass
     {
         [SerializeField]
         private float _mass;

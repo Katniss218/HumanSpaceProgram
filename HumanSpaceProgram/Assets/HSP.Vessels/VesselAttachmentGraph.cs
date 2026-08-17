@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityPlus.Serialization;
+using UnityPlus.Serialization.Descriptors;
 
 namespace HSP.Vessels
 {
@@ -44,13 +46,13 @@ namespace HSP.Vessels
         /// <summary>
         /// Creates a new graph from a single root part.
         /// </summary>
-        public static VesselAttachmentGraph Create( VesselPart rootPart )
+        public static VesselAttachmentGraph Create( VesselPart singlePart )
         {
-            if( rootPart == null )
-                throw new ArgumentNullException( nameof( rootPart ) );
+            if( singlePart == null )
+                throw new ArgumentNullException( nameof( singlePart ) );
 
             var adjacencyList = new Dictionary<VesselPart, List<AttachmentEdge>>();
-            adjacencyList[rootPart] = new List<AttachmentEdge>();
+            adjacencyList[singlePart] = new List<AttachmentEdge>();
             return new VesselAttachmentGraph( adjacencyList );
         }
 
@@ -248,6 +250,79 @@ namespace HSP.Vessels
             {
                 destination[node] = new List<AttachmentEdge>( source.GetEdges( node ) );
             }
+        }
+
+        private List<(VesselPart, VesselPart)> GetSerializedEdges()
+        {
+            var edges = new List<(VesselPart, VesselPart)>();
+            var recorded = new HashSet<(VesselPart, VesselPart)>();
+
+            foreach( var kvp in _adjacencyList )
+            {
+                var nodeA = kvp.Key;
+                if( nodeA == null ) continue;
+
+                foreach( var edge in kvp.Value )
+                {
+                    var nodeB = edge.Target;
+                    if( nodeB == null || nodeA == nodeB ) continue;
+
+                    if( !recorded.Contains( (nodeA, nodeB) ) && !recorded.Contains( (nodeB, nodeA) ) )
+                    {
+                        recorded.Add( (nodeA, nodeB) );
+                        edges.Add( (nodeA, nodeB) );
+                    }
+                }
+            }
+
+            return edges;
+        }
+
+        private static VesselAttachmentGraph FromSerializedEdges( List<(VesselPart, VesselPart)> edges )
+        {
+            var adjacency = new Dictionary<VesselPart, List<AttachmentEdge>>();
+
+            if( edges != null )
+            {
+                foreach( var (a, b) in edges )
+                {
+                    if( a == null || b == null || a == b )
+                        continue;
+
+                    if( !adjacency.TryGetValue( a, out var listA ) )
+                    {
+                        listA = new List<AttachmentEdge>();
+                        adjacency[a] = listA;
+                    }
+                    if( !listA.Any( e => e.Target == b ) )
+                    {
+                        listA.Add( new AttachmentEdge { Target = b } );
+                    }
+
+                    if( !adjacency.TryGetValue( b, out var listB ) )
+                    {
+                        listB = new List<AttachmentEdge>();
+                        adjacency[b] = listB;
+                    }
+                    if( !listB.Any( e => e.Target == a ) )
+                    {
+                        listB.Add( new AttachmentEdge { Target = a } );
+                    }
+                }
+            }
+
+            return new VesselAttachmentGraph( adjacency );
+        }
+
+        [MapsInheritingFrom( typeof( VesselAttachmentGraph ) )]
+        public static IDescriptor VesselAttachmentGraphMapping()
+        {
+            return new MemberwiseDescriptor<VesselAttachmentGraph>()
+                .WithConstructor(
+                    args => FromSerializedEdges( (List<(VesselPart, VesselPart)>)args[0] ),
+                    ("edges", typeof( List<(VesselPart, VesselPart)> ))
+                )
+                .WithReadonlyMember( "edges", typeof( Ctx.Array<Ctx.Ref> ), o => o.GetSerializedEdges() );
         }
     }
 }

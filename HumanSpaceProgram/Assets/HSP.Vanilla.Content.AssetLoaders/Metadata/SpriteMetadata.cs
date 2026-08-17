@@ -6,7 +6,10 @@ namespace HSP.Vanilla.Content.AssetLoaders.Metadata
 {
     public class SpriteMetadata
     {
-        const int CONTEXT_BORDER = -377894935;
+        public static class Ctx
+        {
+            public interface Border : IContext { }
+        }
 
         public Rect Rect { get; set; } // refault to full size
         public Vector2 Pivot { get; set; } // default to center
@@ -18,10 +21,10 @@ namespace HSP.Vanilla.Content.AssetLoaders.Metadata
             return new MemberwiseDescriptor<SpriteMetadata>()
                 .WithMember( "rect", o => o.Rect )
                 .WithMember( "pivot", o => o.Pivot )
-                .WithMember( "border", CONTEXT_BORDER, o => o.Border );
+                .WithMember( "border", typeof( Ctx.Border ), o => o.Border );
         }
 
-        [MapsInheritingFrom( typeof( Vector4 ), Context = CONTEXT_BORDER )]
+        [MapsInheritingFrom( typeof( Vector4 ), ContextType = typeof( Ctx.Border ) )]
         public static IDescriptor Vector4BorderMapping()
         {
             return new MemberwiseDescriptor<Vector4>()

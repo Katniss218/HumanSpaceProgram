@@ -10,7 +10,7 @@ namespace HSP.Vanilla.Components
     /// <summary>
     /// 
     /// </summary>
-    public class FVesselSeparator : MonoBehaviour
+    public class FVesselSeparator : FComponent
     {
         public FAttachNode NodeToSeparate;
 
@@ -33,9 +33,9 @@ namespace HSP.Vanilla.Components
             _hasSeparated = true;
         }
 
-        void Awake()
+        public FVesselSeparator()
         {
-            Separate ??= new ControlleeInput( SeparateListener );
+            Separate = new ControlleeInput( SeparateListener );
         }
 
         [MapsInheritingFrom( typeof( FVesselSeparator ) )]

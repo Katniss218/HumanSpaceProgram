@@ -16,7 +16,9 @@ namespace HSP.Vessels
         /// <summary>
         /// Gets or sets the vessel that this part belongs to. 
         /// </summary>
-        public Vessel Vessel { get; internal set; }
+        public IPartGraph Graph { get; internal set; }
+
+        public IVessel Vessel => Graph as IVessel;
 
         /// <summary>
         /// The ID of this part type (not instance).
@@ -32,6 +34,40 @@ namespace HSP.Vessels
             return null;
         }
 
+        private FComponent[] _components = Array.Empty<FComponent>();
+        public IReadOnlyList<FComponent> Components => _components;
+
+        private readonly FComponentCache _componentCache = new FComponentCache();
+
+        public void SetComponents( FComponent[] components )
+        {
+            if( _components != null )
+            {
+                foreach( var comp in _components )
+                {
+                    comp?.OnDisable();
+                }
+            }
+            _components = components ?? Array.Empty<FComponent>();
+            foreach( var comp in _components )
+            {
+                if( comp != null )
+                {
+                    comp.Part = this;
+                    comp.transform = this.transform;
+                    comp.gameObject = this.gameObject;
+                    comp.OnEnable();
+                }
+            }
+            _componentCache.Clear();
+            _componentCache.AddRange( _components );
+        }
+
+        public IReadOnlyList<T> GetFComponents<T>() where T : class
+        {
+            return _componentCache.Get<T>();
+        }
+
         public static VesselPart GetPart( Transform obj )
         {
             return obj.GetComponentInParent<VesselPart>();
@@ -42,7 +78,8 @@ namespace HSP.Vessels
         public static IDescriptor VesselPartMapping()
         {
             return new MemberwiseDescriptor<VesselPart>()
-                .WithMember( "part_id", o => o.PartID );
+                .WithMember( "part_id", o => o.PartID )
+                .WithMember( "components", o => (FComponent[])o._components, ( VesselPart o, FComponent[] c ) => o.SetComponents( c ) );
         }
     }
 }

@@ -22,7 +22,8 @@ namespace HSP.Vessels
     {
         private static (Vector3 pos, Quaternion rot) GetLocalPoseRelative( Transform descendant, Transform ancestor )
         {
-            if( descendant == ancestor ) return (Vector3.zero, Quaternion.identity);
+            if( descendant == ancestor )
+                return (Vector3.zero, Quaternion.identity);
 
             Vector3 localPos = Vector3.zero;
             Quaternion localRot = Quaternion.identity;
@@ -38,7 +39,7 @@ namespace HSP.Vessels
             return (localPos, localRot);
         }
 
-        private static (VesselSubtreePhysicsState state, Vector3 localCoM) GetSubtreePhysicsState( Vessel vessel, IEnumerable<VesselPart> parts )
+        private static (VesselSubtreePhysicsState state, Vector3 localCoM) GetSubtreePhysicsState( IVessel vessel, IEnumerable<VesselPart> parts )
         {
             float totalMass = 0;
             Vector3 localCoMAccumulator = Vector3.zero;
@@ -141,7 +142,7 @@ namespace HSP.Vessels
             var graphB = vesselB.Attachments;
             if( vesselA == null && vesselB == null )
             {
-                Vessel newVessel = VesselFactory.CreatePartless( HSPSceneManager.GetScene( partA.gameObject ),
+                Vessel newVessel = VesselFactory.CreatePartless<Vessel>( HSPSceneManager.GetScene( partA.gameObject ),
                     partA.transform.position,
                     partA.transform.rotation,
                     Vector3Dbl.zero,
@@ -285,11 +286,11 @@ namespace HSP.Vessels
             return true;
         }
 
-        private static void CreateVesselFromSplit( Vessel oldVessel, HashSet<VesselPart> splitParts, VesselAttachmentGraph splitGraph )
+        private static void CreateVesselFromSplit( IVessel oldVessel, HashSet<VesselPart> splitParts, VesselAttachmentGraph splitGraph )
         {
             (VesselSubtreePhysicsState state, Vector3 localCoM) = GetSubtreePhysicsState( oldVessel, splitParts );
 
-            Vessel newVessel = VesselFactory.CreatePartless( HSPSceneManager.GetScene( oldVessel.gameObject ),
+            Vessel newVessel = VesselFactory.CreatePartless<Vessel>( HSPSceneManager.GetScene( oldVessel.gameObject ),
                 state.AbsoluteCoM,
                 oldVessel.ReferenceFrameTransform.GetAbsoluteRotation(),
                 state.AbsoluteLinearVelocity,

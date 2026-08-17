@@ -1,4 +1,5 @@
 ﻿using System;
+using HSP.Vessels;
 using UnityEngine;
 using UnityPlus.Serialization;
 using UnityPlus.Serialization.Descriptors;
@@ -6,7 +7,7 @@ using UnityPlus.Serialization.Descriptors;
 namespace HSP.Vanilla.Components
 {
     [Obsolete("Not implemented yet.")] // TODO - add actual functionality.
-	public class FReactionControlController : MonoBehaviour
+	public class FReactionControlController : FComponent
 	{
 
 

@@ -19,6 +19,6 @@ namespace HSP.Content.Vessels
         /// Instantiates the gameobject hierarchy of this specific part from the original source.
         /// </summary>
         /// <returns>The root game object of the instantiated hierarchy.</returns>
-        public abstract Vessel Load( IForwardReferenceMap refMap );
+        public abstract IPartGraph Load( IForwardReferenceMap refMap );
     }
 }

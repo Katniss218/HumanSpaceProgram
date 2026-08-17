@@ -6,6 +6,7 @@ using HSP.Time;
 using HSP.Vanilla.Components;
 using HSP.Vanilla.Scenes.GameplayScene;
 using HSP.Vessels;
+using HSP.Vessels.Serialization;
 using System.IO;
 using System.Linq;
 using UnityEngine;
@@ -120,30 +121,16 @@ namespace HSP._DevUtils
             }
             if( UnityEngine.Input.GetKeyDown( KeyCode.F4 ) )
             {
-                VesselMetadata loadedVesselMetadata = VesselMetadata.LoadFromDisk( "vessel2" );
-
-                // load current vessel from the files defined by metadata's ID.
-                Directory.CreateDirectory( loadedVesselMetadata.GetRootDirectory() );
-                JsonSerializedDataHandler _designObjDataHandler = new JsonSerializedDataHandler( Path.Combine( loadedVesselMetadata.GetRootDirectory(), "gameobjects.json" ) );
-                var data = _designObjDataHandler.Read();
-
-                GameObject loadedObj = SerializationUnit.Deserialize<GameObject>( data );
-
                 FLaunchSiteMarker launchSiteSpawner = VesselManager.LoadedVessels.First().gameObject.GetComponentInChildren<FLaunchSiteMarker>();
                 Vector3Dbl spawnerPosAirf = GameplaySceneReferenceFrameManager.ReferenceFrame.TransformPosition( launchSiteSpawner.transform.position );
                 QuaternionDbl spawnerRotAirf = GameplaySceneReferenceFrameManager.ReferenceFrame.TransformRotation( launchSiteSpawner.transform.rotation );
 
-                Vessel v2 = VesselFactory.CreatePartless( GameplaySceneM.instance, spawnerPosAirf, spawnerRotAirf, Vector3Dbl.zero, Vector3Dbl.zero );
-
-                v2.RootPart = loadedObj.transform;
-                v2.RootPart.localPosition = Vector3.zero;
-                v2.RootPart.localRotation = Quaternion.identity;
-
-                Vector3 bottomBoundPos = v2.GetBottomPosition();
-                Vector3Dbl closestBoundAirf = GameplaySceneReferenceFrameManager.ReferenceFrame.TransformPosition( bottomBoundPos );
-                Vector3Dbl closestBoundToVesselAirf = v2.ReferenceFrameTransform.GetAbsolutePosition() - closestBoundAirf;
-                Vector3Dbl airfPos = spawnerPosAirf + closestBoundToVesselAirf;
-                v2.ReferenceFrameTransform.SetAbsolutePosition( airfPos );
+                Vessel v2 = VesselSerializationUtils.Load( GameplaySceneM.instance, VesselMetadata.GetRootDirectory( "vessel2" ) );
+                if( v2 != null )
+                {
+                    v2.ReferenceFrameTransform.SetAbsolutePosition( spawnerPosAirf );
+                    v2.ReferenceFrameTransform.SetAbsoluteRotation( spawnerRotAirf );
+                }
             }
             //if( UnityEngine.Input.GetKeyDown( KeyCode.F5 ) )
             //{

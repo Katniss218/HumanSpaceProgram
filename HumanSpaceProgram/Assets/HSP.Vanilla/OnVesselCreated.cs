@@ -1,7 +1,7 @@
 using HSP.Aerodynamics;
 using HSP.SceneManagement;
 using HSP.Trajectories.AccelerationProviders;
-using HSP.Trajectories.Components;
+using HSP.Vanilla.Components;
 using HSP.Trajectories.TrajectoryIntegrators;
 using HSP.Vanilla.ReferenceFrames;
 using HSP.Vanilla.ResourceFlow;
@@ -73,7 +73,7 @@ namespace HSP.Vanilla
         {
             if( HSPSceneManager.IsLoaded<GameplaySceneM>() )
             {
-                if( e.oldRootPart == null )
+                if( e.oldRootPart == null || e.v == null )
                     return;
 
                 if( FAnchor.HasAnchor( e.v ) )

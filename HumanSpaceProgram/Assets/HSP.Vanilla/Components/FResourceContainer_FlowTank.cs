@@ -10,7 +10,7 @@ using UnityPlus.Serialization.Descriptors;
 
 namespace HSP.Vanilla.Components
 {
-    public class FResourceContainer_FlowTank : MonoBehaviour, IBuildsFlowNetwork, IResourceContainer
+    public class FResourceContainer_FlowTank : FComponent, IBuildsFlowNetwork, IResourceContainer
     {
         /// <summary>
         /// Gets or sets the initial triangulation positions for the tank.
@@ -30,7 +30,7 @@ namespace HSP.Vanilla.Components
 
         public event IHasMass.MassChange OnAfterMassChanged;
 
-        void FixedUpdate()
+        public override void FixedUpdate()
         {
             // Optimize - only compute if needed / if not in equilibrium.
             // The inflows and contents and stuff are all known so this can be done
@@ -56,7 +56,6 @@ namespace HSP.Vanilla.Components
 
             c.TryAddFlowObj( this, _cachedTank );
 
-            Vessel vessel = this.transform.GetVessel();
             Transform reference = vessel.ReferenceTransform;
 
             foreach( var inlet in Inlets )
@@ -82,7 +81,6 @@ namespace HSP.Vanilla.Components
             // This is the correct place for frequent state updates like physics.
             if( _cachedTank != null )
             {
-                Vessel vessel = this.transform.GetVessel();
                 if( vessel == null ) return;
 
                 _cachedTank.FluidState = this.FluidState;

@@ -1,11 +1,11 @@
 using HSP.SceneManagement;
 using HSP.Timelines;
 using HSP.Vessels;
+using HSP.Vessels.Serialization;
 using System;
 using System.IO;
 using UnityEngine;
 using UnityPlus.Serialization;
-using UnityPlus.Serialization.Formats;
 
 namespace HSP.Vanilla.Scenes.GameplayScene
 {
@@ -31,16 +31,12 @@ namespace HSP.Vanilla.Scenes.GameplayScene
             int i = 0;
             foreach( var vessel in VesselManager.LoadedVessels )
             {
-                var vesselDataHandler = new FileSerializedDataHandler( Path.Combine( vesselsPath, $"{i}", "_vessel.json" ), JsonFormat.Instance );
-                var partsDataHandler = new FileSerializedDataHandler( Path.Combine( vesselsPath, $"{i}", "parts.json" ), JsonFormat.Instance ); // gameobjects
-                var graphDataHandler = new FileSerializedDataHandler( Path.Combine( vesselsPath, $"{i}", "graph.json" ), JsonFormat.Instance );
-
+                string vesselDir = Path.Combine( vesselsPath, $"{i}" );
                 try
                 {
-                    var data = SerializationUnit.Serialize( vessel.gameObject, TimelineManager.RefStore );
-                    //dataHandler.Write( data );
+                    VesselSerializationUtils.Save( vessel, vesselDir, TimelineManager.RefStore );
                 }
-                catch( UPSSerializationException ex )
+                catch( Exception ex )
                 {
                     Debug.LogError( $"Failed to serialize vessel '{vessel.name}': {ex.Message}" );
                     Debug.LogException( ex );
@@ -67,22 +63,19 @@ namespace HSP.Vanilla.Scenes.GameplayScene
 
             foreach( var dir in Directory.GetDirectories( vesselsPath ) )
             {
-                var vesselDataHandler = new FileSerializedDataHandler( Path.Combine( dir, "_vessel.json" ), JsonFormat.Instance );
-                var partsDataHandler = new FileSerializedDataHandler( Path.Combine( dir, "parts.json" ), JsonFormat.Instance ); // gameobjects
-                var graphDataHandler = new FileSerializedDataHandler( Path.Combine( dir, "graph.json" ), JsonFormat.Instance );
-
-                SerializedData data = null;// dataHandler.Read();
-
                 try
                 {
-                    GameObject go = SerializationUnit.Deserialize<GameObject>( data, TimelineManager.RefStore );
-                    HSPSceneManager.MoveGameObjectToScene<GameplaySceneM>( go );
+                    Vessel vessel = VesselSerializationUtils.Load<Vessel>( GameplaySceneM.Instance, dir, TimelineManager.RefStore );
+                    //if( vessel != null )
+                    //{
+                    //    HSPSceneManager.MoveGameObjectToScene<GameplaySceneM>( vessel.gameObject );
+                    //}
                 }
-                catch( UPSSerializationException ex )
+                catch( Exception ex )
                 {
-                    Debug.LogError( $"Failed to deserialize vessel from '{dir}'." );
+                    Debug.LogError( $"Failed to deserialize vessel from '{dir}': {ex.Message}" );
                     Debug.LogException( ex );
-                    e.AddMessage( LogType.Error, $"Failed to deserialize vessel from '{dir}'." );
+                    e.AddMessage( LogType.Error, $"Failed to deserialize vessel from '{dir}': {ex.Message}" );
                 }
             }
         }

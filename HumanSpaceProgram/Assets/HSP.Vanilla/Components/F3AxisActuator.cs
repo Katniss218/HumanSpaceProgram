@@ -1,5 +1,6 @@
-﻿using HSP.ControlSystems;
+using HSP.ControlSystems;
 using HSP.ControlSystems.Controls;
+using HSP.Vessels;
 using UnityEngine;
 using UnityPlus.Serialization;
 using UnityPlus.Serialization.Descriptors;
@@ -7,7 +8,7 @@ using Ctx = UnityPlus.Serialization.Ctx;
 
 namespace HSP.Vanilla.Components
 {
-    public class F3AxisActuator : MonoBehaviour
+    public class F3AxisActuator : FComponent
     {
         /// <summary>
         /// The transform used as a reference (0,0,0) orientation.
@@ -78,16 +79,16 @@ namespace HSP.Vanilla.Components
             this.Z = xyz.z;
         }
 
-        void Awake()
+        public F3AxisActuator()
         {
-            GetReferenceTransform ??= new ControlParameterOutput<Transform>( GetTransform );
-            SetX ??= new ControlleeInput<float>( SetXListener );
-            SetY ??= new ControlleeInput<float>( SetYListener );
-            SetZ ??= new ControlleeInput<float>( SetZListener );
-            SetXYZ ??= new ControlleeInput<Vector3>( SetXYZListener );
+            GetReferenceTransform = new ControlParameterOutput<Transform>( GetTransform );
+            SetX = new ControlleeInput<float>( SetXListener );
+            SetY = new ControlleeInput<float>( SetYListener );
+            SetZ = new ControlleeInput<float>( SetZListener );
+            SetXYZ = new ControlleeInput<Vector3>( SetXYZListener );
         }
 
-        void FixedUpdate()
+        public override void FixedUpdate()
         {
             if( XActuatorTransform != null )
             {

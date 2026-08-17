@@ -121,7 +121,7 @@ namespace HSP.Content.Vessels
         /// <summary>
         /// Loads a specified registered unity hierarchy from its source.
         /// </summary>
-        public static bool TryLoad( NamespacedID namespacedPartId, out Vessel partGraph )
+        public static bool TryLoad( NamespacedID namespacedPartId, out IPartGraph partGraph )
         {
             return TryLoad( namespacedPartId, new ForwardReferenceStore(), out partGraph );
         }
@@ -129,7 +129,7 @@ namespace HSP.Content.Vessels
         /// <summary>
         /// Loads a specified registered unity hierarchy from its source.
         /// </summary>
-        public static bool TryLoad( NamespacedID namespacedPartId, IForwardReferenceMap refMap, out Vessel partGraph )
+        public static bool TryLoad( NamespacedID namespacedPartId, IForwardReferenceMap refMap, out IPartGraph partGraph )
         {
             if( _registry.TryGetValue( namespacedPartId, out PartFactory factory ) )
             {

@@ -14,27 +14,22 @@ namespace HSP.Vessels
     /// </summary>
     public static class VesselFactory
     {
-        // add source (save file / in memory scene change, etc).
-
         const string name = "tempname_vessel";
 
         /// <summary>
-        /// Creates a new partless (empty) vessel in the specified scene.
+        /// Creates a new partless (empty) vessel graph of type T in the specified scene.
         /// </summary>
-        /// <param name="absolutePosition">The position where the vessel will be created, in `Absolute Inertial Reference Frame`.</param>
-        /// <param name="absoluteRotation">The rotation of the vessel, in `Absolute Inertial Reference Frame`.</param>
-        /// <returns>The created partless vessel.</returns>
-        public static Vessel CreatePartless( IHSPScene scene, Vector3Dbl absolutePosition, QuaternionDbl absoluteRotation, Vector3Dbl absoluteVelocity, Vector3Dbl absoluteAngularVelocity )
+        public static T CreatePartless<T>( IHSPScene scene, Vector3Dbl absolutePosition, QuaternionDbl absoluteRotation, Vector3Dbl absoluteVelocity, Vector3Dbl absoluteAngularVelocity ) where T : Component, IVessel
         {
             GameObject gameObject = new GameObject( $"Vessel, '{name}'" );
             HSPSceneManager.MoveGameObjectToScene( gameObject, scene );
 
-            Vessel vessel = gameObject.AddComponent<Vessel>();
-            vessel.DisplayName = name;
+            T vessel = gameObject.AddComponent<T>();
+            // vessel.DisplayName = name; // If T implements a display name we could set it, but we don't strictly know.
 
             HSPEvent.EventManager.TryInvoke( HSPEvent_ON_VESSEL_CREATED.ID, vessel );
 
-            vessel.ReferenceFrameTransform.SetAbsoluteState(
+            vessel.ReferenceFrameTransform?.SetAbsoluteState(
                 position: absolutePosition,
                 rotation: absoluteRotation,
                 velocity: absoluteVelocity,
@@ -44,12 +39,20 @@ namespace HSP.Vessels
             return vessel;
         }
 
+        public static T CreateFromGraph<T>( IHSPScene scene, VesselAttachmentGraph graph, Vector3Dbl absolutePosition, QuaternionDbl absoluteRotation, Vector3Dbl absoluteVelocity, Vector3Dbl absoluteAngularVelocity ) where T : Component, IVessel
+        {
+            T vessel = CreatePartless<T>(scene, absolutePosition, absoluteRotation, absoluteVelocity, absoluteAngularVelocity);
+            vessel.SetGraph(graph);
+            return vessel;
+        }
+
         /// <summary>
         /// Completely deletes a vessel and cleans up after it.
         /// </summary>
-        public static void Destroy( Vessel vessel )
+        public static void Destroy( IVessel vessel )
         {
-            UnityEngine.Object.Destroy( vessel.gameObject );
+            if (vessel is Component comp)
+                UnityEngine.Object.Destroy( comp.gameObject );
         }
     }
 }

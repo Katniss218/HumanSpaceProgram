@@ -19,8 +19,13 @@ namespace HSP.Vessels
         public Transform transform { get; internal set; }
         public GameObject gameObject { get; internal set; }
 
+        public IVessel Vessel => Part?.Vessel;
+
         public virtual void Update() { }
         public virtual void FixedUpdate() { }
         public virtual void BackgroundUpdate() { }
+
+        public virtual void OnEnable() { }
+        public virtual void OnDisable() { }
     }
 }

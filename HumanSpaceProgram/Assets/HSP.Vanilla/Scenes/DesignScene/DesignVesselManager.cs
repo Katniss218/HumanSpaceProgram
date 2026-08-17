@@ -153,16 +153,13 @@ namespace HSP.Vanilla.Scenes.DesignScene
 
         public static void SaveVessel()
         {
-            // save current vessel to the files defined by metadata's ID.
-            Directory.CreateDirectory( CurrentVesselMetadata.GetRootDirectory() );
-            FileSerializedDataHandler _designObjDataHandler = new FileSerializedDataHandler( Path.Combine( CurrentVesselMetadata.GetRootDirectory(), "gameobjects.json" ), JsonFormat.Instance );
+            if( DesignObject == null || !DesignObject.Parts.Any() )
+                throw new InvalidOperationException( $"Can't save, the design object is empty." );
 
             HSPEvent.EventManager.TryInvoke( HSPEvent_BEFORE_DESIGN_SCENE_VESSEL_SAVED.ID, null );
 
-            var data = SerializationUnit.Serialize( GetGameObject() );
+            VesselSerializationUtils.Save( DesignObject, CurrentVesselMetadata.GetRootDirectory(), null, CurrentVesselMetadata );
 
-            CurrentVesselMetadata.SaveToDisk();
-            _designObjDataHandler.Write( data );
             HSPEvent.EventManager.TryInvoke( HSPEvent_AFTER_DESIGN_SCENE_VESSEL_SAVED.ID, null );
         }
 
@@ -170,14 +167,14 @@ namespace HSP.Vanilla.Scenes.DesignScene
         {
             VesselMetadata loadedVesselMetadata = VesselMetadata.LoadFromDisk( vesselId );
 
-            // load current vessel from the files defined by metadata's ID.
-            Directory.CreateDirectory( loadedVesselMetadata.GetRootDirectory() );
-            FileSerializedDataHandler _designObjDataHandler = new FileSerializedDataHandler( Path.Combine( loadedVesselMetadata.GetRootDirectory(), "gameobjects.json" ), JsonFormat.Instance );
-
             HSPEvent.EventManager.TryInvoke( HSPEvent_BEFORE_DESIGN_SCENE_VESSEL_LOADED.ID, null );
-            CurrentVesselMetadata = loadedVesselMetadata; // CurrentVesselMetadata should be set after invoking before load.
+            CurrentVesselMetadata = loadedVesselMetadata;
 
-            // @@TODO - load the vessel from the 3-file state. Same as the gameplay load function.
+            Vessel vessel = VesselSerializationUtils.Load( loadedVesselMetadata.GetRootDirectory() );
+            if( vessel != null )
+            {
+                SetDesignObject( vessel );
+            }
 
             HSPEvent.EventManager.TryInvoke( HSPEvent_AFTER_DESIGN_SCENE_VESSEL_LOADED.ID, null );
         }
